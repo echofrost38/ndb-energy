@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "aws.accessKey",
+    "type": "java.lang.String",
+    "description": "Amazon DynamoDB access key id"
+  },
+  {
+    "name": "aws.secretKey",
+    "type": "java.lang.String",
+    "description": "Amazon DynamoDB secet key"
+  }
+]}

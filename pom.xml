@@ -13,9 +13,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>auction</name>
-	<description>Demo project for Spring Boot</description>
+	<description>NDB Auction</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>16</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

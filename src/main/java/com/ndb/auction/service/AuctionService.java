@@ -14,6 +14,8 @@ public class AuctionService extends BaseService implements IAuctionService {
 		
 		// check Admin role  
 		
+		// check duplicate number
+		
 		// Validation
 		
 		// Save
@@ -46,6 +48,21 @@ public class AuctionService extends BaseService implements IAuctionService {
 		// Check Validation ( null possible ) 
 		
 		return auctionDao.updateAuctionByAdmin(auction);
+	}
+
+	@Override
+	public Auction startAuction(String id) {
+		
+		// check already opened Round
+		
+		
+		return null;
+	}
+
+	@Override
+	public Auction endAuction(String id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }

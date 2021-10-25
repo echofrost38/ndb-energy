@@ -9,14 +9,23 @@ import com.ndb.auction.models.Auction;
  * 2. get all auction list 
  * 3. get auction by round number 
  * 4. update auction round
+ * 5. update auction stat when new bid is placed 
  */
 
 public interface IAuctionDao {
+	
 	Auction createNewAuction(Auction auction);
 
 	List<Auction> getAuctionList();
-
+	
 	Auction getAuctionById(String num);
 
+	Auction updateAuctionStats();
+	
 	Auction updateAuctionByAdmin(Auction auction);
+	
+	Auction startAuction(String id);
+	
+	Auction endAuction(String id);
+	
 }

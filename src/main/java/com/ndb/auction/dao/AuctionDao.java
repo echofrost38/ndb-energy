@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.ndb.auction.models.Auction;
 
@@ -39,10 +37,50 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 
 	@Override
 	public Auction updateAuctionByAdmin(Auction auction) {
-		DynamoDBMapperConfig config = DynamoDBMapperConfig.builder()
-				.withSaveBehavior(SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
-				.build();
-		dynamoDBMapper.save(auction, config);
+		dynamoDBMapper.save(auction, updateConfig);
+		return auction;
+	}
+
+	@Override
+	public Auction startAuction(String id) {
+		
+		// get all opened auction
+		List<Auction> openedList = dynamoDBMapper.scan(Auction.class, new DynamoDBScanExpression());
+		
+		if(openedList.size() != 0) {
+			// Opened auction already exists
+			
+		}
+		
+		Auction targetAuction = dynamoDBMapper.load(Auction.class, id);
+		if(targetAuction == null) {
+			// There is no such auction with id
+			
+		}
+		
+		// check other required fields. ? All required fields are check when it is created.
+		
+		targetAuction.setStatus(Auction.STARTED);
+		dynamoDBMapper.save(targetAuction, updateConfig);
+		
+		return targetAuction;
+	}
+
+	@Override
+	public Auction endAuction(String id) {
+		Auction targetAuction = dynamoDBMapper.load(Auction.class, id);
+		if(targetAuction == null) {
+			// There is no such auction with id
+			
+		}
+		targetAuction.setStatus(Auction.ENDED);
+		dynamoDBMapper.save(targetAuction, updateConfig);
+		return targetAuction;
+	}
+
+	@Override
+	public Auction updateAuctionStats() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

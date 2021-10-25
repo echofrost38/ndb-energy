@@ -1,0 +1,31 @@
+type Query {
+	getBidListByRound(round: Int!): [Bid]
+	getBidListByUser(userId: String!): [Bid]
+	getBid(userId: Int!, round: Int!) : Bid
+}
+
+type Mutation {
+	placeBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!
+	) : Bid	
+	updateBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!
+	) : Bid
+}
+
+type Bid {
+	userId: String,
+	roundNumber: Int,
+	tokenAmount: Float,
+	totalPrice: Float,
+	tokenPrice: Float,
+	placedAt: Float,
+	updatedAt: Float,
+	status: Int
+}

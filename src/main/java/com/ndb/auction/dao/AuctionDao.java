@@ -11,8 +11,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.AuctionStats;
-import com.ndb.auction.models.Bid;
 
 @Repository
 public class AuctionDao extends BaseDao implements IAuctionDao {

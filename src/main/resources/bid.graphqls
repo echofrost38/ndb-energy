@@ -1,7 +1,7 @@
 type Query {
 	getBidListByRound(round: Int!): [Bid]
 	getBidListByUser(userId: String!): [Bid]
-	getBid(userId: Int!, round: Int!) : Bid
+	getBid(userId: String!, round: Int!) : Bid
 }
 
 type Mutation {

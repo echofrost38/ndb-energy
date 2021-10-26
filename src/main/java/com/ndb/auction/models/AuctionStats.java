@@ -14,6 +14,12 @@ public class AuctionStats {
 		this.win = 0.0;
 		this.fail = 0.0;
 	}
+	
+	public AuctionStats(double qty, double win, double fail) {
+		this.qty = qty;
+		this.win = win;
+		this.fail = fail;
+	}
 
 	@DynamoDBAttribute(attributeName = "qty")
 	public Double getQty() {

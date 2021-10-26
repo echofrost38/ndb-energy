@@ -34,7 +34,7 @@ public class BidDao extends BaseDao implements IBidDao {
 
 	@Override
 	public Bid updateBid(Bid bid) {
-		dynamoDBMapper.save(bid);
+		dynamoDBMapper.save(bid, updateConfig);
 		return bid;
 	}
 
@@ -42,9 +42,11 @@ public class BidDao extends BaseDao implements IBidDao {
 	public List<Bid> getBidListByRound(Integer round) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
         eav.put(":val1", new AttributeValue().withN(round.toString()));
-
+        // for eliminate Pending bids
+        eav.put(":val2", new AttributeValue().withN("0"));
+        
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-            .withFilterExpression("round_number = :val1")
+            .withFilterExpression("round_number = :val1 and status > val2")
             .withExpressionAttributeValues(eav);
 
         return dynamoDBMapper.scan(Bid.class, scanExpression);
@@ -55,10 +57,15 @@ public class BidDao extends BaseDao implements IBidDao {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(userId.toString()));
 		DynamoDBQueryExpression<Bid> queryExpression = new DynamoDBQueryExpression<Bid>()
-		    .withKeyConditionExpression("Id = :v1")
+		    .withKeyConditionExpression("user_id = :v1")
 		    .withExpressionAttributeValues(eav);
 
 		return dynamoDBMapper.query(Bid.class, queryExpression);
+	}
+
+	@Override
+	public void updateBidStatus(List<Bid> bids) {
+		dynamoDBMapper.batchSave(bids);
 	}
 
 }

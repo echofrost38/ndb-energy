@@ -59,38 +59,27 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 	}
 
 	@Override
-	public Auction startAuction(String id) {
-		
-		// get all opened auction
-		List<Auction> openedList = dynamoDBMapper.scan(Auction.class, new DynamoDBScanExpression());
-		
-		if(openedList.size() != 0) {
-			// Opened auction already exists
-			
-		}
-		
-		Auction targetAuction = dynamoDBMapper.load(Auction.class, id);
-		if(targetAuction == null) {
-			// There is no such auction with id
-			
-		}
-		
-		// check other required fields. ? All required fields are check when it is created.
-		
+	public Auction startAuction(Auction targetAuction) {
 		targetAuction.setStatus(Auction.STARTED);
 		dynamoDBMapper.save(targetAuction, updateConfig);
-		
 		return targetAuction;
+	}
+	
+	public List<Auction> getOpendedList() {
+		// get all opened auction
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		// filter with started status ( STARTED = 1 ) 
+		eav.put(":val1", new AttributeValue().withN("1"));
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+            .withFilterExpression("status = :val1")
+            .withExpressionAttributeValues(eav);
+        
+		return dynamoDBMapper.scan(Auction.class, scanExpression);
 	}
 
 	@Override
-	public Auction endAuction(String id) {
-		Auction targetAuction = dynamoDBMapper.load(Auction.class, id);
-		if(targetAuction == null) {
-			// There is no such auction with id
-			
-		}
-		targetAuction.setStatus(Auction.ENDED);
+	public Auction endAuction(Auction targetAuction) {
 		dynamoDBMapper.save(targetAuction, updateConfig);
 		return targetAuction;
 	}

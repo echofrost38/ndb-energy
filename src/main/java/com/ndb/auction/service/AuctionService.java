@@ -54,15 +54,31 @@ public class AuctionService extends BaseService implements IAuctionService {
 	public Auction startAuction(String id) {
 		
 		// check already opened Round
+		List<Auction> list = auctionDao.getOpendedList();
+		if(list.size() != 0) {
+			// there is already opened auction
+			return null; // or exception
+		}
 		
+		// check current auction is pending
+		Auction target = auctionDao.getAuctionById(id);
+		if(target.getStatus() != Auction.PENDING) {
+			// it isn't PENDING round
+			return null; // or exception
+		}
 		
-		return null;
+		return auctionDao.startAuction(target);
 	}
 
 	@Override
 	public Auction endAuction(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		// check Auction is Started!
+		Auction target = auctionDao.getAuctionById(id);
+		if(target.getStatus() != Auction.STARTED) {
+			return null; // or exception
+		}
+		auctionDao.endAuction(target);
+		return target;
 	}
     
 }

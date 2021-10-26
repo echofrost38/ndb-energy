@@ -131,7 +131,7 @@ public class Auction extends BaseModel {
     }
 
     @DynamoDBAttribute(attributeName="status")
-    public Integer isStatus() {
+    public Integer getStatus() {
         return status;
     }
     public void setStatus(Integer status) {

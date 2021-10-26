@@ -3,7 +3,6 @@ package com.ndb.auction.dao;
 import java.util.List;
 
 import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.AuctionStats;
 
 /**
  * 1. create new auction round 
@@ -27,8 +26,8 @@ public interface IAuctionDao {
 	
 	Auction updateAuctionByAdmin(Auction auction);
 	
-	Auction startAuction(String id);
+	Auction startAuction(Auction auction);
 	
-	Auction endAuction(String id);
+	Auction endAuction(Auction auction);
 	
 }

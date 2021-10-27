@@ -43,10 +43,10 @@ public class BidDao extends BaseDao implements IBidDao {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
         eav.put(":val1", new AttributeValue().withN(round.toString()));
         // for eliminate Pending bids
-        eav.put(":val2", new AttributeValue().withN("0"));
+//        eav.put(":val2", new AttributeValue().withN("0"));
         
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-            .withFilterExpression("round_number = :val1 and status > val2")
+            .withFilterExpression("round_number = :val1")
             .withExpressionAttributeValues(eav);
 
         return dynamoDBMapper.scan(Bid.class, scanExpression);

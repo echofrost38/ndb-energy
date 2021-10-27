@@ -1,0 +1,27 @@
+type Mutation {
+	placeBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!
+	) : Bid	
+	updateBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!
+	) : Bid
+	createAuction(
+		number: Int!, 
+		startedAt: String!,  
+		totalToken: Float!, 
+		minPrice: Float!
+	) : Auction!
+	updateAuction(
+		id: String!
+		number: Int, 
+		startedAt: String,  
+		totalToken: Float, 
+		minPrice: Float		
+	) : Auction!
+}

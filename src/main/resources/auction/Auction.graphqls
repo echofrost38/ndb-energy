@@ -1,0 +1,11 @@
+type Auction {
+	auctionId: String,
+	number: Int,
+	startedAt: Float,
+	endedAt: Float,
+	totalToken: Float,
+	minPrice: Float,
+	sold: Float,
+	stats: Stats,
+	status: Int
+}

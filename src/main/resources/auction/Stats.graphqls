@@ -1,0 +1,5 @@
+type Stats {
+	qty: Float, 
+	win: Float,
+	fail: Float
+}

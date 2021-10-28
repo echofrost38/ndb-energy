@@ -3,7 +3,8 @@ type Mutation {
 		userId: String!,
 		roundNumber: Int!,
 		tokenAmount: Float!,
-		tokenPrice: Float!
+		tokenPrice: Float!,
+		payType: String!
 	) : Bid	
 	updateBid(
 		userId: String!,

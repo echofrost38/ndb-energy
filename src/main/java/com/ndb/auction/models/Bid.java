@@ -38,6 +38,7 @@ public class Bid {
     private Double tokenAmount;
     private Double totalPrice;
     private Double tokenPrice;
+    private String payType;
     private Long placedAt;
     private Long updatedAt;
     private Integer status;
@@ -123,6 +124,15 @@ public class Bid {
     public void setStatus(Integer status) {
         this.status = status;
     }
+    
+    @DynamoDBAttribute(attributeName="pay_type")
+	public String getPayType() {
+		return payType;
+	}
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
 
     
 }

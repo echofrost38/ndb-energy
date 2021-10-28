@@ -7,7 +7,7 @@ import com.ndb.auction.models.Bid;
 public interface IBidService {
 	
 	// place new bid
-	Bid placeNewBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice);
+	Bid placeNewBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice, String payType);
 	
 	// get Bid List
 	List<Bid> getBidListByRound(Integer round);

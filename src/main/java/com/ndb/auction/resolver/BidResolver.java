@@ -2,6 +2,7 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.Bid;
@@ -16,6 +17,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		return bidService.placeNewBid(userId, roundNumber, tokenAmount, tokenPrice, payment);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	public List<Bid> getBidListByRound(Integer round){
 		return bidService.getBidListByRound(round);
 	}

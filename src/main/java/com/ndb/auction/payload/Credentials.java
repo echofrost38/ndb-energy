@@ -2,14 +2,19 @@ package com.ndb.auction.payload;
 
 public class Credentials {
 	
-	private String email;
+	private String status;
 	private String token;
 	
-	public String getEmail() {
-		return email;
+	public Credentials(String status, String token) {
+		this.status = status;
+		this.token = token;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	public String getToken() {
 		return token;

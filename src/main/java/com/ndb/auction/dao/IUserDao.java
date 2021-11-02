@@ -1,6 +1,7 @@
 package com.ndb.auction.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ndb.auction.models.User;
 
@@ -10,10 +11,13 @@ public interface IUserDao {
 	User createUser(User user);
 	
 	// get user by email
-	User getUserByEmail(String email);
+	Optional<User> getUserByEmail(String email);
 	
 	// get user by id
 	User getUserById(String id);
+	
+	// update user
+	User updateUser(User user);
 	
 	// update user verify status
 	

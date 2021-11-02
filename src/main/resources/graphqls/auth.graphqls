@@ -1,0 +1,36 @@
+extend type Mutation {
+	signup(
+		email: String!,
+		password: String!,
+		country: String!
+	) : String!
+	verifyAccount(
+		email: String!,
+		code: String!,
+	) : String!
+	resendVerifyCode (
+		email: String
+	) : String!
+	request2FA (
+		email: String!,
+		method: String!,
+		phone: String
+	) : String!
+	confirmRequest2FA(
+		email: String!,
+		code: String!
+	) : String!
+	signin(
+		email: String!,
+		password: String!
+	) : Credentials!
+	confirm2FA(
+		email: String!,
+		token: String!,
+		code: String!
+	) : Credentials!
+}
+
+schema {
+   mutation: Mutation
+}

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Auction;
+import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
 public class AuctionService extends BaseService implements IAuctionService {

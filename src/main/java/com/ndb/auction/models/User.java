@@ -1,6 +1,7 @@
 package com.ndb.auction.models;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,22 +27,28 @@ public class User {
 	private String id;
 	private String name;
 	private String surname;
-	private String role;
+	private Set<String> role;
 	private Long birthDate;
 	private String email;
 	private String mobile;
 	private String password;
 	private String country;
 	private Map<String, Wallet> wallet;
-	private Set<String> twoStep;
+	private String twoStep;
 	private Map<String, Boolean> security;
 	private String avatarPrefix;
 	private String avatarName;
 	private Map<String, String> extWallet;
 	private Boolean tos;
 	private Map<String, Boolean> verify;
-	private Map<String, Integer> notifySet;
+	private String googleSecret;
+	private Integer notifySetting;
 	private Long lastLogin;
+	
+	// for update purpose
+	public User() {
+		
+	}
 	
 	public User(String email, String password, String country, boolean tos) {
 		// from user input
@@ -50,7 +57,8 @@ public class User {
 		this.country = country;
 		this.tos = tos;
 		
-		this.role = "User";
+		this.role = new HashSet<String>();
+		this.role.add("USER");
 		
 		// initialize the wallet with possible coins
 		this.wallet = new HashMap<String, Wallet>();
@@ -70,13 +78,10 @@ public class User {
 		
 		this.verify = new HashMap<String, Boolean>();
 		verify.put("email", false);
-		verify.put("mobile", false);
+		verify.put("mobile", true);
 		verify.put("identity", false);
 		
-		this.notifySet = new HashMap<String, Integer>();
-		this.notifySet.put("gateway_id", 0);
-		// default notify setting is disabled
-		this.notifySet.put("notify", 0); 
+		this.setNotifySetting(0xFFFF);
 	}
 	
 	@DynamoDBHashKey(attributeName="id")
@@ -88,7 +93,7 @@ public class User {
 		this.id = id;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="name")
 	public String getName() {
 		return name;
 	}
@@ -96,7 +101,7 @@ public class User {
 		this.name = name;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="surname")
 	public String getSurname() {
 		return surname;
 	}
@@ -104,15 +109,15 @@ public class User {
 		this.surname = surname;
 	}
 	
-	@DynamoDBAttribute
-	public String getRole() {
+	@DynamoDBAttribute(attributeName="role")
+	public Set<String> getRole() {
 		return role;
 	}
-	public void setRole(String role) {
+	public void setRole(Set<String> role) {
 		this.role = role;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="birth_date")
 	public Long getBirthDate() {
 		return birthDate;
 	}
@@ -120,7 +125,7 @@ public class User {
 		this.birthDate = birthDate;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="email")
 	@DynamoDBIndexHashKey(globalSecondaryIndexName="s_email")
 	public String getEmail() {
 		return email;
@@ -129,7 +134,7 @@ public class User {
 		this.email = email;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="mobile")
 	public String getMobile() {
 		return mobile;
 	}
@@ -137,7 +142,7 @@ public class User {
 		this.mobile = mobile;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="password")
 	public String getPassword() {
 		return password;
 	}
@@ -145,7 +150,7 @@ public class User {
 		this.password = password;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="country")
 	public String getCountry() {
 		return country;
 	}
@@ -153,7 +158,7 @@ public class User {
 		this.country = country;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="wallet")
 	public Map<String, Wallet> getWallet() {
 		return wallet;
 	}
@@ -161,15 +166,15 @@ public class User {
 		this.wallet = wallet;
 	}
 	
-	@DynamoDBAttribute
-	public Set<String> getTwoStep() {
+	@DynamoDBAttribute(attributeName="two_setp")
+	public String getTwoStep() {
 		return twoStep;
 	}
-	public void setTwoStep(Set<String> twoStep) {
+	public void setTwoStep(String twoStep) {
 		this.twoStep = twoStep;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="security")
 	public Map<String, Boolean> getSecurity() {
 		return security;
 	}
@@ -177,7 +182,7 @@ public class User {
 		this.security = security;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="avatar_prefix")
 	public String getAvatarPrefix() {
 		return avatarPrefix;
 	}
@@ -185,7 +190,7 @@ public class User {
 		this.avatarPrefix = avatarPrefix;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="avatar_name")
 	public String getAvatarName() {
 		return avatarName;
 	}
@@ -193,7 +198,7 @@ public class User {
 		this.avatarName = avatarName;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="ext_wallet")
 	public Map<String, String> getExtWallet() {
 		return extWallet;
 	}
@@ -201,7 +206,7 @@ public class User {
 		this.extWallet = extWallet;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="tos")
 	public Boolean getTos() {
 		return tos;
 	}
@@ -209,7 +214,7 @@ public class User {
 		this.tos = tos;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="verify")
 	public Map<String, Boolean> getVerify() {
 		return verify;
 	}
@@ -217,19 +222,30 @@ public class User {
 		this.verify = verify;
 	}
 	
-	@DynamoDBAttribute
-	public Map<String, Integer> getNotifySet() {
-		return notifySet;
+	@DynamoDBAttribute(attributeName="notify_set")
+	public Integer getNotifySetting() {
+		return notifySetting;
 	}
-	public void setNotifySet(Map<String, Integer> notifySet) {
-		this.notifySet = notifySet;
+	public void setNotifySetting(Integer notifySetting) {
+		this.notifySetting = notifySetting;
 	}
 	
-	@DynamoDBAttribute
+	@DynamoDBAttribute(attributeName="last_login")
 	public Long getLastLogin() {
 		return lastLogin;
 	}
 	public void setLastLogin(Long lastLogin) {
 		this.lastLogin = lastLogin;
 	}
+	
+	@DynamoDBAttribute(attributeName="google_secret")
+	public String getGoogleSecret() {
+		return googleSecret;
+	}
+
+	public void setGoogleSecret(String googleSecret) {
+		this.googleSecret = googleSecret;
+	}
+
+
 }

@@ -1,0 +1,5 @@
+type Wallet {
+   total: Float,
+   free: Float,
+   holding: Float
+}

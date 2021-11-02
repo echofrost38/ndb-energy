@@ -1,24 +1,90 @@
 package com.ndb.auction.resolver;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.User;
 import com.ndb.auction.payload.Credentials;
+import com.ndb.auction.service.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
-public class AuthResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver{
+public class AuthResolver extends BaseResolver implements GraphQLMutationResolver {
+
+	public String signup(String email, String password, String country) {
+		password = encoder.encode(password);
+		return userService.createUser(email, password, country, true);
+	}
 	
-	public Auction signup(String email, String password, String country) {
-		
-		Auction res = new Auction();
-		return res;
+	public String verifyAccount(String email, String code) {
+		if(userService.verifyAccount(email, code)) {
+			return "Success";
+		} 
+		return "Failed";
+	}
+	
+	public String resendVerifyCode(String email) {
+		return resendVerifyCode(email);
+	}
+	
+	public String request2FA(String email, String method, String phone) {
+		return userService.request2FA(email, method, phone);
+	}
+	
+	public String confirmRequest2FA(String email, String code) {
+		return userService.confirmRequest2FA(email, code);
 	}
 	
 	public Credentials signin(String email, String password) {
-		return new Credentials();
+		
+		// get user ( Not found exception is threw in service)
+		User user = userService.getUserByEmail(email);
+		
+		if(!encoder.matches(password, user.getPassword())) {
+			return new Credentials("Failed", "password mismatch");
+		}
+		
+		if(!user.getVerify().get("email")) {
+			return new Credentials("Failed", "please verify");
+		}
+		
+		if(!user.getVerify().get("2FA")) {
+			return new Credentials("Failed", "Please set 2FA");
+		}
+		
+		String token = userService.signin2FA(user);
+		if(token.equals("error")) {
+			return new Credentials("Failed", "2FA Error");
+		}
+		
+		totpService.setToken(token, password);
+		return new Credentials("Success", token);
+	}
+	
+	public Credentials confirm2FA(String email, String token, String code) {
+		String password = totpService.getPassword(token);
+		if(password.equals("")) {
+			return new Credentials("Failed", "Password expired");
+		}
+		
+		if(!userService.verify2FACode(email, code)) {
+			return new Credentials("Failed", "2FA code mismatch");
+		}
+		
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(email, password));
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		String jwt = jwtUtils.generateJwtToken(authentication);
+
+//		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+//		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+//				.collect(Collectors.toList());
+		//return new Credentials(email, jwt);
+		return new Credentials("Success", jwt);
 	}
 	
 }

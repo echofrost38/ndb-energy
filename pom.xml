@@ -11,7 +11,7 @@
 	<groupId>com.ndb</groupId>
 	<artifactId>auction</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>auction</name>
 	<description>NDB Auction</description>
 	<properties>
@@ -22,7 +22,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -54,7 +62,50 @@
 		    <artifactId>graphql-spring-boot-starter</artifactId>
 		    <version>12.0.0</version>
 		</dependency>
-
+		<dependency>
+		    <groupId>com.graphql-java-kickstart</groupId>
+		    <artifactId>graphql-java-tools</artifactId>
+		    <version>12.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt</artifactId>
+		    <version>0.9.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.xml.bind</groupId>
+		    <artifactId>jaxb-api</artifactId>
+	    </dependency><!--$NO-MVN-MAN-VER$-->
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>slf4j-api</artifactId>
+	    </dependency>
+	    
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+		  	<groupId>com.twilio.sdk</groupId>
+		  	<artifactId>twilio</artifactId>
+		  	<version>8.21.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+		
+		<dependency>
+		  	<groupId>dev.samstevens.totp</groupId>
+		  	<artifactId>totp</artifactId>
+		  	<version>1.7.1</version>
+		</dependency>
+		<dependency>	
+			<groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>19.0</version>
+		</dependency>
 		
 	</dependencies>
 

@@ -12,17 +12,9 @@ type Mutation {
 		tokenAmount: Float!,
 		tokenPrice: Float!
 	) : Bid
-	createAuction(
-		number: Int!, 
-		startedAt: String!,  
-		totalToken: Float!, 
-		minPrice: Float!
-	) : Auction!
-	updateAuction(
-		id: String!
-		number: Int, 
-		startedAt: String,  
-		totalToken: Float, 
-		minPrice: Float		
-	) : Auction!
+}
+
+type Query {
+	getAuctions : [Auction]
+	getAuctionById(id: String!) : Auction!
 }

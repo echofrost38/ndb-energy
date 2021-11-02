@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.service.interfaces.IBidService;
 
 /**
  * TODOs

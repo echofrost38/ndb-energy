@@ -1,7 +1,0 @@
-type Query {
-	getAuctions : [Auction]
-	getAuctionById(id: String!) : Auction!
-	getBidListByRound(round: Int!): [Bid]
-	getBidListByUser(userId: String!): [Bid]
-	getBid(userId: String!, round: Int!) : Bid
-}

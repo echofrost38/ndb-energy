@@ -2,12 +2,17 @@ package com.ndb.auction.service;
 
 import com.ndb.auction.dao.AuctionDao;
 import com.ndb.auction.dao.BidDao;
+import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseService {
+	
+    public final static String VERIFY_TEMPLATE = "verify.ftlh";
+    public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
+    public final static String RESET_TEMPLATE = "reset.ftlh";
 	
 	@Autowired
 	ScheduledTasks schedule;
@@ -20,4 +25,16 @@ public class BaseService {
     
     @Autowired
     public UserDao userDao;
+    
+    @Autowired
+    public NotificationDao notificationDao;
+    
+    @Autowired
+    public MailService mailService;
+    
+    @Autowired
+    public TotpService totpService;
+    
+    @Autowired
+    public SMSService smsService;
 }

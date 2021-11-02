@@ -1,4 +1,4 @@
-package com.ndb.auction.service;
+package com.ndb.auction.service.interfaces;
 
 import java.util.List;
 

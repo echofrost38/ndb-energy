@@ -1,0 +1,5 @@
+type User {
+   email: String!,
+   password: String!,
+   country: String!
+}

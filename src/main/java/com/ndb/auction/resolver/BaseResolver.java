@@ -1,9 +1,14 @@
 package com.ndb.auction.resolver;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
+import com.ndb.auction.service.TotpService;
+import com.ndb.auction.service.UserService;
 
 public class BaseResolver {
 	
@@ -12,5 +17,20 @@ public class BaseResolver {
     
     @Autowired
     BidService bidService;
+    
+	@Autowired
+	PasswordEncoder encoder;
+	
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	AuthenticationManager authenticationManager;
+	
+	@Autowired
+	JwtUtils jwtUtils;
+	
+	@Autowired
+	TotpService totpService;
     
 }

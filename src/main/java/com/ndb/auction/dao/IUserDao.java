@@ -28,4 +28,5 @@ public interface IUserDao {
 	// delete user
 	User deleteUser(String id);
 	
+	User getUserByResetToken(String token);
 }

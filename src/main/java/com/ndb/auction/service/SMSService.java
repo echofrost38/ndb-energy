@@ -39,7 +39,7 @@ public class SMSService {
 		String smsContent = getSMSContent(code, TEMPLATE);
 		Message message = Message.creator(
 				new PhoneNumber(phone),
-		        new PhoneNumber("+15017250604"), 
+		        new PhoneNumber("+14159414656"), 
 		        smsContent)
 			.create();
 		return message.getStatus().toString();

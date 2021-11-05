@@ -2,6 +2,7 @@ package com.ndb.auction.models;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public class User {
 	private Map<String, Boolean> verify;
 	private String googleSecret;
 	private Integer notifySetting;
+	
+	private AvatarSet avatar;
+	private Map<String, List<Integer>> avatar_purchase;
+	
+
 	private Long lastLogin;
 	
 	// for update purpose
@@ -166,7 +172,7 @@ public class User {
 		this.wallet = wallet;
 	}
 	
-	@DynamoDBAttribute(attributeName="two_setp")
+	@DynamoDBAttribute(attributeName="two_step")
 	public String getTwoStep() {
 		return twoStep;
 	}
@@ -246,6 +252,23 @@ public class User {
 	public void setGoogleSecret(String googleSecret) {
 		this.googleSecret = googleSecret;
 	}
-
+	
+	@DynamoDBAttribute(attributeName="avatar")
+	public AvatarSet getAvatar() {
+		return avatar;
+	}
+	
+	public void setAvatar(AvatarSet avatar) {
+		this.avatar = avatar;
+	}
+	
+	@DynamoDBAttribute(attributeName="avatar_purchase")
+	public Map<String, List<Integer>> getAvatar_purchase() {
+		return avatar_purchase;
+	}
+	
+	public void setAvatar_purchase(Map<String, List<Integer>> avatar_purchase) {
+		this.avatar_purchase = avatar_purchase;
+	}
 
 }

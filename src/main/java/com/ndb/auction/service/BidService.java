@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Auction;
@@ -23,7 +24,10 @@ import com.ndb.auction.service.interfaces.IBidService;
 
 @Service
 public class BidService extends BaseService implements IBidService {
-
+	
+	@Autowired
+	private StripeService stripeService;
+	
 	@Override
 	public Bid placeNewBid(
 			String userId, 
@@ -91,12 +95,12 @@ public class BidService extends BaseService implements IBidService {
 	 * It is called from Payment service with user id and round number.
 	 */
 	@Override
-	public void updateBidRanking(String userId, Integer roundNumber) {
+	public void updateBidRanking(String userId, String roundId) {
 		
-		Auction currentRound = auctionDao.getAuctionByRound(roundNumber);
+		Auction currentRound = auctionDao.getAuctionById(roundId);
 		
-		Bid bid = bidDao.getBid(roundNumber, userId);
-		List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
+		Bid bid = bidDao.getBid(roundId, userId);
+		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		bidList.add(bid);
 		Bid[] newList = bidList.toArray(new Bid[0]);
 		Arrays.sort(newList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
@@ -137,9 +141,9 @@ public class BidService extends BaseService implements IBidService {
         
 	}
 	
-	public void closeBid(Integer round) {
+	public void closeBid(String roundId) {
 		// Assume all status already confirmed when new bid is placed
-		List<Bid> bidList = bidDao.getBidListByRound(round);
+		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		
 		// processing all bids
 		ListIterator<Bid> iterator = bidList.listIterator();
@@ -150,17 +154,18 @@ public class BidService extends BaseService implements IBidService {
 	        
 	        switch (bid.getPayType()) {
 		        case "CREDIT":
-		        	// get Fiat payment transaction
 		        	
 		        	if(bid.getStatus() == Bid.WINNER) {
 		        		// capture payment
-		        		
+		        		boolean result = stripeService.UpdateTransaction(roundId, userId, Bid.WINNER);
 		        		// get capture result
-		        		
-		        		// if success ALLOC NDB
+		        		if(result) {
+		        			// if success ALLOC NDB
+		        			
+		        		}
 		        	} else if (bid.getStatus() == Bid.FAILED) {
 		        		// cancel authorization
-		        		
+		        		stripeService.UpdateTransaction(roundId, userId, Bid.FAILED);
 		        	}
 		        	break;
 		        case "CRYPTO":

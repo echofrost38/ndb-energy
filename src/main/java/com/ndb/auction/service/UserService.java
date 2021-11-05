@@ -2,8 +2,10 @@ package com.ndb.auction.service;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 
@@ -127,7 +129,8 @@ public class UserService extends BaseService implements IUserService {
 		}
 		
 		if(status) {
-			user.getVerify().replace("2FA", true);
+			user.getSecurity().replace("2FA", true);
+			userDao.updateUser(user);
 			return "Success";
 		} else {
 			return "Failed";
@@ -185,6 +188,33 @@ public class UserService extends BaseService implements IUserService {
 		return false;
 	}
 	
+	public boolean sendResetToken(String email) {
+		User user = getUserByEmail(email);		
+		String code = totpService.get2FACode(email);
+		try {
+			mailService.sendVerifyEmail(user, code, RESET_TEMPLATE);
+		} catch (MessagingException | IOException | TemplateException e) {
+			return false; // or exception
+		}
+		return true;
+	}
+	
+	public String resetPassword(String email, String code, String newPass) {
+
+		if(totpService.check2FACode(email, code)) {
+			User user = getUserByEmail(email);
+			user.setPassword(newPass);
+			
+			userDao.updateUser(user);
+		} else {
+			return "Failed";
+		}
+		
+		return "Success";
+	}
+	
+	
+	
 	private boolean sendEmailCode(User user, String template) {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {
@@ -194,7 +224,7 @@ public class UserService extends BaseService implements IUserService {
 		}	
 		return true;
 	}
-			
+	
 	@Override
 	public User getUserByEmail(String email) {
 		Optional<User> tUser = userDao.getUserByEmail(email);
@@ -204,5 +234,5 @@ public class UserService extends BaseService implements IUserService {
 		}
 		
 		return tUser.get();
-	}
+	}	
 }

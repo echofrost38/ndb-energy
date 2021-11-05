@@ -1,0 +1,17 @@
+extend type Query {
+	getStripePubKey : String!
+}
+
+extend type Mutation {
+	stripePayment (
+		roundId: String,
+		userId: String, 
+		amount: Float,
+		paymentIntentId: String
+	) : PayResponse!
+}
+
+schema {
+   query: Query,
+   mutation: Mutation
+}

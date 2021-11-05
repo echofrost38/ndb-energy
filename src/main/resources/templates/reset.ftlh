@@ -9,9 +9,9 @@
 <body>
 	<div style="margin-top: 10px">Greetings</div>
 	<br/>
-	<div>Please verify your account with 2FA code.</div>
+	<div> User account is created. Please reset your password with the code.</div>
 	<div>
-		<h4>2 Factor Authentication Code : <span style="color: yellow;">${code}</span></h4>
+		<h4>Activation Code : <span style="font-weight: bold;">${code}</span></h4>
 	</div>
 </body>
 </html>

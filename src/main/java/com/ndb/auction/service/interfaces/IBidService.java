@@ -21,7 +21,9 @@ public interface IBidService {
 	// update Bid
 	Bid updateBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice);
 	
-	// called when new bid is placed
-	void updateBidRanking(String userId, Integer roundNumber);
+	/**
+	 * It is called from Payment service with user id and round id.
+	 */
+	void updateBidRanking(String userId, String roundId);
 	
 }

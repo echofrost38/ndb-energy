@@ -10,9 +10,13 @@ public interface IBidDao {
 	
 	List<Bid> getBidListByRound(Integer round_number);
 	
+	List<Bid> getBidListByRound(String roundId);
+	
 	List<Bid> getBidListByUser(String userId);
 	
 	Bid getBid(Integer round, String userId);
+	
+	Bid getBid(String roundId, String userId);
 	
 	Bid updateBid(Bid bid);
 	

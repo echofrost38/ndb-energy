@@ -65,4 +65,18 @@ public class UserDao extends BaseDao implements IUserDao {
 		return user;
 	}
 
+	@Override
+	public User getUserByResetToken(String token) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(token));
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+		    .withFilterExpression("reset_token = :v1")
+		    .withExpressionAttributeValues(eav);
+        List<User> users = dynamoDBMapper.scan(User.class, scanExpression);
+        if(users.size() == 0) {
+        	return null;
+        }
+		return users.get(0);
+	}
+
 }

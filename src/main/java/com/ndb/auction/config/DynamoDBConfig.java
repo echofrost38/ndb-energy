@@ -32,7 +32,7 @@ public class DynamoDBConfig {
     @Bean
     public DynamoDBMapper dynamoDBMapper() {
     	AmazonDynamoDB client;
-        if(mode == REAL) {
+        if(mode.equals(REAL)) {
         	client = AmazonDynamoDBClientBuilder.standard()
         			.withCredentials(new AWSStaticCredentialsProvider(amazonAWSCredentials()))
         			.withRegion(Regions.US_EAST_1).build();        	

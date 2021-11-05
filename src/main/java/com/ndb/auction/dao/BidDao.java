@@ -51,11 +51,22 @@ public class BidDao extends BaseDao implements IBidDao {
 
         return dynamoDBMapper.scan(Bid.class, scanExpression);
 	}
+	
+	@Override
+	public List<Bid> getBidListByRound(String roundId) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(roundId));
+		DynamoDBQueryExpression<Bid> queryExpression = new DynamoDBQueryExpression<Bid>()
+		    .withKeyConditionExpression("round_id = :v1")
+		    .withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.query(Bid.class, queryExpression);
+	}
 
 	@Override
 	public List<Bid> getBidListByUser(String userId) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-		eav.put(":v1", new AttributeValue().withS(userId.toString()));
+		eav.put(":v1", new AttributeValue().withS(userId));
 		DynamoDBQueryExpression<Bid> queryExpression = new DynamoDBQueryExpression<Bid>()
 		    .withKeyConditionExpression("user_id = :v1")
 		    .withExpressionAttributeValues(eav);
@@ -67,5 +78,12 @@ public class BidDao extends BaseDao implements IBidDao {
 	public void updateBidStatus(List<Bid> bids) {
 		dynamoDBMapper.batchSave(bids);
 	}
+
+	@Override
+	public Bid getBid(String roundId, String userId) {
+		return dynamoDBMapper.load(Bid.class, roundId, userId);
+	}
+
+	
 
 }

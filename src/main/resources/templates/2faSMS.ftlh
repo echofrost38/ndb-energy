@@ -1,1 +1,1 @@
-2FA Code: {code}
+2FA Code: ${code}

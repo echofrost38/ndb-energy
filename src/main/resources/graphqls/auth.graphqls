@@ -29,6 +29,14 @@ extend type Mutation {
 		token: String!,
 		code: String!
 	) : Credentials!
+	forgotPassword (
+		email: String!
+	) : String!
+	resetPassword (
+		email: String!,
+		code: String!,
+		newPassword: String!
+	) : String!
 }
 
 schema {

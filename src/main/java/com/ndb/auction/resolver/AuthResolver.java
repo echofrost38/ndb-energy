@@ -51,7 +51,7 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 			return new Credentials("Failed", "please verify");
 		}
 		
-		if(!user.getVerify().get("2FA")) {
+		if(!user.getSecurity().get("2FA")) {
 			return new Credentials("Failed", "Please set 2FA");
 		}
 		
@@ -85,6 +85,20 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 //				.collect(Collectors.toList());
 		//return new Credentials(email, jwt);
 		return new Credentials("Success", jwt);
+	}
+	
+	public String forgotPassword(String email) {
+		if(userService.sendResetToken(email)) {
+			return "Success";
+		} else {
+			return "Failed";
+		}
+		
+	}
+	
+	public String resetPassword(String email, String code, String newPassword) {
+		newPassword = encoder.encode(newPassword);
+		return userService.resetPassword(email, code, newPassword);
 	}
 	
 }

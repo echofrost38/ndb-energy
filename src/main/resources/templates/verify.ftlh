@@ -11,7 +11,7 @@
 	<br/>
 	<div> User account is created. Please verify your account with the code.</div>
 	<div>
-		<h4>Activation Code : <span style="color: yellow;">{code}</span></h4>
+		<h4>Activation Code : <span style="font-weight: bold;">${code}</span></h4>
 	</div>
 </body>
 </html>

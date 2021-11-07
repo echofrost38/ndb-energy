@@ -6,7 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
+import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BidService;
+import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserService;
@@ -36,4 +38,10 @@ public class BaseResolver {
     
 	@Autowired
 	StripeService stripeService;
+	
+	@Autowired
+	AvatarService avatarService;
+
+	@Autowired
+	ProfileService profileService;
 }

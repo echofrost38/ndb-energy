@@ -1,0 +1,17 @@
+type AvatarSet {
+    facial: String,
+    hair: String,
+    haColor: String,
+    exp: String,
+    hats: String,
+    others: String
+}
+
+input AvatarSetInput {
+    facial: String,
+    hair: String,
+    haColor: String,
+    exp: String,
+    hats: String,
+    others: String
+}

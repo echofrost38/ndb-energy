@@ -1,7 +1,6 @@
 package com.ndb.auction.service.interfaces;
 
 import java.util.List;
-import java.util.Set;
 
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
@@ -10,22 +9,21 @@ import com.ndb.auction.models.SkillSet;
 
 public interface IAvatarService {
 	
-	AvatarComponent createAvatarComponent(String groupId, Integer compId, Integer tierLevel, Double price);
+	AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited);
 	
 	List<AvatarComponent> getAvatarComponents();
 	
 	List<AvatarComponent> getAvatarComponentsById(String groupId);
 	
-	AvatarComponent getAvatarComponent(String groupId, Integer sKey);
+	AvatarComponent getAvatarComponent(String groupId, String sKey);
 	
-	AvatarComponent updateAvatar(String groupId, Integer compId, Integer tierLevel, Double price);
+	AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited);
 	
 	AvatarProfile createAvatarProfile(
-				String prefix,
 				String name,
 				String surname,
 				String shortName,
-				Set<SkillSet> skillSet,
+				List<SkillSet> skillSet,
 				AvatarSet avatarSet,
 				String enemy,
 				String invention,
@@ -37,7 +35,7 @@ public interface IAvatarService {
 				String name,
 				String surname,
 				String shortName,
-				Set<SkillSet> skillSet,
+				List<SkillSet> skillSet,
 				AvatarSet avatarSet,
 				String enemy,
 				String invention,
@@ -47,4 +45,8 @@ public interface IAvatarService {
 	List<AvatarProfile> getAvatarProfiles();
 	
 	AvatarProfile getAvatarProfile(String id);
+
+	AvatarProfile getAvatarProfileByName(String name);
+
+	List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set);
 }

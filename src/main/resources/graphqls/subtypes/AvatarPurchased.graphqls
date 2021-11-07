@@ -1,0 +1,4 @@
+type AvatarPurchased {
+    key: String,
+    value: [Int]
+}

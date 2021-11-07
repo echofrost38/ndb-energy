@@ -12,6 +12,9 @@ public interface IUserDao {
 	
 	// get user by email
 	Optional<User> getUserByEmail(String email);
+
+	// get user by avatar
+	User getUserByAvatar(String prefix, String name);
 	
 	// get user by id
 	User getUserById(String id);
@@ -28,5 +31,4 @@ public interface IUserDao {
 	// delete user
 	User deleteUser(String id);
 	
-	User getUserByResetToken(String token);
 }

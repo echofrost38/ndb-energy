@@ -1,0 +1,11 @@
+type AvatarProfile {
+    id: String!,
+    name: String!,
+    surname: String,
+    shortName: String,
+    skillSet: [SkillSet],
+    avatarSet: AvatarSet,
+    enemy: String,
+    invention: String,
+    bio: String
+}

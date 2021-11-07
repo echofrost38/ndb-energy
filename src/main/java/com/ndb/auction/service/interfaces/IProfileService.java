@@ -2,6 +2,8 @@ package com.ndb.auction.service.interfaces;
 
 import java.util.List;
 
+import com.ndb.auction.models.AvatarComponent;
+import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.User;
@@ -43,5 +45,13 @@ public interface IProfileService {
 	
 	// change password
 	Integer changePassword(String userId, String password);
+
+	// set avatar
+	String setAvatar(String id, String prefix, String userName);
+
+	// update avatar set
+	AvatarSet updateAvatarSet(String userId, AvatarSet set);
+
+	String purchaseComponent(List<AvatarComponent> components);
 	
 }

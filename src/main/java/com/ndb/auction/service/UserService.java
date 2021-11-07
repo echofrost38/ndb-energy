@@ -2,10 +2,8 @@ package com.ndb.auction.service;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 

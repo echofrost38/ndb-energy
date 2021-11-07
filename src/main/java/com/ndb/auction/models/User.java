@@ -32,21 +32,24 @@ public class User {
 	private Long birthDate;
 	private String email;
 	private String mobile;
-	private String password;
 	private String country;
 	private Map<String, Wallet> wallet;
+	private Map<String, String> extWallet;
+	
+	private Boolean tos;
+	
+	private String password;
 	private String twoStep;
 	private Map<String, Boolean> security;
-	private String avatarPrefix;
-	private String avatarName;
-	private Map<String, String> extWallet;
-	private Boolean tos;
 	private Map<String, Boolean> verify;
 	private String googleSecret;
+	
 	private Integer notifySetting;
 	
+	private String avatarPrefix;
+	private String avatarName;
 	private AvatarSet avatar;
-	private Map<String, List<Integer>> avatar_purchase;
+	private Map<String, List<String>> avatarPurchase;
 	
 
 	private Long lastLogin;
@@ -263,12 +266,12 @@ public class User {
 	}
 	
 	@DynamoDBAttribute(attributeName="avatar_purchase")
-	public Map<String, List<Integer>> getAvatar_purchase() {
-		return avatar_purchase;
+	public Map<String, List<String>> getAvatarPurchase() {
+		return avatarPurchase;
 	}
 	
-	public void setAvatar_purchase(Map<String, List<Integer>> avatar_purchase) {
-		this.avatar_purchase = avatar_purchase;
+	public void setAvatarPurchase(Map<String, List<String>> avatar_purchase) {
+		this.avatarPurchase = avatar_purchase;
 	}
 
 }

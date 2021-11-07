@@ -30,7 +30,7 @@ public class StripePaymentDao extends BaseDao {
 			return null;
 		}
 		tx.setStatus(newStatus);
-		dynamoDBMapper.save(tx);
+		dynamoDBMapper.save(tx, updateConfig);
 		return tx;
 	}
 	
@@ -39,7 +39,7 @@ public class StripePaymentDao extends BaseDao {
 		if(tx == null) 
 			return null;
 		tx.setStatus(newStatus);
-		dynamoDBMapper.save(tx);
+		dynamoDBMapper.save(tx, updateConfig);
 		return tx;
 	}
 	

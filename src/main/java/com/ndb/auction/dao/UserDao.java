@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.User;
 
 @Repository
@@ -66,17 +65,19 @@ public class UserDao extends BaseDao implements IUserDao {
 	}
 
 	@Override
-	public User getUserByResetToken(String token) {
+	public User getUserByAvatar(String prefix, String name) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-		eav.put(":v1", new AttributeValue().withS(token));
+		eav.put(":v1", new AttributeValue().withS(prefix));
+		eav.put(":v2", new AttributeValue().withS(name));
+
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-		    .withFilterExpression("reset_token = :v1")
+		    .withFilterExpression("avatar_prefix = :v1 and avatar_name = :v2")
 		    .withExpressionAttributeValues(eav);
         List<User> users = dynamoDBMapper.scan(User.class, scanExpression);
         if(users.size() == 0) {
         	return null;
         }
-		return users.get(0);
+		return users.get(0);	
 	}
 
 }

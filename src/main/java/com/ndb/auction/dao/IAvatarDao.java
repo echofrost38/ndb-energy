@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
+import com.ndb.auction.models.AvatarSet;
 
 public interface IAvatarDao {
 	
@@ -15,11 +16,15 @@ public interface IAvatarDao {
 	
 	List<AvatarComponent> getAvatarComponentsByGid(String groupId);
 	
-	AvatarComponent getAvatarComponent(String groupId, Integer sKey);
+	AvatarComponent getAvatarComponent(String groupId, String sKey);
 	
+	List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set);
+
 	// update avatar component
 	AvatarComponent updateAvatarComponent(AvatarComponent component);
 	
+	List<AvatarComponent> updateAvatarComponents(List<AvatarComponent> components);
+
 	// create new avatar
 	AvatarProfile createAvatarProfile(AvatarProfile avatar);
 	
@@ -31,6 +36,7 @@ public interface IAvatarDao {
 	
 	AvatarProfile getAvatarProfile(String id);
 	
+	AvatarProfile getAvatarProfileByName(String prefix);
 	
 	/**
 	 *  User tier

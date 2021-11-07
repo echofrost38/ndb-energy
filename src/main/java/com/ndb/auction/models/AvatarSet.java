@@ -6,65 +6,59 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 @DynamoDBDocument
 public class AvatarSet {
 
-	private Integer facial;
-	private Integer hair;
-	private Integer acces;
-	private Integer faColor;
-	private Integer haColor;
-	private Integer acColor;
+	public String facial;
+	public String hair;
+	public String haColor;
+	public String exp;
+	public String hats;
+	public String others;
 	
 	@DynamoDBAttribute(attributeName = "facial")
-	public Integer getFacial() {
+	public String getFacial() {
 		return facial;
 	}
-
-	public void setFacial(Integer facial) {
+	public void setFacial(String facial) {
 		this.facial = facial;
 	}
-
+	
 	@DynamoDBAttribute(attributeName = "hair")
-	public Integer getHair() {
+	public String getHair() {
 		return hair;
 	}
-
-	public void setHair(Integer hair) {
+	public void setHair(String hair) {
 		this.hair = hair;
 	}
-
-	@DynamoDBAttribute(attributeName = "acces")
-	public Integer getAcces() {
-		return acces;
-	}
-
-	public void setAcces(Integer acces) {
-		this.acces = acces;
-	}
-
-	@DynamoDBAttribute(attributeName = "fa_color")
-	public Integer getFaColor() {
-		return faColor;
-	}
-
-	public void setFaColor(Integer faColor) {
-		this.faColor = faColor;
-	}
-
-	@DynamoDBAttribute(attributeName = "ha_color")
-	public Integer getHaColor() {
+	
+	@DynamoDBAttribute(attributeName = "haColor")
+	public String getHaColor() {
 		return haColor;
 	}
-
-	public void setHaColor(Integer haColor) {
+	public void setHaColor(String haColor) {
 		this.haColor = haColor;
 	}
-
-	@DynamoDBAttribute(attributeName = "ac_color")
-	public Integer getAcColor() {
-		return acColor;
+	
+	@DynamoDBAttribute(attributeName = "exp")
+	public String getExp() {
+		return exp;
 	}
-
-	public void setAcColor(Integer acColor) {
-		this.acColor = acColor;
+	public void setExp(String exp) {
+		this.exp = exp;
+	}
+	
+	@DynamoDBAttribute(attributeName = "hats")
+	public String getHats() {
+		return hats;
+	}
+	public void setHats(String hats) {
+		this.hats = hats;
+	}
+	
+	@DynamoDBAttribute(attributeName = "others")
+	public String getOthers() {
+		return others;
+	}
+	public void setOthers(String others) {
+		this.others = others;
 	}
 
 }

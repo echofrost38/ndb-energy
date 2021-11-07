@@ -76,7 +76,7 @@ public class BidDao extends BaseDao implements IBidDao {
 
 	@Override
 	public void updateBidStatus(List<Bid> bids) {
-		dynamoDBMapper.batchSave(bids);
+		dynamoDBMapper.batchSave(bids, updateConfig);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.User;
 import com.ndb.auction.payload.Credentials;
-import com.ndb.auction.service.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 

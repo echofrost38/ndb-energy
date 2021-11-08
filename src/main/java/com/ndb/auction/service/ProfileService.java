@@ -3,10 +3,12 @@ package com.ndb.auction.service;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.AvatarComponent;
+import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
@@ -68,6 +70,10 @@ public class ProfileService extends BaseService implements IProfileService {
 		return bidDao.getBidListByUser(userId);
 	}
 
+	/**
+	 * prefix means avatar first name!
+	 * once user select avatar with first name, user will have owned components 
+	 */
 	@Override
 	public String setAvatar(String id, String prefix, String name) {
 		// check user exists
@@ -80,7 +86,20 @@ public class ProfileService extends BaseService implements IProfileService {
 		if(user == null) {
 			return "Not found user";
 		}
-
+		
+		// update purchase list and user avatar set!!
+		AvatarProfile profile = avatarDao.getAvatarProfileByName(prefix);
+		AvatarSet sets = profile.getAvatarSet();
+		List<AvatarComponent> components = avatarDao.getAvatarComponentsBySet(sets);
+		Map<String, List<String>> purchasedMap = user.getAvatarPurchase();
+		for (AvatarComponent comp : components) {
+			String group = comp.getGroupId();
+			List<String> purchased = purchasedMap.get(group);
+			purchased.add(comp.getCompId());
+			purchasedMap.replace(group, purchased);
+		}
+		user.setAvatarPurchase(purchasedMap);
+		user.setAvatar(sets);
 		user.setAvatarPrefix(prefix);
 		user.setAvatarName(name);
 		userDao.updateUser(user);

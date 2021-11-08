@@ -13,12 +13,6 @@ public class AuctionService extends BaseService implements IAuctionService {
 	@Override
 	public Auction createNewAuction(Auction auction) {
 		
-		// check Admin role  
-		
-		// check duplicate number
-		
-		// Validation
-		
 		// Save
 		auctionDao.createNewAuction(auction);
 		
@@ -43,11 +37,12 @@ public class AuctionService extends BaseService implements IAuctionService {
 
 	@Override
 	public Auction updateAuctionByAdmin(Auction auction) {
-		
-		// Check Admin Role
-		
+				
 		// Check Validation ( null possible ) 
-		
+		Auction _auction = auctionDao.getAuctionById(auction.getAuctionId());
+		if(_auction == null) return null;
+		if(_auction.getStatus() != Auction.PENDING) return null;
+
 		return auctionDao.updateAuctionByAdmin(auction);
 	}
 

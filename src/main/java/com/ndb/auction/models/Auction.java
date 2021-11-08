@@ -38,7 +38,7 @@ public class Auction extends BaseModel {
     	
     }
     
-    public Auction(Integer _number, String _startedAt, Double _totalToken, Double _minPrice) {
+    public Auction(Integer _number, String _startedAt, long duration, Double _totalToken, Double _minPrice) {
     	this.number = _number;
     	this.totalToken = _totalToken;
     	this.minPrice = _minPrice;
@@ -52,7 +52,7 @@ public class Auction extends BaseModel {
 	    	try {
 	    	    Date d = f.parse(_startedAt);
 	    	    long startedAtMill = d.getTime();
-	    	    long endedAtMill = startedAtMill + 24L * 60L * 60L * 1000L;
+	    	    long endedAtMill = startedAtMill + duration;
 	    	    this.startedAt = startedAtMill;
 	    	    this.endedAt = endedAtMill;
 	    	} catch (ParseException e) {

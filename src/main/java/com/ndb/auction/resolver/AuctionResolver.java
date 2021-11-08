@@ -11,8 +11,11 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class AuctionResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver  {
-	public Auction createAuction(int number, String startedAt, double totalToken, double minPrice) {
-		Auction auction = new Auction(number, startedAt, totalToken, minPrice);
+	
+	// start time / duration / total amount / min price 
+	// not sure => % of total amount for all rounds, previous min price!!
+	public Auction createAuction(int number, String startedAt, long duration, double totalToken, double minPrice) {
+		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice);
 		return auctionService.createNewAuction(auction);
 	}
 	
@@ -24,8 +27,8 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		return auctionService.getAuctionById(id);
 	}
 	
-	public Auction updateAuction(String id, int number, String startedAt, double totalToken, double minPrice) {
-		Auction auction = new Auction(number, startedAt, totalToken, minPrice);
+	public Auction updateAuction(String id, int number, String startedAt, long duration, double totalToken, double minPrice) {
+		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice);
 		auction.setAuctionId(id);
 		return auctionService.updateAuctionByAdmin(auction);
 	}

@@ -2,6 +2,7 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.AvatarComponent;
@@ -98,16 +99,19 @@ public class AvatarService extends BaseService implements IAvatarService{
 	}
 
 	@Override
+	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfile(String id) {
 		return avatarDao.getAvatarProfile(id);
 	}
 
 	@Override
+	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfileByName(String fname) {
 		return avatarDao.getAvatarProfileByName(fname);
 	}
 
 	@Override
+	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set) {
 		return avatarDao.getAvatarComponentsBySet(set);
 	}

@@ -26,6 +26,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "Bid")
 public class Bid {
+
+    public static final int CREDIT = 1;
+    public static final int CRYPTO = 2;
+    public static final int WALLET = 3;
 	
 	public static final int NOT_CONFIRMED = 0;
 	public static final int WINNER 		  = 1;
@@ -34,11 +38,11 @@ public class Bid {
     public static final int INSUFFI 	  = 4; 
 	
     private String userId;
-    private Integer roundNumber;
+    private String roundId;
     private Double tokenAmount;
     private Double totalPrice;
     private Double tokenPrice;
-    private String payType;
+    private Integer payType;
     private Long placedAt;
     private Long updatedAt;
     private Integer status;
@@ -47,9 +51,9 @@ public class Bid {
     	
     }
     
-    public Bid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice) {
+    public Bid(String userId, String roundId, Double tokenAmount, Double tokenPrice) {
     	this.userId = userId;
-    	this.roundNumber = roundNumber;
+    	this.roundId = roundId;
     	this.tokenAmount = tokenAmount;
     	this.tokenPrice = tokenPrice;
     	this.totalPrice = tokenAmount * tokenPrice;
@@ -67,13 +71,13 @@ public class Bid {
         this.userId = userId;
     }
     
-    @DynamoDBRangeKey(attributeName="round_number")
-    @DynamoDBIndexHashKey(globalSecondaryIndexName="s_round_number")
-    public Integer getRoundNumber() {
-        return roundNumber;
+    @DynamoDBRangeKey(attributeName="round_id")
+    @DynamoDBIndexHashKey(globalSecondaryIndexName="s_round_id")
+    public String getRoundId() {
+        return roundId;
     }
-    public void setRoundNumber(Integer roundNumber) {
-        this.roundNumber = roundNumber;
+    public void setRoundId(String roundNumber) {
+        this.roundId = roundNumber;
     }
     
     @DynamoDBAttribute(attributeName="token_amount")
@@ -126,11 +130,11 @@ public class Bid {
     }
     
     @DynamoDBAttribute(attributeName="pay_type")
-	public String getPayType() {
+	public Integer getPayType() {
 		return payType;
 	}
 
-	public void setPayType(String payType) {
+	public void setPayType(Integer payType) {
 		this.payType = payType;
 	}
 

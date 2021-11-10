@@ -7,7 +7,7 @@ import com.ndb.auction.models.Bid;
 public interface IBidService {
 	
 	// place new bid
-	Bid placeNewBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice, String payType);
+	Bid placeNewBid(String userId, String roundId, Double tokenAmount, Double tokenPrice, Integer payType);
 	
 	// get Bid List
 	List<Bid> getBidListByRound(Integer round);
@@ -19,7 +19,7 @@ public interface IBidService {
 	Bid getBid(Integer round, String userId);
 	
 	// update Bid
-	Bid updateBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice);
+	Bid updateBid(String userId, String roundId, Double tokenAmount, Double tokenPrice);
 	
 	/**
 	 * It is called from Payment service with user id and round id.

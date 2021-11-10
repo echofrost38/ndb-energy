@@ -1,26 +1,20 @@
-extend type Query {
-	getBidListByRound(round: Int!): [Bid]
-	getBidListByUser(userId: String!): [Bid]
-	getBid(userId: String!, round: Int!) : Bid
+type Mutation {
+	placeBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!,
+		payType: Int!
+	) : Bid	
+	updateBid(
+		userId: String!,
+		roundNumber: Int!,
+		tokenAmount: Float!,
+		tokenPrice: Float!
+	) : Bid
 }
 
-extend type Mutation {
-	createAuction(
-		number: Int!, 
-		startedAt: String!,  
-		totalToken: Float!, 
-		minPrice: Float!
-	) : Auction!
-	updateAuction(
-		id: String!
-		number: Int, 
-		startedAt: String,  
-		totalToken: Float, 
-		minPrice: Float		
-	) : Auction!
-}
-
-schema {
-   query: Query,
-   mutation: Mutation
+type Query {
+	getAuctions : [Auction]
+	getAuctionById(id: String!) : Auction!
 }

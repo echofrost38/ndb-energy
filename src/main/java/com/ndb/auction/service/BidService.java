@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
 
 /**
@@ -31,22 +34,34 @@ public class BidService extends BaseService implements IBidService {
 	@Override
 	public Bid placeNewBid(
 			String userId, 
-			Integer roundNumber, 
+			String roundId, 
 			Double tokenAmount, 
 			Double tokenPrice,
-			String payType
+			Integer payType
 	) {
+		// Check existing
+		Bid bid = bidDao.getBid(roundId, userId);
+
+		if(bid != null) {
+			return null;
+		}
+
 		// create new pending bid
-		Bid bid = new Bid(userId, roundNumber, tokenAmount, tokenPrice);
+		bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
 		
 		// check Round is opened. 
-		Auction auction = auctionDao.getAuctionByRound(roundNumber);
+		Auction auction = auctionDao.getAuctionById(roundId);
 		if(auction.getStatus() != Auction.STARTED) {
 			return null; // or exception
 		}
 		
 		// set bid type
 		bid.setPayType(payType);
+
+		// check pay type : WALLET!!!!!
+		if(payType == Bid.WALLET) {
+			
+		}
 
 		// save with pending status
 		bidDao.placeBid(bid);
@@ -73,9 +88,9 @@ public class BidService extends BaseService implements IBidService {
 	}
 
 	@Override
-	public Bid updateBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice) {
+	public Bid updateBid(String userId, String roundId, Double tokenAmount, Double tokenPrice) {
 		
-		Bid bid = bidDao.getBid(roundNumber, userId);
+		Bid bid = bidDao.getBid(roundId, userId);
 		
 		// check null 
 		if(bid == null) {
@@ -153,7 +168,7 @@ public class BidService extends BaseService implements IBidService {
 	        String userId = bid.getUserId();
 	        
 	        switch (bid.getPayType()) {
-		        case "CREDIT":
+		        case Bid.CREDIT:
 		        	
 		        	if(bid.getStatus() == Bid.WINNER) {
 		        		// capture payment
@@ -161,14 +176,23 @@ public class BidService extends BaseService implements IBidService {
 		        		// get capture result
 		        		if(result) {
 		        			// if success ALLOC NDB
-		        			
+		        			double ndb = bid.getTokenAmount();
+							User user = userDao.getUserById(userId);
+							Map<String, Wallet> tempWallet = user.getWallet();
+							Wallet ndbWallet = tempWallet.get("NDB");
+							double balance = ndbWallet.getFree();
+							ndbWallet.setFree(balance + ndb);
+							tempWallet.replace("NDB", ndbWallet);
+							user.setWallet(tempWallet);
+
+							userDao.updateUser(user);
 		        		}
 		        	} else if (bid.getStatus() == Bid.FAILED) {
 		        		// cancel authorization
 		        		stripeService.UpdateTransaction(roundId, userId, Bid.FAILED);
 		        	}
 		        	break;
-		        case "CRYPTO":
+		        case Bid.CRYPTO:
 		        	// get Crypto payment transaction
 		        	
 		        	if(bid.getStatus() == Bid.WINNER) {
@@ -181,7 +205,7 @@ public class BidService extends BaseService implements IBidService {
 		        		
 		        	}
 		        	break;
-		        case "WALLET":
+		        case Bid.WALLET:
 		        	if(bid.getStatus() == Bid.WINNER) {
 		        		// holding -> deduct
 		        		

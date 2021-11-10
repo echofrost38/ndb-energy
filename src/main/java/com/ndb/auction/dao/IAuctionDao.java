@@ -29,5 +29,7 @@ public interface IAuctionDao {
 	Auction startAuction(Auction auction);
 	
 	Auction endAuction(Auction auction);
+
+	List<Auction> getAuctionByStatus(Integer status);
 	
 }

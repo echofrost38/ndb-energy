@@ -4,7 +4,7 @@ type Bid {
 	tokenAmount: Float,
 	totalPrice: Float,
 	tokenPrice: Float,
-	payType: String,
+	payType: Int,
 	placedAt: Float,
 	updatedAt: Float,
 	status: Int

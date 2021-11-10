@@ -27,8 +27,8 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		return auctionService.getAuctionById(id);
 	}
 	
-	public Auction updateAuction(String id, int number, String startedAt, long duration, double totalToken, double minPrice) {
-		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice);
+	public Auction updateAuction(String id, int number, long duration, double totalToken, double minPrice) {
+		Auction auction = new Auction(number, null, duration, totalToken, minPrice);
 		auction.setAuctionId(id);
 		return auctionService.updateAuctionByAdmin(auction);
 	}

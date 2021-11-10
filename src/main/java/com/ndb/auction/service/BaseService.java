@@ -3,6 +3,7 @@ package com.ndb.auction.service;
 import com.ndb.auction.dao.AuctionDao;
 import com.ndb.auction.dao.AvatarDao;
 import com.ndb.auction.dao.BidDao;
+import com.ndb.auction.dao.CryptoPaymentDao;
 import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.UserDao;
@@ -22,6 +23,9 @@ public class BaseService {
 	
 	@Value("${stripe.public.key}")
 	public String stripePublicKey;
+
+    @Value("${coinbase.apiKey}")
+	public String coinbaseApiKey;
 	
 	@Autowired
 	ScheduledTasks schedule;
@@ -52,4 +56,7 @@ public class BaseService {
     
     @Autowired
     public StripePaymentDao stripeDao;
+
+    @Autowired 
+    public CryptoPaymentDao cryptoDao;
 }

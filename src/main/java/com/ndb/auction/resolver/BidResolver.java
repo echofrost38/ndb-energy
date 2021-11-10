@@ -13,8 +13,8 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class BidResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
-	public Bid placeBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice, String payment) {
-		return bidService.placeNewBid(userId, roundNumber, tokenAmount, tokenPrice, payment);
+	public Bid placeBid(String userId, String roundId, Double tokenAmount, Double tokenPrice, Integer payment) {
+		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
@@ -30,7 +30,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		return bidService.getBid(round, userId);
 	}
 	
-	public Bid updateBid(String userId, Integer roundNumber, Double tokenAmount, Double tokenPrice) {
-		return bidService.updateBid(userId, roundNumber, tokenAmount, tokenPrice);
+	public Bid updateBid(String userId, String roundId, Double tokenAmount, Double tokenPrice) {
+		return bidService.updateBid(userId, roundId, tokenAmount, tokenPrice);
 	}
 }

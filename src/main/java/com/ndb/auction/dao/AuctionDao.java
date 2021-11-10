@@ -62,19 +62,6 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 		dynamoDBMapper.save(targetAuction, updateConfig);
 		return targetAuction;
 	}
-	
-	public List<Auction> getOpendedList() {
-		// get all opened auction
-		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
-		// filter with started status ( STARTED = 1 ) 
-		eav.put(":val1", new AttributeValue().withN("1"));
-
-        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-            .withFilterExpression("status = :val1")
-            .withExpressionAttributeValues(eav);
-        
-		return dynamoDBMapper.scan(Auction.class, scanExpression);
-	}
 
 	@Override
 	public Auction endAuction(Auction targetAuction) {
@@ -86,6 +73,18 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 	public Auction updateAuctionStats(Auction stats) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Auction> getAuctionByStatus(Integer status) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":val1", new AttributeValue().withN(status.toString()));
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+            .withFilterExpression("status = :val1")
+            .withExpressionAttributeValues(eav);
+        
+		return dynamoDBMapper.scan(Auction.class, scanExpression);
 	}
 	
 }

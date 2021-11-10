@@ -233,4 +233,12 @@ public class UserService extends BaseService implements IUserService {
 		
 		return tUser.get();
 	}	
+
+	public User getUserById(String id) {
+		return userDao.getUserById(id);
+	}
+
+	public User updateUser(User user) {
+		return userDao.updateUser(user);
+	}
 }

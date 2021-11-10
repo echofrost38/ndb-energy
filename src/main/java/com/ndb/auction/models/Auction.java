@@ -20,14 +20,16 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class Auction extends BaseModel {
 	
 	// Auction status constants
-	public static final int PENDING = 0;
-	public static final int STARTED = 1;
-	public static final int ENDED   = 2;
+	public static final Integer PENDING   = 0;
+    public static final Integer COUNTDOWN = 1;
+	public static final Integer STARTED   = 2;
+	public static final Integer ENDED     = 3;
 
     private String auctionId;
     private Integer number;
     private Long startedAt;
     private Long endedAt;
+    private Long duration; // second
     private Double totalToken;
     private Double minPrice;
     private Double sold;
@@ -55,6 +57,7 @@ public class Auction extends BaseModel {
 	    	    long endedAtMill = startedAtMill + duration;
 	    	    this.startedAt = startedAtMill;
 	    	    this.endedAt = endedAtMill;
+                this.duration = duration / 1000;
 	    	} catch (ParseException e) {
 	    	    e.printStackTrace();
 	    	}
@@ -137,4 +140,15 @@ public class Auction extends BaseModel {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    @DynamoDBAttribute(attributeName="duration")
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    
 }

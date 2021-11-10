@@ -13,25 +13,35 @@ public class AuctionService extends BaseService implements IAuctionService {
 	@Override
 	public Auction createNewAuction(Auction auction) {
 		
-		// Save
-		auctionDao.createNewAuction(auction);
+		// check conflict auction round
+		Auction _auction = auctionDao.getAuctionByRound(auction.getNumber());
+		if(_auction != null) {
+			return null;
+		}
+
+		Auction prev = auctionDao.getAuctionByRound(auction.getNumber() - 1);
+		if(prev == null || prev.getStatus() == Auction.STARTED) {
+			auction.setStatus(Auction.COUNTDOWN);
+
+			// Save
+			auctionDao.createNewAuction(auction);
+
+			// set new countdown!!
+
+		} else {
+			auctionDao.createNewAuction(auction);
+		}
 		
 		return auction;
 	}
 
 	@Override
 	public List<Auction> getAuctionList() {
-		
-		// Check Client or Admin Role
-		
 		return auctionDao.getAuctionList();
 	}
 
 	@Override
 	public Auction getAuctionById(String id) {
-		
-		// Check Client or Admin Role
-		
 		return auctionDao.getAuctionById(id);
 	}
 
@@ -50,7 +60,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 	public Auction startAuction(String id) {
 		
 		// check already opened Round
-		List<Auction> list = auctionDao.getOpendedList();
+		List<Auction> list = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if(list.size() != 0) {
 			// there is already opened auction
 			return null; // or exception
@@ -58,12 +68,20 @@ public class AuctionService extends BaseService implements IAuctionService {
 		
 		// check current auction is pending
 		Auction target = auctionDao.getAuctionById(id);
-		if(target.getStatus() != Auction.PENDING) {
+		if(target.getStatus() != Auction.COUNTDOWN) {
 			// it isn't PENDING round
 			return null; // or exception
 		}
-		
-		return auctionDao.startAuction(target);
+
+		auctionDao.startAuction(target);
+
+		// get next round
+		Auction nextRound = auctionDao.getAuctionByRound(target.getStatus() + 1);
+		if(nextRound != null) {
+			nextRound.setStatus(Auction.COUNTDOWN);
+			auctionDao.updateAuctionStats(nextRound);
+		}
+		return nextRound;
 	}
 
 	@Override
@@ -74,6 +92,9 @@ public class AuctionService extends BaseService implements IAuctionService {
 			return null; // or exception
 		}
 		auctionDao.endAuction(target);
+
+		// async call!!
+
 		return target;
 	}
     

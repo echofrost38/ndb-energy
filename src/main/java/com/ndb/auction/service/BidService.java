@@ -37,7 +37,8 @@ public class BidService extends BaseService implements IBidService {
 			String roundId, 
 			Double tokenAmount, 
 			Double tokenPrice,
-			Integer payType
+			Integer payType,
+			String cryptoType
 	) {
 		// Check existing
 		Bid bid = bidDao.getBid(roundId, userId);
@@ -60,7 +61,28 @@ public class BidService extends BaseService implements IBidService {
 
 		// check pay type : WALLET!!!!!
 		if(payType == Bid.WALLET) {
+			// check user's wallet!
+			double totalPrice = tokenAmount * tokenPrice;
+			double cryptoAmount = 0.0;
+
+			User user = userDao.getUserById(userId);
+			Map<String, Wallet> wallets = user.getWallet();
+			Wallet wallet = wallets.get(cryptoType);
+			double holding = wallet.getHolding();
+			double free = wallet.getFree();
+			if(free < cryptoAmount) {
+				return null;
+			}
+			wallet.setFree(free - cryptoAmount);
+			wallet.setHolding(holding + cryptoAmount);
+			wallets.replace(cryptoType, wallet);
+			user.setWallet(wallets);
+			userDao.updateUser(user);
+
+			bidDao.placeBid(bid);
 			
+			updateBidRanking(userId, roundId);
+			return bid;
 		}
 
 		// save with pending status

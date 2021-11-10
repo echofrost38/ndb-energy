@@ -43,6 +43,7 @@ public class Bid {
     private Double totalPrice;
     private Double tokenPrice;
     private Integer payType;
+    private String cryptoType;
     private Long placedAt;
     private Long updatedAt;
     private Integer status;
@@ -137,6 +138,15 @@ public class Bid {
 	public void setPayType(Integer payType) {
 		this.payType = payType;
 	}
+
+    @DynamoDBAttribute(attributeName="crypto_type")
+    public String getCryptoType() {
+        return cryptoType;
+    }
+
+    public void setCryptoType(String cryptoType) {
+        this.cryptoType = cryptoType;
+    }
 
     
 }

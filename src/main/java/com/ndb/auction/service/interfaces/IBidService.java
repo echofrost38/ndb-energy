@@ -9,6 +9,8 @@ public interface IBidService {
 	// place new bid
 	Bid placeNewBid(String userId, String roundId, Double tokenAmount, Double tokenPrice, Integer payType, String cryptoType);
 	
+	Bid increaseBid(String userId, String roundId, Double tokenAmount, Double tokenPrice, Integer payType, String cryptoType);
+
 	// get Bid List
 	List<Bid> getBidListByRound(Integer round);
 	

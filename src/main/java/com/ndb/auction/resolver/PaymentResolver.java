@@ -31,8 +31,8 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return stripeService.getTransactionByUser(userId);
 	}
 
-	public FiatTransaction getFiatTransaction(String roundId, String userId) {
-		return stripeService.getTransaction(roundId, userId);
+	public List<FiatTransaction> getFiatTransaction(String roundId, String userId) {
+		return stripeService.getTransactions(roundId, userId);
 	}
 
 
@@ -53,7 +53,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return cryptoService.getTransactionByRound(roundId);
 	}
 	
-	public CryptoTransaction getCryptoTransaction(String roundId, String userId) {
+	public List<CryptoTransaction> getCryptoTransaction(String roundId, String userId) {
 		return cryptoService.getTransaction(roundId, userId);
 	}
 

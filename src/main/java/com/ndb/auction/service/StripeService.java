@@ -40,13 +40,6 @@ public class StripeService extends BaseService {
 		PayResponse response = new PayResponse();
 		try {
             if (paymentIntentId == null) {
-
-            	// check existing
-        		FiatTransaction fTx = stripeDao.getTransaction(roundId, userId);
-        		if(fTx != null) {
-        			response.setError("Already exists");
-        			return response;
-        		}
             	
             	// Create new PaymentIntent for the order
                 PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
@@ -62,7 +55,7 @@ public class StripeService extends BaseService {
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams);
                 
-                fTx = new FiatTransaction(roundId, userId, amount, intent.getId());
+                FiatTransaction fTx = new FiatTransaction(roundId, userId, amount, intent.getId());
                 fTx = stripeDao.createNewPayment(fTx);
                 
             } else {
@@ -77,10 +70,29 @@ public class StripeService extends BaseService {
                 intent = intent.confirm();
                 
                 stripeDao.updatePaymentStatus(paymentIntentId, FiatTransaction.AUTHORIZED);
-                
+				Bid bid = bidService.getBid(roundId, userId);
+				double usdAmount = (double)amount;
+				if(bid.getPendingIncrease()) {
+                    double pendingPrice = bid.getDelta();
+                    if(pendingPrice > usdAmount) {
+                        response.setError("Insufficient funds");
+						return response;
+                    }
+                    
+                    bidService.updateBid(userId, roundId, bid.getTempTokenAmount(), bid.getTempTokenPrice());
+                    
+                } else {
+                    double totalPrice = bid.getTotalPrice();
+                    if(totalPrice > usdAmount) {
+                        response.setError("Insufficient funds");
+						return response;
+                    }
+					bidService.updateBidRanking(userId, roundId);
+                }
+
                 // Call update bid ranking!
                 // it must be called only when payment is confirmed.....
-                bidService.updateBidRanking(userId, roundId);
+
             }
             
             response = generateResponse(intent, response);
@@ -93,11 +105,11 @@ public class StripeService extends BaseService {
 	}
 	
 	// update payments - called by closeBid
-	public boolean UpdateTransaction(String roundId, String userId, Integer status) {
+	public boolean UpdateTransaction(String paymentId, Integer status) {
 		
 		PaymentIntent intent;
 		
-		FiatTransaction tx = stripeDao.getTransaction(roundId, userId);
+		FiatTransaction tx = stripeDao.getTransactionById(paymentId);
 		if(tx == null) {
 			return false;
 		}
@@ -129,8 +141,8 @@ public class StripeService extends BaseService {
 		return stripeDao.getTransactionsByUser(userId);
 	}
 	
-	public FiatTransaction getTransaction(String roundId, String userId) {
-		return stripeDao.getTransaction(roundId, userId);
+	public List<FiatTransaction> getTransactions(String roundId, String userId) {
+		return stripeDao.getTransactions(roundId, userId);
 	}
 	
 	private PayResponse generateResponse(PaymentIntent intent, PayResponse response) {

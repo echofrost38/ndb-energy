@@ -7,6 +7,7 @@ import java.util.Map;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
 
 import org.springframework.stereotype.Repository;
@@ -45,7 +46,7 @@ public class CryptoPaymentDao extends BaseDao {
 		return dynamoDBMapper.scan(CryptoTransaction.class, scanExpression);
     }
 
-    public CryptoTransaction getTransaction(String roundId, String userId) {
+    public List<CryptoTransaction> getTransaction(String roundId, String userId) {
         Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(roundId));
 		eav.put(":v2", new AttributeValue().withS(userId));
@@ -53,15 +54,26 @@ public class CryptoPaymentDao extends BaseDao {
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("round_id = :v1 and user_id = :v2")
 		    .withExpressionAttributeValues(eav);
-		List<CryptoTransaction> list = dynamoDBMapper.scan(CryptoTransaction.class, scanExpression);
-        if(list.size() == 0) {
-            return null;
-        }
-        return list.get(0);
+		return dynamoDBMapper.scan(CryptoTransaction.class, scanExpression);
     }
 
     public CryptoTransaction updateCryptoTransaction(CryptoTransaction tx) {
         dynamoDBMapper.save(tx, updateConfig);
         return tx;
+    }
+
+    // for crypto coin
+    public List<Coin> getCoins() {
+        return dynamoDBMapper.scan(Coin.class, new DynamoDBScanExpression());
+    }
+
+    public Coin addNewCoin(Coin coin) {
+        dynamoDBMapper.save(coin);
+        return coin;
+    }
+
+    public Coin deleteCoin(Coin coin) {
+        dynamoDBMapper.delete(coin);
+        return coin;
     }
 }

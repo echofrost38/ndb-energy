@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
+import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.Wallet;
@@ -20,6 +21,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * TODOs
+ * 1. processing lack of payment!!!
+ */
 
 @RestController
 @RequestMapping("/")
@@ -53,11 +59,31 @@ public class CryptoController extends BaseController {
             CoinbasePayments payments = data.getPayments().get(0);
             
             if(payments.getStatus().equals("CONFIRMED")) {
-                
-                Map<String, CoinbasePricing> paymentValues = payments.getValue();
-                CoinbasePricing cryptoPricing = paymentValues.get("crypto");
                 String code = data.getCode();
                 CryptoTransaction txn = cryptoService.getTransactionById(code);
+                
+                Map<String, CoinbasePricing> paymentValues = payments.getValue();
+                
+                CoinbasePricing cryptoPricing = paymentValues.get("crypto");
+                CoinbasePricing usdPricing = paymentValues.get("local");
+
+                double usdAmount = Double.valueOf(usdPricing.getAmount());
+                Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
+
+                if(bid.getPendingIncrease()) {
+                    double pendingPrice = bid.getDelta();
+                    if(pendingPrice > usdAmount) {
+                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+                    }
+                    
+                    bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
+                    
+                } else {
+                    double totalPrice = bid.getTotalPrice();
+                    if(totalPrice > usdAmount) {
+                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+                    }
+                }
                 
                 String cryptoType = cryptoPricing.getCurrency();
                 Double cryptoAmount = Double.valueOf(cryptoPricing.getAmount());

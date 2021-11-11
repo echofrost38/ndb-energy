@@ -65,6 +65,7 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 
 	@Override
 	public Auction endAuction(Auction targetAuction) {
+		targetAuction.setStatus(Auction.ENDED);
 		dynamoDBMapper.save(targetAuction, updateConfig);
 		return targetAuction;
 	}

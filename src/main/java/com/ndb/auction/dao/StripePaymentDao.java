@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.models.FiatTransaction;
@@ -34,15 +33,6 @@ public class StripePaymentDao extends BaseDao {
 		return tx;
 	}
 	
-	public FiatTransaction updatePaymentStatus(String roundId, String userId, Integer newStatus) {
-		FiatTransaction tx = getTransaction(roundId, userId);
-		if(tx == null) 
-			return null;
-		tx.setStatus(newStatus);
-		dynamoDBMapper.save(tx, updateConfig);
-		return tx;
-	}
-	
 	public List<FiatTransaction> getTransactionsByUser(String userId) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(userId));
@@ -55,14 +45,21 @@ public class StripePaymentDao extends BaseDao {
 	public List<FiatTransaction> getTransactionsByRound(String roundId){
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(roundId));
-		DynamoDBQueryExpression<FiatTransaction> queryExpression = new DynamoDBQueryExpression<FiatTransaction>()
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("round_id = :v1")
 		    .withExpressionAttributeValues(eav);
-		return dynamoDBMapper.query(FiatTransaction.class, queryExpression);
+		return dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
 	}
 	
-	public FiatTransaction getTransaction(String roundId, String userId) {
-		return dynamoDBMapper.load(FiatTransaction.class, roundId, userId);
+	public List<FiatTransaction> getTransactions(String roundId, String userId) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(roundId));
+		eav.put(":v2", new AttributeValue().withS(userId));
+
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+		    .withFilterExpression("round_id = :v1 and user_id = :v2")
+		    .withExpressionAttributeValues(eav);
+		return dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
 	}
 	
 	public FiatTransaction getTransactionById(String paymentId) {

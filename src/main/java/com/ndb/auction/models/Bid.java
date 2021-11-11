@@ -1,9 +1,11 @@
 package com.ndb.auction.models;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * TODO
+ * TODOs
  * 1. check status map meaning
  * 2. composite keys
  */
@@ -40,12 +42,21 @@ public class Bid {
     private String userId;
     private String roundId;
     private Double tokenAmount;
+    
     private Double totalPrice;
     private Double tokenPrice;
+
+    private Double tempTokenAmount;
+    private Double tempTokenPrice;
+    private Double delta;
+    private Boolean pendingIncrease;
+
+    private Map<String, BidHolding> holdingList;
+
     private Integer payType;
     private String cryptoType;
     private Long placedAt;
-    private Long updatedAt;
+    private Long updatedAt; 
     private Integer status;
     
     public Bid() {
@@ -58,9 +69,17 @@ public class Bid {
     	this.tokenAmount = tokenAmount;
     	this.tokenPrice = tokenPrice;
     	this.totalPrice = tokenAmount * tokenPrice;
+
+        this.pendingIncrease = false;
+        this.tempTokenAmount = 0.0;
+        this.tempTokenPrice = 0.0;
+        this.delta = 0.0;
+
     	this.placedAt = new Date().getTime();
     	this.updatedAt = this.placedAt;
     	this.status = NOT_CONFIRMED;
+
+        this.holdingList = new HashMap<String, BidHolding>();
     }
 
     @DynamoDBHashKey(attributeName="user_id")
@@ -148,5 +167,49 @@ public class Bid {
         this.cryptoType = cryptoType;
     }
 
+    @DynamoDBAttribute(attributeName="temp_token_amount")
+    public Double getTempTokenAmount() {
+        return tempTokenAmount;
+    }
+
+    public void setTempTokenAmount(Double tempTokenAmount) {
+        this.tempTokenAmount = tempTokenAmount;
+    }
+
+    @DynamoDBAttribute(attributeName="temp_token_price")
+    public Double getTempTokenPrice() {
+        return tempTokenPrice;
+    }
+
+    public void setTempTokenPrice(Double tempTokenPrice) {
+        this.tempTokenPrice = tempTokenPrice;
+    }
+
+    @DynamoDBAttribute(attributeName="pending_increase")
+    public Boolean getPendingIncrease() {
+        return pendingIncrease;
+    }
+
+    public void setPendingIncrease(Boolean pendingIncrease) {
+        this.pendingIncrease = pendingIncrease;
+    }
+    
+    @DynamoDBAttribute(attributeName="delta")
+    public Double getDelta() {
+        return delta;
+    }
+
+    public void setDelta(Double delta) {
+        this.delta = delta;
+    }
+    
+    @DynamoDBAttribute(attributeName="holding_list")
+    public Map<String, BidHolding> getHoldingList() {
+        return holdingList;
+    }
+
+    public void setHoldingList(Map<String, BidHolding> holdingList) {
+        this.holdingList = holdingList;
+    }
     
 }

@@ -1,16 +1,25 @@
 type Mutation {
 	placeBid(
 		userId: String!,
-		roundNumber: Int!,
+		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
-		payType: Int!
+		payType: Int!,
+		cryptoType: String
 	) : Bid	
 	updateBid(
 		userId: String!,
-		roundNumber: Int!,
+		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!
+	) : Bid
+	increaseBid(
+		userId: String!,
+		roundId: String!,
+		tokenAmount: Float!,
+		tokenPrice: Float!,
+		payType: Int!,
+		cryptoType: String
 	) : Bid
 }
 

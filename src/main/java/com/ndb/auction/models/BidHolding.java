@@ -6,7 +6,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 @DynamoDBDocument
 public class BidHolding {
     
-    private String type;
     private double crypto;
     private double usd; // crypto * price
 

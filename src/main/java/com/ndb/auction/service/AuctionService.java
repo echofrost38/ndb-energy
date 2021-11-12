@@ -94,7 +94,6 @@ public class AuctionService extends BaseService implements IAuctionService {
 		}
 		auctionDao.endAuction(target);
 
-
 		return target;
 	}
     

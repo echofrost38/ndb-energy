@@ -11,9 +11,13 @@ public class Coin {
 
     // short name: BTC
     private String symbol;
+    
+    public Coin(String name, String symbol) {
+        this.name = name;
+        this.symbol = symbol;
+    }
 
-
-    @DynamoDBAttribute(attributeName = "name")
+    @DynamoDBAttribute(attributeName = "coin_name")
     public String getName() {
         return name;
     }
@@ -22,7 +26,7 @@ public class Coin {
         this.name = name;
     }
 
-    @DynamoDBAttribute(attributeName = "symbol")
+    @DynamoDBAttribute(attributeName = "coin_symbol")
     public String getSymbol() {
         return symbol;
     }

@@ -1,8 +1,6 @@
 package com.ndb.auction.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
@@ -21,34 +19,41 @@ public class CryptoService extends BaseService {
     
     // get crypto price from binance API
     // coin name, symbol, pair
-    private Map<String, String> coinList;
+    private List<Coin> coinList;
     private WebClient binanceAPI;
     private WebClient coinbaseAPI;
 
     public CryptoService(WebClient.Builder webClientBuilder) {
-        coinList = new HashMap<String, String>();
         this.binanceAPI = webClientBuilder
 				.baseUrl("https://api.binance.com/api/v3")
 				.build();
         this.coinbaseAPI = webClientBuilder
             .baseUrl("https://api.commerce.coinbase.com")
             .build();
+        buildCoinCache();
     }
 
     public synchronized void buildCoinCache() {
         clearCoinCache();
-        List<Coin> list = cryptoDao.getCoins();
-        for (Coin coin : list) {
-            coinList.put(coin.getSymbol(), coin.getName());
-        }
+        this.coinList = cryptoDao.getCoins();
     }
 
-    public Map<String, String> getCoinList() {
+    public List<Coin> getCoinList() {
         return this.coinList;
     }
 
     private void clearCoinCache() {
         this.coinList.clear();
+    }
+
+    public Coin addNewCoin(String name, String symbol) {
+        Coin coin = new Coin(name, symbol);
+        return cryptoDao.addNewCoin(coin);
+    }
+
+    public Coin deleteCoin(String name, String symbol) {
+        Coin coin = new Coin(name, symbol);
+        return cryptoDao.deleteCoin(coin);
     }
 
     public double getCryptoPriceBySymbol(String symbol) {

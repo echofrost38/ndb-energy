@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.PayResponse;
@@ -65,5 +66,20 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	public List<CryptoTransaction> getCryptoTransaction(String roundId, String userId) {
 		return cryptoService.getTransaction(roundId, userId);
 	}
+
+	public List<Coin> getCoins() {
+		return cryptoService.getCoinList();
+	}
+
+	// admin 
+	public Coin addNewCoin(String name, String symbol) {
+		return cryptoService.addNewCoin(name, symbol);
+	}
+
+	public Coin deleteCoin(String name, String symbol) {
+		return cryptoService.deleteCoin(name, symbol);
+	}
+
+
 
 }

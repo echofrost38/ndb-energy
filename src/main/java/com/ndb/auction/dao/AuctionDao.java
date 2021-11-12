@@ -77,7 +77,7 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 
 	@Override
 	public Auction updateAuctionStats(Auction stats) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

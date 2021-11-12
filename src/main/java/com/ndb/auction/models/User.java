@@ -15,16 +15,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName = "User")
 public class User {
 	
-	private static final String[] COINS = {
-			"Bitcoin",
-            "Bitcoin Cash",
-            "Dai",
-            "Dogecoin",
-            "Ethereum",
-            "Litecoin",
-            "USD Coin"
-	};
-	
 	private String id;
 	private String name;
 	private String surname;
@@ -59,7 +49,7 @@ public class User {
 		
 	}
 	
-	public User(String email, String password, String country, boolean tos) {
+	public User(String email, String password, String country, boolean tos, List<Coin> coinList) {
 		// from user input
 		this.email = email;
 		this.password = password;
@@ -71,8 +61,8 @@ public class User {
 		
 		// initialize the wallet with possible coins
 		this.wallet = new HashMap<String, Wallet>();
-		for(int i = 0; i < COINS.length; i++) {
-			this.wallet.put(COINS[i], new Wallet());
+		for (Coin coin : coinList) {
+			this.wallet.put(coin.getSymbol(), new Wallet());
 		}
 		
 		this.security = new HashMap<String, Boolean>();
@@ -86,7 +76,7 @@ public class User {
 		this.extWallet.put("addr", "");
 		
 		this.verify = new HashMap<String, Boolean>();
-		verify.put("email", false);
+		verify.put("email", true);
 		verify.put("mobile", true);
 		verify.put("identity", false);
 		

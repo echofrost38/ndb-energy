@@ -2,6 +2,7 @@ package com.ndb.auction.service;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.User;
 import com.ndb.auction.service.interfaces.IUserService;
 
@@ -33,7 +35,8 @@ public class UserService extends BaseService implements IUserService {
 				return "Already exists, sent verify code";
 			}
 		} else {
-			user = new User(email, password, country, tos);			
+			List<Coin> coins = cryptoDao.getCoins();
+			user = new User(email, password, country, tos, coins);			
 			userDao.createUser(user);
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);

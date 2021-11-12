@@ -34,13 +34,17 @@ public class Auction extends BaseModel {
     private Double minPrice;
     private Double sold;
     private AuctionStats stats;
+
+    private AvatarSet avatar;
+    private Double token;
+
     private Integer status;
     
     public Auction() {
     	
     }
     
-    public Auction(Integer _number, String _startedAt, long duration, Double _totalToken, Double _minPrice) {
+    public Auction(Integer _number, String _startedAt, long duration, Double _totalToken, Double _minPrice, AvatarSet avatar, Double token) {
     	this.number = _number;
     	this.totalToken = _totalToken;
     	this.minPrice = _minPrice;
@@ -66,6 +70,8 @@ public class Auction extends BaseModel {
     	this.status = PENDING; 
     	AuctionStats auctionStats = new AuctionStats();
     	this.stats = auctionStats;
+        this.avatar = avatar;
+        this.token = token;
     }
 
     @DynamoDBHashKey(attributeName="id")
@@ -150,5 +156,22 @@ public class Auction extends BaseModel {
         this.duration = duration;
     }
 
+    @DynamoDBAttribute(attributeName = "avatar_set")
+    public AvatarSet getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(AvatarSet avatar) {
+        this.avatar = avatar;
+    }
+
+    @DynamoDBAttribute(attributeName = "avatar_token")
+    public Double getToken() {
+        return token;
+    }
+
+    public void setToken(Double token) {
+        this.token = token;
+    }
     
 }

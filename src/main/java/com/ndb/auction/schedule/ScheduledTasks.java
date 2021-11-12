@@ -6,12 +6,16 @@ import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.service.AuctionService;
+import com.ndb.auction.service.BidService;
 
 @Component
 public class ScheduledTasks {
 	
 	@Autowired
 	AuctionService auctionService;
+
+	@Autowired
+	BidService bidService;
 	
 	private Auction startedRound;
 	private Long startedCounter;
@@ -88,7 +92,9 @@ public class ScheduledTasks {
 			if(readyCounter == 0) {
 				// ended count down ! trigger to start this round!!
 				String id = readyRound.getAuctionId();
+
 				Auction nextRound = auctionService.startAuction(id);
+				
 				startedRound = readyRound;
 				startedCounter = readyRound.getDuration();
 				if(nextRound != null) {
@@ -106,7 +112,12 @@ public class ScheduledTasks {
 			if(startedCounter == 0) {
 				// end round!
 				auctionService.endAuction(startedRound.getAuctionId());
+				
 				startedRound = null;
+				
+				// bid processing 
+				// ********* checking delayed more 1s ************ 
+				bidService.closeBid(startedRound.getAuctionId());
 			}
 		}
 	}

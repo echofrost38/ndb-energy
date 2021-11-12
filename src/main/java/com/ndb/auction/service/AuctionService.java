@@ -27,6 +27,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 			auctionDao.createNewAuction(auction);
 
 			// set new countdown!!
+			schedule.setNewCountdown(auction);
 
 		} else {
 			auctionDao.createNewAuction(auction);
@@ -93,7 +94,6 @@ public class AuctionService extends BaseService implements IAuctionService {
 		}
 		auctionDao.endAuction(target);
 
-		// async call!!
 
 		return target;
 	}

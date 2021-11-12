@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
+import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
@@ -198,7 +199,14 @@ public class BidService extends BaseService implements IBidService {
         
 	}
 	
+	// not sychnorized
 	public void closeBid(String roundId) {
+		
+		Auction auction = auctionDao.getAuctionById(roundId);
+		List<AvatarComponent> avatarComponents = 
+			avatarDao.getAvatarComponentsBySet(auction.getAvatar());
+		Double avatarToken = auction.getToken();
+		
 		// Assume all status already confirmed when new bid is placed
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		
@@ -269,11 +277,24 @@ public class BidService extends BaseService implements IBidService {
 					wallet.setHolding(hold);
 				}
 			}
+
+			// checking Round AVATAR
+			boolean roundAvatarWinner = true;
+			Map<String, List<String>> userAvatarPurchased = user.getAvatarPurchase();
+			for (AvatarComponent component : avatarComponents) {
+				List<String> list = userAvatarPurchased.get(component.getGroupId());
+				if(!list.contains(component.getCompId())) {
+					roundAvatarWinner = false;
+				}
+			}			
 			
 			// check total price and NDB wallet!!
 	        if(bid.getStatus() == Bid.WINNER) {
 				double tokenPrice = bid.getTokenPrice();
 				double token = totalPrice / tokenPrice;
+				if(roundAvatarWinner) {
+					token += avatarToken;
+				}
 				Wallet wallet = tempWallet.get("NDB");
 				wallet.setFree(wallet.getFree() + token);
 			}

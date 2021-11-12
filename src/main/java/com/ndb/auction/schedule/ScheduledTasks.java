@@ -89,6 +89,7 @@ public class ScheduledTasks {
 		// count down ( ready round )
 		if(readyRound != null && readyCounter > 0L) {
 			readyCounter--;
+			System.out.println("Ready counter: " + readyCounter.toString());
 			if(readyCounter == 0) {
 				// ended count down ! trigger to start this round!!
 				String id = readyRound.getAuctionId();

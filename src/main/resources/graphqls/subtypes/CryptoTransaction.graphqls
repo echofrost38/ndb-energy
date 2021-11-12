@@ -5,7 +5,7 @@ type CryptoTransaction {
     code: String!,
     amount: Float!,
     cryptoAmount: Float,
-    cryptoType: Float,
+    cryptoType: String,
     status: Int,
     createdAt: String,
     updatedAt: String

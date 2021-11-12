@@ -54,11 +54,11 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return cryptoService.getTransactionById(code);
 	}
 
-	public List<CryptoTransaction> getTransactionByUser(String userId) {
+	public List<CryptoTransaction> getCryptoTransactionByUser(String userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}
 
-	public List<CryptoTransaction> getTransactionByRound(String roundId) {
+	public List<CryptoTransaction> getCryptoTransactionByRound(String roundId) {
 		return cryptoService.getTransactionByRound(roundId);
 	}
 	

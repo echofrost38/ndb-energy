@@ -16,7 +16,12 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver{
 	
 	// create new component
-	public AvatarComponent createNewComponent(String groupId, Integer tierLevel, Double price, Integer limited) {
+	public AvatarComponent createNewComponent(
+		String groupId, 
+		Integer tierLevel, 
+		Double price, 
+		Integer limited
+	) {
 		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited);
 	}
 	

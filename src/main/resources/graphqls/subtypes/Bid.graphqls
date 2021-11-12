@@ -1,7 +1,4 @@
-type BidHoldings {
-	key: String,
-	value: BidHolding
-}
+
 
 type Bid {
 	userId: String,
@@ -13,10 +10,22 @@ type Bid {
 	tempTokenPrice: Float,
 	delta: Float,
 	pendingIncrease: Boolean,
-	holdingList: [BidHoldings]
+	# holdingList: [BidHoldings],
 	payType: Int,
 	cryptoType: String,
 	placedAt: Float,
 	updatedAt: Float,
 	status: Int
 }
+
+type BidHoldings {
+	key: String,
+	value: BidHolding
+}
+
+type BidHolding {
+    crypto: Float,
+    usd: Float
+}
+
+scalar BidHolding

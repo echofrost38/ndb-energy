@@ -47,7 +47,12 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
             .withFilterExpression("round_number = :val1")
             .withExpressionAttributeValues(eav);
 
-        return dynamoDBMapper.scan(Auction.class, scanExpression).get(0);
+		List<Auction> list = dynamoDBMapper.scan(Auction.class, scanExpression);
+		if(list.size() == 0) {
+			return null;
+		} else {
+			return list.get(0);
+		}
 	}
 
 	@Override

@@ -4,7 +4,7 @@ type Mutation {
 		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
-		payType: Int!,
+		payment: Int!,
 		cryptoType: String
 	) : Bid	
 	updateBid(
@@ -18,7 +18,7 @@ type Mutation {
 		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
-		payType: Int!,
+		payment: Int!,
 		cryptoType: String
 	) : Bid
 }

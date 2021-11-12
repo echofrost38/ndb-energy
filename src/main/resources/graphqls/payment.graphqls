@@ -1,9 +1,9 @@
 extend type Query {
 	getStripePubKey : String!
-	getStripeTransactionByRound(
+	getStripeTransactionsByRound(
 		roundId: String!
 	) : [StripeTransaction]
-	getStripeTransactionByUser(
+	getStripeTransactionsByUser(
 		userId: String!
 	) : [StripeTransaction]
 	getStripeTransaction(
@@ -22,7 +22,7 @@ extend type Query {
 	getCryptoTransaction(
 		roundId: String!,
 		userId: String!
-	) : CryptoTransaction
+	) : [CryptoTransaction]
 }
 
 extend type Mutation {

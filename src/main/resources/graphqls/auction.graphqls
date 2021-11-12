@@ -12,7 +12,7 @@ extend type Mutation {
 		minPrice: Float!,
 		avatar: AvatarSetInput,
 		token: Float
-	) : Auction!
+	) : Auction
 	updateAuction(
 		id: String!
 		number: Int, 

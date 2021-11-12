@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName="fiat_tx")
-public class FiatTransaction {
+public class StripeTransaction {
 	
 	public static final Integer INITIATED = 0;
 	public static final Integer AUTHORIZED = 1;
@@ -23,11 +23,11 @@ public class FiatTransaction {
 	private Integer status;
 	private Long createdAt;
 	
-	public FiatTransaction() {
+	public StripeTransaction() {
 		
 	}
 	
-	public FiatTransaction(String roundId, String userId, Long amount, String paymentIntentId) {
+	public StripeTransaction(String roundId, String userId, Long amount, String paymentIntentId) {
 		this.roundId = roundId;
 		this.userId = userId;
 		this.amount = amount;

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import com.ndb.auction.models.CryptoTransaction;
-import com.ndb.auction.models.FiatTransaction;
+import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.PayResponse;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -19,25 +19,34 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return stripeService.getPublicKey();
 	}
 	
-	public PayResponse stripePayment(String roundId, String userId, Long amount, String paymentIntentId) {
+	public PayResponse stripePayment(
+		String roundId, 
+		String userId, 
+		Long amount, 
+		String paymentIntentId 
+	) {
 		return stripeService.createNewPayment(roundId, userId, amount, paymentIntentId);
 	}
 
-	public List<FiatTransaction> getTransactionsByRound(String roundId) {
+	public List<StripeTransaction> getStripeTransactionsByRound(String roundId) {
 		return stripeService.getTransactionsByRound(roundId);
 	}
 
-	public List<FiatTransaction> getTransactionsByUser(String userId) {
+	public List<StripeTransaction> getStripeTransactionsByUser(String userId) {
 		return stripeService.getTransactionByUser(userId);
 	}
 
-	public List<FiatTransaction> getFiatTransaction(String roundId, String userId) {
+	public List<StripeTransaction> getStripeTransaction(String roundId, String userId) {
 		return stripeService.getTransactions(roundId, userId);
 	}
 
 
 	// for crypto payment
-	public CryptoTransaction createCryptoPayment(String roundId, String userId, Double amount) {
+	public CryptoTransaction createCryptoPayment(
+		String roundId, 
+		String userId, 
+		Double amount
+	) {
 		return cryptoService.createNewPayment(roundId, userId, amount);
 	}
 

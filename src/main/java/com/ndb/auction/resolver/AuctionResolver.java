@@ -15,7 +15,15 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	
 	// start time / duration / total amount / min price 
 	// not sure => % of total amount for all rounds, previous min price!!
-	public Auction createAuction(int number, String startedAt, long duration, double totalToken, double minPrice, AvatarSet avatarSet, Double token) {
+	public Auction createAuction(
+		int number, 
+		String startedAt, 
+		long duration, 
+		double totalToken, 
+		double minPrice, 
+		AvatarSet avatarSet, 
+		Double token
+	) {
 		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatarSet, token);
 		return auctionService.createNewAuction(auction);
 	}

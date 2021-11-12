@@ -13,7 +13,14 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class BidResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
-	public Bid placeBid(String userId, String roundId, Double tokenAmount, Double tokenPrice, Integer payment, String cryptoType) {
+	public Bid placeBid(
+		String userId, 
+		String roundId, 
+		Double tokenAmount, 
+		Double tokenPrice, 
+		Integer payment, 
+		String cryptoType
+	) {
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 

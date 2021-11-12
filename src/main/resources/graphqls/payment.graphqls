@@ -1,5 +1,28 @@
 extend type Query {
 	getStripePubKey : String!
+	getStripeTransactionByRound(
+		roundId: String!
+	) : [StripeTransaction]
+	getStripeTransactionByUser(
+		userId: String!
+	) : [StripeTransaction]
+	getStripeTransaction(
+		roundId: String!,
+		userId: String!
+	) : [StripeTransaction]
+	getCryptoTransactionByCode(
+		code: String!
+	) : CryptoTransaction
+	getCryptoTransactionByUser(
+		userId: String!
+	) : [CryptoTransaction]
+	getCryptoTransactionByRound(
+		roundId: String!
+	) : [CryptoTransaction]
+	getCryptoTransaction(
+		roundId: String!,
+		userId: String!
+	) : CryptoTransaction
 }
 
 extend type Mutation {
@@ -9,6 +32,11 @@ extend type Mutation {
 		amount: Float,
 		paymentIntentId: String
 	) : PayResponse!
+	createCryptoPayment(
+		roundId: String!,
+		userId: String!,
+		amount: Float!
+	) : CryptoTransaction
 }
 
 schema {

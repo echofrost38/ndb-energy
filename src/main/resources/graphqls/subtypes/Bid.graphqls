@@ -1,10 +1,21 @@
+type BidHoldings {
+	key: String,
+	value: BidHolding
+}
+
 type Bid {
 	userId: String,
-	roundNumber: Int,
+	roundId: String,
 	tokenAmount: Float,
 	totalPrice: Float,
 	tokenPrice: Float,
+	tempTokenAmount: Float,
+	tempTokenPrice: Float,
+	delta: Float,
+	pendingIncrease: Boolean,
+	holdingList: [BidHoldings]
 	payType: Int,
+	cryptoType: String,
 	placedAt: Float,
 	updatedAt: Float,
 	status: Int

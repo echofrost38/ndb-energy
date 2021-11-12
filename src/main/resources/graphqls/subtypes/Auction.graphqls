@@ -5,6 +5,8 @@ type Auction {
 	endedAt: Float,
 	totalToken: Float,
 	minPrice: Float,
+	avatar: AvatarSet,
+	token: Float,
 	sold: Float,
 	stats: Stats,
 	status: Int

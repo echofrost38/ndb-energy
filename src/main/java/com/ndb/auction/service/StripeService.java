@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.FiatTransaction;
+import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.PayResponse;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
@@ -55,12 +55,12 @@ public class StripeService extends BaseService {
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams);
                 
-                FiatTransaction fTx = new FiatTransaction(roundId, userId, amount, intent.getId());
+                StripeTransaction fTx = new StripeTransaction(roundId, userId, amount, intent.getId());
                 fTx = stripeDao.createNewPayment(fTx);
                 
             } else {
                 // Confirm the PaymentIntent to collect the money
-            	FiatTransaction tx = stripeDao.getTransactionById(paymentIntentId);
+            	StripeTransaction tx = stripeDao.getTransactionById(paymentIntentId);
             	if(tx == null) {
             		response.setError("Not found paymentIntent");
             		return response;
@@ -69,7 +69,7 @@ public class StripeService extends BaseService {
                 intent = PaymentIntent.retrieve(paymentIntentId);
                 intent = intent.confirm();
                 
-                stripeDao.updatePaymentStatus(paymentIntentId, FiatTransaction.AUTHORIZED);
+                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
 				Bid bid = bidService.getBid(roundId, userId);
 				double usdAmount = (double)amount;
 				if(bid.getPendingIncrease()) {
@@ -109,7 +109,7 @@ public class StripeService extends BaseService {
 		
 		PaymentIntent intent;
 		
-		FiatTransaction tx = stripeDao.getTransactionById(paymentId);
+		StripeTransaction tx = stripeDao.getTransactionById(paymentId);
 		if(tx == null) {
 			return false;
 		}
@@ -119,10 +119,10 @@ public class StripeService extends BaseService {
 			intent = PaymentIntent.retrieve(paymentIntentId);
 			if(status == Bid.WINNER) {
 				intent.capture();		
-				stripeDao.updatePaymentStatus(paymentIntentId, FiatTransaction.CAPTURED);
+				stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.CAPTURED);
 			} else {
 				intent.cancel();
-				stripeDao.updatePaymentStatus(paymentIntentId, FiatTransaction.CANCELED);
+				stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.CANCELED);
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -132,16 +132,16 @@ public class StripeService extends BaseService {
 	}
 	
 	// get transactions
-	public List<FiatTransaction> getTransactionsByRound(String roundId) {
+	public List<StripeTransaction> getTransactionsByRound(String roundId) {
 		return stripeDao.getTransactionsByRound(roundId);
 	}
 	
-	public List<FiatTransaction> getTransactionByUser(String userId) {
+	public List<StripeTransaction> getTransactionByUser(String userId) {
 		
 		return stripeDao.getTransactionsByUser(userId);
 	}
 	
-	public List<FiatTransaction> getTransactions(String roundId, String userId) {
+	public List<StripeTransaction> getTransactions(String roundId, String userId) {
 		return stripeDao.getTransactions(roundId, userId);
 	}
 	

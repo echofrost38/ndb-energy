@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.ndb.auction.models.FiatTransaction;
+import com.ndb.auction.models.StripeTransaction;
 
 @Repository
 public class StripePaymentDao extends BaseDao {
@@ -18,13 +18,13 @@ public class StripePaymentDao extends BaseDao {
 		super(dynamoDBMapper);
 	}
 	
-	public FiatTransaction createNewPayment(FiatTransaction tx) {
+	public StripeTransaction createNewPayment(StripeTransaction tx) {
 		dynamoDBMapper.save(tx);
 		return tx;
 	}
 	
-	public FiatTransaction updatePaymentStatus(String paymentId, Integer newStatus) {
-		FiatTransaction tx = getTransactionById(paymentId);
+	public StripeTransaction updatePaymentStatus(String paymentId, Integer newStatus) {
+		StripeTransaction tx = getTransactionById(paymentId);
 		if(tx == null) {
 			return null;
 		}
@@ -33,25 +33,25 @@ public class StripePaymentDao extends BaseDao {
 		return tx;
 	}
 	
-	public List<FiatTransaction> getTransactionsByUser(String userId) {
+	public List<StripeTransaction> getTransactionsByUser(String userId) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(userId));
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("user_id = :v1")
 		    .withExpressionAttributeValues(eav);
-		return dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
+		return dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
 	}
 	
-	public List<FiatTransaction> getTransactionsByRound(String roundId){
+	public List<StripeTransaction> getTransactionsByRound(String roundId){
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(roundId));
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("round_id = :v1")
 		    .withExpressionAttributeValues(eav);
-		return dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
+		return dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
 	}
 	
-	public List<FiatTransaction> getTransactions(String roundId, String userId) {
+	public List<StripeTransaction> getTransactions(String roundId, String userId) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(roundId));
 		eav.put(":v2", new AttributeValue().withS(userId));
@@ -59,16 +59,16 @@ public class StripePaymentDao extends BaseDao {
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("round_id = :v1 and user_id = :v2")
 		    .withExpressionAttributeValues(eav);
-		return dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
+		return dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
 	}
 	
-	public FiatTransaction getTransactionById(String paymentId) {
+	public StripeTransaction getTransactionById(String paymentId) {
 		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(paymentId));
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
 		    .withFilterExpression("payment_intent = :v1")
 		    .withExpressionAttributeValues(eav);
-		List<FiatTransaction> list = dynamoDBMapper.scan(FiatTransaction.class, scanExpression);
+		List<StripeTransaction> list = dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
 		if(list.size() == 0) {
 			return null;
 		}

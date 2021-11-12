@@ -16,7 +16,7 @@ import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
-import com.ndb.auction.models.FiatTransaction;
+import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
@@ -219,8 +219,8 @@ public class BidService extends BaseService implements IBidService {
 			double totalPrice = 0.0;
 
 			// check stripe
-			List<FiatTransaction> fiatTxns = stripeService.getTransactions(roundId, userId);
-			for (FiatTransaction fiatTransaction : fiatTxns) {
+			List<StripeTransaction> fiatTxns = stripeService.getTransactions(roundId, userId);
+			for (StripeTransaction fiatTransaction : fiatTxns) {
 				boolean result = stripeService.UpdateTransaction(fiatTransaction.getPaymentIntentId(), bid.getStatus());
 				if(result && (bid.getStatus() == Bid.WINNER)) {
 					totalPrice += fiatTransaction.getAmount();					

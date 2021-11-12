@@ -1,7 +1,6 @@
 extend type Query {
-	getBidListByRound(round: Int!): [Bid]
-	getBidListByUser(userId: String!): [Bid]
-	getBid(userId: String!, round: Int!) : Bid
+	getAuctions : [Auction]
+	getAuctionById(id: String!) : Auction!
 }
 
 extend type Mutation {
@@ -10,14 +9,18 @@ extend type Mutation {
 		startedAt: String!,  
 		duration: Float!,
 		totalToken: Float!, 
-		minPrice: Float!
+		minPrice: Float!,
+		avatar: AvatarSetInput,
+		token: Float
 	) : Auction!
 	updateAuction(
 		id: String!
 		number: Int, 
 		duration: Float,  
 		totalToken: Float, 
-		minPrice: Float		
+		minPrice: Float,
+		avatar: AvatarSetInput,
+		token: Float
 	) : Auction!
 }
 

@@ -24,7 +24,7 @@ public interface IAvatarService {
 				String surname,
 				String shortName,
 				List<SkillSet> skillSet,
-				AvatarSet avatarSet,
+				List<AvatarSet> avatarSet,
 				String enemy,
 				String invention,
 				String bio
@@ -36,7 +36,7 @@ public interface IAvatarService {
 				String surname,
 				String shortName,
 				List<SkillSet> skillSet,
-				AvatarSet avatarSet,
+				List<AvatarSet> avatarSet,
 				String enemy,
 				String invention,
 				String bio
@@ -48,5 +48,5 @@ public interface IAvatarService {
 
 	AvatarProfile getAvatarProfileByName(String name);
 
-	List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set);
+	List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set);
 }

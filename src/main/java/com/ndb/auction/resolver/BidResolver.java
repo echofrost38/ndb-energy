@@ -3,9 +3,11 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.service.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -15,26 +17,27 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid placeBid(
-		String userId, 
 		String roundId, 
 		Double tokenAmount, 
 		Double tokenPrice, 
 		Integer payment, 
 		String cryptoType
 	) {
+		String userId = "";
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
-		String userId, 
 		String roundId, 
 		Double tokenAmount, 
 		Double tokenPrice, 
 		Integer payment, 
 		String cryptoType
 	) {
-		return bidService.increaseBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        String id = userDetails.getId();
+		return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -43,13 +46,27 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	}
 	
 	@PreAuthorize("isAuthenticated()")
+	public List<Bid> getBidListByUser() {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        String id = userDetails.getId();
+		return bidService.getBidListByUser(id);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<Bid> getBidListByUser(String userId) {
 		return bidService.getBidListByUser(userId);
 	}
-	
-	@PreAuthorize("isAuthenticated()")
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Bid getBid(String userId, Integer round) {
 		return bidService.getBid(round, userId);
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public Bid getBid(Integer round) {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        String id = userDetails.getId();
+		return bidService.getBid(round, id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -59,11 +76,12 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid updateBid(
-		String userId, 
 		String roundId, 
 		Double tokenAmount, 
 		Double tokenPrice
 	) {
-		return bidService.updateBid(userId, roundId, tokenAmount, tokenPrice);
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        String id = userDetails.getId();
+		return bidService.updateBid(id, roundId, tokenAmount, tokenPrice);
 	}
 }

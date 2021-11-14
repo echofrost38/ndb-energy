@@ -35,14 +35,14 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, AvatarSet avatarSet, String enemy, String invention, String bio) 
+	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
 	{
 		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
 	}
 	
 	// update existing avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, AvatarSet avatarSet, String enemy, String invention, String bio) 
+	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
 	{
 		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
 	}
@@ -79,7 +79,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set) {
+	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarService.getAvatarComponentsBySet(set);
 	}
 

@@ -18,7 +18,7 @@ public interface IAvatarDao {
 	
 	AvatarComponent getAvatarComponent(String groupId, String sKey);
 	
-	List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set);
+	List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set);
 
 	// update avatar component
 	AvatarComponent updateAvatarComponent(AvatarComponent component);

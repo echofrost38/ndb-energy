@@ -19,7 +19,7 @@ public class AvatarProfile {
 	private String surname;
 	private String shortName;
 	private List<SkillSet> skillSet;
-	private AvatarSet avatarSet;
+	private List<AvatarSet> avatarSet;
 	private String enemy;
 	private String invention;
 	private String bio;
@@ -33,7 +33,7 @@ public class AvatarProfile {
 		String surname,
 		String shortName,
 		List<SkillSet> skillSet,
-		AvatarSet avatarSet,
+		List<AvatarSet> avatarSet,
 		String enemy,
 		String invention,
 		String bio
@@ -95,11 +95,11 @@ public class AvatarProfile {
 	}
 
 	@DynamoDBAttribute(attributeName="avatar_set")
-	public AvatarSet getAvatarSet() {
+	public List<AvatarSet> getAvatarSet() {
 		return avatarSet;
 	}
 
-	public void setAvatarSet(AvatarSet avatarSet) {
+	public void setAvatarSet(List<AvatarSet> avatarSet) {
 		this.avatarSet = avatarSet;
 	}
 

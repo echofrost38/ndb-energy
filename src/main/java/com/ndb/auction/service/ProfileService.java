@@ -61,7 +61,7 @@ public class ProfileService extends BaseService implements IProfileService {
 
 	@Override
 	public Integer changePassword(String userId, String password) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -89,14 +89,13 @@ public class ProfileService extends BaseService implements IProfileService {
 		
 		// update purchase list and user avatar set!!
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(prefix);
-		AvatarSet sets = profile.getAvatarSet();
+		List<AvatarSet> sets = profile.getAvatarSet();
 		List<AvatarComponent> components = avatarDao.getAvatarComponentsBySet(sets);
 		Map<String, List<String>> purchasedMap = user.getAvatarPurchase();
 		for (AvatarComponent comp : components) {
 			String group = comp.getGroupId();
 			List<String> purchased = purchasedMap.get(group);
 			purchased.add(comp.getCompId());
-			purchasedMap.replace(group, purchased);
 		}
 		user.setAvatarPurchase(purchasedMap);
 		user.setAvatar(sets);
@@ -107,7 +106,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	}
 
 	@Override
-	public AvatarSet updateAvatarSet(String userId, AvatarSet set) {
+	public List<AvatarSet> updateAvatarSet(String userId, List<AvatarSet> set) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
 			return null;

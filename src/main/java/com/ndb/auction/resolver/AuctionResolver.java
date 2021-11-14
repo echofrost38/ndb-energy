@@ -23,7 +23,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		long duration, 
 		double totalToken, 
 		double minPrice, 
-		AvatarSet avatar, 
+		List<AvatarSet> avatar, 
 		Double token
 	) {
 		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatar, token);
@@ -47,7 +47,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		long duration, 
 		double totalToken, 
 		double minPrice, 
-		AvatarSet avatarSet, 
+		List<AvatarSet> avatarSet, 
 		Double token
 	) {
 		Auction auction = new Auction(number, null, duration, totalToken, minPrice, avatarSet, token);

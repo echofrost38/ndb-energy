@@ -99,7 +99,7 @@ public class AvatarDao extends BaseDao implements IAvatarDao {
 	}
 
 	@Override
-	public List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set) {
+	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		List<AvatarComponent> list = new ArrayList<AvatarComponent>();
 		Field[] fields = AvatarSet.class.getDeclaredFields();
 		

@@ -25,7 +25,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
     // update avatar profile ( avatar set )
     @PreAuthorize("isAuthenticated()")
-    public AvatarSet updateAvatarSet(AvatarSet set) {
+    public List<AvatarSet> updateAvatarSet(List<AvatarSet> set) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
         String id = userDetails.getId();
 

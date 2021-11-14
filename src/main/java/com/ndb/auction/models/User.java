@@ -45,7 +45,7 @@ public class User {
 	
 	private String avatarPrefix;
 	private String avatarName;
-	private AvatarSet avatar;
+	private List<AvatarSet> avatar;
 	private Map<String, List<String>> avatarPurchase;
 	
 
@@ -86,6 +86,9 @@ public class User {
 		verify.put("email", true);
 		verify.put("mobile", true);
 		verify.put("identity", false);
+
+		this.avatarPurchase = new HashMap<String, List<String>>();
+		
 		
 		this.setNotifySetting(0xFFFF);
 	}
@@ -254,11 +257,11 @@ public class User {
 	}
 	
 	@DynamoDBAttribute(attributeName="avatar")
-	public AvatarSet getAvatar() {
+	public List<AvatarSet> getAvatar() {
 		return avatar;
 	}
 	
-	public void setAvatar(AvatarSet avatar) {
+	public void setAvatar(List<AvatarSet> avatar) {
 		this.avatar = avatar;
 	}
 	

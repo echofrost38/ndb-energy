@@ -50,7 +50,7 @@ public interface IProfileService {
 	String setAvatar(String id, String prefix, String userName);
 
 	// update avatar set
-	AvatarSet updateAvatarSet(String userId, AvatarSet set);
+	List<AvatarSet> updateAvatarSet(String userId, List<AvatarSet> set);
 
 	String purchaseComponent(List<AvatarComponent> components);
 	

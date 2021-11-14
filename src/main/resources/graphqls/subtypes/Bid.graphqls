@@ -1,5 +1,3 @@
-
-
 type Bid {
 	userId: String,
 	roundId: String,
@@ -10,7 +8,7 @@ type Bid {
 	tempTokenPrice: Float,
 	delta: Float,
 	pendingIncrease: Boolean,
-	# holdingList: [BidHoldings],
+	holdings: [BidHoldings],
 	payType: Int,
 	cryptoType: String,
 	placedAt: Float,
@@ -27,5 +25,3 @@ type BidHolding {
     crypto: Float,
     usd: Float
 }
-
-scalar BidHolding

@@ -3,6 +3,7 @@ package com.ndb.auction.models;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * TODOs: 
@@ -34,7 +35,7 @@ public class Auction extends BaseModel {
     private Double sold;
     private AuctionStats stats;
 
-    private AvatarSet avatar;
+    private List<AvatarSet> avatar;
     private Double token;
 
     private Integer status;
@@ -43,7 +44,7 @@ public class Auction extends BaseModel {
     	
     }
     
-    public Auction(Integer _number, String _startedAt, long duration, Double _totalToken, Double _minPrice, AvatarSet avatar, Double token) {
+    public Auction(Integer _number, String _startedAt, long duration, Double _totalToken, Double _minPrice, List<AvatarSet> avatar, Double token) {
     	this.number = _number;
     	this.totalToken = _totalToken;
     	this.minPrice = _minPrice;
@@ -156,11 +157,11 @@ public class Auction extends BaseModel {
     }
 
     @DynamoDBAttribute(attributeName = "avatar_set")
-    public AvatarSet getAvatar() {
+    public List<AvatarSet> getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(AvatarSet avatar) {
+    public void setAvatar(List<AvatarSet> avatar) {
         this.avatar = avatar;
     }
 

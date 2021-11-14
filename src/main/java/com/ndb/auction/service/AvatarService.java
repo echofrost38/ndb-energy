@@ -53,7 +53,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 
 	@Override
 	public AvatarProfile createAvatarProfile(String name, String surname, String shortName,
-			List<SkillSet> skillSet, AvatarSet avatarSet, String enemy, String invention, String bio) {
+			List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) {
 		
 		// check condition
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
@@ -72,7 +72,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 			String surname, 
 			String shortName,
 			List<SkillSet> skillSet, 
-			AvatarSet avatarSet, 
+			List<AvatarSet> avatarSet, 
 			String enemy, 
 			String invention, 
 			String bio) 
@@ -112,7 +112,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 
 	@Override
 	@PreAuthorize("isAuthenticated()")
-	public List<AvatarComponent> getAvatarComponentsBySet(AvatarSet set) {
+	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarDao.getAvatarComponentsBySet(set);
 	}
 

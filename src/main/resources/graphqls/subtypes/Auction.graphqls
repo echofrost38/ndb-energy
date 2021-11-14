@@ -10,5 +10,4 @@ type Auction {
 	sold: Float,
 	stats: Stats,
 	status: Int,
-	round: Int
 }

@@ -2,6 +2,7 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.Auction;
@@ -15,6 +16,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	
 	// start time / duration / total amount / min price 
 	// not sure => % of total amount for all rounds, previous min price!!
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction createAuction(
 		int number, 
 		String startedAt, 
@@ -28,14 +30,17 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		return auctionService.createNewAuction(auction);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<Auction> getAuctions() {
 		return auctionService.getAuctionList();
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction getAuctionById(String id) {
 		return auctionService.getAuctionById(id);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction updateAuction(
 		String id, 
 		int number, 

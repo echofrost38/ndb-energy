@@ -18,7 +18,7 @@ import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.User;
-import com.ndb.auction.models.Wallet;
+import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
 
 /**

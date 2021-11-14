@@ -1,11 +1,13 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.user;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 
 @DynamoDBDocument
 public class Wallet {
 	
+	private String key;
 	private double total;
 	private double free;
 	private double holding;
@@ -15,7 +17,16 @@ public class Wallet {
 		this.free = 0.0;
 		this.holding = 0.0;
 	}
+
 	
+	@DynamoDBIgnore
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
+
 	@DynamoDBAttribute
 	public double getTotal() {
 		return total;

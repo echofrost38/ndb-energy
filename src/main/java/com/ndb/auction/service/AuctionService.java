@@ -30,6 +30,11 @@ public class AuctionService extends BaseService implements IAuctionService {
 			schedule.setNewCountdown(auction);
 
 		} else {
+			// check end time and start time
+			long prevEnd = prev.getEndedAt();
+			long curStart = auction.getStartedAt();
+			if(curStart < prevEnd) return null;
+
 			auctionDao.createNewAuction(auction);
 		}
 		

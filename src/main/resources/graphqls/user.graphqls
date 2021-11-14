@@ -1,0 +1,7 @@
+extend type Query {
+	getUser : User
+}
+
+schema {
+    query: Query
+}

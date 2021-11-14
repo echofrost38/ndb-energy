@@ -8,6 +8,7 @@ import java.util.Random;
 
 import javax.mail.MessagingException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -20,6 +21,9 @@ import freemarker.template.TemplateException;
 
 @Service
 public class UserService extends BaseService implements IUserService {
+
+	@Autowired
+	CryptoService cryptoService;
 
 	@Override
 	public String createUser(String email, String password, String country, Boolean tos) {
@@ -35,7 +39,7 @@ public class UserService extends BaseService implements IUserService {
 				return "Already exists, sent verify code";
 			}
 		} else {
-			List<Coin> coins = cryptoDao.getCoins();
+			List<Coin> coins = cryptoService.getCoinList();
 			user = new User(email, password, country, tos, coins);			
 			userDao.createUser(user);
 		}

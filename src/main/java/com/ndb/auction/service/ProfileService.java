@@ -13,7 +13,7 @@ import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.User;
-import com.ndb.auction.models.Wallet;
+import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IProfileService;
 
 /**

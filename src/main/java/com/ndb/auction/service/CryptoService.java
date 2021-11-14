@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class CryptoService extends BaseService {
-    
+
     // get crypto price from binance API
     // coin name, symbol, pair
     private List<Coin> coinList;
@@ -30,7 +30,6 @@ public class CryptoService extends BaseService {
         this.coinbaseAPI = webClientBuilder
             .baseUrl("https://api.commerce.coinbase.com")
             .build();
-        buildCoinCache();
     }
 
     public synchronized void buildCoinCache() {
@@ -39,10 +38,14 @@ public class CryptoService extends BaseService {
     }
 
     public List<Coin> getCoinList() {
+        if(this.coinList == null) {
+            buildCoinCache();
+        }
         return this.coinList;
     }
 
     private void clearCoinCache() {
+        if(this.coinList == null) return;
         this.coinList.clear();
     }
 

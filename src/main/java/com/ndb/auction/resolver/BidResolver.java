@@ -25,6 +25,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
 		String userId, 
 		String roundId, 
@@ -41,18 +42,22 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		return bidService.getBidListByRound(round);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	public List<Bid> getBidListByUser(String userId) {
 		return bidService.getBidListByUser(userId);
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	public Bid getBid(String userId, Integer round) {
 		return bidService.getBid(round, userId);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<Bid> getBidListById(String roundId) {
 		return null;
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	public Bid updateBid(
 		String userId, 
 		String roundId, 

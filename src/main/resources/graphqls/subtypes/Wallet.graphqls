@@ -1,4 +1,5 @@
 type Wallet {
+   key: String,
    total: Float,
    free: Float,
    holding: Float

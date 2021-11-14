@@ -1,5 +1,6 @@
 package com.ndb.auction.resolver;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,10 +17,12 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class PaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
 	// for stripe payment
+	@PreAuthorize("isAuthenticated()")
 	public String getStripePubKey() {
 		return stripeService.getPublicKey();
 	}
 	
+	@PreAuthorize("isAuthenticated()")
 	public PayResponse stripePayment(
 		String roundId, 
 		String userId, 
@@ -29,20 +32,24 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return stripeService.createNewPayment(roundId, userId, amount, paymentIntentId);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<StripeTransaction> getStripeTransactionsByRound(String roundId) {
 		return stripeService.getTransactionsByRound(roundId);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	public List<StripeTransaction> getStripeTransactionsByUser(String userId) {
 		return stripeService.getTransactionByUser(userId);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<StripeTransaction> getStripeTransaction(String roundId, String userId) {
 		return stripeService.getTransactions(roundId, userId);
 	}
 
 
 	// for crypto payment
+	@PreAuthorize("isAuthenticated()")
 	public CryptoTransaction createCryptoPayment(
 		String roundId, 
 		String userId, 
@@ -51,10 +58,12 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return cryptoService.createNewPayment(roundId, userId, amount);
 	}
 
+
 	public CryptoTransaction getCryptoTransactionByCode(String code) {
 		return cryptoService.getTransactionById(code);
 	}
 
+	@PreAuthorize("isAuthenticated()")
 	public List<CryptoTransaction> getCryptoTransactionByUser(String userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}

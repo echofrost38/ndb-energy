@@ -3,39 +3,50 @@ extend type Query {
 	getStripeTransactionsByRound(
 		roundId: String!
 	) : [StripeTransaction]
-	getStripeTransactionsByUser(
-		userId: String!
+	getStripeTransactionsByUser
+	 : [StripeTransaction]
+	getStripeTransactionsByAdmin(
+		 userId: String!
 	) : [StripeTransaction]
 	getStripeTransaction(
 		roundId: String!,
-		userId: String!
+	) : [StripeTransaction]
+	getStripeTransactionByAdmin(
+		roundId: String!,
+		userId: String
 	) : [StripeTransaction]
 	getCryptoTransactionByCode(
 		code: String!
 	) : CryptoTransaction
-	getCryptoTransactionByUser(
-		userId: String!
+	getCryptoTransactionByUser 
+	  : [CryptoTransaction]
+	getCryptoTransactionByAdmin(
+		userId: String
 	) : [CryptoTransaction]
 	getCryptoTransactionByRound(
 		roundId: String!
 	) : [CryptoTransaction]
 	getCryptoTransaction(
 		roundId: String!,
-		userId: String!
+	) : [CryptoTransaction]
+	getCryptoTransactions(
+		roundId: String!,
+		userId: String
 	) : [CryptoTransaction]
 	getCoins : [Coin]
+	getCryptoPrice(
+		symbol: String
+	) : Float
 }
 
 extend type Mutation {
 	stripePayment (
 		roundId: String,
-		userId: String, 
 		amount: Float,
 		paymentIntentId: String
 	) : PayResponse!
 	createCryptoPayment(
 		roundId: String!,
-		userId: String!,
 		amount: Float!
 	) : CryptoTransaction
 	addNewCoin (

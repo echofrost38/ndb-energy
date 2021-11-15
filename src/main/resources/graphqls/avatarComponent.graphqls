@@ -8,7 +8,7 @@ extend type Query {
     ) : [AvatarComponent]
     getAvatarComponents : [AvatarComponent]
     getAvatarComponentsBySet (
-        set: AvatarSetInput
+        set: [AvatarSetInput]
     ) : [AvatarComponent]
 }
 

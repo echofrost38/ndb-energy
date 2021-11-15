@@ -4,7 +4,7 @@ type AvatarProfile {
     surname: String,
     shortName: String,
     skillSet: [SkillSet],
-    avatarSet: AvatarSet,
+    avatarSet: [AvatarSet],
     enemy: String,
     invention: String,
     bio: String

@@ -1,6 +1,5 @@
 package com.ndb.auction.service;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -117,16 +116,10 @@ public class ProfileService extends BaseService implements IProfileService {
 		String compId = "";
 		List<AvatarComponent> purchasedComponents = new ArrayList<AvatarComponent>();
 
-		Field[] fields = AvatarSet.class.getDeclaredFields();
-		for (Field field : fields) {
-			groupId = field.getName();
-			try {
-				compId = (String) field.get(set);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-				return null;
-			}
-
+		
+		for (AvatarSet avatarSet : set) {
+			groupId = avatarSet.getGroupId();
+			
 			AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
 			if(component == null) {
 				return null;

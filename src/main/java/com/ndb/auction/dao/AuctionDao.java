@@ -87,7 +87,7 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 		eav.put(":val1", new AttributeValue().withN(status.toString()));
 
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-            .withFilterExpression("status = :val1")
+            .withFilterExpression("istatus = :val1")
             .withExpressionAttributeValues(eav);
         
 		return dynamoDBMapper.scan(Auction.class, scanExpression);

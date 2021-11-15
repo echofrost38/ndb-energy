@@ -63,6 +63,10 @@ public class BidService extends BaseService implements IBidService {
 		if(auction.getStatus() != Auction.STARTED) {
 			return null; // or exception
 		}
+
+		if(auction.getMinPrice() > tokenPrice) {
+			return null;
+		}
 		
 		// set bid type
 		bid.setPayType(payType);

@@ -13,6 +13,11 @@ public class AuctionService extends BaseService implements IAuctionService {
 	@Override
 	public Auction createNewAuction(Auction auction) {
 		
+		// Started at checking
+		if(System.currentTimeMillis() > auction.getStartedAt()) {
+			return null;
+		}
+
 		// check conflict auction round
 		Auction _auction = auctionDao.getAuctionByRound(auction.getNumber());
 		if(_auction != null) {
@@ -100,6 +105,25 @@ public class AuctionService extends BaseService implements IAuctionService {
 		auctionDao.endAuction(target);
 
 		return target;
+	}
+
+	public List<Auction> getAuctionByStatus(Integer status) {
+		return auctionDao.getAuctionByStatus(status);
+	}
+
+	public String checkRounds() {
+		List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
+		if(auctions.size() != 0) {
+			Auction auction  = auctions.get(0);
+			schedule.setNewCountdown(auction);
+		}
+
+		auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
+		if(auctions.size() != 0) {
+			Auction auction = auctions.get(0);
+			schedule.setStartRound(auction);
+		}
+		return "Checked";
 	}
     
 }

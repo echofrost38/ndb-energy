@@ -1,17 +1,9 @@
 type AvatarSet {
-    facial: String,
-    hair: String,
-    haColor: String,
-    exp: String,
-    hats: String,
-    others: String
+    groupId: String,
+    compId: String
 }
 
 input AvatarSetInput {
-    facial: String,
-    hair: String,
-    haColor: String,
-    exp: String,
-    hats: String,
-    others: String
+    groupId: String,
+    compId: String
 }

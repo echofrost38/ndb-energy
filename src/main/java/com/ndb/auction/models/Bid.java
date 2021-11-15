@@ -142,7 +142,7 @@ public class Bid {
         this.updatedAt = updatedAt;
     }
     
-    @DynamoDBAttribute(attributeName="status")
+    @DynamoDBAttribute(attributeName="istatus")
     public Integer getStatus() {
         return status;
     }

@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * TODOs: 
@@ -54,7 +55,7 @@ public class Auction extends BaseModel {
     	// Date Format : 2021-10-24T12:00:00.000-0000
     	// check null
     	if(_startedAt != null) {
-	    	SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	    	SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault());
 	    	try {
 	    	    Date d = f.parse(_startedAt);
 	    	    long startedAtMill = d.getTime();
@@ -139,7 +140,7 @@ public class Auction extends BaseModel {
         this.stats = stats;
     }
 
-    @DynamoDBAttribute(attributeName="status")
+    @DynamoDBAttribute(attributeName="istatus")
     public Integer getStatus() {
         return status;
     }

@@ -46,7 +46,7 @@ public class BidDao extends BaseDao implements IBidDao {
        	eav.put(":val2", new AttributeValue().withN("0"));
         
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-            .withFilterExpression("round_number = :val1 and status <> :val2")
+            .withFilterExpression("round_number = :val1 and istatus <> :val2")
             .withExpressionAttributeValues(eav);
 
         return dynamoDBMapper.scan(Bid.class, scanExpression);
@@ -59,7 +59,7 @@ public class BidDao extends BaseDao implements IBidDao {
 		eav.put(":v2", new AttributeValue().withN("0"));
 
 		DynamoDBQueryExpression<Bid> queryExpression = new DynamoDBQueryExpression<Bid>()
-		    .withKeyConditionExpression("round_id = :v1 and status <> :v2")
+		    .withKeyConditionExpression("round_id = :v1 and istatus <> :v2")
 		    .withExpressionAttributeValues(eav);
 
 		return dynamoDBMapper.query(Bid.class, queryExpression);

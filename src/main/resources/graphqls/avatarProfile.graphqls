@@ -19,7 +19,7 @@ extend type Mutation {
         surname: String!,
         shortName: String!,
         skillSet: [SkillSetInput]!,
-        avatarSet: AvatarSetInput,
+        avatarSet: [AvatarSetInput],
         enemy: String,
         invention: String,
         bio: String
@@ -30,7 +30,7 @@ extend type Mutation {
         surname: String,
         shortName: String,
         skillSet: [SkillSetInput],
-        avatarSet: AvatarSetInput,
+        avatarSet: [AvatarSetInput],
         enemy: String,
         invention: String,
         bio: String

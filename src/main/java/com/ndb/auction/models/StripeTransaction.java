@@ -3,7 +3,7 @@ package com.ndb.auction.models;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="fiat_tx")
+@DynamoDBTable(tableName="Stripe_tx")
 public class StripeTransaction {
 	
 	public static final Integer INITIATED = 0;
@@ -22,6 +22,7 @@ public class StripeTransaction {
 	private Long amount;
 	private Integer status;
 	private Long createdAt;
+	private Long updatedAt;
 	
 	public StripeTransaction() {
 		
@@ -72,7 +73,7 @@ public class StripeTransaction {
 		this.amount = amount;
 	}
 	
-	@DynamoDBAttribute(attributeName="status")
+	@DynamoDBAttribute(attributeName="istatus")
 	public Integer getStatus() {
 		return status;
 	}
@@ -90,4 +91,14 @@ public class StripeTransaction {
 		this.createdAt = createdAt;
 	}
 
+	@DynamoDBAttribute(attributeName="updated_at")
+	public Long getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Long updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	
 }

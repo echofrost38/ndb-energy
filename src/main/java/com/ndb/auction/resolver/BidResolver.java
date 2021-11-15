@@ -23,55 +23,9 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		Integer payment, 
 		String cryptoType
 	) {
-		String userId = "";
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String userId = userDetails.getId();
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public Bid increaseBid(
-		String roundId, 
-		Double tokenAmount, 
-		Double tokenPrice, 
-		Integer payment, 
-		String cryptoType
-	) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
-        String id = userDetails.getId();
-		return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice, payment, cryptoType);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public List<Bid> getBidListByRound(Integer round){
-		return bidService.getBidListByRound(round);
-	}
-	
-	@PreAuthorize("isAuthenticated()")
-	public List<Bid> getBidListByUser() {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
-        String id = userDetails.getId();
-		return bidService.getBidListByUser(id);
-	}
-
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Bid> getBidListByUser(String userId) {
-		return bidService.getBidListByUser(userId);
-	}
-
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public Bid getBid(String userId, Integer round) {
-		return bidService.getBid(round, userId);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public Bid getBid(Integer round) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
-        String id = userDetails.getId();
-		return bidService.getBid(round, id);
-	}
-
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Bid> getBidListById(String roundId) {
-		return null;
 	}
 	
 	@PreAuthorize("isAuthenticated()")
@@ -80,8 +34,55 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		Double tokenAmount, 
 		Double tokenPrice
 	) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
-        String id = userDetails.getId();
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String id = userDetails.getId();
 		return bidService.updateBid(id, roundId, tokenAmount, tokenPrice);
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	public Bid increaseBid(
+		String roundId, 
+		Double tokenAmount, 
+		Double tokenPrice, 
+		Integer payment, 
+		String cryptoType
+		) {
+			UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			String id = userDetails.getId();
+			return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice, payment, cryptoType);
+		}
+		
+	@PreAuthorize("isAuthenticated()")
+	public List<Bid> getBidListByRound(Integer round){
+		return bidService.getBidListByRound(round);
+	}
+	
+	@PreAuthorize("isAuthenticated()")
+	public List<Bid> getBidListByUser() {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = userDetails.getId();
+		return bidService.getBidListByUser(id);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public List<Bid> getBidListByAdmin(String userId) {
+		return bidService.getBidListByUser(userId);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public Bid getBidByAdmin(String userId, Integer round) {
+		return bidService.getBid(round, userId);
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public Bid getBid(Integer round) {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = userDetails.getId();
+		return bidService.getBid(round, id);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public List<Bid> getBidListById(String roundId) {
+		return null;
 	}
 }

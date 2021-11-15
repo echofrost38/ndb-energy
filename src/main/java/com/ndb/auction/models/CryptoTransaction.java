@@ -2,7 +2,9 @@ package com.ndb.auction.models;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
+@DynamoDBTable(tableName="Crypto_tx")
 public class CryptoTransaction {
     public static final Integer INITIATED = 0;
     public static final Integer CONFIRMED = 1;
@@ -27,6 +29,7 @@ public class CryptoTransaction {
     }
 
     public CryptoTransaction(String txnId, String roundId, String userId, String code, double amount, double cryptoAmount, String cryptoType, String createdAt) {
+        this.code = code;
         this.txnId = txnId;
         this.roundId = roundId;
         this.userId = userId;
@@ -109,7 +112,7 @@ public class CryptoTransaction {
         this.updatedAt = updatedAt;
     }
 
-    @DynamoDBAttribute(attributeName = "status")
+    @DynamoDBAttribute(attributeName = "istatus")
     public Integer getStatus() {
         return status;
     }

@@ -13,7 +13,7 @@ type User {
    tos: Boolean,
    notifySetting: Int,
    lastLogin: Float,
-   avatar: AvatarSet,
+   avatar: [AvatarSet],
    avatarPurchased: [AvatarPurchased],
    userWallet: [Wallet],
    userExtWallet: [ExtWallet],

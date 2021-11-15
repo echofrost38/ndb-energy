@@ -1,4 +1,5 @@
 extend type Query {
+	checkRounds : String
 	getAuctions : [Auction]
 	getAuctionById(id: String!) : Auction!
 }
@@ -10,7 +11,7 @@ extend type Mutation {
 		duration: Float!,
 		totalToken: Float!, 
 		minPrice: Float!,
-		avatar: AvatarSetInput,
+		avatar: [AvatarSetInput],
 		token: Float
 	) : Auction
 	updateAuction(
@@ -19,7 +20,7 @@ extend type Mutation {
 		duration: Float,  
 		totalToken: Float, 
 		minPrice: Float,
-		avatar: AvatarSetInput,
+		avatar: [AvatarSetInput],
 		token: Float
 	) : Auction!
 }

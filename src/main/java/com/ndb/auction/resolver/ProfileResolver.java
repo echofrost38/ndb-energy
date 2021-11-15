@@ -18,7 +18,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     // prefix means avatar name!!!
     @PreAuthorize("isAuthenticated()")
     public String setAvatar(String prefix, String name) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String id = userDetails.getId();
         return profileService.setAvatar(id, prefix, name);
     }
@@ -26,7 +26,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     // update avatar profile ( avatar set )
     @PreAuthorize("isAuthenticated()")
     public List<AvatarSet> updateAvatarSet(List<AvatarSet> set) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String id = userDetails.getId();
 
         return profileService.updateAvatarSet(id, set);

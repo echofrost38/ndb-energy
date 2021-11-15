@@ -2,15 +2,20 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.coinbase.CoinbaseBody;
+import com.ndb.auction.models.coinbase.CoinbasePostBody;
+import com.ndb.auction.models.coinbase.CoinbaseRes;
 import com.ndb.auction.payload.CoinPrice;
 
 import org.apache.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import reactor.core.publisher.Mono;
 
 
 
@@ -73,15 +78,26 @@ public class CryptoService extends BaseService {
 
     public CryptoTransaction createNewPayment(String roundId, String userId, double amount) {
         
+        CoinbasePostBody data = new CoinbasePostBody(
+            "Bid payment",
+            "Bid payment for " + userId,
+            "fixed_price",
+            amount
+        );
+
         // API call for create new charge
-        CoinbaseBody resBody = coinbaseAPI.post()
+        String response = coinbaseAPI.post()
             .uri(uriBuilder -> uriBuilder.path("/charges").build())
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .header("X-CC-Api-Key", coinbaseApiKey)
             .header("X-CC-Version", "2018-03-22")
+            .body(Mono.just(data), CoinbasePostBody.class)
             .retrieve()
-            .bodyToMono(CoinbaseBody.class).block();
-
+            .bodyToMono(String.class).block();
+        
+        CoinbaseRes res = new Gson().fromJson(response, CoinbaseRes.class);
+        
+        CoinbaseBody resBody = res.getData();
         String txnId = resBody.getId();
         String code = resBody.getCode();
         String createdAt = resBody.getCreated_at();

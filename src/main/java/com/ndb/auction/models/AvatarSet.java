@@ -6,23 +6,23 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 @DynamoDBDocument
 public class AvatarSet {
 
-	public String group_id;
-	public String comp_id;
+	public String groupId;
+	public String compId;
 
 	@DynamoDBAttribute(attributeName = "group_id")
-	public String getGroup_id() {
-		return group_id;
+	public String getGroupId() {
+		return groupId;
 	}
-	public void setGroup_id(String group_id) {
-		this.group_id = group_id;
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 	@DynamoDBAttribute(attributeName = "comp_id")
-	public String getComp_id() {
-		return comp_id;
+	public String getCompId() {
+		return compId;
 	}
-	public void setComp_id(String comp_id) {
-		this.comp_id = comp_id;
+	public void setCompId(String compId) {
+		this.compId = compId;
 	}
 	
 	

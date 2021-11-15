@@ -1,6 +1,5 @@
 type Mutation {
 	placeBid(
-		userId: String!,
 		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
@@ -8,13 +7,11 @@ type Mutation {
 		cryptoType: String
 	) : Bid	
 	updateBid(
-		userId: String!,
 		roundId: String!,
 		tokenAmount: Float!,
-		tokenPrice: Float!
+		tokenPrice: Float!,
 	) : Bid
 	increaseBid(
-		userId: String!,
 		roundId: String!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
@@ -24,7 +21,21 @@ type Mutation {
 }
 
 type Query {
-	getBidListByRound(round: Int!): [Bid]
-	getBidListByUser(userId: String!): [Bid]
-	getBid(userId: String!, round: Int!) : Bid
+	getBidListByRound(
+		round: Int!
+	): [Bid]
+	getBidListByUser : [Bid]
+	getBidListByAdmin(
+		userId: String!
+	): [Bid]
+	getBidByAdmin(
+		userId: String, 
+		round: Int!
+	) : Bid
+	getBid(
+		round: Int!
+	) : Bid
+	getBidListById(
+		roundId: String
+	) : [Bid]
 }

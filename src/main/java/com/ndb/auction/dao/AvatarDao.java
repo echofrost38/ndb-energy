@@ -1,6 +1,5 @@
 package com.ndb.auction.dao;
 
-import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,21 +100,10 @@ public class AvatarDao extends BaseDao implements IAvatarDao {
 	@Override
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		List<AvatarComponent> list = new ArrayList<AvatarComponent>();
-		Field[] fields = AvatarSet.class.getDeclaredFields();
 		
-		for (Field field : fields) {
-			String groupId = field.getName();
-			String compId = "";
-			
-			try {
-				compId = (String)field.get(set);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-				return null;
-			}
-			if(compId == null) {
-				continue;
-			}
+		for (AvatarSet field : set) {
+			String groupId = field.getGroupId();
+			String compId = field.getCompId();
 			list.add(getAvatarComponent(groupId, compId));
 		}
 		

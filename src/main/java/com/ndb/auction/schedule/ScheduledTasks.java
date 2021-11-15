@@ -84,20 +84,31 @@ public class ScheduledTasks {
 		return 1;
 	}
 
+	public void setStartRound(Auction auction) {
+		if(this.startedRound != null) {
+			return;
+		}
+		this.startedRound = auction;
+		this.startedCounter = auction.getEndedAt() - System.currentTimeMillis();
+		this.startedCounter /= 1000;
+	}
+
 	@Scheduled(fixedRate = 1000)
-	public void AuctionCounter() {		
+	public void AuctionCounter() {
+		
+		
 		// count down ( ready round )
 		if(readyRound != null && readyCounter > 0L) {
 			readyCounter--;
 			System.out.println("Ready counter: " + readyCounter.toString());
 			if(readyCounter == 0) {
 				// ended count down ! trigger to start this round!!
-				String id = readyRound.getAuctionId();
-
-				Auction nextRound = auctionService.startAuction(id);
 				
 				startedRound = readyRound;
 				startedCounter = readyRound.getDuration();
+				
+				String id = readyRound.getAuctionId();
+				Auction nextRound = auctionService.startAuction(id);
 				if(nextRound != null) {
 					readyRound = nextRound;
 					readyCounter = (nextRound.getStartedAt() - System.currentTimeMillis()) / 1000;
@@ -110,6 +121,7 @@ public class ScheduledTasks {
 		// check current started round
 		if(startedRound != null && startedCounter > 0L) {
 			startedCounter--;
+			System.out.println("Started counter: " + startedCounter.toString());
 			if(startedCounter == 0) {
 				// end round!
 				auctionService.endAuction(startedRound.getAuctionId());

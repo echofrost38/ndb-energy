@@ -155,8 +155,8 @@ public class ProfileService extends BaseService implements IProfileService {
 			return null;
 		}
 		ndbWallet.setFree(balance - totalPrice);
-		tempWallet.replace("NDB", ndbWallet);
-		user.setWallet(tempWallet);
+		// tempWallet.replace("NDB", ndbWallet);
+		// user.setWallet(tempWallet);
 
 		user.setAvatar(set);
 		userDao.updateUser(user);

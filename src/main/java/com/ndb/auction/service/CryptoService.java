@@ -3,6 +3,7 @@ package com.ndb.auction.service;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.coinbase.CoinbaseBody;
@@ -78,6 +79,12 @@ public class CryptoService extends BaseService {
 
     public CryptoTransaction createNewPayment(String roundId, String userId, double amount) {
         
+        // round existing
+        Auction round = auctionDao.getAuctionById(roundId);
+        if(round == null) {
+            return null;
+        }
+
         CoinbasePostBody data = new CoinbasePostBody(
             "Bid payment",
             "Bid payment for " + userId,

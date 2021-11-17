@@ -83,6 +83,6 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public List<Bid> getBidListById(String roundId) {
-		return null;
+		return bidService.getBidListByRoundId(roundId);
 	}
 }

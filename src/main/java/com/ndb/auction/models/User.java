@@ -64,7 +64,7 @@ public class User {
 		this.tos = tos;
 		
 		this.role = new HashSet<String>();
-		this.role.add("ROLE_ADMIN");
+		this.role.add("ROLE_USER");
 		
 		// initialize the wallet with possible coins
 		this.wallet = new HashMap<String, Wallet>();
@@ -83,8 +83,8 @@ public class User {
 		this.extWallet.put("addr", "");
 		
 		this.verify = new HashMap<String, Boolean>();
-		verify.put("email", true);
-		verify.put("mobile", true);
+		verify.put("email", false);
+		verify.put("mobile", false);
 		verify.put("identity", false);
 
 		this.avatarPurchase = new HashMap<String, List<String>>();

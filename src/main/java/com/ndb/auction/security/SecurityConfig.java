@@ -52,12 +52,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
     public void configure(HttpSecurity http) throws Exception {
-        http
-        	.cors().and().csrf().disable()
+        http.cors();
+		http
+        	.csrf().disable()
         	.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         	.authorizeRequests()
 				.antMatchers("/graphql/**").permitAll()
+				.antMatchers("/graphiql/**").permitAll()
+				.antMatchers("/playground/**").permitAll()
 				.antMatchers("/coinbase/**").permitAll()
         	.anyRequest().authenticated();
         

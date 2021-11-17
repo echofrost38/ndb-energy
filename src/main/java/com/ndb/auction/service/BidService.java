@@ -117,6 +117,10 @@ public class BidService extends BaseService implements IBidService {
 		return Arrays.asList(bidList);
 	}
 
+	public List<Bid> getBidListByRoundId(String round) {
+		return bidDao.getBidListByRound(round);
+	}
+
 	@Override
 	public List<Bid> getBidListByUser(String userId) {
 		// User's bidding history
@@ -163,7 +167,15 @@ public class BidService extends BaseService implements IBidService {
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
+		
+		// 11.16 breakpoint!!
+
 		bidList.add(bid);
+		
+		for (Bid _bid : bidList) {
+			_bid.getTokenPrice();
+		}
+		
 		Bid[] newList = bidList.toArray(new Bid[0]);
 		Arrays.sort(newList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
 		

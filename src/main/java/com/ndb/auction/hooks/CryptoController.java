@@ -54,12 +54,27 @@ public class CryptoController extends BaseController {
         CoinbaseEvent event = new Gson().fromJson(reqQuery, CoinbaseEvent.class);
         CoinbaseEventBody body = event.getEvent();
         
+        // testing!
+        body.setType("charge.confirmed");
+
         if(body.getType().equals("charge.confirmed")) {
             CoinbaseEventData data = body.getData();
+
+            if(data.getPayments().size() == 0) {
+                return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            }
             CoinbasePayments payments = data.getPayments().get(0);
             
+            // testing
+            payments.setStatus("CONFIRMED");
+
             if(payments.getStatus().equals("CONFIRMED")) {
                 String code = data.getCode();
+                
+
+                // testing 
+                code = "Y9B8XK2J";
+                
                 CryptoTransaction txn = cryptoService.getTransactionById(code);
                 
                 Map<String, CoinbasePricing> paymentValues = payments.getValue();
@@ -67,7 +82,10 @@ public class CryptoController extends BaseController {
                 CoinbasePricing cryptoPricing = paymentValues.get("crypto");
                 CoinbasePricing usdPricing = paymentValues.get("local");
 
+            
+
                 double usdAmount = Double.valueOf(usdPricing.getAmount());
+                usdAmount = 4300.0;
                 Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
 
                 if(bid.getPendingIncrease()) {
@@ -88,6 +106,9 @@ public class CryptoController extends BaseController {
                 String cryptoType = cryptoPricing.getCurrency();
                 Double cryptoAmount = Double.valueOf(cryptoPricing.getAmount());
 
+                cryptoType = "BTC";
+                cryptoAmount = 0.14;
+
                 txn.setCryptoAmount(cryptoAmount);
                 txn.setCryptoType(cryptoType);
                 txn.setStatus(CryptoTransaction.CONFIRMED);
@@ -107,7 +128,10 @@ public class CryptoController extends BaseController {
 
                 userService.updateUser(user);
 
+
+
                 // send notification to user for payment result!!
+                
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             }

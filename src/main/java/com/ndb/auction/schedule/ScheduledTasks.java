@@ -96,7 +96,6 @@ public class ScheduledTasks {
 	@Scheduled(fixedRate = 1000)
 	public void AuctionCounter() {
 		
-		
 		// count down ( ready round )
 		if(readyRound != null && readyCounter > 0L) {
 			readyCounter--;

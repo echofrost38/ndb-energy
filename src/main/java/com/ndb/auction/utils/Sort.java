@@ -1,7 +1,10 @@
 package com.ndb.auction.utils;
 
+import org.springframework.stereotype.Component;
+
 import com.ndb.auction.models.Bid;
 
+@Component
 public class Sort {
     private void merge(Bid arr[], int left, int middle, int right)
     {

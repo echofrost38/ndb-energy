@@ -20,6 +20,7 @@ import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
+import com.ndb.auction.utils.Sort;
 
 /**
  * TODOs
@@ -32,6 +33,9 @@ import com.ndb.auction.service.interfaces.IBidService;
 
 @Service
 public class BidService extends BaseService implements IBidService {
+	
+	@Autowired
+	private Sort sort;
 	
 	@Autowired
 	private StripeService stripeService;
@@ -167,18 +171,16 @@ public class BidService extends BaseService implements IBidService {
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
-		
-		// 11.16 breakpoint!!
-
-		bidList.add(bid);
-		
-		for (Bid _bid : bidList) {
-			_bid.getTokenPrice();
-		}
-		
-		Bid[] newList = bidList.toArray(new Bid[0]);
-		Arrays.sort(newList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
-		
+		Bid _bidArray[] = (Bid[])bidList.toArray();
+		Bid newList[] = Arrays.copyOf(_bidArray, _bidArray.length + 1);
+		newList[_bidArray.length] = bid;
+	
+		// Sort Bid List by 
+		// 1. Token Price
+		// 2. Total Price ( Amount of pay )
+		// 3. Placed time ( early is winner )
+		sort.mergeSort(newList, 0, newList.length);
+				
 		// true : winner, false : fail
 		boolean status = true; 
 		

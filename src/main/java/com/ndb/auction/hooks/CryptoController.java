@@ -82,10 +82,12 @@ public class CryptoController extends BaseController {
                 CoinbasePricing cryptoPricing = paymentValues.get("crypto");
                 CoinbasePricing usdPricing = paymentValues.get("local");
 
-            
-
                 double usdAmount = Double.valueOf(usdPricing.getAmount());
+                
+                // for testing
                 usdAmount = 4300.0;
+                
+                
                 Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
 
                 if(bid.getPendingIncrease()) {
@@ -106,6 +108,7 @@ public class CryptoController extends BaseController {
                 String cryptoType = cryptoPricing.getCurrency();
                 Double cryptoAmount = Double.valueOf(cryptoPricing.getAmount());
 
+                // for testing!
                 cryptoType = "BTC";
                 cryptoAmount = 0.14;
 
@@ -123,8 +126,8 @@ public class CryptoController extends BaseController {
                 Wallet wallet = tempWallet.get(cryptoType);
                 double balance = wallet.getHolding();
                 wallet.setHolding(balance + cryptoAmount);
-                tempWallet.replace(cryptoType, wallet);
-                user.setWallet(tempWallet);
+//                tempWallet.replace(cryptoType, wallet);
+//                user.setWallet(tempWallet);
 
                 userService.updateUser(user);
 

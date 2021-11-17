@@ -10,6 +10,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.AvatarComponent;
@@ -56,7 +57,7 @@ public class BidService extends BaseService implements IBidService {
 		Bid bid = bidDao.getBid(roundId, userId);
 
 		if(bid != null) {
-			return null;
+			throw new BidException("Already place a bid to this round.", "roundId");
 		}
 
 		// create new pending bid
@@ -65,11 +66,11 @@ public class BidService extends BaseService implements IBidService {
 		// check Round is opened. 
 		Auction auction = auctionDao.getAuctionById(roundId);
 		if(auction.getStatus() != Auction.STARTED) {
-			return null; // or exception
+			throw new BidException("Round is not yet started.", "roundId");
 		}
 
 		if(auction.getMinPrice() > tokenPrice) {
-			return null;
+			throw new BidException("Token price must be larget than min price.", "tokenPrice");
 		}
 		
 		// set bid type
@@ -88,7 +89,7 @@ public class BidService extends BaseService implements IBidService {
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
-				return null;
+				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
 
 			wallet.setFree(free - cryptoAmount);
@@ -147,7 +148,7 @@ public class BidService extends BaseService implements IBidService {
 		
 		// check null 
 		if(bid == null) {
-			return null; // or exception
+			throw new BidException("Bid is not yet placed.", "roundId");
 		}
 		
 		// 
@@ -330,11 +331,11 @@ public class BidService extends BaseService implements IBidService {
 	{
 		Bid originalBid = bidDao.getBid(roundId, userId);
 		if(originalBid == null) {
-			return null;
+			throw new BidException("Bid is not yet placed.", "roundId");
 		}
 
 		if(originalBid.getPendingIncrease()) {
-			return null;
+			throw new BidException("Bid is not yet placed.", "roundId");
 		}
 
 		double _tokenAmount = originalBid.getTokenAmount();
@@ -346,7 +347,7 @@ public class BidService extends BaseService implements IBidService {
 			(_tokenPrice < tokenPrice) ||
 			(_tokenPrice == tokenPrice && _tokenAmount == tokenAmount)
 		) {
-			return null;
+			throw new BidException("New price must be larger than original price.", "tokenPrice");
 		}
 
 		double _total = _tokenAmount * _tokenPrice;
@@ -366,7 +367,7 @@ public class BidService extends BaseService implements IBidService {
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
-				return null;
+				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
 
 			wallet.setFree(free - cryptoAmount);

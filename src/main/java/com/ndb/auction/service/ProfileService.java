@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.ndb.auction.exceptions.AvatarNotFoundException;
+import com.ndb.auction.exceptions.BidException;
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -41,7 +44,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public Integer getNotifySetting(String userId) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null; // or exception 404
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
 	
 		return user.getNotifySetting();
@@ -51,7 +54,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public Integer updateNotifySetting(String userId, Integer setting) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null; // or exception 404
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}		
 		user.setNotifySetting(setting);
 		userDao.updateUser(user);
@@ -83,7 +86,7 @@ public class ProfileService extends BaseService implements IProfileService {
 
 		user = userDao.getUserById(id);
 		if(user == null) {
-			return "Not found user";
+			throw new UserNotFoundException("We were unable to find a user with avatar", "name");
 		}
 		
 		// update purchase list and user avatar set!!
@@ -108,7 +111,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public List<AvatarSet> updateAvatarSet(String userId, List<AvatarSet> set) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null;
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
 		double totalPrice = 0.0;
 		double price = 0.0;
@@ -122,7 +125,7 @@ public class ProfileService extends BaseService implements IProfileService {
 			
 			AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
 			if(component == null) {
-				return null;
+				throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 			}
 
 			// check free
@@ -152,7 +155,7 @@ public class ProfileService extends BaseService implements IProfileService {
 		Wallet ndbWallet = tempWallet.get("NDB");
 		double balance = ndbWallet.getFree();
 		if(balance > totalPrice) {
-			return null;
+			throw new BidException("You don't have enough balance in wallet.", "set");
 		}
 		ndbWallet.setFree(balance - totalPrice);
 		// tempWallet.replace("NDB", ndbWallet);

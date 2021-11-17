@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
@@ -16,10 +17,12 @@ import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
+
 public class PaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
 	// for stripe payment
-	@PreAuthorize("isAuthenticated()")
+//	@PreAuthorize("isAuthenticated()")
+	@CrossOrigin
 	public String getStripePubKey() {
 		return stripeService.getPublicKey();
 	}

@@ -57,15 +57,16 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 
 
-	@PreAuthorize("isAuthenticated()")
+//	@PreAuthorize("isAuthenticated()")
 	public PayResponse stripePayment(
 		String roundId, 
 		Long amount, 
-		String paymentIntentId 
+		String paymentIntentId,
+		String paymentMethodId
 	) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
-		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId);
+//		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = "id";//userDetails.getId();
+		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId, paymentMethodId);
 	}
 
 

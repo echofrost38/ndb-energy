@@ -1,6 +1,6 @@
 type PayResponse {
-   clientSecret: String!,
-   paymentIntentId: String!,
+   clientSecret: String,
+   paymentIntentId: String,
    requiresAction: Boolean,
    error: String
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -39,7 +40,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited) {
 		AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
 		if(component == null) {
-			return null;
+			throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 		}
 		price = price == null ? 0 : price;
 		tierLevel = tierLevel == null ? 0 : tierLevel;
@@ -58,7 +59,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 		// check condition
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
 		if(profile != null) {
-			return null;
+			throw new AvatarNotFoundException("Already exists with '" + name + "'", "name");
 		}
 		
 		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
@@ -79,7 +80,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 	{
 		AvatarProfile profile = avatarDao.getAvatarProfile(id);
 		if(profile == null) {
-			return null;
+			throw new AvatarNotFoundException("Cannot find avatar profile.", "id");
 		}
 		profile.setName(name);
 		profile.setSurname(surname);

@@ -1,10 +1,10 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 
@@ -146,7 +146,7 @@ public class UserService extends BaseService implements IUserService {
 	public String signin2FA(User user) {
 		byte[] array = new byte[32]; 
 	    new Random().nextBytes(array);
-	    String token = new String(array, Charset.forName("UTF-8"));
+	    String token = UUID.randomUUID().toString();
 	    
 	    String method = user.getTwoStep();
 	    switch(method) {

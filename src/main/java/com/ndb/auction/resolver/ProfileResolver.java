@@ -8,10 +8,12 @@ import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
+@Component
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     // select avatar profile
@@ -25,11 +27,11 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
     // update avatar profile ( avatar set )
     @PreAuthorize("isAuthenticated()")
-    public List<AvatarSet> updateAvatarSet(List<AvatarSet> set) {
+    public List<AvatarSet> updateAvatarSet(List<AvatarSet> components) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String id = userDetails.getId();
 
-        return profileService.updateAvatarSet(id, set);
+        return profileService.updateAvatarSet(id, components);
     }
 
     // purchase component

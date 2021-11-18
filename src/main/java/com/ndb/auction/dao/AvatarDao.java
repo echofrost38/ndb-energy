@@ -93,7 +93,7 @@ public class AvatarDao extends BaseDao implements IAvatarDao {
 
 	@Override
 	public List<AvatarComponent> updateAvatarComponents(List<AvatarComponent> components) {
-		dynamoDBMapper.batchSave(components, updateConfig);
+		dynamoDBMapper.batchWrite(components, new ArrayList<AvatarComponent>(), updateConfig);
 		return components;
 	}
 

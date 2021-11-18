@@ -2,7 +2,10 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Bid;
@@ -15,12 +18,20 @@ import com.stripe.param.PaymentIntentCreateParams;
 @Service
 public class StripeService extends BaseService {
 	
+	@Value("${stripe.secret.key}")
+	private String stripeSecretKey;
+	
+	@Value("${stripe.public.key}")
+	private String stripePublicKey;
+	
 	@Autowired 
 	private BidService bidService;
 	
-	public StripeService() {
-		Stripe.apiKey = stripeSecretKey;
-	}
+    @PostConstruct
+    public void init() {
+    	Stripe.apiKey = stripeSecretKey;
+    }
+	
 	
 	public String getPublicKey( ) {
 		return stripePublicKey;
@@ -32,9 +43,10 @@ public class StripeService extends BaseService {
 	 * @param userId : String user who makes new payment
 	 * @param amount
 	 * @param paymentIntentId
+	 * @param paymentMethodId
 	 * @return
 	 */
-	public PayResponse createNewPayment(String roundId, String userId, Long amount, String paymentIntentId) {
+	public PayResponse createNewPayment(String roundId, String userId, Long amount, String paymentIntentId, String paymentMethodId) {
 		
 		PaymentIntent intent;
 		PayResponse response = new PayResponse();
@@ -45,7 +57,7 @@ public class StripeService extends BaseService {
                 PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency("usd")
                         .setAmount(amount)
-                        .setPaymentMethod("card")
+                        .setPaymentMethod(paymentMethodId)
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
                         .setConfirm(true)
@@ -55,21 +67,13 @@ public class StripeService extends BaseService {
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams);
                 
-                StripeTransaction fTx = new StripeTransaction(roundId, userId, amount, intent.getId());
-                fTx = stripeDao.createNewPayment(fTx);
+                StripeTransaction tx = new StripeTransaction(roundId, userId, amount, intent.getId());
+                tx = stripeDao.createNewPayment(tx);
                 
-            } else {
-                // Confirm the PaymentIntent to collect the money
-            	StripeTransaction tx = stripeDao.getTransactionById(paymentIntentId);
-            	if(tx == null) {
-            		response.setError("Not found paymentIntent");
-            		return response;
-            	}
-            	
-                intent = PaymentIntent.retrieve(paymentIntentId);
-                intent = intent.confirm();
+//                intent = PaymentIntent.retrieve(paymentIntentId);
+//                intent = intent.confirm();
                 
-                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
+//                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
 				Bid bid = bidService.getBid(roundId, userId);
 				double usdAmount = (double)amount;
 				if(bid.getPendingIncrease()) {
@@ -93,9 +97,9 @@ public class StripeService extends BaseService {
                 // Call update bid ranking!
                 // it must be called only when payment is confirmed.....
 
+				response = generateResponse(intent, response);
             }
             
-            response = generateResponse(intent, response);
         } catch (Exception e) {
             // Handle "hard declines" e.g. insufficient funds, expired card, etc
             // See https://stripe.com/docs/declines/codes for more
@@ -105,11 +109,11 @@ public class StripeService extends BaseService {
 	}
 	
 	// update payments - called by closeBid
-	public boolean UpdateTransaction(String paymentId, Integer status) {
+	public boolean UpdateTransaction(String id, Integer status) {
 		
 		PaymentIntent intent;
 		
-		StripeTransaction tx = stripeDao.getTransactionById(paymentId);
+		StripeTransaction tx = stripeDao.getTransactionById(id);
 		if(tx == null) {
 			return false;
 		}
@@ -155,6 +159,11 @@ public class StripeService extends BaseService {
             response.setRequiresAction(true);
             break;
         case "requires_payment_method":
+        	break;
+        case "requires_capture":
+        	response.setRequiresAction(false);
+        	response.setClientSecret(intent.getClientSecret());
+        	break;
         case "requires_source":
             // Card was not properly authenticated, suggest a new payment method
             response.setError("Your card was denied, please provide a new payment method");

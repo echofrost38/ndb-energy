@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.ndb.auction.exceptions.AvatarNotFoundException;
+import com.ndb.auction.exceptions.BidException;
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -41,7 +44,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public Integer getNotifySetting(String userId) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null; // or exception 404
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
 	
 		return user.getNotifySetting();
@@ -51,7 +54,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public Integer updateNotifySetting(String userId, Integer setting) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null; // or exception 404
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}		
 		user.setNotifySetting(setting);
 		userDao.updateUser(user);
@@ -80,10 +83,10 @@ public class ProfileService extends BaseService implements IProfileService {
 		if(user != null) {
 			return "Already exists";
 		}
-
+		
 		user = userDao.getUserById(id);
 		if(user == null) {
-			return "Not found user";
+			throw new UserNotFoundException("We were unable to find a user with avatar", "name");
 		}
 		
 		// update purchase list and user avatar set!!
@@ -94,6 +97,10 @@ public class ProfileService extends BaseService implements IProfileService {
 		for (AvatarComponent comp : components) {
 			String group = comp.getGroupId();
 			List<String> purchased = purchasedMap.get(group);
+			if(purchased == null) {
+				purchased = new ArrayList<String>();
+				purchasedMap.put(group, purchased);
+			}
 			purchased.add(comp.getCompId());
 		}
 		user.setAvatarPurchase(purchasedMap);
@@ -108,7 +115,7 @@ public class ProfileService extends BaseService implements IProfileService {
 	public List<AvatarSet> updateAvatarSet(String userId, List<AvatarSet> set) {
 		User user = userDao.getUserById(userId);
 		if(user == null) {
-			return null;
+			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
 		double totalPrice = 0.0;
 		double price = 0.0;
@@ -119,10 +126,10 @@ public class ProfileService extends BaseService implements IProfileService {
 		
 		for (AvatarSet avatarSet : set) {
 			groupId = avatarSet.getGroupId();
-			
+			compId = avatarSet.getCompId();
 			AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
 			if(component == null) {
-				return null;
+				throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 			}
 
 			// check free
@@ -132,7 +139,13 @@ public class ProfileService extends BaseService implements IProfileService {
 			}
 
 			// check purchased
-			List<String> purchaseList = user.getAvatarPurchase().get(groupId);
+			Map<String, List<String>> purchasedMap = user.getAvatarPurchase();
+			List<String> purchaseList = purchasedMap.get(groupId);
+			if(purchaseList == null) {
+				purchaseList = new ArrayList<String>();
+				purchasedMap.put(groupId, purchaseList);
+			}
+			
 			if(purchaseList.contains(compId)) {
 				continue;
 			}
@@ -144,6 +157,7 @@ public class ProfileService extends BaseService implements IProfileService {
 
 			totalPrice += component.getPrice();
 			component.increasePurchase();
+			purchaseList.add(component.getCompId());
 			purchasedComponents.add(component);
 		}
 
@@ -151,8 +165,8 @@ public class ProfileService extends BaseService implements IProfileService {
 		Map<String, Wallet> tempWallet = user.getWallet();
 		Wallet ndbWallet = tempWallet.get("NDB");
 		double balance = ndbWallet.getFree();
-		if(balance > totalPrice) {
-			return null;
+		if(balance < totalPrice) {
+			throw new BidException("You don't have enough balance in wallet.", "set");
 		}
 		ndbWallet.setFree(balance - totalPrice);
 		// tempWallet.replace("NDB", ndbWallet);

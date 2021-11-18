@@ -3,7 +3,6 @@ package com.ndb.auction.service;
 import java.util.List;
 
 import com.google.gson.Gson;
-import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
@@ -83,7 +82,7 @@ public class CryptoService extends BaseService {
         // round existing
         Auction round = auctionDao.getAuctionById(roundId);
         if(round == null) {
-        	throw new AuctionException("Round doesn't exist.", "roundId");
+            return null;
         }
 
         CoinbasePostBody data = new CoinbasePostBody(

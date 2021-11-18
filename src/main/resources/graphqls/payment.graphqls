@@ -43,8 +43,7 @@ extend type Mutation {
 	stripePayment (
 		roundId: String,
 		amount: Float,
-		paymentIntentId: String,
-		paymentMethodId: String
+		paymentIntentId: String
 	) : PayResponse!
 	createCryptoPayment(
 		roundId: String!,

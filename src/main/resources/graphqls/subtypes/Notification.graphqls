@@ -1,0 +1,7 @@
+type Notification {
+   id: String!,
+   userId: String,
+   t: String,
+   msg: String,
+   read: String,
+}

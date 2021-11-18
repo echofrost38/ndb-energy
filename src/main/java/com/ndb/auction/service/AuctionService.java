@@ -1,28 +1,36 @@
 package com.ndb.auction.service;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ndb.auction.exceptions.AuctionException;
+import lombok.RequiredArgsConstructor;
+
 import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.Notification;
+import com.ndb.auction.publisher.NotificationPublisher;
 import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
+@RequiredArgsConstructor
 public class AuctionService extends BaseService implements IAuctionService {
+
+	private final NotificationPublisher notificationPublisher;
 
 	@Override
 	public Auction createNewAuction(Auction auction) {
 		
 		// Started at checking
 		if(System.currentTimeMillis() > auction.getStartedAt()) {
-			throw new AuctionException("Round start time is invalid.", auction.getAuctionId());
+			return null;
 		}
 
 		// check conflict auction round
 		Auction _auction = auctionDao.getAuctionByRound(auction.getNumber());
 		if(_auction != null) {
-			throw new AuctionException("Round doesn't exist.", auction.getAuctionId());
+			return null;
 		}
 
 		Auction prev = auctionDao.getAuctionByRound(auction.getNumber() - 1);
@@ -39,8 +47,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 			// check end time and start time
 			long prevEnd = prev.getEndedAt();
 			long curStart = auction.getStartedAt();
-			if(curStart < prevEnd) 
-				throw new AuctionException("Round start time is invalid.", auction.getAuctionId());
+			if(curStart < prevEnd) return null;
 
 			auctionDao.createNewAuction(auction);
 		}
@@ -64,8 +71,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 		// Check Validation ( null possible ) 
 		Auction _auction = auctionDao.getAuctionById(auction.getAuctionId());
 		if(_auction == null) return null;
-		if(_auction.getStatus() != Auction.PENDING) 
-			throw new AuctionException("Round is not pending status.", auction.getAuctionId());
+		if(_auction.getStatus() != Auction.PENDING) return null;
 
 		return auctionDao.updateAuctionByAdmin(auction);
 	}
@@ -95,9 +101,17 @@ public class AuctionService extends BaseService implements IAuctionService {
 			nextRound.setStatus(Auction.COUNTDOWN);
 			auctionDao.updateAuctionStats(nextRound);
 		}
+
+		//send notification
+		System.out.println("Auction Started, Please send me as Notification!");
 		
-		// send new round is started notification!!!!
-		
+		Notification notification = new Notification();
+
+        notification.setUserId("35c9bcdd-647e-4a39-86e6-b388bd97d88f");
+		notification.setStamp(System.currentTimeMillis());
+
+		notificationPublisher.publish(notification);
+
 		return nextRound;
 	}
 

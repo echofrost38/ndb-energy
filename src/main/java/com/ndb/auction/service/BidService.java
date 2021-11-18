@@ -10,7 +10,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.AvatarComponent;
@@ -21,7 +20,6 @@ import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
-import com.ndb.auction.utils.Sort;
 
 /**
  * TODOs
@@ -34,9 +32,6 @@ import com.ndb.auction.utils.Sort;
 
 @Service
 public class BidService extends BaseService implements IBidService {
-	
-	@Autowired
-	private Sort sort;
 	
 	@Autowired
 	private StripeService stripeService;
@@ -57,7 +52,7 @@ public class BidService extends BaseService implements IBidService {
 		Bid bid = bidDao.getBid(roundId, userId);
 
 		if(bid != null) {
-			throw new BidException("Already place a bid to this round.", "roundId");
+			return null;
 		}
 
 		// create new pending bid
@@ -66,11 +61,11 @@ public class BidService extends BaseService implements IBidService {
 		// check Round is opened. 
 		Auction auction = auctionDao.getAuctionById(roundId);
 		if(auction.getStatus() != Auction.STARTED) {
-			throw new BidException("Round is not yet started.", "roundId");
+			return null; // or exception
 		}
 
 		if(auction.getMinPrice() > tokenPrice) {
-			throw new BidException("Token price must be larget than min price.", "tokenPrice");
+			return null;
 		}
 		
 		// set bid type
@@ -89,7 +84,7 @@ public class BidService extends BaseService implements IBidService {
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
-				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
+				return null;
 			}
 
 			wallet.setFree(free - cryptoAmount);
@@ -148,7 +143,7 @@ public class BidService extends BaseService implements IBidService {
 		
 		// check null 
 		if(bid == null) {
-			throw new BidException("Bid is not yet placed.", "roundId");
+			return null; // or exception
 		}
 		
 		// 
@@ -172,16 +167,18 @@ public class BidService extends BaseService implements IBidService {
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
-		Bid _bidArray[] = (Bid[])bidList.toArray();
-		Bid newList[] = Arrays.copyOf(_bidArray, _bidArray.length + 1);
-		newList[_bidArray.length] = bid;
-	
-		// Sort Bid List by 
-		// 1. Token Price
-		// 2. Total Price ( Amount of pay )
-		// 3. Placed time ( early is winner )
-		sort.mergeSort(newList, 0, newList.length);
-				
+		
+		// 11.16 breakpoint!!
+
+		bidList.add(bid);
+		
+		for (Bid _bid : bidList) {
+			_bid.getTokenPrice();
+		}
+		
+		Bid[] newList = bidList.toArray(new Bid[0]);
+		Arrays.sort(newList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
+		
 		// true : winner, false : fail
 		boolean status = true; 
 		
@@ -331,11 +328,11 @@ public class BidService extends BaseService implements IBidService {
 	{
 		Bid originalBid = bidDao.getBid(roundId, userId);
 		if(originalBid == null) {
-			throw new BidException("Bid is not yet placed.", "roundId");
+			return null;
 		}
 
 		if(originalBid.getPendingIncrease()) {
-			throw new BidException("Bid is not yet placed.", "roundId");
+			return null;
 		}
 
 		double _tokenAmount = originalBid.getTokenAmount();
@@ -347,7 +344,7 @@ public class BidService extends BaseService implements IBidService {
 			(_tokenPrice < tokenPrice) ||
 			(_tokenPrice == tokenPrice && _tokenAmount == tokenAmount)
 		) {
-			throw new BidException("New price must be larger than original price.", "tokenPrice");
+			return null;
 		}
 
 		double _total = _tokenAmount * _tokenPrice;
@@ -367,7 +364,7 @@ public class BidService extends BaseService implements IBidService {
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
-				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
+				return null;
 			}
 
 			wallet.setFree(free - cryptoAmount);

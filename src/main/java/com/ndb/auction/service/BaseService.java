@@ -18,6 +18,12 @@ public class BaseService {
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
     
+	@Value("${stripe.secret.key}")
+	public String stripeSecretKey;
+	
+	@Value("${stripe.public.key}")
+	public String stripePublicKey;
+
     @Value("${coinbase.apiKey}")
 	public String coinbaseApiKey;
 	

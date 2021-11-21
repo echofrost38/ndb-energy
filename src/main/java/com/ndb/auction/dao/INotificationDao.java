@@ -10,6 +10,4 @@ public interface INotificationDao {
 	Notification setReadStatus(String userId, String nId);
 	
 	void pushNewNotifications(List<Notification> list);
-
-	void pushNewNotification(Notification notification);
 }

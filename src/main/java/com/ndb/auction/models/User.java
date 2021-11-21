@@ -238,9 +238,6 @@ public class User {
 	public void setNotifySetting(Integer notifySetting) {
 		this.notifySetting = notifySetting;
 	}
-	public boolean allowNotification(Notification notification) {
-		return ((this.notifySetting >> (notification.getType() - 1)) & 0x01) > 0;
-	}
 	
 	@DynamoDBAttribute(attributeName="last_login")
 	public Long getLastLogin() {

@@ -85,4 +85,10 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	public List<Bid> getBidListById(String roundId) {
 		return bidService.getBidListByRoundId(roundId);
 	}
+	
+	///////////////// for test 
+	public String closeBid(String roundId) {
+		bidService.closeBid(roundId);
+		return "Success";
+	}
 }

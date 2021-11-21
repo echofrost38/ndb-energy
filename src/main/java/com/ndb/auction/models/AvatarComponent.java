@@ -85,6 +85,7 @@ public class AvatarComponent {
 
 	public void increasePurchase() {
 		this.purchased++;
+		this.limited--;
 	}
 
 }

@@ -37,11 +37,6 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 	}
 
 	@Override
-	public void pushNewNotification(Notification notification) {
-		dynamoDBMapper.save(notification);	
-	}
-
-	@Override
 	public Notification setReadStatus(String userId, String nId) {
 		Notification notification = dynamoDBMapper.load(Notification.class, userId, nId);
 		if(notification == null) {

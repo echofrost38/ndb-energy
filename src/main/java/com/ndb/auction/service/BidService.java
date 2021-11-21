@@ -73,6 +73,13 @@ public class BidService extends BaseService implements IBidService {
 			throw new BidException("Token price must be larget than min price.", "tokenPrice");
 		}
 		
+		if(payType == Bid.CRYPTO) {
+			long leftTime = auction.getEndedAt() - System.currentTimeMillis();
+			if(leftTime < 10 * 60 * 1000) {
+				throw new BidException("Bid must be placed 10 minutes before the end of round.", "roundId");
+			}
+		}
+		
 		// set bid type
 		bid.setPayType(payType);
 

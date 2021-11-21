@@ -62,7 +62,16 @@ public class StripePaymentDao extends BaseDao {
 		return dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
 	}
 	
-	public StripeTransaction getTransactionById(String id) {
-		return dynamoDBMapper.load(StripeTransaction.class, id);
+	public StripeTransaction getTransactionById(String paymentId) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(paymentId));
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+		    .withFilterExpression("payment_intent = :v1")
+		    .withExpressionAttributeValues(eav);
+		List<StripeTransaction> list = dynamoDBMapper.scan(StripeTransaction.class, scanExpression);
+		if(list.size() == 0) {
+			return null;
+		}
+		return list.get(0);
 	}
 }

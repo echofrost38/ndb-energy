@@ -20,5 +20,5 @@ public interface IBidDao {
 	
 	Bid updateBid(Bid bid);
 	
-	void updateBidStatus(Bid bids[]);	
+	void updateBidStatus(List<Bid> bids);	
 }

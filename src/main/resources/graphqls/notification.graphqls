@@ -4,9 +4,13 @@ type Subscription {
 
 type Query {
     getAllNotificationTypes: [NotificationType]
+    getAllUnReadNotifications: [Notification]
 }
 
 type Mutation {
+    setNotificationRead(
+        id: String
+    ): Notification
     addNotificationType(
         name: String
     ): String

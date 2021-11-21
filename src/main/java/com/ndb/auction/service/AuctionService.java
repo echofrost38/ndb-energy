@@ -8,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
 @RequiredArgsConstructor
 public class AuctionService extends BaseService implements IAuctionService {
+
+	private final NotificationService notificationService;
 
 	@Override
 	public Auction createNewAuction(Auction auction) {

@@ -39,13 +39,7 @@ extend type Mutation {
 	) : String!
 }
 
-type Subscription {
-   	fluxTest(
-   		param: String!
-   	)  : String
-}
-
 schema {
    mutation: Mutation,
-   query: Query,
+   query: Query
 }

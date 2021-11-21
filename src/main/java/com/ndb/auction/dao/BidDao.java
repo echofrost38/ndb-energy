@@ -1,7 +1,5 @@
 package com.ndb.auction.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +78,8 @@ public class BidDao extends BaseDao implements IBidDao {
 	}
 
 	@Override
-	public void updateBidStatus(Bid bids[]) {
-		dynamoDBMapper.batchWrite(Arrays.asList(bids), new ArrayList<Bid>(), updateConfig);
+	public void updateBidStatus(List<Bid> bids) {
+		dynamoDBMapper.batchSave(bids, updateConfig);
 	}
 
 	@Override

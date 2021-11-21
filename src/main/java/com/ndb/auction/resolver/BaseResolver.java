@@ -14,7 +14,6 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserService;
-import com.ndb.auction.service.SumsubService;
 
 public class BaseResolver {
 	
@@ -50,9 +49,6 @@ public class BaseResolver {
 
 	@Autowired 
 	CryptoService cryptoService;
-	
-	@Autowired
-	SumsubService sumsubService;
 
 	@Autowired
 	NotificationService notificationService;

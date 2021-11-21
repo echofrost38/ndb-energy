@@ -125,11 +125,11 @@ public class ScheduledTasks {
 				// end round!
 				auctionService.endAuction(startedRound.getAuctionId());
 				
+				startedRound = null;
 				
 				// bid processing 
 				// ********* checking delayed more 1s ************ 
 				bidService.closeBid(startedRound.getAuctionId());
-				startedRound = null;
 			}
 		}
 	}

@@ -124,16 +124,13 @@ public class CryptoController extends BaseController {
                 // make simpler!
                 Map<String, Wallet> tempWallet = user.getWallet();
                 Wallet wallet = tempWallet.get(cryptoType);
-                
-                if(wallet == null) {
-                	wallet = new Wallet();
-                	tempWallet.put(cryptoType, wallet);
-                }
-                
                 double balance = wallet.getHolding();
                 wallet.setHolding(balance + cryptoAmount);
+//                tempWallet.replace(cryptoType, wallet);
+//                user.setWallet(tempWallet);
 
                 userService.updateUser(user);
+
 
 
                 // send notification to user for payment result!!

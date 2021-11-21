@@ -10,6 +10,7 @@ import java.util.List;
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
+import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.payload.PayResponse;
 import com.ndb.auction.service.UserDetailsImpl;
 
@@ -72,7 +73,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 
 	// for crypto payment
 	@PreAuthorize("isAuthenticated()")
-	public CryptoTransaction createCryptoPayment(
+	public CryptoPayload createCryptoPayment(
 		String roundId, 
 		Double amount
 	) {

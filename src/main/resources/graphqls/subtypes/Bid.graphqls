@@ -25,3 +25,4 @@ type BidHolding {
     crypto: Float,
     usd: Float
 }
+

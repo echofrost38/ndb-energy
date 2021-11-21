@@ -95,7 +95,7 @@ public class Notification {
 		this.msg = message;
 	}
 
-	@DynamoDBAttribute(attributeName = "read_flag")
+	@DynamoDBAttribute(attributeName = "read")
 	public boolean isRead() {
 		return read;
 	}

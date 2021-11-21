@@ -11,6 +11,7 @@ import com.ndb.auction.models.coinbase.CoinbaseBody;
 import com.ndb.auction.models.coinbase.CoinbasePostBody;
 import com.ndb.auction.models.coinbase.CoinbaseRes;
 import com.ndb.auction.payload.CoinPrice;
+import com.ndb.auction.payload.CryptoPayload;
 
 import org.apache.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -78,7 +79,7 @@ public class CryptoService extends BaseService {
         return Double.valueOf(objs.getPrice());
     }
 
-    public CryptoTransaction createNewPayment(String roundId, String userId, double amount) {
+    public CryptoPayload createNewPayment(String roundId, String userId, double amount) {
         
         // round existing
         Auction round = auctionDao.getAuctionById(roundId);
@@ -111,8 +112,10 @@ public class CryptoService extends BaseService {
         String createdAt = resBody.getCreated_at();
         CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, 0.0, null, createdAt);
         cryptoDao.createNewPayment(tx);
-
-        return tx;
+        
+        CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());
+        
+        return payload;
     }
 
     public CryptoTransaction getTransactionById(String id) {

@@ -49,15 +49,4 @@ public class MailService {
         configuration.getTemplate(template).process(model, stringWriter);
         return stringWriter.getBuffer().toString();
     }
-
-    public void sendNormalEmail(User user, String subject, String text) throws MessagingException, IOException, TemplateException  {
-
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-        helper.setSubject(subject);
-        helper.setTo(user.getEmail());
-        String emailContent = getEmailContent(user, text, "AlertEmail.ftlh");
-        helper.setText(emailContent, true);
-        javaMailSender.send(mimeMessage);
-    }
 }

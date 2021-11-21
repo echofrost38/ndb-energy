@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
+@RequiredArgsConstructor
 public class AuctionService extends BaseService implements IAuctionService {
 
 	@Override
@@ -95,8 +98,10 @@ public class AuctionService extends BaseService implements IAuctionService {
 			nextRound.setStatus(Auction.COUNTDOWN);
 			auctionDao.updateAuctionStats(nextRound);
 		}
+		//send notification
+		System.out.println("Auction Started, Please send me as Notification!");
 		
-		// send new round is started notification!!!!
+		notificationService.broadcast(1, "title", "message");
 		
 		return nextRound;
 	}

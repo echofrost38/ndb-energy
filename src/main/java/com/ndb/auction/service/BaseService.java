@@ -23,12 +23,12 @@ public class BaseService {
     
 	// The description of the authorization method is available here: https://developers.sumsub.com/api-reference/#app-tokens
     @Value("${sumsub.secret.key}")
-    protected static final String SUMSUB_SECRET_KEY = "YOUR_SUMSUB_SECRET_KEY"; // Example: Hej2ch71kG2kTd1iIUDZFNsO5C1lh5Gq
+    public String SUMSUB_SECRET_KEY; // Example: Hej2ch71kG2kTd1iIUDZFNsO5C1lh5Gq
     
     @Value("${sumsub.app.token}")
-    protected static final String SUMSUB_APP_TOKEN = "YOUR_SUMSUB_APP_TOKEN"; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
+    public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
     
-    protected static final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
+    public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
 	
 	@Autowired
 	ScheduledTasks schedule;
@@ -62,4 +62,7 @@ public class BaseService {
 
     @Autowired 
     public CryptoPaymentDao cryptoDao;
+    
+    @Autowired
+    public NotificationService notificationService;
 }

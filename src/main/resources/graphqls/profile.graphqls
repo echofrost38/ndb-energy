@@ -10,9 +10,10 @@ extend type Mutation {
 	) : [AvatarSet]
 	initVerification(
 		country: String!,
-		docType: String!
+		docType: String!,
+		levelName: String!
 	) : String
-	uploadDocument(
+	uploadDocuments(
 		file: [Upload]
 	) : String	
 	uploadSelfie(

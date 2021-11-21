@@ -60,7 +60,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     	return "Success";
     }
     
-    public String uploadDocuments(Part part[]) {
+    public String uploadDocuments(List<Part> file) {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
         

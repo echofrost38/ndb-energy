@@ -7,6 +7,9 @@ type Query {
 }
 
 type Mutation {
+    setNotificationRead(
+        id: String
+    ): Notification
     addNotificationType(
         name: String
     ): String

@@ -52,4 +52,22 @@ public class SMSService {
 		configuration.getTemplate(template).process(model, writer);
 		return writer.getBuffer().toString();
 	}
+
+	/**
+	 * Send normal SMS 
+	 * @param phone phone number
+	 * @param smsContent content 
+	 * @return
+	 * @throws IOException
+	 * @throws TemplateException
+	 */
+	public String sendNormalSMS(String phone, String smsContent) throws IOException {
+		Twilio.init(sid, token);
+		Message message = Message.creator(
+				new PhoneNumber(phone),
+		        new PhoneNumber("+14159414656"), 
+		        smsContent)
+			.create();
+		return message.getStatus().toString();
+	}
 }

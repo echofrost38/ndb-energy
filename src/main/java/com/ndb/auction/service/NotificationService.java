@@ -86,7 +86,7 @@ public class NotificationService {
             n.setUserId(user.getId());
 
             // Here, check if user allowed this notification.
-            if(((user.getNotifySetting() >> (type - 1)) & 0x01) > 0)
+            if(user.allowNotification(notification))
                 notifications.add(n);
         }
         
@@ -111,7 +111,9 @@ public class NotificationService {
         return sink.asFlux().filter(p -> {
             // log.info("notification userid : {}, current userid : {}", p.getUserId(), userid);
             // return p.getUserId().equals(userid);
-            return p.isBroadcast() ? true : p.getUserId().equals(userid);
+            return p.isBroadcast() 
+                ? user.allowNotification(p)
+                : p.getUserId().equals(userid);
         }); 
     }
 

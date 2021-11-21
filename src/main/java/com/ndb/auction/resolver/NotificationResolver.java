@@ -35,8 +35,6 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
         return notificationPublisher.getNotificationPublisher();
     }
 
-
-
     /*
         Notification Type
     */

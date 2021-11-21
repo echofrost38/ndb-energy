@@ -60,7 +60,7 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 		eav.put(":v2", new AttributeValue().withN("0"));
 		
 		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-		    .withFilterExpression("user_id = :v1 and read <> :v2")
+		    .withFilterExpression("user_id = :v1 and read_flag = :v2")
 		    .withExpressionAttributeValues(eav);
 
 		return dynamoDBMapper.scan(Notification.class, scanExpression);

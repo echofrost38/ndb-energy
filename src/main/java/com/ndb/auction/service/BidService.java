@@ -235,8 +235,8 @@ public class BidService extends BaseService implements IBidService {
         }
 		auctionDao.updateAuctionStats(currentRound);
         
-        // Call notify !!!!!
-        
+        // send Notification
+        notificationService.send(4, "title", "message", userId);
 	}
 	
 	// not sychnorized
@@ -378,7 +378,7 @@ public class BidService extends BaseService implements IBidService {
 			userDao.updateUser(user);
 
 			// send notification
-	        
+	        notificationService.send(5, "title", "message", userId);
 	    }
 	}
 

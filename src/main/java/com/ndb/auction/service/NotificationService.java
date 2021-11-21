@@ -61,7 +61,7 @@ public class NotificationService {
 
         if (result.isFailure()) {
             // do something here, since emission failed
-            log.info("Send to {} message is failed!", userId);
+//            log.info("Send to {} message is failed!", userId);
         }
     }
 
@@ -98,7 +98,7 @@ public class NotificationService {
 
         if (result.isFailure()) {
             // do something here, since emission failed
-            log.info("Broadcast message is failed!");
+//            log.info("Broadcast message is failed!");
         }
     }
 
@@ -135,17 +135,5 @@ public class NotificationService {
         notificationType.setName(name);
         return notificationTypeDao.updateNotificationType(notificationType);
     }
- 
-    public Notification setNotificationRead(String nId) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userId = userDetails.getId();
-
-        return notificationDao.setReadStatus(userId, nId);
-    }
-
-    public List<Notification> getAllUnReadNotifications() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userId = userDetails.getId();
-        return notificationDao.getAllUnReadNotificationsByUser(userId);
-    }
+    
 }

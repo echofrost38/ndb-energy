@@ -9,9 +9,11 @@ import com.ndb.auction.models.User;
 import com.ndb.auction.payload.Credentials;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.kickstart.tools.GraphQLSubscriptionResolver;
+import reactor.core.publisher.Mono;
 
 @Component
-public class AuthResolver extends BaseResolver implements GraphQLMutationResolver {
+public class AuthResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLSubscriptionResolver {
 
 	public String signup(String email, String password, String country) {
 		password = encoder.encode(password);
@@ -98,6 +100,10 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	public String resetPassword(String email, String code, String newPassword) {
 		newPassword = encoder.encode(newPassword);
 		return userService.resetPassword(email, code, newPassword);
+	}
+	
+	public Mono<String> fluxTest(String param) {
+		return Mono.just("flux test: " + param);
 	}
 	
 }

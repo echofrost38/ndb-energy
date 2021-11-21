@@ -4,7 +4,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import org.reactivestreams.Publisher;
-// import reactor.core.publisher.Flux;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -12,14 +11,10 @@ import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// import java.time.Duration;
-import java.time.LocalDateTime;
-// import java.util.UUID;
 import java.util.List;
 
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.NotificationType;
-import com.ndb.auction.service.NotificationService;
 
 
 @Slf4j
@@ -27,22 +22,11 @@ import com.ndb.auction.service.NotificationService;
 @RequiredArgsConstructor
 public class NotificationResolver extends BaseResolver implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
 
-    private final NotificationService notificationPublisher;
     
     @PreAuthorize("isAuthenticated()")
     public Publisher<Notification> notifications() {
-        log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
-        return notificationPublisher.getNotificationPublisher();
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public Notification setNotificationRead(String id) {
-        return notificationService.setNotificationRead(id);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public List<Notification> getAllUnReadNotifications() {
-        return notificationService.getAllUnReadNotifications();
+//        log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
+        return notificationService.getNotificationPublisher();
     }
 
     /*

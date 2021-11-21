@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 
 import graphql.kickstart.execution.subscriptions.SubscriptionSession;
 import graphql.kickstart.execution.subscriptions.apollo.ApolloSubscriptionConnectionListener;
@@ -33,14 +32,15 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
 
     @Override
     public void onConnect(SubscriptionSession session, OperationMessage message) {
-        log.info("onConnect with payload {}", message.getPayload());
+//        log.info("onConnect with payload {}", message.getPayload());
 
-        var payload = (Map<String, String>) message.getPayload();
+		@SuppressWarnings("unchecked")
+		var payload = (Map<String, String>) message.getPayload();
 
         // Get the JWT, perform authentication / rejection
         // here
         var jwt = payload.get("Authorization").substring(7);
-        log.info("payload : {}", jwt);
+//        log.info("payload : {}", jwt);
 
         String email = jwtUtils.getEmailFromJwtToken(jwt);
 
@@ -92,18 +92,18 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
 
     @Override
     public void onStart(SubscriptionSession session, OperationMessage message) {
-        log.info("onStart with payload {}", message.getPayload());
+//        log.info("onStart with payload {}", message.getPayload());
         var authentication = (Authentication) session.getUserProperties().get(AUTHENTICATION);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override
     public void onStop(SubscriptionSession session, OperationMessage message) {
-        log.info("onStop with payload {}", message.getPayload());
+//        log.info("onStop with payload {}", message.getPayload());
     }
 
     @Override
     public void onTerminate(SubscriptionSession session, OperationMessage message) {
-        log.info("onTerminate with payload {}", message.getPayload());
+//        log.info("onTerminate with payload {}", message.getPayload());
     }
 }

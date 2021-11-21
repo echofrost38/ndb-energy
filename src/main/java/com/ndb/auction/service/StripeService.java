@@ -109,11 +109,11 @@ public class StripeService extends BaseService {
 	}
 	
 	// update payments - called by closeBid
-	public boolean UpdateTransaction(String paymentId, Integer status) {
+	public boolean UpdateTransaction(String id, Integer status) {
 		
 		PaymentIntent intent;
 		
-		StripeTransaction tx = stripeDao.getTransactionById(paymentId);
+		StripeTransaction tx = stripeDao.getTransactionById(id);
 		if(tx == null) {
 			return false;
 		}

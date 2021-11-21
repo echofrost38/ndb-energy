@@ -1,0 +1,27 @@
+scalar Upload
+
+extend type Mutation {
+	setAvatar(
+		prefix: String!,
+		name: String!
+	) : String
+	updateAvatarSet(
+		components: [AvatarSetInput]
+	) : [AvatarSet]
+	initVerification(
+		country: String!,
+		docType: String!,
+		levelName: String!
+	) : String
+	uploadDocuments(
+		file: [Upload]
+	) : String	
+	uploadSelfie(
+		selfie: Upload
+	) : String
+	requestCheck : String
+}
+
+schema {
+	mutation: Mutation
+}

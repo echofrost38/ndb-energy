@@ -20,10 +20,10 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.getUserById(id);
     }
 
-    @PreAuthorize("isAuthenticated")
-    public String setAvatar(String prefix, String name) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
-        return profileService.setAvatar(id, prefix, name);
-    }
+//    @PreAuthorize("isAuthenticated")
+//    public String setAvatar(String prefix, String name) {
+//        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String id = userDetails.getId();
+//        return profileService.setAvatar(id, prefix, name);
+//    }
 }

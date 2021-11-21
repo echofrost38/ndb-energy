@@ -77,8 +77,8 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 
 	@Override
 	public Auction updateAuctionStats(Auction stats) {
-		
-		return null;
+		dynamoDBMapper.save(stats, updateConfig);
+		return stats;
 	}
 
 	@Override

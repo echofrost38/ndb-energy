@@ -14,6 +14,7 @@ import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
 import com.ndb.auction.models.user.Wallet;
+import com.ndb.auction.service.NotificationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,9 +117,8 @@ public class CryptoController extends BaseController {
 
                 userService.updateUser(user);
 
-
-                // send notification to user for payment result!!
-                
+                // send notification to user for payment result!!                
+                notificationService.send(3, "Payment Result", "msg", user.getId());
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             }

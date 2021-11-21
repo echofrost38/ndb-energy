@@ -4,9 +4,13 @@ type Subscription {
 
 type Query {
     getAllNotificationTypes: [NotificationType]
+    getAllUnReadNotifications: [Notification]
 }
 
 type Mutation {
+    setNotificationRead(
+        id: String
+    ): Notification
     addNotificationType(
         name: String
     ): String
@@ -17,10 +21,4 @@ type Mutation {
         id: Int!,
         name: String
     ): NotificationType
-}
-
-
-schema {
-   query: Query,
-   mutation: Mutation
 }

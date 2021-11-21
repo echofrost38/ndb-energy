@@ -98,10 +98,10 @@ public class AuctionService extends BaseService implements IAuctionService {
 			nextRound.setStatus(Auction.COUNTDOWN);
 			auctionDao.updateAuctionStats(nextRound);
 		}
-		//send notification
+		// send notification
 		System.out.println("Auction Started, Please send me as Notification!");
 		
-		notificationService.broadcast(1, "title", "message");
+		notificationService.broadcast(1, "Auction", "Auction Started!");
 		
 		return nextRound;
 	}
@@ -114,6 +114,9 @@ public class AuctionService extends BaseService implements IAuctionService {
 			return null; // or exception
 		}
 		auctionDao.endAuction(target);
+
+		// send notification
+		notificationService.broadcast(2, "Auction", "Auction Finished!");
 
 		return target;
 	}

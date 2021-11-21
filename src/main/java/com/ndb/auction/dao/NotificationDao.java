@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.models.Notification;
 
@@ -52,4 +53,16 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 		dynamoDBMapper.save(notification, updateConfig);
 		return notification;
 	}
+
+    public List<Notification> getAllUnReadNotificationsByUser(String userId) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(userId.toString()));
+		eav.put(":v2", new AttributeValue().withN("0"));
+		
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+		    .withFilterExpression("user_id = :v1 and read_flag = :v2")
+		    .withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.scan(Notification.class, scanExpression);
+    }
 }

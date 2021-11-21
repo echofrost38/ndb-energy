@@ -49,7 +49,7 @@ extend type Mutation {
 	createCryptoPayment(
 		roundId: String!,
 		amount: Float!
-	) : CryptoPayload
+	) : CryptoTransaction
 	addNewCoin (
 		name: String,
 		symbol: String

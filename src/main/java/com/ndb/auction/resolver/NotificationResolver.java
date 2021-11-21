@@ -29,6 +29,16 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
         return notificationService.getNotificationPublisher();
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public Notification setNotificationRead(String id) {
+        return notificationService.setNotificationRead(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<Notification> getAllUnReadNotifications() {
+        return notificationService.getAllUnReadNotifications();
+    }
+
     /*
         Notification Type
     */

@@ -1,4 +1,0 @@
-type CoinbasePricing {
-	amount: String!
-	currency: String!
-}

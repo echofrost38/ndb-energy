@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class BaseController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    NotificationService notificationService;
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
 

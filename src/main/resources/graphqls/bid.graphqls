@@ -18,9 +18,6 @@ type Mutation {
 		payment: Int!,
 		cryptoType: String
 	) : Bid
-	closeBid(
-		roundId: String!
-	) : String
 }
 
 type Query {

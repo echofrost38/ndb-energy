@@ -1,0 +1,20 @@
+type Subscription {
+    notifications : Notification
+}
+
+type Query {
+    getAllNotificationTypes: [NotificationType]
+}
+
+type Mutation {
+    addNotificationType(
+        name: String
+    ): String
+    deleteNotificationType(
+        id: Int
+    ): [NotificationType]
+    updateNotificationType(
+        id: Int!,
+        name: String
+    ): NotificationType
+}

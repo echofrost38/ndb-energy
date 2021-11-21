@@ -86,12 +86,6 @@ public class BidService extends BaseService implements IBidService {
 			User user = userDao.getUserById(userId);
 			Map<String, Wallet> wallets = user.getWallet();
 			Wallet wallet = wallets.get(cryptoType);
-			if(wallet == null) {
-				wallet = new Wallet();
-				wallets.put(cryptoType, wallet);
-			}
-			
-			
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
@@ -100,7 +94,8 @@ public class BidService extends BaseService implements IBidService {
 
 			wallet.setFree(free - cryptoAmount);
 			wallet.setHolding(holding + cryptoAmount);
-			
+			wallets.replace(cryptoType, wallet);
+			user.setWallet(wallets);
 			userDao.updateUser(user);
 
 			Map<String, BidHolding> holdingList = bid.getHoldingList();
@@ -177,8 +172,7 @@ public class BidService extends BaseService implements IBidService {
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
-		Bid _bidArray[] = new Bid[bidList.size()];
-		bidList.toArray(_bidArray);
+		Bid _bidArray[] = (Bid[])bidList.toArray();
 		Bid newList[] = Arrays.copyOf(_bidArray, _bidArray.length + 1);
 		newList[_bidArray.length] = bid;
 	
@@ -186,9 +180,7 @@ public class BidService extends BaseService implements IBidService {
 		// 1. Token Price
 		// 2. Total Price ( Amount of pay )
 		// 3. Placed time ( early is winner )
-		if(newList.length > 1) {
-			sort.mergeSort(newList, 0, newList.length - 1);			
-		} 
+		sort.mergeSort(newList, 0, newList.length);
 				
 		// true : winner, false : fail
 		boolean status = true; 
@@ -216,7 +208,7 @@ public class BidService extends BaseService implements IBidService {
 		}
 		
 		// Save new Bid status
-		bidDao.updateBidStatus(newList);
+		bidDao.updateBidStatus(Arrays.asList(newList));
 		
         // update & save new auction stats
 		currentRound.setStats(new AuctionStats(qty, win, fail));       
@@ -235,11 +227,7 @@ public class BidService extends BaseService implements IBidService {
 		Double avatarToken = auction.getToken();
 		
 		// Assume all status already confirmed when new bid is placed
-		List<Bid> _bidList = bidDao.getBidListByRound(roundId);
-		Bid bids[] = new Bid[_bidList.size()];
-		_bidList.toArray(bids);
-		
-		List<Bid> bidList = Arrays.asList(bids);
+		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		
 		// processing all bids
 		ListIterator<Bid> iterator = bidList.listIterator();
@@ -252,7 +240,7 @@ public class BidService extends BaseService implements IBidService {
 			// check stripe
 			List<StripeTransaction> fiatTxns = stripeService.getTransactions(roundId, userId);
 			for (StripeTransaction fiatTransaction : fiatTxns) {
-				boolean result = stripeService.UpdateTransaction(fiatTransaction.getId(), bid.getStatus());
+				boolean result = stripeService.UpdateTransaction(fiatTransaction.getPaymentIntentId(), bid.getStatus());
 				if(result && (bid.getStatus() == Bid.WINNER)) {
 					totalPrice += fiatTransaction.getAmount();					
 				}
@@ -274,10 +262,6 @@ public class BidService extends BaseService implements IBidService {
 					String cryptoType = cryptoTransaction.getCryptoType();
 					double cryptoAmount = cryptoTransaction.getCryptoAmount();
 					Wallet wallet = tempWallet.get(cryptoType);
-					if(wallet == null) {
-						wallet = new Wallet();
-						tempWallet.put(cryptoType, wallet);
-					}
 					double hold = wallet.getHolding();
 					double free = wallet.getFree();
 					if(hold > cryptoAmount) {
@@ -301,11 +285,6 @@ public class BidService extends BaseService implements IBidService {
 					// hold -> release
 					double cryptoAmount = holding.getCrypto();
 					Wallet wallet = tempWallet.get(_cryptoType);
-					if(wallet == null) {
-						wallet = new Wallet();
-						tempWallet.put(_cryptoType, wallet);
-					}
-					
 					double hold = wallet.getHolding();
 					double free = wallet.getFree();
 					if(hold > cryptoAmount) {
@@ -323,12 +302,6 @@ public class BidService extends BaseService implements IBidService {
 			Map<String, List<String>> userAvatarPurchased = user.getAvatarPurchase();
 			for (AvatarComponent component : avatarComponents) {
 				List<String> list = userAvatarPurchased.get(component.getGroupId());
-				
-				if(list == null) {
-					roundAvatarWinner = false;
-					break;
-				};
-				
 				if(!list.contains(component.getCompId())) {
 					roundAvatarWinner = false;
 				}
@@ -342,10 +315,6 @@ public class BidService extends BaseService implements IBidService {
 					token += avatarToken;
 				}
 				Wallet wallet = tempWallet.get("NDB");
-				if(wallet == null) {
-					wallet = new Wallet();
-					tempWallet.put("NDB", wallet);
-				}
 				wallet.setFree(wallet.getFree() + token);
 			}
 			
@@ -374,8 +343,8 @@ public class BidService extends BaseService implements IBidService {
 
 		// check amount & price 
 		if(
-			(_tokenAmount > tokenAmount) || 
-			(_tokenPrice > tokenPrice) ||
+			(_tokenAmount < tokenAmount) || 
+			(_tokenPrice < tokenPrice) ||
 			(_tokenPrice == tokenPrice && _tokenAmount == tokenAmount)
 		) {
 			throw new BidException("New price must be larger than original price.", "tokenPrice");
@@ -395,11 +364,6 @@ public class BidService extends BaseService implements IBidService {
 
 			User user = userDao.getUserById(userId);
 			Wallet wallet = user.getWallet().get(cryptoType);
-			if(wallet == null) {
-				wallet = new Wallet();
-				user.getWallet().put(cryptoType, wallet);
-			}
-			
 			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {

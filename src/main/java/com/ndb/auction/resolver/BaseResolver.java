@@ -9,6 +9,7 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
@@ -48,4 +49,7 @@ public class BaseResolver {
 
 	@Autowired 
 	CryptoService cryptoService;
+
+	@Autowired
+	NotificationService notificationService;
 }

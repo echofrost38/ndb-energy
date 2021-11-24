@@ -1,4 +1,4 @@
-type Mutation {
+extend type Mutation {
 	placeBid(
 		roundId: String!,
 		tokenAmount: Float!,
@@ -23,7 +23,7 @@ type Mutation {
 	) : String
 }
 
-type Query {
+extend type Query {
 	getBidListByRound(
 		round: Int!
 	): [Bid]
@@ -41,4 +41,10 @@ type Query {
 	getBidListById(
 		roundId: String
 	) : [Bid]
+}
+
+
+schema {
+   query: Query,
+   mutation: Mutation
 }

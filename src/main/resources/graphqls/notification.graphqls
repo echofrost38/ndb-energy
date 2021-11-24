@@ -22,3 +22,9 @@ type Mutation {
         name: String
     ): NotificationType
 }
+
+
+schema {
+   query: Query,
+   mutation: Mutation
+}

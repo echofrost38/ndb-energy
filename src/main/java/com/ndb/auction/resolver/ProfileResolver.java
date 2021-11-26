@@ -68,7 +68,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
     
     @PreAuthorize("isAuthenticated()")
-    public String upload(Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String upload(String docType, Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
         User user = userService.getUserById(userId);

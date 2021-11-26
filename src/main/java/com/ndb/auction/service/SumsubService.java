@@ -44,7 +44,13 @@ public class SumsubService extends BaseService {
 	
 	// create applicant
 	public String createApplicant(String userId, String levelName) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        // https://developers.sumsub.com/api-reference/#creating-an-applicant
+        
+        // 
+        List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
+        if(applicants.size() != 0) {
+            return applicants.get(0).getId();
+        }
+
         Applicant applicant = new Applicant(userId);
 
         Response response = sendPost(

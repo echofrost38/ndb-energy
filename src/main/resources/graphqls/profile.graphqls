@@ -14,7 +14,8 @@ extend type Mutation {
 		levelName: String!
 	) : String
 	upload(
-		file: Upload
+		docType: String!
+		file: Upload!
 	) : String	
 	uploadSelfie(
 		selfie: Upload

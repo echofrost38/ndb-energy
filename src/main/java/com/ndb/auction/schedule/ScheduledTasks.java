@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
+import com.ndb.auction.service.StatService;
 
 @Component
 public class ScheduledTasks {
@@ -16,6 +17,9 @@ public class ScheduledTasks {
 
 	@Autowired
 	BidService bidService;
+
+	@Autowired
+	StatService statService;
 	
 	private Auction startedRound;
 	private Long startedCounter;
@@ -125,7 +129,8 @@ public class ScheduledTasks {
 				// end round!
 				auctionService.endAuction(startedRound.getAuctionId());
 				
-				
+				statService.updateRoundCache(startedRound.getNumber());
+
 				// bid processing 
 				// ********* checking delayed more 1s ************ 
 				bidService.closeBid(startedRound.getAuctionId());

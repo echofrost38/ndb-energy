@@ -11,6 +11,7 @@ import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.ProfileService;
+import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserService;
@@ -56,4 +57,7 @@ public class BaseResolver {
 
 	@Autowired
 	NotificationService notificationService;
+
+	@Autowired 
+	StatService statService;
 }

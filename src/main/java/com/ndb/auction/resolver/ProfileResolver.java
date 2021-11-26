@@ -9,6 +9,8 @@ import javax.servlet.http.Part;
 
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarSet;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,41 +49,60 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
     
     // Identity Verification
-    public String initVerification(String country, String docType, String levelName) {
+    @PreAuthorize("isAuthenticated()")
+    public String createApplicant(String country, String docType, String levelName) {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
     	try {
-			String result = sumsubService.createApplicant(userId, docType, levelName);
+			String result = sumsubService.createApplicant(userId, levelName);
 			if(result == null) return "Failed";
 		} catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
 			return "Failed";
 		}
+    	User user = userService.getUserById(userId);
+    	user.setDocType(docType);
+    	userService.updateUser(user);
+    	
     	return "Success";
     }
     
-    public String uploadDocuments(List<Part> file) {
+    @PreAuthorize("isAuthenticated()")
+    public String upload(Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
-        
-    	return "";
+        User user = userService.getUserById(userId);
+        List<Applicant> appList = sumsubService.getApplicantsByUserId(userId);
+        if(appList.size() == 0) {
+        	return null;
+        }
+        String applicantId = appList.get(0).getId();
+    	String imageId = sumsubService.addDocument(applicantId, user.getCountry(), user.getDocType(), file);
+    	return imageId;
     }
     
+    @PreAuthorize("isAuthenticated()")
     public String uploadSelfie(Part part) {
     	
     	return "";
     }
     
+    @PreAuthorize("isAuthenticated()")
     public String requestCheck() {
     	
     	return "";
     }
     
-//    public String upload(Part part) throws IOException {
-//        System.out.println("Part: " + part.getSubmittedFileName());
-//        part.write(part.getSubmittedFileName());
-//        
-//        return "Success";
-//    }
-
+    @PreAuthorize("isAuthenticated()")
+    public String gettingApplicantData(String applicantId) {
+    	String levelName = "";
+    	try {
+			levelName = sumsubService.gettingApplicantData(applicantId).getReview().getLevelName();
+		} catch (InvalidKeyException | NoSuchAlgorithmException | IOException | NullPointerException e) {
+			e.printStackTrace();
+			return "";
+		}
+    	return levelName;
+    }
+    
 }

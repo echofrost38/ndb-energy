@@ -88,17 +88,18 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
         
         // Send SMS about offline
         try {
-            String result = smsService.sendNormalSMS(phone, smsContent);
-            log.info("SMS result {}", result);
+//            String result = 
+            		smsService.sendNormalSMS(phone, smsContent);
+//            log.info("SMS result {}", result);
         } catch (Exception e) {
-            log.info("SMS Error {}", e);
+//            log.info("SMS Error {}", e);
         }
 
         // Send Mail about offline
         try {
 			mailService.sendNormalEmail(user, "You are offline from NDB", smsContent);
 		} catch (MessagingException | IOException | TemplateException e) {
-            log.info("SMS Error {}", e);
+//            log.info("SMS Error {}", e);
 		}
     }   
 

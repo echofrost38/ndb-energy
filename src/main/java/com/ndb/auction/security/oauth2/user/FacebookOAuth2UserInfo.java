@@ -35,4 +35,10 @@ public class FacebookOAuth2UserInfo extends OAuth2UserInfo {
         }
         return null;
     }
+
+    @Override
+    public String getLocale() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -2,5 +2,10 @@ package com.ndb.auction.models.user;
 
 public enum  AuthProvider {
     local,
-    google
+    google,
+    facebook,
+    linkedin,
+    twitter,
+    apple,
+    amazon,
 }

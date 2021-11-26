@@ -1,4 +1,4 @@
-package com.ndb.auction.security.oauth2;
+package com.ndb.auction.service;
 
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.exceptions.OAuth2AuthenticationProcessingException;
@@ -17,13 +17,26 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import freemarker.template.TemplateException;
+
+import java.io.IOException;
 import java.util.Optional;
+
+import javax.mail.MessagingException;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
+    public final static String VERIFY_TEMPLATE = "verify.ftlh";
+
     @Autowired
     private UserDao userDao;
+    
+    @Autowired
+    public TotpService totpService;
+
+    @Autowired
+    public MailService mailService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -47,14 +60,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         Optional<User> userOptional = userDao.getUserByEmail(oAuth2UserInfo.getEmail());
         User user;
-        if(userOptional.isPresent()) {
+        if(userOptional != null) {
             user = userOptional.get();
             if(!user.getProvider().equals(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
                         user.getProvider() + " account. Please use your " + user.getProvider() +
                         " account to login.");
             }
-            user = updateExistingUser(user, oAuth2UserInfo);
+            // user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
@@ -69,6 +82,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setProviderId(oAuth2UserInfo.getId());
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
+        user.setCountry(oAuth2UserInfo.getLocale());
         // user.setImageUrl(oAuth2UserInfo.getImageUrl());
         return userDao.createUser(user);
     }
@@ -79,4 +93,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userDao.createUser(existingUser);
     }
 
+    private boolean sendEmailCode(User user) {
+		String code = totpService.getVerifyCode(user.getEmail());
+		try {
+			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);
+		} catch (MessagingException | IOException | TemplateException e) {
+			return false; // or exception
+		}	
+		return true;
+	}
 }

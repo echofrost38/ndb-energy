@@ -47,7 +47,7 @@ public class User {
 	private String avatarName;
 	private List<AvatarSet> avatar;
 	private Map<String, List<String>> avatarPurchase;
-	private String docType;
+	
 
 	private Long lastLogin;
 	
@@ -276,15 +276,6 @@ public class User {
 	public void setAvatarPurchase(Map<String, List<String>> avatar_purchase) {
 		this.avatarPurchase = avatar_purchase;
 	}
-	
-	@DynamoDBAttribute(attributeName="doc_type")
-	public String getDocType() {
-		return docType;
-	}
-
-	public void setDocType(String docType) {
-		this.docType = docType;
-	}
 
 	@DynamoDBIgnore
 	public List<AvatarPurchased> getAvatarPurchased() {
@@ -352,6 +343,5 @@ public class User {
 		}
 		return list;
 	}
-
 
 }

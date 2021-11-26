@@ -70,7 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/playground/**").permitAll()
 				.antMatchers("/subscriptions/**").permitAll()
 				.antMatchers("/coinbase/**").permitAll()
-				.antMatchers("/sumsub/**").permitAll()
         	.anyRequest().authenticated();
         
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

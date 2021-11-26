@@ -8,13 +8,13 @@ extend type Mutation {
 	updateAvatarSet(
 		components: [AvatarSetInput]
 	) : [AvatarSet]
-	createApplicant(
+	initVerification(
 		country: String!,
 		docType: String!,
 		levelName: String!
 	) : String
-	upload(
-		file: Upload
+	uploadDocuments(
+		file: [Upload]
 	) : String	
 	uploadSelfie(
 		selfie: Upload
@@ -22,13 +22,6 @@ extend type Mutation {
 	requestCheck : String
 }
 
-extend type Query {
-	gettingApplicantData(
-		applicantId: String!
-	) : String
-}
-
 schema {
-	mutation: Mutation,
-	query: Query
+	mutation: Mutation
 }

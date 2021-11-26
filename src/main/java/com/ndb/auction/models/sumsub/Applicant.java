@@ -3,11 +3,7 @@ package com.ndb.auction.models.sumsub;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @DynamoDBTable(tableName="Applicant")
 public class Applicant {
 	
@@ -22,7 +18,7 @@ public class Applicant {
         this.userId = userId;
     }
 	
-	@DynamoDBHashKey(attributeName="applicant_id")
+	@DynamoDBHashKey(attributeName="id")
 	public String getId() {
 		return id;
 	}

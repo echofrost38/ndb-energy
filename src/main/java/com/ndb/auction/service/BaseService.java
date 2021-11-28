@@ -8,6 +8,7 @@ import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.schedule.ScheduledTasks;
+import com.ndb.auction.security.TokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,4 +66,7 @@ public class BaseService {
     
     @Autowired
     public NotificationService notificationService;
+
+    @Autowired
+    public TokenProvider tokenProvider;
 }

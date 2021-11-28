@@ -2,6 +2,7 @@ package com.ndb.auction.security.oauth2;
 
 import com.ndb.auction.config.AppProperties;
 import com.ndb.auction.security.TokenProvider;
+import com.ndb.auction.service.TotpService;
 import com.ndb.auction.exceptions.BadRequestException;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
@@ -25,6 +27,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private TokenProvider tokenProvider;
 
     private AppProperties appProperties;
+
+    @Autowired
+    private TotpService totpService;
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
@@ -62,6 +67,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String token = tokenProvider.createToken(authentication);
 
+        // Save token on cache
+        totpService.setToken(token, UUID.randomUUID().toString());
+        
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)
                 .build().toUriString();

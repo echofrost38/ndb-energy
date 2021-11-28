@@ -45,7 +45,7 @@ spring:
               clientSecret: fd1e68930a9726a28621238239504b8e54173d34285495d487b8713a9121169b
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               authorizationGrantType: authorization_code
-              code: SplxlOBezQQYbYS6WxSbIA
+              # code: SplxlOBezQQYbYS6WxSbIA
               scope:
                 - profile
                 - postal_code

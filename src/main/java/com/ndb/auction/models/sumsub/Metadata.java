@@ -6,23 +6,23 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName="Metadata")
 public class Metadata {
     // https://developers.sumsub.com/api-reference/#request-metadata-body-part-fields
-    private DocType idDocType;
+    private String idDocType;
     private String country;
 
     public Metadata() {
     }
 
-    public Metadata(DocType idDocType, String country) {
+    public Metadata(String idDocType, String country) {
         this.idDocType = idDocType;
         this.country = country;
     }
 
     @DynamoDBAttribute(attributeName="doc_type")
-    public DocType getIdDocType() {
+    public String getIdDocType() {
         return idDocType;
     }
 
-    public void setIdDocType(DocType idDocType) {
+    public void setIdDocType(String idDocType) {
         this.idDocType = idDocType;
     }
 

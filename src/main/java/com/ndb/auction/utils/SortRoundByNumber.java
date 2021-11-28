@@ -1,18 +1,18 @@
 package com.ndb.auction.utils;
 
+import com.ndb.auction.models.Auction;
+
 import org.springframework.stereotype.Component;
 
-import com.ndb.auction.models.Bid;
-
 @Component
-public class Sort {
-    private void merge(Bid arr[], int left, int middle, int right)
+public class SortRoundByNumber {
+    private void merge(Auction arr[], int left, int middle, int right)
     {
         int low = middle - left + 1;                    //size of the left subarray
         int high = right - middle;                      //size of the right subarray
  
-        Bid L[] = new Bid[low];                             //create the left and right subarray
-        Bid R[] = new Bid[high];
+        Auction L[] = new Auction[low];                             //create the left and right subarray
+        Auction R[] = new Auction[high];
 
         int i = 0, j = 0;
  
@@ -32,28 +32,11 @@ public class Sort {
 
         while (i < low && j < high)                     //merge the left and right subarrays
         {
-            if (L[i].getTokenPrice() > R[j].getTokenPrice()) 
+            if (L[i].getNumber() > R[j].getNumber()) 
             {
                 arr[k] = L[i];
                 i++;
-            } else if(L[i].getTokenPrice() == R[j].getTokenPrice()) {
-            	// equal price
-            	if(L[i].getTotalPrice() > R[j].getTotalPrice()) {
-            		arr[k] = L[i];
-                    i++;
-            	} else if (L[i].getTotalPrice() == R[j].getTotalPrice()) {
-            		if(L[i].getPlacedAt() <= R[j].getPlacedAt()) {
-            			arr[k] = L[i];
-                        i++;
-            		} else {
-            			arr[k] = R[j];
-                        j++;	
-            		}
-            	} else {
-            		arr[k] = R[j];
-                    j++;
-            	}
-            }
+            } 
             else 
             {
                 arr[k] = R[j];
@@ -77,7 +60,7 @@ public class Sort {
         }
     }
  
-    public void mergeSort(Bid arr[], int left, int right)       //helper function that creates the sub cases for sorting
+    public void mergeSort(Auction arr[], int left, int right)       //helper function that creates the sub cases for sorting
     {
         int middle;
         if (left < right) {                             //sort only if the left index is lesser than the right index (meaning that sorting is done)

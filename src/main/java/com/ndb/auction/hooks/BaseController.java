@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.NotificationService;
+import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,14 @@ public class BaseController {
 
     @Autowired
     NotificationService notificationService;
+    
+    @Autowired
+    SumsubService sumsubService;
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
-
+    private static final String HMAC_SHA_1 = "HmacSHA1";
+    
+    
     public String getBody(HttpServletRequest request) throws IOException {
 
         String body = null;
@@ -74,6 +80,25 @@ public class BaseController {
         try {
             Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_256);
             SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_256);
+            hmacSHA512.init(secretKeySpec);
+
+            byte[] digest = hmacSHA512.doFinal(value.getBytes());
+            BigInteger hash = new BigInteger(1, digest);
+            result = hash.toString(16);
+            if ((result.length() % 2) != 0) {
+                result = "0" + result;
+            }
+        } catch (IllegalStateException | InvalidKeyException | NoSuchAlgorithmException ex) {
+            throw new RuntimeException("Problemas calculando HMAC", ex);
+        }
+        return result;
+    }
+    
+    public String buildHmacSHA1Signature(String value, String secret) {
+    	String result;
+        try {
+            Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_1);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_1);
             hmacSHA512.init(secretKeySpec);
 
             byte[] digest = hmacSHA512.doFinal(value.getBytes());

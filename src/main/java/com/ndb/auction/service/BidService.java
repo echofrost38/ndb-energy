@@ -43,7 +43,7 @@ public class BidService extends BaseService implements IBidService {
 
 	@Autowired
 	private CryptoService cryptoService;
-	
+
 	@Override
 	public Bid placeNewBid(
 			String userId, 
@@ -193,9 +193,7 @@ public class BidService extends BaseService implements IBidService {
 		// 1. Token Price
 		// 2. Total Price ( Amount of pay )
 		// 3. Placed time ( early is winner )
-		if(newList.length > 1) {
-			sort.mergeSort(newList, 0, newList.length - 1);			
-		} 
+		sort.mergeSort(newList, 0, newList.length - 1);
 				
 		// true : winner, false : fail
 		boolean status = true; 
@@ -258,9 +256,6 @@ public class BidService extends BaseService implements IBidService {
 		// processing all bids
 		ListIterator<Bid> iterator = bidList.listIterator();
 	    while (iterator.hasNext()) {
-	    	
-	    	if(totalToken == 0)
-	    		break;
 	    	
 	        Bid bid = iterator.next();
 	        

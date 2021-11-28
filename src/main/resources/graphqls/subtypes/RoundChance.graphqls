@@ -1,0 +1,5 @@
+type RoundChance {
+    roundNumber: Int!,
+    winRate: Float!,
+    failedRate: Float!
+}

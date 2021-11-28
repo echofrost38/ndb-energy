@@ -14,7 +14,6 @@ import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
 import com.ndb.auction.models.user.Wallet;
-import com.ndb.auction.service.NotificationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

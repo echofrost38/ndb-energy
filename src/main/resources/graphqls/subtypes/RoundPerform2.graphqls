@@ -1,0 +1,6 @@
+type RoundPerform2 {
+    roundNumber: Int!,
+    min: Float!,
+    max: Float!,
+    std: Float!
+}

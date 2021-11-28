@@ -20,10 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ndb.auction.security.jwt.AuthEntryPointJwt;
 import com.ndb.auction.security.jwt.AuthTokenFilter;
-import com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.ndb.auction.security.oauth2.OAuth2AuthenticationFailureHandler;
-import com.ndb.auction.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import com.ndb.auction.service.CustomOAuth2UserService;
 import com.ndb.auction.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -37,20 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
-
-	@Autowired
-    private CustomOAuth2UserService customOAuth2UserService;
-
-    @Autowired
-    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-
-    @Autowired
-    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
-	@Bean
-    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
-        return new HttpCookieOAuth2AuthorizationRequestRepository();
-    }
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -88,25 +70,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/playground/**").permitAll()
 				.antMatchers("/subscriptions/**").permitAll()
 				.antMatchers("/coinbase/**").permitAll()
-				.antMatchers("/auth/**", "/oauth2/**").permitAll()
-        	.anyRequest().authenticated()
-			.and()
-			.oauth2Login()
-				.authorizationEndpoint()
-					.baseUri("/oauth2/authorize")
-					.authorizationRequestRepository(cookieAuthorizationRequestRepository())
-					.and()
-				.redirectionEndpoint()
-					.baseUri("/oauth2/callback/*")
-					.and()
-				.userInfoEndpoint()
-					.userService(customOAuth2UserService)
-					.and()
-				.successHandler(oAuth2AuthenticationSuccessHandler)
-				.failureHandler(oAuth2AuthenticationFailureHandler);
-			// .and()
-			// .logout();
-         
+				.antMatchers("/sumsub/**").permitAll()
+        	.anyRequest().authenticated();
+        
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 	

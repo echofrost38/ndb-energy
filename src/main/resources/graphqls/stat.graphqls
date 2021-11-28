@@ -1,0 +1,8 @@
+extend type Query {
+    getRoundPerform2: [RoundPerform2],
+    getRoundChance: [RoundChance]
+}
+
+schema {
+    query: Query
+}

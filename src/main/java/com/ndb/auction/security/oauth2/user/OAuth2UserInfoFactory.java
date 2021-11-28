@@ -3,8 +3,6 @@ package com.ndb.auction.security.oauth2.user;
 import com.ndb.auction.exceptions.OAuth2AuthenticationProcessingException;
 import com.ndb.auction.models.user.AuthProvider;
 
-import LinkedInOAuth2UserInfo;
-
 import java.util.Map;
 
 public class OAuth2UserInfoFactory {

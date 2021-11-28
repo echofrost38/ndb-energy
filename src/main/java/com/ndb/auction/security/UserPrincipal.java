@@ -12,7 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 public class UserPrincipal implements OAuth2User, UserDetails {
-    private String id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -123125221942107357L;
+	private String id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;

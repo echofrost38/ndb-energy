@@ -4,15 +4,15 @@ spring:
         client:
           registration:
             google:
-              clientId: 217015743019-arfgls5skjg3tehl67gf8sitbf0rq9k9.apps.googleusercontent.com
-              clientSecret: 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
+              clientId: 325113996523-15ftfqb0j4khbq9hdblebiqar8on6lmk.apps.googleusercontent.com
+              clientSecret: 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
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               scope:
                 - email
                 - profile
             facebook:
-              clientId: 121189305185277
-              clientSecret: 42ffe5aa7379e8326387e0fe16f34132
+              clientId: 433995704835713
+              clientSecret: 16c2632bd91bfacfaef51d9103412fa6
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               scope:
                 - email
@@ -41,8 +41,8 @@ spring:
               clientName: Apple
               clientAuthenticationMethod: post
             amazon: 
-              clientId: amzn1.application-oa2-client.e2f433ea10784bf7876d95e33e881875
-              clientSecret: fd1e68930a9726a28621238239504b8e54173d34285495d487b8713a9121169b
+              clientId: amzn1.application-oa2-client.4b659eb05cc746cd90a57b9dfb58d2a9
+              clientSecret: a362a65ff007ec07801a92dd7efc96ee89ce6d5be5ddcb4b3d19432fa1249ed2
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               authorizationGrantType: authorization_code
               # code: SplxlOBezQQYbYS6WxSbIA

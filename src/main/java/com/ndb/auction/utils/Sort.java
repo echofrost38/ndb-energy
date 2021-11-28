@@ -25,7 +25,7 @@ public class Sort {
             R[j] = arr[middle + 1 + j];
         }
         
-
+ 
         int k = left;                                           //get starting index for sort
         i = 0;                                             //reset loop variables before performing merge
         j = 0;

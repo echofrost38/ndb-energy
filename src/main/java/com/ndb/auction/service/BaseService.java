@@ -5,12 +5,10 @@ import com.ndb.auction.dao.AvatarDao;
 import com.ndb.auction.dao.BidDao;
 import com.ndb.auction.dao.CryptoPaymentDao;
 import com.ndb.auction.dao.NotificationDao;
-import com.ndb.auction.dao.OAuth2Dao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.schedule.ScheduledTasks;
-import com.ndb.auction.security.TokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

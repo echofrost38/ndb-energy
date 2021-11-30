@@ -70,8 +70,5 @@ public class BaseService {
     public NotificationService notificationService;
 
     @Autowired
-    public TokenProvider tokenProvider;
-    
-    @Autowired
     public SumsubDao sumsubDao;
 }

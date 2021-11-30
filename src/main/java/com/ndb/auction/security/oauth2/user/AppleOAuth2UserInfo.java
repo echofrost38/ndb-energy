@@ -30,7 +30,6 @@ public class AppleOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getLocale() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

@@ -11,7 +11,6 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.User;
 
-import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.EmitResult;
 
-@Slf4j
 @Component
 public class NotificationService {
 

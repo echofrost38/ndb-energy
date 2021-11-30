@@ -18,12 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+@Slf4j
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -40,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
+        log.info("oAuth2UserReguest {}", oAuth2UserRequest);
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         try {
@@ -52,8 +55,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    @SuppressWarnings("deprecation")
-	private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
@@ -94,8 +96,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userDao.createUser(existingUser);
     }
 
-    @SuppressWarnings("unused")
-	private boolean sendEmailCode(User user) {
+    private boolean sendEmailCode(User user) {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {
 			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);

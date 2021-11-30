@@ -22,8 +22,7 @@ public class FacebookOAuth2UserInfo extends OAuth2UserInfo {
         return (String) attributes.get("email");
     }
 
-    @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public String getImageUrl() {
         if(attributes.containsKey("picture")) {
             Map<String, Object> pictureObj = (Map<String, Object>) attributes.get("picture");
@@ -39,7 +38,6 @@ public class FacebookOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getLocale() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

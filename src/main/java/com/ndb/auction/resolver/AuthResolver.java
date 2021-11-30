@@ -1,10 +1,14 @@
 package com.ndb.auction.resolver;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
+import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.models.User;
 import com.ndb.auction.payload.Credentials;
 
@@ -100,6 +104,40 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	public String resetPassword(String email, String code, String newPassword) {
 		newPassword = encoder.encode(newPassword);
 		return userService.resetPassword(email, code, newPassword);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public OAuth2Registration addOAuth2Registration(
+		String registrationId,
+		String clientId,
+		String clientSecret,
+		String clientAuthenticationMethod,
+		String authorizationGrantType,
+		String redirectUriTemplate,
+		Set<String> scope,
+		String authorizationUri,
+		String tokenUri,
+		String userInfoUri,
+		String userNameAttributeName,
+		String jwkSetUri,
+		String clientName
+	) {
+		OAuth2Registration registration = new OAuth2Registration(
+			registrationId,
+			clientId,
+			clientSecret,
+			clientAuthenticationMethod,
+			authorizationGrantType,
+			redirectUriTemplate,
+			scope,
+			authorizationUri,
+			tokenUri,
+			userInfoUri,
+			userNameAttributeName,
+			jwkSetUri,
+			clientName
+		);
+		return oAuth2RegistrationService.createRegistration(registration);
 	}
 	
 	public Mono<String> fluxTest(String param) {

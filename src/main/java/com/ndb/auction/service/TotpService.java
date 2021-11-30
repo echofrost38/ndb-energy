@@ -61,6 +61,7 @@ public class TotpService {
 		 tokenCache.put(token, password);
 	 }
 	 
+	 // Get password with UUID token
 	 public String getPassword(String token) {
 		 String pass;
 		 try {

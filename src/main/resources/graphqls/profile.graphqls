@@ -13,11 +13,16 @@ extend type Mutation {
 		docType: String!,
 		levelName: String!
 	) : String
+	upgradeApplicant(
+		levelName: String!
+	) : String
 	upload(
-		docType: String!
+		docType: String!,
+		country: String!,
 		file: Upload!
 	) : String	
 	uploadSelfie(
+		country: String!,
 		selfie: Upload
 	) : String
 	requestCheck : String

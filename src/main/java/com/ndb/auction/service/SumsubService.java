@@ -66,6 +66,23 @@ public class SumsubService extends BaseService {
         sumsubDao.createNewApplicant(applicant);
         return applicantId;
     }
+
+    public String upgradeApplicant(String userId, String levelName) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+        List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
+        if(applicants.size() == 0) {
+            return null;
+        }
+        Applicant applicant = applicants.get(0);
+
+        Response response = sendPost(
+            "/resources/applicants/" + applicant.getId() + "/moveToLevel?" + levelName, 
+            null);
+        
+        ResponseBody responseBody = response.body();
+        ApplicantResponse applicantResponse = objectMapper.readValue(responseBody.string(), ApplicantResponse.class);
+
+        return applicantResponse.getId();
+    }
 	
 	// uploading document
 	public String addDocument(String applicantId, String country, String docType, File doc) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
@@ -121,6 +138,21 @@ public class SumsubService extends BaseService {
 		return response.headers().get("X-Image-Id");
 	}
 	
+    public String requestChecking(String userId) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+        List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
+        if(applicants.size() == 0) {
+            return null;
+        }
+        Applicant applicant = applicants.get(0);
+        Response response = sendPost(
+            "/resources/applicants/" + applicant.getId() + "/status/pending", 
+            RequestBody.create(
+                MediaType.parse("application/json; charset=utf-8"), "")
+        );
+        
+        return response.body().string();
+    }
+
 	public ApplicantResponse gettingApplicantData(String applicantId) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 		Response response = sendGet("/resources/applicants/" + applicantId + "/one");
 		if(response.code() == 401) {

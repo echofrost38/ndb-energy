@@ -31,4 +31,5 @@ public class LinkedInOAuth2UserInfo extends OAuth2UserInfo {
     public String getLocale() {
         return null;
     }
+	
 }

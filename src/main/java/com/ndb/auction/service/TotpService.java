@@ -19,6 +19,7 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
+import lombok.extern.slf4j.Slf4j;
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
 import java.util.Random;
@@ -26,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 public class TotpService {
 	
  	 //cache based on username and OPT MAX 8 
@@ -69,6 +71,7 @@ public class TotpService {
 			tokenCache.invalidate(token);
 			return pass;
 		 } catch (ExecutionException e) {
+			// TODO Auto-generated catch block
 			return "";
 		 }
 	 }

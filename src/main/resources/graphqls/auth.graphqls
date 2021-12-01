@@ -37,39 +37,6 @@ extend type Mutation {
 		code: String!,
 		newPassword: String!
 	) : String!
-	addOAuth2Registration (
-		registrationId: String!,
-		clientId: String,
-		clientSecret: String,
-		clientAuthenticationMethod: String,
-		authorizationGrantType: String,
-		redirectUriTemplate: String,
-		scope: [String],
-		authorizationUri: String,
-		tokenUri: String,
-		userInfoUri: String,
-		userNameAttributeName: String,
-		jwkSetUri: String,
-		clientName: String
-	) : OAuth2Registration
-	# updateOAuth2Registration (
-	# 	registrationId: String!,
-	# 	clientId: String,
-	# 	clientSecret: String,
-	# 	clientAuthenticationMethod: String,
-	# 	authorizationGrantType: String,
-	# 	redirectUriTemplate: String,
-	# 	scope: [String],
-	# 	authorizationUri: String,
-	# 	tokenUri: String,
-	# 	userInfoUri: String,
-	# 	userNameAttributeName: String,
-	# 	jwkSetUri: String,
-	# 	clientName: String,
-	# ) : OAuth2Registration
-	# deleteOAuth2Registration (
-	# 	registrationId: String!
-	# ) : OAuth2Registration
 }
 
 type Subscription {

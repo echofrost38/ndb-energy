@@ -26,7 +26,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import graphql.kickstart.execution.subscriptions.SubscriptionSession;
 import graphql.kickstart.execution.subscriptions.apollo.ApolloSubscriptionConnectionListener;
 import graphql.kickstart.execution.subscriptions.apollo.OperationMessage;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class AuthenticationConnectionListener implements ApolloSubscriptionConnectionListener {
 

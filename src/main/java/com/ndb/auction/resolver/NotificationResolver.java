@@ -25,7 +25,7 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     
     @PreAuthorize("isAuthenticated()")
     public Publisher<Notification> notifications() {
-//        log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
+    //    log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
         return notificationService.getNotificationPublisher();
     }
 

@@ -21,7 +21,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class FinancialResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-    
+
     // Deposit
     @PreAuthorize("isAuthenticated()")
     public CryptoPayload getDepositAddress() {
@@ -33,9 +33,9 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
         return null;
     }
 
-    // Direct Sale
+    // Direct Sale NDT Token
     @PreAuthorize("isAuthenticated()")
-    public String directSale(double amount, double price) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String directSale(double amount, double price, int whereTo) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
         
@@ -56,26 +56,27 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
             }
         }
 
+        String response = "Failed";
         if(totalPrice < kycThreshold) {
             // don't need verification
-
+            response = financialService.directSale(userId, amount, whereTo);
         } else if( totalPrice < amlThreshold) {
             // check kyc level
             if(sumsubService.checkVerificationStatus(userId, SumsubService.KYC)) {
-
+                response = financialService.directSale(userId, amount, whereTo);
             } else {
                 throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
             }
         } else if( totalPrice >= amlThreshold) {
             // check aml level
             if(sumsubService.checkVerificationStatus(userId, SumsubService.AML)) {
-
+                response = financialService.directSale(userId, amount, whereTo);
             } else {
                 throw new UnauthorizedException("You must verify your proof of residence to buy more than " + totalPrice + ".", "amount");
             }
         }
 
-        return "";
+        return response;
     }
 
     // Withdrawal

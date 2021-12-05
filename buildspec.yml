@@ -1,0 +1,16 @@
+
+version: 0.2
+
+phases:
+   install:
+      commands:
+         - echo Entering install phase...
+         - echo Nothing to do now
+   build:
+      commands:
+         - echo Build started on `date`
+         - mvn install
+artifacts:
+   type: zip
+   files:
+      - '**/*'

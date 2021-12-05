@@ -148,6 +148,7 @@ public class SumsubService extends BaseService {
             return null;
         }
         Applicant applicant = applicants.get(0);
+        
         Response response = sendPost(
             "/resources/applicants/" + applicant.getId() + "/status/pending", 
             RequestBody.create(

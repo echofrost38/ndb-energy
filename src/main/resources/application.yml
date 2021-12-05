@@ -4,8 +4,8 @@ spring:
         client:
           registration:
             google:
-              clientId: 325113996523-15ftfqb0j4khbq9hdblebiqar8on6lmk.apps.googleusercontent.com
-              clientSecret: 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
+              clientId: 217015743019-arfgls5skjg3tehl67gf8sitbf0rq9k9.apps.googleusercontent.com
+              clientSecret: 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
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               scope:
                 - email
@@ -41,8 +41,8 @@ spring:
               clientName: Apple
               clientAuthenticationMethod: post
             amazon: 
-              clientId: amzn1.application-oa2-client.4b659eb05cc746cd90a57b9dfb58d2a9
-              clientSecret: a362a65ff007ec07801a92dd7efc96ee89ce6d5be5ddcb4b3d19432fa1249ed2
+              clientId: client-id
+              clientSecret: client-secret
               redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
               authorizationGrantType: authorization_code
               # code: SplxlOBezQQYbYS6WxSbIA

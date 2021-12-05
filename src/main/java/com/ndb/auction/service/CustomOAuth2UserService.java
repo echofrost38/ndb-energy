@@ -18,12 +18,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+@Slf4j
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -40,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
+        // log.info("oAuth2UserReguest {}", oAuth2UserRequest);
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
 
         try {

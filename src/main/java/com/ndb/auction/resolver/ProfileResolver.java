@@ -20,9 +20,7 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     

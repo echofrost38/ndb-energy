@@ -7,11 +7,15 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "FinancialTransactions")
 public class FinancialTransaction {
+
+    public static final int DEPOSIT = 0;
+    public static final int DIRECT_SALE = 0;
+    public static final int WITHDRAWAL = 0;
     
     private String txnId; // from Conbase API
     private String code;
     private String userId;
-    private String transactionType;
+    private int transactionType;
     private double cryptoType;
     private double cryptoAmount;
     private double price;
@@ -23,7 +27,7 @@ public class FinancialTransaction {
 
     }
 
-    public FinancialTransaction(String type, double cryptoType, double cryptoAmount, double price) {
+    public FinancialTransaction(int type, double cryptoType, double cryptoAmount, double price) {
         this.transactionType = type;
         this.cryptoType = cryptoType;
         this.cryptoAmount = cryptoAmount;
@@ -61,10 +65,10 @@ public class FinancialTransaction {
     }
 
     @DynamoDBAttribute(attributeName = "transaction_type")
-    public String getTransactionType() {
+    public int getTransactionType() {
         return transactionType;
     }
-    public void setTransactionType(String transactionType) {
+    public void setTransactionType(int transactionType) {
         this.transactionType = transactionType;
     }
     

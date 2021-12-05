@@ -11,6 +11,5 @@ phases:
          - echo Build started on `date`
          - mvn install
 artifacts:
-   type: zip
    files:
       - '**/*'

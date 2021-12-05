@@ -1,9 +1,13 @@
 package com.ndb.auction.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.models.FinancialTransaction;
 
 public class FinancialDao extends BaseDao{
@@ -25,13 +29,38 @@ public class FinancialDao extends BaseDao{
 
     // get transactions by ID
     public List<FinancialTransaction> getTransactionByUser(String userId) {
-        List<FinancialTransaction> list = dynamoDBMapper.scan(FinancialTransaction.class, new DynamoDBScanExpression());
-        return list; 
+        Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(userId));
+		eav.put(":v2", new AttributeValue().withBOOL(true));
+
+		DynamoDBQueryExpression<FinancialTransaction> queryExpression = new DynamoDBQueryExpression<FinancialTransaction>()
+		    .withKeyConditionExpression("round_id = :v1")
+			.withFilterExpression("is_confirmed = :v2")
+		    .withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.query(FinancialTransaction.class, queryExpression);
     }
     
     // get transactions by type
     public List<FinancialTransaction> getTransactionsByType(int type) {
-        List<FinancialTransaction> list = dynamoDBMapper.scan(FinancialTransaction.class, new DynamoDBScanExpression());
+        Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+        eav.put(":val1", new AttributeValue().withN(String.valueOf(type)));
+        
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+            .withFilterExpression("transaction_type = :val1")
+            .withExpressionAttributeValues(eav);
+        List<FinancialTransaction> list = dynamoDBMapper.scan(FinancialTransaction.class, scanExpression);
         return list;
+    }
+
+    // get transaction by code
+    public List<FinancialTransaction> getTransactionByCode(String code) {
+        Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+        eav.put(":val1", new AttributeValue().withS(code));
+        
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+            .withFilterExpression("code = :val1")
+            .withExpressionAttributeValues(eav);
+        return dynamoDBMapper.scan(FinancialTransaction.class, scanExpression);
     }
 }

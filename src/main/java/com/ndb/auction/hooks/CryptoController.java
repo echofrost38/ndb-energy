@@ -30,8 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class CryptoController extends BaseController {
-    
-    private static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 	
     @PostMapping("/coinbase")
     @ResponseBody

@@ -11,7 +11,7 @@
 	<groupId>com.ndb</groupId>
 	<artifactId>auction</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<name>auction</name>
 	<description>NDB Auction</description>
 	<properties>

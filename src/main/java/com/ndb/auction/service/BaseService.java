@@ -4,11 +4,13 @@ import com.ndb.auction.dao.AuctionDao;
 import com.ndb.auction.dao.AvatarDao;
 import com.ndb.auction.dao.BidDao;
 import com.ndb.auction.dao.CryptoPaymentDao;
+import com.ndb.auction.dao.DirectSaleDao;
 import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.schedule.ScheduledTasks;
+import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,4 +71,10 @@ public class BaseService {
 
     @Autowired
     public SumsubDao sumsubDao;
+
+    @Autowired
+    public UserWalletService userWalletService;
+
+    @Autowired
+    public DirectSaleDao directSaleDao;
 }

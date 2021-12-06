@@ -1,0 +1,7 @@
+type KYCSetting {
+    kind: String,
+    withdraw: Float,
+    deposit: Float,
+    bid: Float,
+    direct: Float
+}

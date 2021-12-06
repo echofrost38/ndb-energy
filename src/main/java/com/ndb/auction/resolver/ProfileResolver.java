@@ -9,6 +9,7 @@ import javax.servlet.http.Part;
 
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarSet;
+import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.service.UserDetailsImpl;
@@ -124,4 +125,10 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     	return levelName;
     }
     
+    // Admin
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public KYCSetting updateKYCSetting(String kind, double withdraw, double deposit, double bid, double direct) {
+        return sumsubService.updateKYCSetting(kind, withdraw, deposit, bid, direct);
+    }
+
 }

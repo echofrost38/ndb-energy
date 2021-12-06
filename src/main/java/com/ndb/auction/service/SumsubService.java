@@ -20,10 +20,13 @@ import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.sumsub.ApplicantResponse;
 import com.ndb.auction.models.sumsub.HttpMethod;
 import com.ndb.auction.models.sumsub.Metadata;
+import com.ndb.auction.models.sumsub.Review;
+import com.ndb.auction.payload.ReviewResult;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -39,6 +42,7 @@ public class SumsubService extends BaseService {
 	
 	public static final String KYC = "basic-kyc-level";
 	public static final String AML = "basic-aml-level";
+    public static final String path = "/home/klinux/";
 	
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -99,7 +103,7 @@ public class SumsubService extends BaseService {
     }
 	
 	public String addDocument(String applicantId, String country, String docType, Part part) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-		final String path = "/home/klinux/";
+        
         final String fileName = part.getName();
 
         OutputStream out = null;
@@ -144,6 +148,7 @@ public class SumsubService extends BaseService {
             return null;
         }
         Applicant applicant = applicants.get(0);
+        
         Response response = sendPost(
             "/resources/applicants/" + applicant.getId() + "/status/pending", 
             RequestBody.create(
@@ -242,7 +247,34 @@ public class SumsubService extends BaseService {
     	return sumsubDao.getApplicantById(applicantId);
     }
     
+    public boolean checkVerificationStatus(String userId, String level) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+        List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
+        if(applicants.size() == 0) return false;
+
+        String applicantId = applicants.get(0).getId();
+        ApplicantResponse applicantResponse = gettingApplicantData(applicantId);
+
+        Review review = applicantResponse.getReview();
+        if(review.getLevelName().equals(level)) {
+            ReviewResult result = review.getReviewResult();
+            if(result == null) return false;
+            if(result.getReviewAnswer().equals("GREEN")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Applicant> getApplicantsByUserId(String userId) {
     	return sumsubDao.getApplicantByUserId(userId);
+    }
+
+    public KYCSetting updateKYCSetting(String kind, double withdraw, double deposit, double bid, double direct) {
+        KYCSetting setting = new KYCSetting(kind, withdraw, deposit, bid, direct);
+        return sumsubDao.updateKYCSetting(setting);
+    }
+
+    public List<KYCSetting> getKYCSettings() {
+        return sumsubDao.getKYCSettings();
     }
 }

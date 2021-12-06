@@ -107,7 +107,7 @@ public class StripeService extends BaseService {
         }
 		return response;
 	}
-	
+
 	// update payments - called by closeBid
 	public boolean UpdateTransaction(String id, Integer status) {
 		

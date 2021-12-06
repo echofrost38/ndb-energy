@@ -19,7 +19,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
     
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
-//        log.info(registrationId, "registrationId cannot be empty");
+        // log.info(registrationId, "registrationId cannot be empty");
 
         OAuth2Registration r = oAuth2RegistrationService.getByRegistrationId(registrationId);
 
@@ -33,7 +33,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
             .authorizationUri(r.getAuthorizationUri())
             .tokenUri(r.getTokenUri())
             .userInfoUri(r.getUserInfoUri())
-            .userNameAttributeName("sub")
+            .userNameAttributeName(r.getUserNameAttributeName())
             .jwkSetUri(r.getJwkSetUri())
             .clientName(r.getClientName())
             .build();

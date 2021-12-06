@@ -9,8 +9,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 public class FinancialTransaction {
 
     public static final int DEPOSIT = 0;
-    public static final int DIRECT_SALE = 0;
-    public static final int WITHDRAWAL = 0;
+    public static final int WITHDRAWAL = 1;
+
     
     private String txnId; // from Conbase API
     private String code;
@@ -18,7 +18,6 @@ public class FinancialTransaction {
     private int transactionType;
     private double cryptoType;
     private double cryptoAmount;
-    private double price;
     private Boolean isConfirmed;
     private long createdAt;
     private long confirmedAt;
@@ -27,11 +26,14 @@ public class FinancialTransaction {
 
     }
 
-    public FinancialTransaction(int type, double cryptoType, double cryptoAmount, double price) {
+    public FinancialTransaction(
+        int type, 
+        double cryptoType, 
+        double cryptoAmount
+    ) {
         this.transactionType = type;
         this.cryptoType = cryptoType;
         this.cryptoAmount = cryptoAmount;
-        this.price = price;
         this.createdAt = System.currentTimeMillis();
         this.isConfirmed = false;
     }
@@ -86,14 +88,6 @@ public class FinancialTransaction {
     }
     public void setCryptoAmount(double cryptoAmount) {
         this.cryptoAmount = cryptoAmount;
-    }
-
-    @DynamoDBAttribute(attributeName = "price")
-    public double getPrice() {
-        return price;
-    }
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     @DynamoDBAttribute(attributeName = "is_confirmed")

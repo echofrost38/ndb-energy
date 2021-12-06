@@ -34,7 +34,7 @@ public class FinancialDao extends BaseDao{
 		eav.put(":v2", new AttributeValue().withBOOL(true));
 
 		DynamoDBQueryExpression<FinancialTransaction> queryExpression = new DynamoDBQueryExpression<FinancialTransaction>()
-		    .withKeyConditionExpression("round_id = :v1")
+		    .withKeyConditionExpression("user_id = :v1")
 			.withFilterExpression("is_confirmed = :v2")
 		    .withExpressionAttributeValues(eav);
 

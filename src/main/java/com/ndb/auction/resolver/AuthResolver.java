@@ -18,11 +18,8 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class AuthResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLSubscriptionResolver {
-	
+
 	public String signup(String email, String password, String country) {
-		// Geo IP checking
-		
-		
 		password = encoder.encode(password);
 		return userService.createUser(email, password, country, true);
 	}
@@ -101,6 +98,7 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 		} else {
 			return "Failed";
 		}
+		
 	}
 	
 	public String resetPassword(String email, String code, String newPassword) {
@@ -142,8 +140,8 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 		return oAuth2RegistrationService.createRegistration(registration);
 	}
 	
-	/// testing purpose
 	public Mono<String> fluxTest(String param) {
 		return Mono.just("flux test: " + param);
 	}
+	
 }

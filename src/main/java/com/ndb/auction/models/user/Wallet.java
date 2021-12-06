@@ -12,13 +12,6 @@ public class Wallet {
 	private double free;
 	private double holding;
 	
-	public Wallet(String key, double free, double hold) {
-		this.key = key;
-		this.free = free;
-		this.holding = hold;
-		this.total = free + hold;
-	}
-
 	public Wallet() {
 		this.total = 0.0;
 		this.free = 0.0;

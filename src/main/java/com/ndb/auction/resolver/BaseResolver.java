@@ -9,7 +9,6 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
-import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
 import com.ndb.auction.service.ProfileService;
@@ -65,7 +64,4 @@ public class BaseResolver {
 
 	@Autowired
 	OAuth2RegistrationService oAuth2RegistrationService;
-
-	@Autowired
-	FinancialService financialService;
 }

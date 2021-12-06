@@ -26,13 +26,6 @@ extend type Mutation {
 		selfie: Upload
 	) : String
 	requestCheck : String
-	updateKYCSetting(
-		kind: String!,
-		withdraw: Float,
-		deposit: Float,
-		bid: Float,
-		direct: Float
-	) : KYCSetting
 }
 
 extend type Query {

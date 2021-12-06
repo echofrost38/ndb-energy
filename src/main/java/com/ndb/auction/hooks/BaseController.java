@@ -12,7 +12,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.FinancialDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.NotificationService;
@@ -37,11 +36,6 @@ public class BaseController {
     
     @Autowired
     SumsubService sumsubService;
-
-    @Autowired
-    FinancialDao financialDao;
-
-    public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String HMAC_SHA_1 = "HmacSHA1";

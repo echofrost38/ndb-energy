@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.sumsub.Applicant;
 
 @Repository
@@ -39,14 +38,4 @@ public class SumsubDao extends BaseDao{
 	public Applicant getApplicantById(String id) {
 		return dynamoDBMapper.load(Applicant.class, id);
 	}
-
-	public KYCSetting updateKYCSetting(KYCSetting setting) {
-		dynamoDBMapper.save(setting, updateConfig);
-		return setting;
-	} 
-
-	public List<KYCSetting> getKYCSettings() {
-		return dynamoDBMapper.scan(KYCSetting.class, new DynamoDBScanExpression());
-	}
-
 }

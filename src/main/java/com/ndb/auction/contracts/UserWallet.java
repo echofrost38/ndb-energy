@@ -207,7 +207,8 @@ public class UserWallet extends Contract {
                 Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Utf8String>>() {}, new TypeReference<DynamicArray<Uint256>>() {}, new TypeReference<DynamicArray<Uint256>>() {}));
         return new RemoteFunctionCall<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>>(function,
                 new Callable<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>>() {
-                    @Override
+                    @SuppressWarnings("unchecked")
+					@Override
                     public Tuple3<List<String>, List<BigInteger>, List<BigInteger>> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
                         return new Tuple3<List<String>, List<BigInteger>, List<BigInteger>>(

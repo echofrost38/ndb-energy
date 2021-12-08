@@ -9,6 +9,7 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
@@ -17,6 +18,7 @@ import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserService;
+import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.SumsubService;
 
 public class BaseResolver {
@@ -68,4 +70,10 @@ public class BaseResolver {
 
 	@Autowired
 	FinancialService financialService;
+
+	@Autowired
+	public DirectSaleService directSaleService;
+
+	@Autowired
+	UserWalletService userWalletService;
 }

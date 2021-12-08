@@ -2,6 +2,8 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import javax.servlet.http.Part;
+
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -17,14 +19,15 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver{
 	
 	// create new component
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	// @PreAuthorize("hasRole('ROLE_ADMIN')")
 	public AvatarComponent createNewComponent(
 		String groupId, 
 		Integer tierLevel, 
 		Double price, 
-		Integer limited
+		Integer limited,
+		Part file
 	) {
-		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited);
+		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, file);
 	}
 	
 	// update component

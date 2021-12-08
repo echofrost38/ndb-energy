@@ -162,16 +162,14 @@ public class ProfileService extends BaseService implements IProfileService {
 		}
 
 		// check user's NDB wallet 
-		Map<String, Wallet> tempWallet = user.getWallet();
-		Wallet ndbWallet = tempWallet.get("NDB");
+		Wallet ndbWallet = userWalletService.getWalletById(userId, "NDB");
 		double balance = ndbWallet.getFree();
 		if(balance < totalPrice) {
 			throw new BidException("You don't have enough balance in wallet.", "set");
 		}
 		ndbWallet.setFree(balance - totalPrice);
-		// tempWallet.replace("NDB", ndbWallet);
-		// user.setWallet(tempWallet);
-
+		
+		
 		user.setAvatar(set);
 		userDao.updateUser(user);
 

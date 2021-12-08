@@ -14,6 +14,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Configuration
 public class DynamoDBConfig {
@@ -29,6 +31,15 @@ public class DynamoDBConfig {
     @Value("${aws.secretKey}")
     private String awsSecretKey;
     
+    @Bean
+    public AmazonS3 s3() {
+        return AmazonS3ClientBuilder
+                .standard()
+                .withRegion(Regions.EU_WEST_2)
+                .withCredentials(new AWSStaticCredentialsProvider(amazonAWSCredentials()))
+                .build();
+    }
+
     @Bean
     public DynamoDBMapper dynamoDBMapper() {
     	AmazonDynamoDB client;

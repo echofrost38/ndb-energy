@@ -24,6 +24,11 @@ public class DirectSaleDao extends BaseDao {
         return directSale;
     }
 
+    // get transaction by txn id
+    public DirectSale getDirectSale(String userId, String txnId) {
+        return dynamoDBMapper.load(DirectSale.class, userId, txnId);
+    }
+
     // get transaction by intent id
     public DirectSale getDirectSaleByIntent(String intentId) {
         Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();

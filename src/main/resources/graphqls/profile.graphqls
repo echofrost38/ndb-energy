@@ -23,7 +23,7 @@ extend type Mutation {
 	) : String	
 	uploadSelfie(
 		country: String!,
-		selfie: Upload
+		selfie: Upload!
 	) : String
 	requestCheck : String
 	updateKYCSetting(

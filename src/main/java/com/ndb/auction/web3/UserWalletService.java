@@ -18,11 +18,10 @@ import org.web3j.tuples.generated.Tuple3;
 
 @Service
 public class UserWalletService {
-    // private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
-    private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
-    private final String password = "2be4d4117839574253730acf4fdfcbe50be3c091412fe60a42edbed21862ddbd";
-
-    private final String contractAddress = "0xc3E073e11c9182512Edc89D06bC488AaD6391375";
+    private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
+    // private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
+    private final String password = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
+    private final String contractAddress = "0x736680D21e2B0C63813FEBc4432891579C28EEe8";
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
@@ -119,11 +118,10 @@ public class UserWalletService {
     }
 
     public Wallet getWalletById(String id, String crypto) {
-        Wallet wallet = new Wallet();
+        Wallet wallet = null;
         try {
             Tuple2<BigInteger, BigInteger> tuple2 = userWallet.getWalletById(id, crypto).send();
-            wallet.setFree(tuple2.component1().doubleValue());
-            wallet.setHolding(tuple2.component2().doubleValue());
+            wallet = new Wallet(crypto, tuple2.component1().doubleValue(), tuple2.component2().doubleValue());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -152,7 +150,8 @@ public class UserWalletService {
         return wallets;
     }
 
-    private UserWallet loadTraderContract(String _password) {
+    @SuppressWarnings("deprecation")
+	private UserWallet loadTraderContract(String _password) {
         UserWallet userWallet = null;
         try {
             Credentials credentials = Credentials.create(_password);

@@ -59,18 +59,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 		
 		for (AvatarComponent avatarComponent : components) {
 			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-			S3Object s3object = s3.getObject(bucketName, key);
-			InputStream finput = s3object.getObjectContent();
-			long length = s3object.getObjectMetadata().getContentLength();
-			byte[] imageBytes = new byte[(int)length];
-			try {
-				finput.read(imageBytes, 0, imageBytes.length);
-				finput.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				continue;
-			}
-			String imageStr = Base64.encodeBase64String(imageBytes);
+			String imageStr = downloadAvatarAccessories(key);
 			avatarComponent.setBase64Image(imageStr);
 		}
 		return components;
@@ -81,18 +70,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 		List<AvatarComponent> components = avatarDao.getAvatarComponentsByGid(groupId);
 		for (AvatarComponent avatarComponent : components) {
 			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-			S3Object s3object = s3.getObject(bucketName, key);
-			InputStream finput = s3object.getObjectContent();
-			long length = s3object.getObjectMetadata().getContentLength();
-			byte[] imageBytes = new byte[(int)length];
-			try {
-				finput.read(imageBytes, 0, imageBytes.length);
-				finput.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				continue;
-			}
-			String imageStr = Base64.encodeBase64String(imageBytes);
+			String imageStr = downloadAvatarAccessories(key);
 			avatarComponent.setBase64Image(imageStr);
 		}
 		return components;
@@ -102,19 +80,8 @@ public class AvatarService extends BaseService implements IAvatarService{
 	public AvatarComponent getAvatarComponent(String groupId, String sKey) {
 		AvatarComponent avatarComponent = avatarDao.getAvatarComponent(groupId, sKey);
 		String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-			S3Object s3object = s3.getObject(bucketName, key);
-			InputStream finput = s3object.getObjectContent();
-			long length = s3object.getObjectMetadata().getContentLength();
-			byte[] imageBytes = new byte[(int)length];
-			try {
-				finput.read(imageBytes, 0, imageBytes.length);
-				finput.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return avatarComponent;
-			}
-			String imageStr = Base64.encodeBase64String(imageBytes);
-			avatarComponent.setBase64Image(imageStr);
+		String imageStr = downloadAvatarAccessories(key);
+		avatarComponent.setBase64Image(imageStr);
 		return avatarComponent;
 	}
 
@@ -197,6 +164,26 @@ public class AvatarService extends BaseService implements IAvatarService{
 	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarDao.getAvatarComponentsBySet(set);
+	}
+
+	private String downloadAvatarAccessories(String key) {
+		S3Object s3object = null;
+		try {
+			s3object = s3.getObject(bucketName, key);
+		} catch (Exception e) {
+			return "";
+		}
+		InputStream finput = s3object.getObjectContent();
+		long length = s3object.getObjectMetadata().getContentLength();
+		byte[] imageBytes = new byte[(int)length];
+		try {
+			finput.read(imageBytes, 0, imageBytes.length);
+			finput.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		}
+		return Base64.encodeBase64String(imageBytes);
 	}
 
 }

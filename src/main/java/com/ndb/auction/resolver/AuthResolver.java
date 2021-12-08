@@ -83,7 +83,7 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 			return new Credentials("Failed", "Password expired");
 		}
 		
-		if(userService.verify2FACode(email, code)) {
+		if(!userService.verify2FACode(email, code)) {
 			return new Credentials("Failed", "2FA code mismatch");
 		}
 		

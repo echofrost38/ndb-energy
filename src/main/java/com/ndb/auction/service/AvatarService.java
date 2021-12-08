@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.util.IOUtils;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
@@ -43,8 +41,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 			content = file.getInputStream();
 			ObjectMetadata metadata = new ObjectMetadata();
 			metadata.setContentLength(file.getSize());
-			
-			
+		
 			s3.putObject(bucketName, groupId + "-" + newComponent.getCompId(), content, metadata);
 		} catch (IOException e) {
 			e.printStackTrace();

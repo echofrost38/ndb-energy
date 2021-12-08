@@ -15,13 +15,18 @@ import javax.servlet.http.HttpServletRequest;
 import com.ndb.auction.dao.FinancialDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.UserService;
+import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseController {
+
+    @Autowired
+    DirectSaleService directSaleService;
 
     @Autowired
     CryptoService cryptoService;
@@ -40,6 +45,9 @@ public class BaseController {
 
     @Autowired
     FinancialDao financialDao;
+
+    @Autowired
+    UserWalletService userWalletService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

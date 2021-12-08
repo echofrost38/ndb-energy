@@ -4,5 +4,6 @@ type AvatarComponent {
     tierLevel: Int!,
     price: Float!,
     limited: Int!,
-    purchased: Int!
+    purchased: Int!,
+    base64Image: String!
 }

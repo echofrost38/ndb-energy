@@ -1,10 +1,18 @@
 package com.ndb.auction.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.Part;
+
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
@@ -15,25 +23,66 @@ import com.ndb.auction.service.interfaces.IAvatarService;
 @Service
 public class AvatarService extends BaseService implements IAvatarService{
 
+	private AmazonS3 s3;
+	private final String bucketName = "auctionupload";
+
+
+	public AvatarService(AmazonS3 s3) {
+		this.s3 = s3;
+	}
+
 	@Override
-	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited) {
+	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, Part file) {
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited);
-		return avatarDao.createAvatarComponent(component);
+		
+		AvatarComponent newComponent = avatarDao.createAvatarComponent(component);
+
+		// upload avatar component into Amazon S3 bucket!
+		InputStream content;
+		try {
+			content = file.getInputStream();
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(file.getSize());
+		
+			s3.putObject(bucketName, groupId + "-" + newComponent.getCompId(), content, metadata);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+		
+		}
+		return newComponent;
 	}
 
 	@Override
 	public List<AvatarComponent> getAvatarComponents() {
-		return avatarDao.getAvatarComponents();
+		List<AvatarComponent> components = avatarDao.getAvatarComponents();
+		
+		for (AvatarComponent avatarComponent : components) {
+			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
+			String imageStr = downloadAvatarAccessories(key);
+			avatarComponent.setBase64Image(imageStr);
+		}
+		return components;
 	}
 
 	@Override
 	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
-		return avatarDao.getAvatarComponentsByGid(groupId);
+		List<AvatarComponent> components = avatarDao.getAvatarComponentsByGid(groupId);
+		for (AvatarComponent avatarComponent : components) {
+			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
+			String imageStr = downloadAvatarAccessories(key);
+			avatarComponent.setBase64Image(imageStr);
+		}
+		return components;
 	}
 
 	@Override
 	public AvatarComponent getAvatarComponent(String groupId, String sKey) {
-		return avatarDao.getAvatarComponent(groupId, sKey);
+		AvatarComponent avatarComponent = avatarDao.getAvatarComponent(groupId, sKey);
+		String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
+		String imageStr = downloadAvatarAccessories(key);
+		avatarComponent.setBase64Image(imageStr);
+		return avatarComponent;
 	}
 
 	@Override
@@ -115,6 +164,26 @@ public class AvatarService extends BaseService implements IAvatarService{
 	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarDao.getAvatarComponentsBySet(set);
+	}
+
+	private String downloadAvatarAccessories(String key) {
+		S3Object s3object = null;
+		try {
+			s3object = s3.getObject(bucketName, key);
+		} catch (Exception e) {
+			return "";
+		}
+		InputStream finput = s3object.getObjectContent();
+		long length = s3object.getObjectMetadata().getContentLength();
+		byte[] imageBytes = new byte[(int)length];
+		try {
+			finput.read(imageBytes, 0, imageBytes.length);
+			finput.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		}
+		return Base64.encodeBase64String(imageBytes);
 	}
 
 }

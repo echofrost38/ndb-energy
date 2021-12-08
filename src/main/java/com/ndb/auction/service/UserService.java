@@ -42,6 +42,10 @@ public class UserService extends BaseService implements IUserService {
 			List<Coin> coins = cryptoService.getCoinList();
 			user = new User(email, password, country, tos, coins);			
 			userDao.createUser(user);
+			user = userDao.getUserByEmail(email).get();
+
+			// create user wallet in contract!
+			
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";

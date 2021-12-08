@@ -19,10 +19,16 @@ import com.ndb.auction.models.user.AvatarPurchased;
 import com.ndb.auction.models.user.ExtWallet;
 import com.ndb.auction.models.user.Security;
 import com.ndb.auction.models.user.Verify;
-import com.ndb.auction.models.user.Wallet;
+// import com.ndb.auction.models.user.Wallet;
+import com.ndb.auction.web3.UserWalletService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @DynamoDBTable(tableName = "User")
 public class User {
+
+	@Autowired
+	UserWalletService userWalletService;
 	
 	private String id;
 	private String name;
@@ -32,7 +38,9 @@ public class User {
 	private String email;
 	private String mobile;
 	private String country;
-	private Map<String, Wallet> wallet;
+
+// for Database version
+	// private Map<String, Wallet> wallet;
 	private Map<String, String> extWallet;
 	
 	private Boolean tos;
@@ -69,13 +77,13 @@ public class User {
 		
 		
 		// initialize the wallet with possible coins
-		this.wallet = new HashMap<String, Wallet>();
-		for (Coin coin : coinList) {
-			this.wallet.put(coin.getSymbol(), new Wallet());
-		}
-		
+	// Database version
+		// this.wallet = new HashMap<String, Wallet>();
+		// for (Coin coin : coinList) {
+		// 	this.wallet.put(coin.getSymbol(), new Wallet());
+		// }
+
 		initUser();
-		
 	}
 
 	@DynamoDBIgnore
@@ -180,13 +188,13 @@ public class User {
 		this.country = country;
 	}
 	
-	@DynamoDBAttribute(attributeName="wallet")
-	public Map<String, Wallet> getWallet() {
-		return wallet;
-	}
-	public void setWallet(Map<String, Wallet> wallet) {
-		this.wallet = wallet;
-	}
+	// @DynamoDBAttribute(attributeName="wallet")
+	// public Map<String, Wallet> getWallet() {
+	// 	return wallet;
+	// }
+	// public void setWallet(Map<String, Wallet> wallet) {
+	// 	this.wallet = wallet;
+	// }
 	
 	@DynamoDBAttribute(attributeName="two_step")
 	public String getTwoStep() {
@@ -325,17 +333,17 @@ public class User {
 		return list;
 	}
 
-	@DynamoDBIgnore
-	public List<Wallet> getUserWallet() {
-		List<Wallet> list = new ArrayList<Wallet>();
-		Set<String> keys = wallet.keySet();
-		for (String key : keys) {
-			Wallet w = wallet.get(key);
-			w.setKey(key);
-			list.add(w);
-		}
-		return list;
-	}
+	// @DynamoDBIgnore
+	// public List<Wallet> getUserWallet() {
+	// 	List<Wallet> list = new ArrayList<Wallet>();
+	// 	Set<String> keys = wallet.keySet();
+	// 	for (String key : keys) {
+	// 		Wallet w = wallet.get(key);
+	// 		w.setKey(key);
+	// 		list.add(w);
+	// 	}
+	// 	return list;
+	// }
 
 	@DynamoDBIgnore
 	public List<ExtWallet> getUserExtWallet() {

@@ -32,7 +32,7 @@ public class BaseService {
     public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
     
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
-	
+
 	@Autowired
 	ScheduledTasks schedule;
 	

@@ -1,5 +1,7 @@
 package com.ndb.auction.hooks;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,18 +101,8 @@ public class CryptoController extends BaseController {
                 // wallet update confirmed amount make hold
                 User user = userService.getUserById(txn.getUserId());
 
-                // update wallet !!
-                // make simpler!
-                Map<String, Wallet> tempWallet = user.getWallet();
-                Wallet wallet = tempWallet.get(cryptoType);
-                
-                if(wallet == null) {
-                	wallet = new Wallet();
-                	tempWallet.put(cryptoType, wallet);
-                }
-                
-                double balance = wallet.getHolding();
-                wallet.setHolding(balance + cryptoAmount);
+                BigInteger amount = BigDecimal.valueOf(cryptoAmount).toBigInteger();
+                userWalletService.addHoldAmount(txn.getUserId(), cryptoType, amount);
 
                 userService.updateUser(user);
 

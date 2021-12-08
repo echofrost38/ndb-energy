@@ -70,23 +70,6 @@ extend type Mutation {
 	# deleteOAuth2Registration (
 	# 	registrationId: String!
 	# ) : OAuth2Registration
-	addNewUser(
-		id: String!,
-		email: String!,
-		name: String!
-	) : String
-	addHoldAmount(
-		id: String!,
-		crypto: String!,
-		amount: Int!
-	) : String
-}
-
-extend type Query {
-	getWalletById(
-		id: String!,
-		crypto: String!
-	) : Wallet
 }
 
 type Subscription {

@@ -42,7 +42,7 @@ public class SumsubService extends BaseService {
 	
 	public static final String KYC = "basic-kyc-level";
 	public static final String AML = "basic-aml-level";
-    public static final String path = "/tmp/sumsub/";
+    public static final String path = "/home/klinux/";
 	
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -57,8 +57,7 @@ public class SumsubService extends BaseService {
 
         Applicant applicant = new Applicant(userId);
 
-        @SuppressWarnings("deprecation")
-		Response response = sendPost(
+        Response response = sendPost(
                 "/resources/applicants?levelName=" + levelName,
                 RequestBody.create(
                         MediaType.parse("application/json; charset=utf-8"),
@@ -93,8 +92,7 @@ public class SumsubService extends BaseService {
 	public String addDocument(String applicantId, String country, String docType, File doc) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         // https://developers.sumsub.com/api-reference/#adding-an-id-document
 		
-        @SuppressWarnings("deprecation")
-		RequestBody requestBody = new MultipartBody.Builder()
+        RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("metadata", objectMapper.writeValueAsString(new Metadata(docType, country)))
                 .addFormDataPart("content", doc.getName(), RequestBody.create(MediaType.parse("image/*"), doc))
@@ -111,10 +109,6 @@ public class SumsubService extends BaseService {
         OutputStream out = null;
         InputStream filecontent = null;
         File file = new File(path + fileName);
-        if(!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        file.createNewFile();
         try {
             out = new FileOutputStream(file);
             filecontent = part.getInputStream();
@@ -136,7 +130,6 @@ public class SumsubService extends BaseService {
             }
         }
 		
-		@SuppressWarnings("deprecation")
 		RequestBody requestBody = new MultipartBody.Builder()
 				.setType(MultipartBody.FORM)
 				.addFormDataPart("metadata", objectMapper.writeValueAsString(new Metadata(docType, country)))
@@ -145,7 +138,7 @@ public class SumsubService extends BaseService {
         Response response = sendPost("/resources/applicants/" + applicantId + "/info/idDoc", requestBody);
         
         System.out.println(response.body().string());
-        file.delete();
+        
 		return response.headers().get("X-Image-Id");
 	}
 	
@@ -156,8 +149,7 @@ public class SumsubService extends BaseService {
         }
         Applicant applicant = applicants.get(0);
         
-        @SuppressWarnings("deprecation")
-		Response response = sendPost(
+        Response response = sendPost(
             "/resources/applicants/" + applicant.getId() + "/status/pending", 
             RequestBody.create(
                 MediaType.parse("application/json; charset=utf-8"), "")

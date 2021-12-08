@@ -6,11 +6,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 
 public class DirectSale {
 
-    // CONSTANTS
-    public static final int STRIPE = 0;
-    public static final int CRYPTO = 1;
-    public static final int WALLET = 2;
-
     private String userId;
     private String txnId;
 
@@ -18,7 +13,6 @@ public class DirectSale {
     private int payType;
     private double ndbPrice;
     private double ndbAmount;
-    private int whereTo;
 
     private boolean isConfirmed;
 
@@ -42,14 +36,13 @@ public class DirectSale {
         String userId,
         String txnId,
         double ndbPrice,
-        double ndbAmount,
-        int whereTo
+        double ndbAmount
     ) {
         this.userId = userId;
         this.txnId = txnId;
         this.ndbPrice = ndbPrice;
         this.ndbAmount = ndbAmount;
-        this.whereTo = whereTo;
+
         this.isConfirmed = false;
         this.createdAt = System.currentTimeMillis();
     }
@@ -92,14 +85,6 @@ public class DirectSale {
     }
     public void setNdbAmount(double ndbAmount) {
         this.ndbAmount = ndbAmount;
-    }
-
-    @DynamoDBAttribute(attributeName = "where_to")
-    public int getWhereTo() {
-        return whereTo;
-    }
-    public void setWhereTo(int whereTo) {
-        this.whereTo = whereTo;
     }
 
     @DynamoDBAttribute(attributeName = "is_confirmed")

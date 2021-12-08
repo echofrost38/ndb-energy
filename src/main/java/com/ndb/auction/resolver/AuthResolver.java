@@ -5,28 +5,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Set;
 
 import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.models.User;
-import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.payload.Credentials;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import reactor.core.publisher.Mono;
 
 @Component
-public class AuthResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLSubscriptionResolver, GraphQLQueryResolver {
+public class AuthResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLSubscriptionResolver {
 	
 	public String signup(String email, String password, String country) {
 		// Geo IP checking
-				
+		
 		
 		password = encoder.encode(password);
 		return userService.createUser(email, password, country, true);
@@ -40,7 +35,7 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	}
 	
 	public String resendVerifyCode(String email) {
-		return resendVerifyCode(email);
+		return userService.resendVerifyCode(email);
 	}
 	
 	public String request2FA(String email, String method, String phone) {
@@ -83,7 +78,7 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 			return new Credentials("Failed", "Password expired");
 		}
 		
-		if(!userService.verify2FACode(email, code)) {
+		if(userService.verify2FACode(email, code)) {
 			return new Credentials("Failed", "2FA code mismatch");
 		}
 		
@@ -150,20 +145,5 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	/// testing purpose
 	public Mono<String> fluxTest(String param) {
 		return Mono.just("flux test: " + param);
-	}
-
-	public String addNewUser(String id, String email, String name) {
-		TransactionReceipt receipt = userWalletService.addNewUser(id, email, name);
-		return receipt.getLogs().get(0).getData();
-	}
-
-	public String addHoldAmount(String id, String crypto, int amount) {
-		BigInteger a = BigDecimal.valueOf(amount).toBigInteger();
-		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, a);
-		return receipt.getLogs().get(0).getData();
-	}
-
-	public Wallet getWalletById(String id, String crypto) {
-		return userWalletService.getWalletById(id, crypto);
 	}
 }

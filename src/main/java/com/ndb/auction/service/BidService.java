@@ -1,7 +1,5 @@
 package com.ndb.auction.service;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -11,8 +9,6 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.protocol.core.methods.response.Log;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
@@ -94,39 +90,26 @@ public class BidService extends BaseService implements IBidService {
 			double cryptoAmount = 
 				totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
-//			User user = userDao.getUserById(userId);
-//			Map<String, Wallet> wallets = user.getWallet();
-//			Wallet wallet = wallets.get(cryptoType);
-//			if(wallet == null) {
-//				wallet = new Wallet();
-//				wallets.put(cryptoType, wallet);
-//			}
-//			
-//			
-//			double holding = wallet.getHolding();
-//			double free = wallet.getFree();
-//			if(free < cryptoAmount) {
-//				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
-//			}
-//
-//			wallet.setFree(free - cryptoAmount);
-//			wallet.setHolding(holding + cryptoAmount);
-//			
-//			userDao.updateUser(user);
+			User user = userDao.getUserById(userId);
+			Map<String, Wallet> wallets = user.getWallet();
+			Wallet wallet = wallets.get(cryptoType);
+			if(wallet == null) {
+				wallet = new Wallet();
+				wallets.put(cryptoType, wallet);
+			}
 			
-			Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
+			
+			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			BigInteger holding = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-			TransactionReceipt receipt = userWalletService.makeHold(userId, cryptoType, holding);
-			List<Log> logs = receipt.getLogs();
-			if(logs.isEmpty()) throw new BidException("We cannot make the hold in your wallet.", "tokenAmount");
-			Log log = logs.get(0);
-			String data = log.getData();
-			System.out.println(data);
+
+			wallet.setFree(free - cryptoAmount);
+			wallet.setHolding(holding + cryptoAmount);
 			
+			userDao.updateUser(user);
+
 			Map<String, BidHolding> holdingList = bid.getHoldingList();
 			BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
 			holdingList.put(cryptoType, hold);
@@ -290,7 +273,7 @@ public class BidService extends BaseService implements IBidService {
 
 			// check crypto
 			User user = userDao.getUserById(userId);
-//			Map<String, Wallet> tempWallet = user.getWallet();
+			Map<String, Wallet> tempWallet = user.getWallet();
 
 			List<CryptoTransaction> cryptoTxns = cryptoService.getTransaction(roundId, userId);
 			for (CryptoTransaction cryptoTransaction : cryptoTxns) {
@@ -303,16 +286,20 @@ public class BidService extends BaseService implements IBidService {
 					// hold -> release
 					String cryptoType = cryptoTransaction.getCryptoType();
 					double cryptoAmount = cryptoTransaction.getCryptoAmount();
-
-					Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
-
+					Wallet wallet = tempWallet.get(cryptoType);
+					if(wallet == null) {
+						wallet = new Wallet();
+						tempWallet.put(cryptoType, wallet);
+					}
 					double hold = wallet.getHolding();
+					double free = wallet.getFree();
 					if(hold > cryptoAmount) {
-						BigInteger amount = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-						userWalletService.releaseHold(userId, cryptoType, amount);
+						hold -= cryptoAmount;
 					} else {
 						continue;
 					}
+					wallet.setFree(free + cryptoAmount);
+					wallet.setHolding(hold);
 				}
 			}
 			
@@ -326,15 +313,21 @@ public class BidService extends BaseService implements IBidService {
 				} else {
 					// hold -> release
 					double cryptoAmount = holding.getCrypto();
-					Wallet wallet = userWalletService.getWalletById(userId, _cryptoType);
+					Wallet wallet = tempWallet.get(_cryptoType);
+					if(wallet == null) {
+						wallet = new Wallet();
+						tempWallet.put(_cryptoType, wallet);
+					}
 					
 					double hold = wallet.getHolding();
+					double free = wallet.getFree();
 					if(hold > cryptoAmount) {
-						BigInteger amount = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-						userWalletService.releaseHold(userId, _cryptoType, amount);
+						hold -= cryptoAmount;
 					} else {
 						continue;
 					}
+					wallet.setFree(free + cryptoAmount);
+					wallet.setHolding(hold);
 				}
 			}
 
@@ -361,14 +354,17 @@ public class BidService extends BaseService implements IBidService {
 				if(roundAvatarWinner) {
 					token += avatarToken;
 				}
+				Wallet wallet = tempWallet.get("NDB");
+				if(wallet == null) {
+					wallet = new Wallet();
+					tempWallet.put("NDB", wallet);
+				}
 				
 				if(totalToken < token) {
-					BigInteger tokenAmount = BigDecimal.valueOf(totalToken).toBigInteger();
-					userWalletService.addFreeAmount(userId, "NDB", tokenAmount);
+					wallet.setFree(wallet.getFree() + totalToken);
 					totalToken = 0;
 				} else {
-					BigInteger tokenAmount = BigDecimal.valueOf(token).toBigInteger();
-					userWalletService.addFreeAmount(userId, "NDB", tokenAmount);
+					wallet.setFree(wallet.getFree() + token);
 					totalToken -= token;
 				}
 				
@@ -418,15 +414,23 @@ public class BidService extends BaseService implements IBidService {
 			double cryptoAmount = 
 				delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
-			Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
+			User user = userDao.getUserById(userId);
+			Wallet wallet = user.getWallet().get(cryptoType);
+			if(wallet == null) {
+				wallet = new Wallet();
+				user.getWallet().put(cryptoType, wallet);
+			}
 			
+			double holding = wallet.getHolding();
 			double free = wallet.getFree();
 			if(free < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			BigInteger amount = BigDecimal.valueOf(free).toBigInteger();
-			userWalletService.makeHold(userId, cryptoType, amount);
-			
+
+			wallet.setFree(free - cryptoAmount);
+			wallet.setHolding(holding + cryptoAmount);
+			userDao.updateUser(user);
+
 			Map<String, BidHolding> holdingList = originalBid.getHoldingList();
 			BidHolding hold = null;
 			if (holdingList.containsKey(cryptoType)) {

@@ -2,8 +2,6 @@ package com.ndb.auction.service.interfaces;
 
 import java.util.List;
 
-import javax.servlet.http.Part;
-
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -11,7 +9,7 @@ import com.ndb.auction.models.SkillSet;
 
 public interface IAvatarService {
 	
-	AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, Part file);
+	AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited);
 	
 	List<AvatarComponent> getAvatarComponents();
 	

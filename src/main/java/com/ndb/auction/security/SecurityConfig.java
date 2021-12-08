@@ -97,8 +97,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/coinbase/**").permitAll()
 				.antMatchers("/auth/**", "/oauth2/**").permitAll()
 				.antMatchers("/sumsub/**").permitAll()
-				.antMatchers("/stripe/**").permitAll()
-				.antMatchers("/crypto/**").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()

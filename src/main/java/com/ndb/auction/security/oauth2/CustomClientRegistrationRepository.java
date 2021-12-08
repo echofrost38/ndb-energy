@@ -17,8 +17,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
     @Autowired
     OAuth2RegistrationService oAuth2RegistrationService;
     
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         // log.info(registrationId, "registrationId cannot be empty");
 

@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.ndb.auction.exceptions.BadRequestException;
 import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.DirectSale;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.service.SumsubService;
@@ -25,55 +24,60 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
 
     // Deposit
     @PreAuthorize("isAuthenticated()")
-    public CryptoPayload getDepositAddress(String txnId) {
+    public CryptoPayload getDepositAddress() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
 
-        return directSaleService.cryptoPayment(userId, txnId);
-    }
-
-    // Direct Sale NDT Token
-    // will return transaction id
-    @PreAuthorize("isAuthenticated()")
-    public String directSale(double amount, double price, int whereTo) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
         
-        if(amount <= 0 || price <= 0) {
-            throw new BadRequestException("Amount and Price must be larger than 0.");
-        }
-        // price mean USD price. 
-        double totalPrice = amount * price;
 
-        List<KYCSetting> verifySettings = sumsubService.getKYCSettings();
-        double kycThreshold = 0.0, amlThreshold = 0.0;
-        for (KYCSetting setting : verifySettings) {
-            if(setting.getKind().equals("KYC")) {
-                kycThreshold = setting.getDirect();
-            } else if (setting.getKind().equals("AML")) {
-                amlThreshold = setting.getDirect();
-            }
-        }
-
-        String response = "Failed";
-        if(totalPrice > kycThreshold) {
-            if( totalPrice < amlThreshold) {
-                if(!sumsubService.checkVerificationStatus(userId, SumsubService.KYC)) {
-                    throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
-                }   
-            } else if( totalPrice >= amlThreshold) {
-                if(!sumsubService.checkVerificationStatus(userId, SumsubService.AML)) {
-                    throw new UnauthorizedException("You must verify your proof of residence to buy more than " + totalPrice + ".", "amount");
-                } 
-            }
-        } 
-        DirectSale directSale = directSaleService.createNewDirectSale(userId, price, amount, whereTo);
-        if(directSale == null) {
-            throw new BadRequestException("We cannot make the direct sale.");
-        }
-        response = directSale.getTxnId();
-        return response;
+        return null;
     }
+
+    // // Direct Sale NDT Token
+    // @PreAuthorize("isAuthenticated()")
+    // public String directSale(double amount, double price, int whereTo) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    //     UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    //     String userId = userDetails.getId();
+        
+    //     if(amount <= 0 || price <= 0) {
+    //         throw new BadRequestException("Amount and Price must be larger than 0.");
+    //     }
+
+    //     // price mean USD price. 
+    //     double totalPrice = amount * price;
+
+    //     List<KYCSetting> verifySettings = sumsubService.getKYCSettings();
+    //     double kycThreshold = 0.0, amlThreshold = 0.0;
+    //     for (KYCSetting setting : verifySettings) {
+    //         if(setting.getKind().equals("KYC")) {
+    //             kycThreshold = setting.getDirect();
+    //         } else if (setting.getKind().equals("AML")) {
+    //             amlThreshold = setting.getDirect();
+    //         }
+    //     }
+
+    //     String response = "Failed";
+    //     if(totalPrice < kycThreshold) {
+    //         // don't need verification
+    //         response = financialService.directSale(userId, amount, whereTo);
+    //     } else if( totalPrice < amlThreshold) {
+    //         // check kyc level
+    //         if(sumsubService.checkVerificationStatus(userId, SumsubService.KYC)) {
+    //             response = financialService.directSale(userId, amount, whereTo);
+    //         } else {
+    //             throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
+    //         }
+    //     } else if( totalPrice >= amlThreshold) {
+    //         // check aml level
+    //         if(sumsubService.checkVerificationStatus(userId, SumsubService.AML)) {
+    //             response = financialService.directSale(userId, amount, whereTo);
+    //         } else {
+    //             throw new UnauthorizedException("You must verify your proof of residence to buy more than " + totalPrice + ".", "amount");
+    //         }
+    //     }
+
+    //     return response;
+    // }
 
     // Withdrawal
     @PreAuthorize("isAuthenticated()")

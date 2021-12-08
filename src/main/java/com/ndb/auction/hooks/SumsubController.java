@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,8 +26,7 @@ import com.ndb.auction.service.SumsubService;
 @RequestMapping("/")
 public class SumsubController extends BaseController{
 	
-	@Value("{sumsub.webhook.secret}")
-	private String SECRET;
+	private static final String SECRET = "5yxq5pq924t9euls0ck9queq50n";
 	
 	@PostMapping("/sumsub")
 	@ResponseBody

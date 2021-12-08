@@ -15,6 +15,7 @@ type User {
    lastLogin: Float,
    avatar: [AvatarSet],
    avatarPurchased: [AvatarPurchased],
+   userWallet: [Wallet],
    userExtWallet: [ExtWallet],
    userSecurity: [Security],
    userVerify: [Verify]

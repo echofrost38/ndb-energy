@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Set;
 
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.Wallet;
@@ -54,7 +55,12 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	public Credentials signin(String email, String password) {
 		
 		// get user ( Not found exception is threw in service)
-		User user = userService.getUserByEmail(email);
+		User user = null;
+		try{
+			user = userService.getUserByEmail(email);
+		} catch(UserNotFoundException e) {
+			return new Credentials("Failed", "Unregistered User");
+		}
 		
 		if(!encoder.matches(password, user.getPassword())) {
 			return new Credentials("Failed", "password mismatch");

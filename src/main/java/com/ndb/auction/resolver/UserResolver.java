@@ -1,5 +1,8 @@
 package com.ndb.auction.resolver;
 
+import java.util.List;
+
+import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.User;
 import com.ndb.auction.service.UserDetailsImpl;
 
@@ -18,6 +21,36 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String id = userDetails.getId();
         return userService.getUserById(id);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public GeoLocation addDisallowed(String countryCode) {
+        return userService.addDisallowed(countryCode);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<GeoLocation> getDisallowed() {
+        return userService.getDisallowed();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public GeoLocation makeAllow(String countryCode) {
+        return userService.makeAllow(countryCode);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String resetPassword(String email) {
+        return userService.resetPassword(email);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String createNewUser(String email, String country, String role, String avatarName, String shortName) {
+        return createNewUser(email, country, role, avatarName, shortName);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String changeRole(String email, String role) {
+        return userService.changeRole(email, role);
     }
 
 //    @PreAuthorize("isAuthenticated")

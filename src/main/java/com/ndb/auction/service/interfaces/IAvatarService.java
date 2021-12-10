@@ -19,7 +19,7 @@ public interface IAvatarService {
 	
 	AvatarComponent getAvatarComponent(String groupId, String sKey);
 	
-	AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited);
+	AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file);
 	
 	AvatarProfile createAvatarProfile(
 				String name,

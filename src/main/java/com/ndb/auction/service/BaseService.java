@@ -5,6 +5,7 @@ import com.ndb.auction.dao.AvatarDao;
 import com.ndb.auction.dao.BidDao;
 import com.ndb.auction.dao.CryptoPaymentDao;
 import com.ndb.auction.dao.DirectSaleDao;
+import com.ndb.auction.dao.GeoLocationDao;
 import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
@@ -14,12 +15,14 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class BaseService {
 	
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
+    public final static String NEW_USER_CREATED = "new_user.ftlh";
     
     @Value("${coinbase.apiKey}")
 	public String coinbaseApiKey;
@@ -32,6 +35,9 @@ public class BaseService {
     public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
     
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
+
+	@Autowired
+	PasswordEncoder encoder;
 
 	@Autowired
 	ScheduledTasks schedule;
@@ -77,4 +83,7 @@ public class BaseService {
 
     @Autowired
     public DirectSaleDao directSaleDao;
+    
+    @Autowired
+    public GeoLocationDao geoLocationDao;
 }

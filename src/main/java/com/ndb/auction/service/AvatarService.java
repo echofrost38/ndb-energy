@@ -14,6 +14,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
+import com.ndb.auction.exceptions.S3Exception;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -36,20 +37,11 @@ public class AvatarService extends BaseService implements IAvatarService{
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited);
 		
 		AvatarComponent newComponent = avatarDao.createAvatarComponent(component);
-
-		// upload avatar component into Amazon S3 bucket!
-		InputStream content;
-		try {
-			content = file.getInputStream();
-			ObjectMetadata metadata = new ObjectMetadata();
-			metadata.setContentLength(file.getSize());
-		
-			s3.putObject(bucketName, groupId + "-" + newComponent.getCompId(), content, metadata);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-		
+		String key = newComponent.getGroupId() + "-" + newComponent.getCompId();
+		if(!uploadFileS3(key, file)) {
+			throw new S3Exception("Cannot Upload Avatar File.", "file");
 		}
+		
 		return newComponent;
 	}
 
@@ -86,7 +78,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 	}
 
 	@Override
-	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited) {
+	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file) {
 		AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
 		if(component == null) {
 			throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
@@ -98,6 +90,16 @@ public class AvatarService extends BaseService implements IAvatarService{
 		component.setTierLevel(tierLevel);
 		component.setLimited(limited);
 		
+		// try delete and put object again
+		String key = component.getGroupId() + "-" + component.getCompId();
+		if(!deleteS3Object(key)) {
+			throw new S3Exception("Cannot update Avatar component.", "file");
+		}
+		if(file != null) {
+			if(!uploadFileS3(key, file)) {
+				throw new S3Exception("Cannot Upload Avatar File.", "file");
+			}
+		}
 		return avatarDao.updateAvatarComponent(component);
 	}
 
@@ -166,6 +168,15 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return avatarDao.getAvatarComponentsBySet(set);
 	}
 
+	private boolean deleteS3Object(String key) {
+		try {
+			s3.deleteObject(bucketName, key);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	private String downloadAvatarAccessories(String key) {
 		S3Object s3object = null;
 		try {
@@ -181,9 +192,24 @@ public class AvatarService extends BaseService implements IAvatarService{
 			finput.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			
+			return "";
 		}
 		return Base64.encodeBase64String(imageBytes);
+	}
+
+	private boolean uploadFileS3(String key, Part file) {
+		// upload avatar component into Amazon S3 bucket!
+		InputStream content;
+		try {
+			content = file.getInputStream();
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(file.getSize());
+			s3.putObject(bucketName, key, content, metadata);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 }

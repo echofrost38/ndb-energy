@@ -75,7 +75,7 @@ public class StripeService extends BaseService {
                 
 //                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
 				Bid bid = bidService.getBid(roundId, userId);
-				double usdAmount = (double)amount;
+				double usdAmount = ((double)amount)/100;
 				if(bid.getPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     if(pendingPrice > usdAmount) {

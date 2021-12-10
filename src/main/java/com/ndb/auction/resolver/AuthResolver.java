@@ -5,17 +5,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.payload.Credentials;
+import com.ndb.auction.utils.RemoteIpHelper;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -27,7 +31,11 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	
 	public String signup(String email, String password, String country) {
 		// Geo IP checking
-				
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		String ipAddress = RemoteIpHelper.getRemoteIpFrom(request);
+		if(!ipChecking.isAllowed(ipAddress)) {
+			return "Not Allowed Location";
+		}
 		
 		password = encoder.encode(password);
 		return userService.createUser(email, password, country, true);
@@ -54,6 +62,13 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	
 	public Credentials signin(String email, String password) {
 		
+		// Geo IP checking
+		HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+		String ipAddress = RemoteIpHelper.getRemoteIpFrom(request);
+		if(!ipChecking.isAllowed(ipAddress)) {
+			return new Credentials("Failed", "Not Allowed Location");
+		}
+
 		// get user ( Not found exception is threw in service)
 		User user = null;
 		try{

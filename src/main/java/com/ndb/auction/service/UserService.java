@@ -269,7 +269,7 @@ public class UserService extends BaseService implements IUserService {
 	}
 
 	///////////////////// user operation ///////////
-	private String getRandomPassword(int len) {
+	public String getRandomPassword(int len) {
 		// ASCII range – alphanumeric (0-9, a-z, A-Z)
 		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -288,13 +288,8 @@ public class UserService extends BaseService implements IUserService {
 		return sb.toString();
 	}
 
-	public String resetPassword(String email) {
-		User user = getUserByEmail(email);
+	public String resetPassword(User user, String rPassword) {
 		
-		// generate random password
-		String rPassword = getRandomPassword(10);
-		String encoded = encoder.encode(rPassword);
-		user.setPassword(encoded);
 		userDao.updateUser(user);
 
 		// emailing resetted password	
@@ -307,20 +302,11 @@ public class UserService extends BaseService implements IUserService {
 		return "Success";
 	}
 
-	public String createNewUser(String email, String country, String role, String avatar, String name) {
-		String rPassword = getRandomPassword(10);
-		String encoded = encoder.encode(rPassword);
-		User user = new User(email, encoded, country, true);
-		user.getVerify().replace("email", true);
-
-		// check role
-		if(role.equals("ROLE_ADMIN")) {
-			user.getRole().add("ROLE_ADMIN");
-		}
+	public String createNewUser(User user, String rPassword) {
 
 		// create new user!
 		userDao.createUser(user);
-		user = userDao.getUserByEmail(email).get();
+		user = userDao.getUserByEmail(user.getEmail()).get();
 		
 		// send email!	
 		try {
@@ -330,7 +316,7 @@ public class UserService extends BaseService implements IUserService {
 			return "Failed";
 		}
 		
-		userWalletService.addNewUser(user.getId(), email, name);
+		userWalletService.addNewUser(user.getId(), user.getEmail(), user.getName());
 
 		return "Success";
 	}

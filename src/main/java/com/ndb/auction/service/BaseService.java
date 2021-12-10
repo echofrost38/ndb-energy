@@ -15,7 +15,6 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class BaseService {
 	
@@ -35,9 +34,6 @@ public class BaseService {
     public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
     
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
-
-	@Autowired
-	PasswordEncoder encoder;
 
 	@Autowired
 	ScheduledTasks schedule;

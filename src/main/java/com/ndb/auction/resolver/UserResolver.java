@@ -40,12 +40,36 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String resetPassword(String email) {
-        return userService.resetPassword(email);
+        String rPassword = userService.getRandomPassword(10);
+        String encoded = encoder.encode(rPassword);
+        User user = userService.getUserByEmail(email);
+        user.setPassword(encoded);
+        return userService.resetPassword(user, rPassword);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createNewUser(String email, String country, String role, String avatarName, String shortName) {
-        return createNewUser(email, country, role, avatarName, shortName);
+        
+        User user = userService.getUserByEmail(email);
+        if(user != null) {
+            return "Already Exists.";
+        }
+
+        String rPassword = userService.getRandomPassword(10);
+        String encoded = encoder.encode(rPassword);
+        user = new User(email, encoded, country, true);
+
+        user.setAvatarPrefix(avatarName);
+        user.setAvatarName(shortName);
+
+        user.getVerify().replace("email", true);
+
+		// check role
+		if(role.equals("ROLE_ADMIN")) {
+			user.getRole().add("ROLE_ADMIN");
+		}
+
+        return userService.createNewUser(user, rPassword);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

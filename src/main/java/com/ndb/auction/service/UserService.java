@@ -228,7 +228,7 @@ public class UserService extends BaseService implements IUserService {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {
 			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);
-		} catch (Exception e) {
+		} catch (MessagingException | IOException | TemplateException e) {
 			return false; // or exception
 		}	
 		return true;

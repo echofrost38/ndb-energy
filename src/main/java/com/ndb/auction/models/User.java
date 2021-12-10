@@ -68,12 +68,21 @@ public class User {
 		initUser();
 	}
 
-	public User(String email, String password, String country, boolean tos) {
+	public User(String email, String password, String country, boolean tos, List<Coin> coinList) {
 		// from user input
 		this.email = email;
 		this.password = password;
 		this.country = country;
 		this.tos = tos;
+		
+		
+		// initialize the wallet with possible coins
+	// Database version
+		// this.wallet = new HashMap<String, Wallet>();
+		// for (Coin coin : coinList) {
+		// 	this.wallet.put(coin.getSymbol(), new Wallet());
+		// }
+
 		initUser();
 	}
 
@@ -95,7 +104,7 @@ public class User {
 		this.verify = new HashMap<String, Boolean>();
 		verify.put("email", false);
 		verify.put("mobile", false);
-		verify.put("identity", false); 
+		verify.put("identity", false);
 
 		this.avatarPurchase = new HashMap<String, List<String>>();
 

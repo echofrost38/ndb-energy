@@ -71,6 +71,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 
 
+	// for crypto payment
 	@PreAuthorize("isAuthenticated()")
 	public CryptoPayload createCryptoPayment(
 		String roundId, 

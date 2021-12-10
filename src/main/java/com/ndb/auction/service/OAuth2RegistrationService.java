@@ -20,15 +20,19 @@ public class OAuth2RegistrationService {
     
     private Map<String, OAuth2Registration> oAuth2Registrations;
 
-    // @PostConstruct
-    // public void init() {
-    //     oAuth2Registrations = new HashMap<String, OAuth2Registration>();
-
-    //     List<OAuth2Registration> registrations = oAuth2Dao.getAllRegistrations();
-    //     for(OAuth2Registration registration : registrations) {
-    //         oAuth2Registrations.put(registration.getRegistrationId(), registration);
-    //     }
-    // }
+    @PostConstruct
+    public void init() {
+        try{
+            oAuth2Registrations = new HashMap<String, OAuth2Registration>();
+    
+            List<OAuth2Registration> registrations = oAuth2Dao.getAllRegistrations();
+            for(OAuth2Registration registration : registrations) {
+                oAuth2Registrations.put(registration.getRegistrationId(), registration);
+            }
+        }catch(Exception e) {
+            
+        }
+    }
 
     public OAuth2Registration getByRegistrationId(String id) {
         return oAuth2Registrations.get(id);

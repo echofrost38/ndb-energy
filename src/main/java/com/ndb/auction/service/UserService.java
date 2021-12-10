@@ -1,12 +1,9 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
@@ -16,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.GeoLocation;
+import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.User;
 import com.ndb.auction.service.interfaces.IUserService;
 
@@ -42,12 +39,13 @@ public class UserService extends BaseService implements IUserService {
 				return "Already exists, sent verify code";
 			}
 		} else {
-			user = new User(email, password, country, tos);			
+			List<Coin> coins = cryptoService.getCoinList();
+			user = new User(email, password, country, tos, coins);			
 			userDao.createUser(user);
 			user = userDao.getUserByEmail(email).get();
 
 			// create user wallet in contract!
-			userWalletService.addNewUser(user.getId(), email, "");
+			
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";
@@ -230,7 +228,7 @@ public class UserService extends BaseService implements IUserService {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {
 			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);
-		} catch (MessagingException | IOException | TemplateException e) {
+		} catch (Exception e) {
 			return false; // or exception
 		}	
 		return true;
@@ -253,100 +251,5 @@ public class UserService extends BaseService implements IUserService {
 
 	public User updateUser(User user) {
 		return userDao.updateUser(user);
-	}
-
-	///////////////////////// Geo Location /////////
-	public GeoLocation addDisallowed(String countryCode) {
-		return geoLocationDao.addDisallowedCountry(countryCode);
-	}
-
-	public List<GeoLocation> getDisallowed() {
-		return geoLocationDao.getGeoLocations();
-	}
-
-	public GeoLocation makeAllow(String countryCode) {
-		return geoLocationDao.makeAllow(countryCode);
-	}
-
-	///////////////////// user operation ///////////
-	private String getRandomPassword(int len) {
-		// ASCII range – alphanumeric (0-9, a-z, A-Z)
-		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-		SecureRandom random = new SecureRandom();
-		StringBuilder sb = new StringBuilder();
-
-		// each iteration of the loop randomly chooses a character from the given
-		// ASCII range and appends it to the `StringBuilder` instance
-
-		for (int i = 0; i < len; i++)
-		{
-			int randomIndex = random.nextInt(chars.length());
-			sb.append(chars.charAt(randomIndex));
-		}
-
-		return sb.toString();
-	}
-
-	public String resetPassword(String email) {
-		User user = getUserByEmail(email);
-		
-		// generate random password
-		String rPassword = getRandomPassword(10);
-		String encoded = encoder.encode(rPassword);
-		user.setPassword(encoded);
-		userDao.updateUser(user);
-
-		// emailing resetted password	
-		try {
-			mailService.sendVerifyEmail(user, rPassword, "newPassword.ftlh");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "Sending email failed.";
-		}
-		return "Success";
-	}
-
-	public String createNewUser(String email, String country, String role, String avatar, String name) {
-		String rPassword = getRandomPassword(10);
-		String encoded = encoder.encode(rPassword);
-		User user = new User(email, encoded, country, true);
-		user.getVerify().replace("email", true);
-
-		// check role
-		if(role.equals("ROLE_ADMIN")) {
-			user.getRole().add("ROLE_ADMIN");
-		}
-
-		// create new user!
-		userDao.createUser(user);
-		user = userDao.getUserByEmail(email).get();
-		
-		// send email!	
-		try {
-			mailService.sendVerifyEmail(user, rPassword, "NE");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "Failed";
-		}
-		
-		userWalletService.addNewUser(user.getId(), email, name);
-
-		return "Success";
-	}
-
-	public String changeRole(String email, String role) {
-		User user = getUserByEmail(email);
-		if(role.equals("admin")) {
-			user.getRole().add("ROLE_ADMIN");
-		} else if (role.equals("user")) {
-			Set<String> roles = new HashSet<String>();
-			roles.add("ROLE_USER");
-			user.setRole(roles);
-		} else {
-			return "Failed";
-		}
-		userDao.updateUser(user);
-		return "Success";
 	}
 }

@@ -18,7 +18,6 @@ import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserService;
-import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.SumsubService;
 
@@ -77,7 +76,4 @@ public class BaseResolver {
 
 	@Autowired
 	UserWalletService userWalletService;
-	
-	@Autowired
-	IPChecking ipChecking;
 }

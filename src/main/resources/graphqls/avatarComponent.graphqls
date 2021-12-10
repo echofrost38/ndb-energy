@@ -27,8 +27,7 @@ extend type Mutation {
         compId: String!,
         tierLevel: Int,
         price: Float,
-        limited: Int,
-        file: Upload
+        limited: Int
     ) : AvatarComponent
 }
 

@@ -25,4 +25,5 @@ public class AvatarSet {
 		this.compId = compId;
 	}
 	
+	
 }

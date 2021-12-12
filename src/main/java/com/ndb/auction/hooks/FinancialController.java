@@ -85,11 +85,6 @@ public class FinancialController extends BaseController {
             directSale.setConfirmedAt(System.currentTimeMillis());
 
             directSaleService.updateDirectSale(directSale);
-
-            // real moving of NDB
-            if(directSale.getWhereTo() == DirectSale.INTERNAL) {
-            }
-
             break;
         }
         default:
@@ -150,16 +145,6 @@ public class FinancialController extends BaseController {
                 tx.setCryptoType(cryptoPricing.getCurrency());
                 tx.setCryptoAmount(Double.valueOf(cryptoPricing.getAmount()));
                 directSaleService.updateDirectSale(tx);
-
-                // Real moving of NDB
-                if(tx.getWhereTo() == DirectSale.INTERNAL) {
-
-                } else if(tx.getWhereTo() == DirectSale.EXTERNAL) {
-                    // 
-                } else {
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-
             }
         }
 

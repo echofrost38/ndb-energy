@@ -35,7 +35,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     // Direct Sale NDT Token
     // will return transaction id
     @PreAuthorize("isAuthenticated()")
-    public String directSale(double amount, double price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String directSale(double amount, double price, int whereTo) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
         
@@ -67,7 +67,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
                 } 
             }
         } 
-        DirectSale directSale = directSaleService.createNewDirectSale(userId, price, amount, whereTo, extAddr);
+        DirectSale directSale = directSaleService.createNewDirectSale(userId, price, amount, whereTo);
         if(directSale == null) {
             throw new BadRequestException("We cannot make the direct sale.");
         }

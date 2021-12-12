@@ -26,6 +26,9 @@ public class UserWalletService {
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
 
+    private final int decimal = 12;
+    private final BigInteger bDecimal = new BigInteger("1000000000000");
+
     private UserWallet userWallet;
 
     @Autowired
@@ -53,6 +56,9 @@ public class UserWalletService {
         try {
             if(userWallet != null) {
                 System.out.println("Adding Free Amount...");
+                
+                // processing decimal
+                amount = amount.pow(decimal);
                 receipt = userWallet.addFreeAmount(id, crypto, amount).send();
                 System.out.println("Added Free amount: " + amount);
             }
@@ -67,6 +73,9 @@ public class UserWalletService {
         try {
             if(userWallet != null) {
                 System.out.println("Adding Hold Amount...");
+
+                // processing decimal
+                amount = amount.pow(decimal);
                 receipt = userWallet.addHoldAmount(id, crypto, amount).send();
                 System.out.println("Successfully Added Hold Amount: " + receipt.getLogs());
             }
@@ -81,6 +90,9 @@ public class UserWalletService {
         try {
             if(userWallet != null) {
                 System.out.println("Making Hold...");
+
+                // processing decimal
+                amount = amount.pow(decimal);
                 receipt = userWallet.makeHold(id, crypto, amount).send();
                 System.out.println("Successfully Made Hold: " + receipt.getLogs());
             }
@@ -95,6 +107,9 @@ public class UserWalletService {
         try {
             if(userWallet != null) {
                 System.out.println("Release Hold...");
+
+                // processing decimal
+                amount = amount.pow(decimal);
                 receipt = userWallet.releaseHold(id, crypto, amount).send();
                 System.out.println("Successfully Released Hold: " + amount);
             }
@@ -121,7 +136,14 @@ public class UserWalletService {
         Wallet wallet = null;
         try {
             Tuple2<BigInteger, BigInteger> tuple2 = userWallet.getWalletById(id, crypto).send();
-            wallet = new Wallet(crypto, tuple2.component1().doubleValue(), tuple2.component2().doubleValue());
+            
+            BigInteger bFree = tuple2.component1();
+            double free = bFree.divide(bDecimal).doubleValue();
+
+            BigInteger bHold = tuple2.component2();
+            double hold = bHold.divide(bDecimal).doubleValue();
+            
+            wallet = new Wallet(crypto, free, hold);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -137,11 +159,13 @@ public class UserWalletService {
             List<BigInteger> holdList = tuple3.component3();
             int len = keyList.size();
             for(int i = 0; i < len; i++) {
-                Wallet wallet = new Wallet(
-                    keyList.get(i), 
-                    freeList.get(i).doubleValue(), 
-                    holdList.get(i).doubleValue()
-                );
+                BigInteger bFree = freeList.get(i);
+                double free = bFree.divide(bDecimal).doubleValue();
+
+                BigInteger bHold = holdList.get(i);
+                double hold = bHold.divide(bDecimal).doubleValue();
+
+                Wallet wallet = new Wallet(keyList.get(i), free, hold);
                 wallets.add(wallet);
             }
         } catch (Exception e) {

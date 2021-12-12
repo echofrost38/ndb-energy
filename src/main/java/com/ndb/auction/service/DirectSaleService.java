@@ -47,9 +47,9 @@ public class DirectSaleService extends BaseService {
     }
 
     // create empty direct sale
-    public DirectSale createNewDirectSale(String userId, double ndbPrice, double ndbAmount, int whereTo, String extAddr) {
+    public DirectSale createNewDirectSale(String userId, double ndbPrice, double ndbAmount, int whereTo) {
         String txnId = UUID.randomUUID().toString();
-        DirectSale directSale = new DirectSale(userId, txnId, ndbPrice, ndbAmount, whereTo, extAddr);
+        DirectSale directSale = new DirectSale(userId, txnId, ndbPrice, ndbAmount, whereTo);
         return directSaleDao.createEmptyDirectSale(directSale);
     }
 
@@ -108,8 +108,11 @@ public class DirectSaleService extends BaseService {
             .bodyToMono(String.class).block();
         
         CoinbaseRes res = new Gson().fromJson(response, CoinbaseRes.class);
+        
         CoinbaseBody resBody = res.getData();
+        
         String code = resBody.getCode();
+        
         directSale.setCode(code);
         directSaleDao.updateDirectSale(directSale);
         return new CryptoPayload(resBody.getAddresses(), resBody.getPricing());

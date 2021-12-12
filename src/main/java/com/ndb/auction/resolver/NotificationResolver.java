@@ -11,7 +11,6 @@ import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ndb.auction.models.Notification;
@@ -26,7 +25,7 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     
     @PreAuthorize("isAuthenticated()")
     public Publisher<Notification> notifications() {
-        log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
+    //    log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
         return notificationService.getNotificationPublisher();
     }
 

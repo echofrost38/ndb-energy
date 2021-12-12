@@ -4,15 +4,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 
-
 public class DirectSale {
 
     // CONSTANTS
     public static final int STRIPE = 0;
     public static final int CRYPTO = 1;
     public static final int WALLET = 2;
-    public static final int INTERNAL = 0;
-    public static final int EXTERNAL = 1;
 
     private String userId;
     private String txnId;
@@ -22,8 +19,6 @@ public class DirectSale {
     private double ndbPrice;
     private double ndbAmount;
     private int whereTo;
-
-    private String extAddr;
 
     private boolean isConfirmed;
 
@@ -48,15 +43,13 @@ public class DirectSale {
         String txnId,
         double ndbPrice,
         double ndbAmount,
-        int whereTo,
-        String extAddr
+        int whereTo
     ) {
         this.userId = userId;
         this.txnId = txnId;
         this.ndbPrice = ndbPrice;
         this.ndbAmount = ndbAmount;
         this.whereTo = whereTo;
-        this.extAddr = extAddr;
         this.isConfirmed = false;
         this.createdAt = System.currentTimeMillis();
     }
@@ -107,15 +100,6 @@ public class DirectSale {
     }
     public void setWhereTo(int whereTo) {
         this.whereTo = whereTo;
-    }
-
-    @DynamoDBAttribute(attributeName = "ext_addr")
-    public String getExtAddr() {
-        return extAddr;
-    }
-
-    public void setExtAddr(String extAddr) {
-        this.extAddr = extAddr;
     }
 
     @DynamoDBAttribute(attributeName = "is_confirmed")

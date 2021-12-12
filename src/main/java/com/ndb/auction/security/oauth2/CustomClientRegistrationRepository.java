@@ -20,7 +20,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
     @SuppressWarnings("deprecation")
 	@Override
     public ClientRegistration findByRegistrationId(String registrationId) {
-        log.info(registrationId, "registrationId cannot be empty");
+        // log.info(registrationId, "registrationId cannot be empty");
 
         OAuth2Registration r = oAuth2RegistrationService.getByRegistrationId(registrationId);
 

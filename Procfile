@@ -1,1 +1,1 @@
-web:java -jar target/auction.jar
+web:java -jar auction.jar

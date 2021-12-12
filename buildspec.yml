@@ -6,7 +6,7 @@ phases:
    build:
       commands:
          - echo Build started on `date`
-         - mvn package
+         - mvn install
          - mv target/auction.jar auction.jar
 artifacts:
    type: zip

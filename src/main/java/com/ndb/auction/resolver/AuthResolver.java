@@ -9,8 +9,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -179,8 +177,8 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	}
 
 	public String addHoldAmount(String id, String crypto, int amount) {
-		BigInteger a = BigDecimal.valueOf(amount).toBigInteger();
-		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, a);
+		double _amount = (double)amount;
+		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, _amount);
 		return receipt.getLogs().get(0).getData();
 	}
 

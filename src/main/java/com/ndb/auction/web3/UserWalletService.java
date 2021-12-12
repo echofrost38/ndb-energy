@@ -1,5 +1,6 @@
 package com.ndb.auction.web3;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,13 +52,14 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt addFreeAmount(String id, String crypto, BigInteger amount) {
+    public TransactionReceipt addFreeAmount(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
                 System.out.println("Adding Free Amount...");
                 
                 // processing decimal
+                BigInteger amount = BigDecimal.valueOf(_amount).toBigInteger();
                 amount = amount.pow(decimal);
                 receipt = userWallet.addFreeAmount(id, crypto, amount).send();
                 System.out.println("Added Free amount: " + amount);
@@ -68,13 +70,14 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt addHoldAmount(String id, String crypto, BigInteger amount) {
+    public TransactionReceipt addHoldAmount(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
                 System.out.println("Adding Hold Amount...");
 
                 // processing decimal
+                BigInteger amount = BigDecimal.valueOf(_amount).toBigInteger();
                 amount = amount.pow(decimal);
                 receipt = userWallet.addHoldAmount(id, crypto, amount).send();
                 System.out.println("Successfully Added Hold Amount: " + receipt.getLogs());
@@ -85,13 +88,14 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt makeHold(String id, String crypto, BigInteger amount) {
+    public TransactionReceipt makeHold(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
                 System.out.println("Making Hold...");
 
                 // processing decimal
+                BigInteger amount = BigDecimal.valueOf(_amount).toBigInteger();
                 amount = amount.pow(decimal);
                 receipt = userWallet.makeHold(id, crypto, amount).send();
                 System.out.println("Successfully Made Hold: " + receipt.getLogs());
@@ -102,13 +106,14 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt releaseHold(String id, String crypto, BigInteger amount) {
+    public TransactionReceipt releaseHold(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
                 System.out.println("Release Hold...");
 
                 // processing decimal
+                BigInteger amount = BigDecimal.valueOf(_amount).toBigInteger();
                 amount = amount.pow(decimal);
                 receipt = userWallet.releaseHold(id, crypto, amount).send();
                 System.out.println("Successfully Released Hold: " + amount);

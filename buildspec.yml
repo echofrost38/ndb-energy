@@ -6,8 +6,13 @@ phases:
    build:
       commands:
          - echo Build started on `date`
-         - mvn install
+         - mvn package
+         - mv target/auction.jar auction.jar
 artifacts:
+   type: zip
    files:
-      - target/auction.jar
-   discard-paths: yes
+      - auction.jar
+      - .ebextensions/**/*
+      - .platform/**/*
+      - Procfile
+   # discard-paths: yes

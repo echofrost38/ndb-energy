@@ -1,7 +1,5 @@
 package com.ndb.auction.service;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -119,8 +117,7 @@ public class BidService extends BaseService implements IBidService {
 			if(free < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			BigInteger holding = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-			TransactionReceipt receipt = userWalletService.makeHold(userId, cryptoType, holding);
+			TransactionReceipt receipt = userWalletService.makeHold(userId, cryptoType, cryptoAmount);
 			List<Log> logs = receipt.getLogs();
 			if(logs.isEmpty()) throw new BidException("We cannot make the hold in your wallet.", "tokenAmount");
 			Log log = logs.get(0);
@@ -308,8 +305,7 @@ public class BidService extends BaseService implements IBidService {
 
 					double hold = wallet.getHolding();
 					if(hold > cryptoAmount) {
-						BigInteger amount = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-						userWalletService.releaseHold(userId, cryptoType, amount);
+						userWalletService.releaseHold(userId, cryptoType, cryptoAmount);
 					} else {
 						continue;
 					}
@@ -330,8 +326,7 @@ public class BidService extends BaseService implements IBidService {
 					
 					double hold = wallet.getHolding();
 					if(hold > cryptoAmount) {
-						BigInteger amount = BigDecimal.valueOf(cryptoAmount).toBigInteger();
-						userWalletService.releaseHold(userId, _cryptoType, amount);
+						userWalletService.releaseHold(userId, _cryptoType, cryptoAmount);
 					} else {
 						continue;
 					}
@@ -363,12 +358,10 @@ public class BidService extends BaseService implements IBidService {
 				}
 				
 				if(totalToken < token) {
-					BigInteger tokenAmount = BigDecimal.valueOf(totalToken).toBigInteger();
-					userWalletService.addFreeAmount(userId, "NDB", tokenAmount);
+					userWalletService.addFreeAmount(userId, "NDB", totalToken);
 					totalToken = 0;
 				} else {
-					BigInteger tokenAmount = BigDecimal.valueOf(token).toBigInteger();
-					userWalletService.addFreeAmount(userId, "NDB", tokenAmount);
+					userWalletService.addFreeAmount(userId, "NDB", totalToken);
 					totalToken -= token;
 				}
 				
@@ -424,8 +417,7 @@ public class BidService extends BaseService implements IBidService {
 			if(free < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			BigInteger amount = BigDecimal.valueOf(free).toBigInteger();
-			userWalletService.makeHold(userId, cryptoType, amount);
+			userWalletService.makeHold(userId, cryptoType, free);
 			
 			Map<String, BidHolding> holdingList = originalBid.getHoldingList();
 			BidHolding hold = null;

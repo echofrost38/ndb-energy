@@ -1,0 +1,23 @@
+extend type Mutation {
+    directSale(
+        amount: Float!,
+        price: Float!,
+        whereTo: Int!,
+        extAddr: String
+    ) : String
+    withdrawal(
+        cryptoType: String,
+        amount: Float
+    ) : String
+}
+
+extend type Query {
+    getDepositAddress(
+        txnId: String
+    ) : CryptoPayload
+}
+
+schema {
+    mutation: Mutation,
+    query: Query
+}

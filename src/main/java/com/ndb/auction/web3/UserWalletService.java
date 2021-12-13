@@ -189,7 +189,7 @@ public class UserWalletService {
             System.out.println(userWallet.getContractAddress());
         }
         catch(Exception e) {
-
+            
         }
         return userWallet;
     }

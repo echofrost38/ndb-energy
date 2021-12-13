@@ -1,0 +1,4 @@
+type GeoLocation {
+    countryCode: String,
+    isAllowed: Boolean
+}

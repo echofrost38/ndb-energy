@@ -2,6 +2,31 @@ extend type Query {
 	getUser : User
 }
 
+extend type Mutation {
+    addDisallowed(
+        countryCode: String!
+    ) : GeoLocation
+    getDisallowed :
+        [GeoLocation]
+    makeAllow(
+        countryCode: String!
+    ) : GeoLocation
+    resetPassword(
+        email: String!
+    ) : String
+    createNewUser(
+        email: String!,
+        country: String!,
+        role: String!,
+        avatarName: String!,
+        shortName: String!
+    ) : String
+    changeRole(
+        email: String!,
+        role: String!
+    ) : String
+}
+
 schema {
     query: Query
 }

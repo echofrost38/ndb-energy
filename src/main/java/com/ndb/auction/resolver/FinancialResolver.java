@@ -34,7 +34,9 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
 
     @PreAuthorize("isAuthenticated()")
     public String deposit() {
-
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
+        
         return "";
     }
 

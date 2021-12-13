@@ -39,6 +39,7 @@ extend type Query {
 	gettingApplicantData(
 		applicantId: String!
 	) : String
+	getKYCSetting : [KYCSetting]
 }
 
 schema {

@@ -23,7 +23,6 @@ import com.ndb.auction.models.NotificationType;
 @RequiredArgsConstructor
 public class NotificationResolver extends BaseResolver implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
 
-    
     @PreAuthorize("isAuthenticated()")
     public Publisher<Notification> notifications() {
         log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());

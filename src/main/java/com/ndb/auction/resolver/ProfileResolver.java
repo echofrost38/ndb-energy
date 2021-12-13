@@ -131,4 +131,9 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         return sumsubService.updateKYCSetting(kind, withdraw, deposit, bid, direct);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<KYCSetting> getKYCSetting() {
+        return sumsubService.getKYCSettings();
+    }
+
 }

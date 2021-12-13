@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.service.UserDetailsImpl;
 
@@ -25,6 +26,9 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String userId = userDetails.getId();
+		if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
+			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		}
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 	
@@ -36,6 +40,9 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String id = userDetails.getId();
+		if(!sumsubService.checkThreshold(id, "bid", tokenAmount * tokenPrice)) {
+			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		}
 		return bidService.updateBid(id, roundId, tokenAmount, tokenPrice);
 	}
 	

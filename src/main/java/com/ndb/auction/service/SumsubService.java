@@ -285,4 +285,72 @@ public class SumsubService extends BaseService {
     public List<KYCSetting> getKYCSettings() {
         return sumsubDao.getKYCSettings();
     }
+
+    public boolean checkThreshold(String userId, String kind, double amount) {
+        List<KYCSetting> settings = sumsubDao.getKYCSettings();
+        double kycThreshold = 0.0, amlThreshold = 0.0;
+        for (KYCSetting kycSetting : settings) {
+            if(kycSetting.getKind().equals("kyc")) {
+                switch (kind) {
+                    case "deposit":
+                        kycThreshold = kycSetting.getDeposit();
+                        break;
+                    case "withdraw":
+                        kycThreshold = kycSetting.getWithdraw();
+                        break;
+                    case "bid":
+                        kycThreshold = kycSetting.getBid();
+                        break;
+                    case "direct_sale":
+                        kycThreshold = kycSetting.getDirect();
+                        break;
+                    default:
+                        return false;
+                }
+            } else if (kycSetting.getKind().equals("aml")) {
+                switch (kind) {
+                    case "deposit":
+                        amlThreshold = kycSetting.getDeposit();
+                        break;
+                    case "withdraw":
+                        amlThreshold = kycSetting.getWithdraw();
+                        break;
+                    case "bid":
+                        amlThreshold = kycSetting.getBid();
+                        break;
+                    case "direct_sale":
+                        amlThreshold = kycSetting.getDirect();
+                        break;
+                    default:
+                        return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        if(amount > kycThreshold) {
+            if( amount < amlThreshold) {
+                try {
+                    if(!checkVerificationStatus(userId, SumsubService.KYC)) {
+                        return false;
+                    }
+                } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }   
+            } else if( amount >= amlThreshold) {
+                try {
+                    if(!checkVerificationStatus(userId, SumsubService.AML)) {
+                        return false;
+                    }
+                } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
+                    e.printStackTrace();
+                    return false;
+                } 
+            }
+        } 
+
+        return true;
+    }
 }

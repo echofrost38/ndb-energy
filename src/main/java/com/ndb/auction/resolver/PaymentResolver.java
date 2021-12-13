@@ -22,7 +22,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class PaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
 	// for stripe payment
-//	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("isAuthenticated()")
 	@CrossOrigin
 	public String getStripePubKey() {
 		return stripeService.getPublicKey();
@@ -126,7 +126,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 
 	// admin 
-	// @PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Coin addNewCoin(String name, String symbol) {
 		return cryptoService.addNewCoin(name, symbol);
 	}

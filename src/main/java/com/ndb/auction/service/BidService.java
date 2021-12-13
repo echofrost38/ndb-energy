@@ -63,6 +63,7 @@ public class BidService extends BaseService implements IBidService {
 		}
 
 		// create new pending bid
+		double totalPrice = tokenAmount * tokenPrice;
 		bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
 		
 		// check Round is opened. 
@@ -88,10 +89,8 @@ public class BidService extends BaseService implements IBidService {
 		// check pay type : WALLET!!!!!
 		if(payType == Bid.WALLET) {
 			// check user's wallet!
-			double totalPrice = tokenAmount * tokenPrice;
-			double cryptoAmount = 
-				totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
-
+			double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
+			
 //			User user = userDao.getUserById(userId);
 //			Map<String, Wallet> wallets = user.getWallet();
 //			Wallet wallet = wallets.get(cryptoType);

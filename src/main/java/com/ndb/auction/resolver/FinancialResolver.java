@@ -32,12 +32,19 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
         return directSaleService.cryptoPayment(userId, txnId);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public String deposit() {
+
+        return "";
+    }
+
     // Direct Sale NDT Token
     // will return transaction id
     @PreAuthorize("isAuthenticated()")
     public String directSale(double amount, double price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
+        String response = "Failed";
         
         if(amount <= 0 || price <= 0) {
             throw new BadRequestException("Amount and Price must be larger than 0.");
@@ -45,28 +52,10 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
         // price mean USD price. 
         double totalPrice = amount * price;
 
-        List<KYCSetting> verifySettings = sumsubService.getKYCSettings();
-        double kycThreshold = 0.0, amlThreshold = 0.0;
-        for (KYCSetting setting : verifySettings) {
-            if(setting.getKind().equals("KYC")) {
-                kycThreshold = setting.getDirect();
-            } else if (setting.getKind().equals("AML")) {
-                amlThreshold = setting.getDirect();
-            }
+        if(!sumsubService.checkThreshold(userId, "direct", totalPrice)) {
+            throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
         }
-
-        String response = "Failed";
-        if(totalPrice > kycThreshold) {
-            if( totalPrice < amlThreshold) {
-                if(!sumsubService.checkVerificationStatus(userId, SumsubService.KYC)) {
-                    throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
-                }   
-            } else if( totalPrice >= amlThreshold) {
-                if(!sumsubService.checkVerificationStatus(userId, SumsubService.AML)) {
-                    throw new UnauthorizedException("You must verify your proof of residence to buy more than " + totalPrice + ".", "amount");
-                } 
-            }
-        } 
+        
         DirectSale directSale = directSaleService.createNewDirectSale(userId, price, amount, whereTo, extAddr);
         if(directSale == null) {
             throw new BadRequestException("We cannot make the direct sale.");

@@ -19,7 +19,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver{
 	
 	// create new component
-	// @PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public AvatarComponent createNewComponent(
 		String groupId, 
 		Integer tierLevel, 

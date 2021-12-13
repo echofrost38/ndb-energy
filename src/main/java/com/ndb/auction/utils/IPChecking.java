@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class IPChecking extends BaseService {
 	
-	@Value("{free.geolocation.apikey}")
+	@Value("${free.geolocation.apikey}")
 	private String apiKey;
 	private WebClient ipGeolocation;
 	

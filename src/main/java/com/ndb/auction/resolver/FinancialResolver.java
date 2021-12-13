@@ -28,7 +28,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     public CryptoPayload getDepositAddress(String txnId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
-
+        
         return directSaleService.cryptoPayment(userId, txnId);
     }
 
@@ -36,7 +36,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     public String deposit() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
-        
+
         return "";
     }
 

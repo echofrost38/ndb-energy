@@ -19,6 +19,7 @@ import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.Wallet;
@@ -247,7 +248,12 @@ public class BidService extends BaseService implements IBidService {
 		auctionDao.updateAuctionStats(currentRound);
         
         // send Notification
-        notificationService.send(4, "title", "message", userId);
+        notificationService.send(
+			Notification.N_BID_RANKING_UPDATED, 
+			"Bid Ranking Updated", 
+			"Bid ranking is updated, please check your bid ranking", 
+			userId
+		);
 	}
 	
 	// not sychnorized
@@ -369,7 +375,11 @@ public class BidService extends BaseService implements IBidService {
 			userDao.updateUser(user);
 
 			// send notification
-	        notificationService.send(5, "title", "message", userId);
+	        notificationService.send(
+				Notification.N_BID_CLOSED, 
+				"Bid Closed", 
+				"Please check you bid result", 
+			userId);
 	    }
 	}
 

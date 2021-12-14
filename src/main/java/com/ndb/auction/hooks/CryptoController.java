@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gson.Gson;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.User;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
@@ -102,7 +103,12 @@ public class CryptoController extends BaseController {
                 userService.updateUser(user);
 
                 // send notification to user for payment result!!                
-                notificationService.send(3, "Payment Result", "msg", user.getId());
+                notificationService.send(
+                    Notification.N_PAYMENT_RESULT,
+                    "Payment Result", 
+                    "Please check you payment result", 
+                    user.getId()
+                );
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             }

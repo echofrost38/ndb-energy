@@ -21,6 +21,7 @@ import reactor.core.publisher.Sinks.EmitResult;
 @Component
 public class NotificationService {
 
+    
     final Sinks.Many<Notification> sink;
 
     @Autowired

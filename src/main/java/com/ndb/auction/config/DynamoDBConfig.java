@@ -2,8 +2,10 @@ package com.ndb.auction.config;
 
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -18,17 +20,20 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Configuration
-public class DynamoDBConfig {
+public class DynamoDBConfig implements EnvironmentAware {
 	
 	private static final String REAL = "real";
-	
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.awsAccessKey = environment.getProperty("aws.access.key");
+        this.awsSecretKey = environment.getProperty("aws.secret.key");
+    }
+
 	@Value("${mode}")
 	private String mode;
-	
-	@Value("${aws.accessKey}")
-    private String awsAccessKey;
 
-    @Value("${aws.secretKey}")
+    private String awsAccessKey;
     private String awsSecretKey;
     
     @Bean
@@ -60,4 +65,5 @@ public class DynamoDBConfig {
     public AWSCredentials amazonAWSCredentials() {
         return new BasicAWSCredentials(awsAccessKey, awsSecretKey);
     }
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.models.Bid;
@@ -17,12 +16,6 @@ import com.stripe.param.PaymentIntentCreateParams;
 
 @Service
 public class StripeService extends BaseService {
-	
-	@Value("${stripe.secret.key}")
-	private String stripeSecretKey;
-	
-	@Value("${stripe.public.key}")
-	private String stripePublicKey;
 	
 	@Autowired 
 	private BidService bidService;

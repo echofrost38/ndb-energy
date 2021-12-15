@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.twilio.Twilio;
@@ -17,15 +18,19 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 @Service
-public class SMSService {
+public class SMSService implements EnvironmentAware {
 	
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.sid = environment.getProperty("TWILIO_SID");
+		this.token = environment.getProperty("TWILIO_TOKEN");
+		this.phone = environment.getProperty("TWILIO_PHONE");
+	}
+
 	private static final String TEMPLATE = "2faSMS.ftlh";
-	
-	@Value("${twilio.sid}")
 	private String sid;
-	
-	@Value("${twilio.token}")
 	private String token;
+	private String phone;
 	
 	private final Configuration configuration;
 	
@@ -39,7 +44,7 @@ public class SMSService {
 		String smsContent = getSMSContent(code, TEMPLATE);
 		Message message = Message.creator(
 				new PhoneNumber(phone),
-		        new PhoneNumber("+14159414656"), 
+		        new PhoneNumber(this.phone), 
 		        smsContent)
 			.create();
 		return message.getStatus().toString();
@@ -65,9 +70,10 @@ public class SMSService {
 		Twilio.init(sid, token);
 		Message message = Message.creator(
 				new PhoneNumber(phone),
-		        new PhoneNumber("+14159414656"), 
+		        new PhoneNumber(this.phone), 
 		        smsContent)
 			.create();
 		return message.getStatus().toString();
 	}
+
 }

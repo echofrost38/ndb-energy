@@ -15,23 +15,35 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 
-public class BaseService {
+public class BaseService implements EnvironmentAware {
 	
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
   
-    
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.SUMSUB_SECRET_KEY = environment.getProperty("SUMSUB_SECRET_KEY");
+        this.SUMSUB_APP_TOKEN = environment.getProperty("SUMSUB_APP_TOKEN");
+        this.stripeSecretKey = environment.getProperty("STRIPE_SECRET_KEY");
+        this.stripePublicKey = environment.getProperty("STRIPE_PUBLIC_KEY");
+        this.apiKey = environment.getProperty("FREE_GEO_APIKEY");
+    }
+
     @Value("${coinbase.apiKey}")
 	public String coinbaseApiKey;
     
+	public String apiKey;
+
+	public String stripeSecretKey;
+	public String stripePublicKey;
+
 	// The description of the authorization method is available here: https://developers.sumsub.com/api-reference/#app-tokens
-    @Value("${sumsub.secret.key}")
     public String SUMSUB_SECRET_KEY; // Example: Hej2ch71kG2kTd1iIUDZFNsO5C1lh5Gq
-    
-    @Value("${sumsub.app.token}")
     public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
     
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
@@ -83,4 +95,5 @@ public class BaseService {
     
     @Autowired
     public GeoLocationDao geoLocationDao;
+
 }

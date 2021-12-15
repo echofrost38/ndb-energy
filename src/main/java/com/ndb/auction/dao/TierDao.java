@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.UserTier;
+import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.stereotype.Repository;
 
@@ -51,5 +52,16 @@ public class TierDao extends BaseDao {
 
 	public TaskSetting getTaskSettings() {
 		return dynamoDBMapper.load(TaskSetting.class, "Setting");
+	}
+
+	// Tier Task
+	public TierTask createNewTask(TierTask tierTask) {
+		dynamoDBMapper.save(tierTask);
+		return tierTask;
+	}
+
+	public TierTask updateTierTask(TierTask tierTask) {
+		dynamoDBMapper.save(tierTask, updateConfig);
+		return tierTask;
 	}
 }

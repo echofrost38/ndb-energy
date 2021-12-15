@@ -11,8 +11,8 @@ extend type Mutation {
     ) : UserTier
     updateUserTier(
         level: Int!,
-        name: String!,
-        points: Float!
+        name: String,
+        points: Float
     ) : UserTier
     deleteUserTier(
         level: Int!

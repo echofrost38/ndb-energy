@@ -105,6 +105,9 @@ public class User {
 		this.provider = AuthProvider.local;
 
 		this.notifySetting = 0xFFFF;
+
+		this.tierLvl = 0;
+		this.tierPoints = 0;
 	}
 
 	

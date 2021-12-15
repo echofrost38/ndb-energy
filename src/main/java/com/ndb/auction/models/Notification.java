@@ -8,6 +8,12 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName = "Notification")
 public class Notification {
+	
+    public final static Integer N_AUCTION_START = 1;
+    public final static Integer N_AUCTION_END = 2;
+    public final static Integer N_PAYMENT_RESULT = 3;
+    public final static Integer N_BID_RANKING_UPDATED = 4;
+    public final static Integer N_BID_CLOSED = 5;  
 
 	// Notification ID : this is unique for same broadcasting
 	private String id; // RangeKey

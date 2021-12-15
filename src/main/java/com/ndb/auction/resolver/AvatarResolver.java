@@ -2,7 +2,7 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
-// import javax.servlet.http.Part;
+import javax.servlet.http.Part;
 
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
@@ -24,15 +24,16 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		String groupId, 
 		Integer tierLevel, 
 		Double price, 
-		Integer limited
+		Integer limited,
+		Part file
 	) {
-		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited);
+		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, file);
 	}
 	
 	// update component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited) {
-		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited);
+	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file) {
+		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, file);
 	}
 
 	// create new avatar

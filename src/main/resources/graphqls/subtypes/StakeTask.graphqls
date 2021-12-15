@@ -1,0 +1,9 @@
+type StakeTask {
+    expiredTime: Int!,
+    ratio: Float!
+}
+
+input StakeTaskInput {
+    expiredTime: Int!,
+    ratio: Float!
+}

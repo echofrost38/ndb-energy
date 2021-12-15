@@ -62,6 +62,9 @@ public class User {
 
 	private AuthProvider provider;
 	private String providerId;
+
+	private int tierLvl;
+	private double tierPoints;
 	
 	// for update purpose
 	public User() {
@@ -306,6 +309,23 @@ public class User {
 
 	public void setProvider(AuthProvider provider) {
 		this.provider = provider;
+	}
+
+	@DynamoDBAttribute(attributeName = "tier_Lvl")
+	public int getTierLvl() {
+		return tierLvl;
+	}
+	public void setTierLvl(int tierLvl) {
+		this.tierLvl = tierLvl;
+	}
+	
+	@DynamoDBAttribute(attributeName = "tier_points")
+	public double getTierPoints() {
+		return tierPoints;
+	}
+
+	public void setTierPoints(double tierPoints) {
+		this.tierPoints = tierPoints;
 	}
 
 	@DynamoDBIgnore

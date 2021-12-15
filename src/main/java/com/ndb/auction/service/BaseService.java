@@ -22,7 +22,6 @@ public class BaseService {
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
-  
     
     @Value("${coinbase.apiKey}")
 	public String coinbaseApiKey;

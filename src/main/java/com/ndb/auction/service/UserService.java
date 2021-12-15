@@ -335,4 +335,6 @@ public class UserService extends BaseService implements IUserService {
 		userDao.updateUser(user);
 		return "Success";
 	}
+
+	
 }

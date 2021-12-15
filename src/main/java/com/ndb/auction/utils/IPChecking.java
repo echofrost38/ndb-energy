@@ -43,6 +43,7 @@ public class IPChecking extends BaseService {
 	public Boolean isAllowed(String ip) {
 		String countryCode = getIpLocation(ip).getCountry_code();	
 		// Get Location 
+		if(countryCode == "") return true;
 		GeoLocation location = geoLocationDao.getGeoLocation(countryCode);
 		if(location == null) return true;
 		return location.isAllowed();

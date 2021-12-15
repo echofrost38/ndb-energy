@@ -80,10 +80,15 @@ public class SumsubController extends BaseController{
 				user.getSecurity().replace("KYC", true);
 			} else if(levelName.equals(SumsubService.AML)) {
 				user.getSecurity().replace("AML", true);
+
+				// update user tasks!!
+				
 			} else {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			userService.updateUser(user);
+
+			// kyc/aml verified notification!!
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);

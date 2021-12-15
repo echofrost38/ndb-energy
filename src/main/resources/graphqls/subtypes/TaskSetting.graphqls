@@ -1,0 +1,17 @@
+type TaskSetting {
+    settingId: String!,
+    verification: Float,
+    walletTasks: [WalletTask],
+    auction: Float,
+    direct: Float,
+    stakingTasks: [StakeTask]
+}
+
+input TaskSettingInput {
+    settingId: String!,
+    verification: Float!,
+    walletTasks: [WalletTaskInput]!,
+    auction: Float!,
+    direct: Float!,
+    stakingTasks: [StakeTaskInput]!
+}

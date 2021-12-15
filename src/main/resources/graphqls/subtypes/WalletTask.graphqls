@@ -1,0 +1,9 @@
+type WalletTask {
+    amount: Int!,
+    points: Float!
+}
+
+input WalletTaskInput {
+    amount: Int!,
+    points: Float!
+}

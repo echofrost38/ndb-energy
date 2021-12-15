@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.Notification;
 import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
@@ -102,11 +101,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 		// send notification
 		System.out.println("Auction Started, Please send me as Notification!");
 		
-		notificationService.broadcast(
-			Notification.N_AUCTION_START, 
-			"Auction Started", 
-			"Auction Started please bid!"
-		);
+		notificationService.broadcast(1, "Auction", "Auction Started!");
 		
 		return nextRound;
 	}
@@ -121,11 +116,7 @@ public class AuctionService extends BaseService implements IAuctionService {
 		auctionDao.endAuction(target);
 
 		// send notification
-		notificationService.broadcast(
-			Notification.N_AUCTION_END, 
-			"Auction Finished", 
-			"Please check you bid results"
-		);
+		notificationService.broadcast(2, "Auction", "Auction Finished!");
 
 		return target;
 	}

@@ -17,6 +17,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,6 +27,12 @@ import reactor.core.publisher.Mono;
 @Service
 public class DirectSaleService extends BaseService {
     
+    @Value("${stripe.secret.key}")
+	private String stripeSecretKey;
+
+	@Value("${stripe.public.key}")
+	private String stripePublicKey;
+
     private WebClient coinbaseAPI;
 
     public DirectSaleService(WebClient.Builder webClientBuilder) {

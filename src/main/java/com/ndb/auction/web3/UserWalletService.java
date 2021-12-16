@@ -9,8 +9,6 @@ import com.ndb.auction.contracts.UserWallet;
 import com.ndb.auction.models.user.Wallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -20,21 +18,12 @@ import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tuples.generated.Tuple3;
 
 @Service
-public class UserWalletService implements EnvironmentAware {
+public class UserWalletService {
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.rpcServer = environment.getProperty("RPC_SERVER");
-        this.password = environment.getProperty("WALLET_SECRET");
-        this.contractAddress = environment.getProperty("INTERNAL_WALLET");
-        this.web3j = Web3j.build(new HttpService(this.rpcServer));
-    }
-
-    private Web3j web3j;
+    private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
     // private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
-    private String rpcServer;
-    private String password;
-    private String contractAddress;
+    private final String password = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
+    private final String contractAddress = "0x736680D21e2B0C63813FEBc4432891579C28EEe8";
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  

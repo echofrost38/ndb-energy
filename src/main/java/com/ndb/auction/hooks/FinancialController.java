@@ -19,8 +19,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.StripeObject;
 import com.stripe.net.Webhook;
 
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,13 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
-public class FinancialController extends BaseController implements EnvironmentAware{
+public class FinancialController extends BaseController {
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        this.stripeWebhookKey = environment.getProperty("STRIPE_WEBHOOK_KEY");
-    }
-
+    @Value("${stripe.webhook.key}")
     private String stripeWebhookKey;
 
     @PostMapping("/stripe/direct")

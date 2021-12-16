@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.twilio.Twilio;
@@ -18,19 +17,18 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 @Service
-public class SMSService implements EnvironmentAware {
+public class SMSService {
 	
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.sid = environment.getProperty("TWILIO_SID");
-		this.token = environment.getProperty("TWILIO_TOKEN");
-		this.phone = environment.getProperty("TWILIO_PHONE");
-	}
+	@Value("${twilio.sid}")
+	private String sid;
+
+	@Value("${twilio.token}")
+	private String token;
+	
+	@Value("${twilio.phone}")
+	private String phone;
 
 	private static final String TEMPLATE = "2faSMS.ftlh";
-	private String sid;
-	private String token;
-	private String phone;
 	
 	private final Configuration configuration;
 	

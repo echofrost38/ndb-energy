@@ -6,8 +6,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,14 +25,9 @@ import com.ndb.auction.service.SumsubService;
 
 @RestController
 @RequestMapping("/")
-public class SumsubController extends BaseController implements EnvironmentAware {
-	
+public class SumsubController extends BaseController {
 
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.SECRET = environment.getProperty("sumsub.webhook.secret");
-	}
-
+	@Value("{sumsub.webhook.secret}")
 	private String SECRET;
 	
 	@PostMapping("/sumsub")

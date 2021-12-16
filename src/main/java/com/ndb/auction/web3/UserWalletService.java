@@ -19,7 +19,6 @@ import org.web3j.tuples.generated.Tuple3;
 
 @Service
 public class UserWalletService {
-
     private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
     // private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
     private final String password = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
@@ -194,5 +193,4 @@ public class UserWalletService {
         }
         return userWallet;
     }
-
 }

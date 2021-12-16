@@ -25,8 +25,8 @@ import com.ndb.auction.service.SumsubService;
 
 @RestController
 @RequestMapping("/")
-public class SumsubController extends BaseController {
-
+public class SumsubController extends BaseController{
+	
 	@Value("{sumsub.webhook.secret}")
 	private String SECRET;
 	
@@ -93,5 +93,4 @@ public class SumsubController extends BaseController {
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
 }

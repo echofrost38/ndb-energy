@@ -5,8 +5,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -15,18 +13,12 @@ import com.ndb.auction.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 
 @Component
-public class JwtUtils implements EnvironmentAware {
+public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
-	@Override
-	public void setEnvironment(Environment environment) {
-		this.jwtSecret = environment.getProperty("app.jwt.secret");
-		this.jwtExpirationMs = Integer.valueOf(environment.getProperty("app.jwt.expire"));
-	}
-
+	
 	@Value("${app.jwtSecret}")
 	private String jwtSecret;
-
+	
 	@Value("${app.jwtExpirationMs}")
 	private int jwtExpirationMs;
 	
@@ -63,5 +55,4 @@ public class JwtUtils implements EnvironmentAware {
 
 		return false;
 	}
-
 }

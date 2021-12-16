@@ -20,10 +20,10 @@ public class StripeService extends BaseService {
 	
 	@Value("${stripe.secret.key}")
 	private String stripeSecretKey;
-
+	
 	@Value("${stripe.public.key}")
 	private String stripePublicKey;
-
+	
 	@Autowired 
 	private BidService bidService;
 	

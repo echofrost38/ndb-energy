@@ -18,6 +18,7 @@ public class IPChecking extends BaseService {
 	
 	@Value("${free.geolocation.apikey}")
 	private String apiKey;
+
 	private WebClient ipGeolocation;
 	
 	public IPChecking(WebClient.Builder webClientBuilder) {

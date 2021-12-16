@@ -19,13 +19,16 @@ import freemarker.template.TemplateException;
 @Service
 public class SMSService {
 	
-	private static final String TEMPLATE = "2faSMS.ftlh";
-	
 	@Value("${twilio.sid}")
 	private String sid;
-	
+
 	@Value("${twilio.token}")
 	private String token;
+	
+	@Value("${twilio.phone}")
+	private String phone;
+
+	private static final String TEMPLATE = "2faSMS.ftlh";
 	
 	private final Configuration configuration;
 	
@@ -39,7 +42,7 @@ public class SMSService {
 		String smsContent = getSMSContent(code, TEMPLATE);
 		Message message = Message.creator(
 				new PhoneNumber(phone),
-		        new PhoneNumber("+14159414656"), 
+		        new PhoneNumber(this.phone), 
 		        smsContent)
 			.create();
 		return message.getStatus().toString();
@@ -65,9 +68,10 @@ public class SMSService {
 		Twilio.init(sid, token);
 		Message message = Message.creator(
 				new PhoneNumber(phone),
-		        new PhoneNumber("+14159414656"), 
+		        new PhoneNumber(this.phone), 
 		        smsContent)
 			.create();
 		return message.getStatus().toString();
 	}
+
 }

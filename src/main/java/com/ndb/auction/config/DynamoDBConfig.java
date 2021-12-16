@@ -21,11 +21,11 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 public class DynamoDBConfig {
 	
 	private static final String REAL = "real";
-	
+
 	@Value("${mode}")
 	private String mode;
-	
-	@Value("${aws.accessKey}")
+
+    @Value("${aws.accessKey}")
     private String awsAccessKey;
 
     @Value("${aws.secretKey}")
@@ -60,4 +60,5 @@ public class DynamoDBConfig {
     public AWSCredentials amazonAWSCredentials() {
         return new BasicAWSCredentials(awsAccessKey, awsSecretKey);
     }
+
 }

@@ -27,13 +27,13 @@ import reactor.core.publisher.Mono;
 @Service
 public class DirectSaleService extends BaseService {
     
-    private WebClient coinbaseAPI;
-
-	@Value("${stripe.secret.key}")
+    @Value("${stripe.secret.key}")
 	private String stripeSecretKey;
-	
+
 	@Value("${stripe.public.key}")
 	private String stripePublicKey;
+
+    private WebClient coinbaseAPI;
 
     public DirectSaleService(WebClient.Builder webClientBuilder) {
         this.coinbaseAPI = webClientBuilder

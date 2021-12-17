@@ -1,5 +1,6 @@
 package com.ndb.auction.hooks;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,11 +8,15 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.ndb.auction.models.DirectSale;
+import com.ndb.auction.models.TaskSetting;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.UserTier;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
+import com.ndb.auction.models.tier.TierTask;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
@@ -76,7 +81,9 @@ public class FinancialController extends BaseController {
             Long received = paymentIntent.getAmountReceived();
             DirectSale directSale = directSaleService.getDirectSaleByPayment(paymentIntent.getId());
             double amount = directSale.getNdbAmount() * directSale.getNdbPrice();
-            Long lAmount = Double.valueOf(amount).longValue();
+
+            // decimals
+            Long lAmount = Double.valueOf(amount * 100).longValue();
             if(received < lAmount) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -94,6 +101,9 @@ public class FinancialController extends BaseController {
             } else {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);    
             }
+
+            // User Tier!!
+            addDirectSalePoints(directSale.getUserId(), amount);
 
             break;
         }
@@ -156,6 +166,9 @@ public class FinancialController extends BaseController {
                 tx.setCryptoAmount(Double.valueOf(cryptoPricing.getAmount()));
                 directSaleService.updateDirectSale(tx);
 
+                // update Tier Setting!!!!
+                addDirectSalePoints(tx.getUserId(), payAmount);
+
                 // Real moving of NDB
                 if(tx.getWhereTo() == DirectSale.INTERNAL) {
                     // add free ndb into ndb wallet
@@ -171,5 +184,29 @@ public class FinancialController extends BaseController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    private void addDirectSalePoints(String userId, double amount) {
+		TierTask tierTask = tierService.getTierTask(userId);
+		TaskSetting taskSetting = tierService.getTaskSetting();
+		List<UserTier> tiers = tierService.getUserTiers();
+
+        double prevDirect = tierTask.getDirect();
+        tierTask.setDirect(prevDirect + amount);
+
+		User user = userService.getUserById(userId);
+		
+		double points = user.getTierPoints();
+		points += (taskSetting.getDirect() * amount);
+		double _points = points;
+		for (UserTier tier : tiers) {
+			if(tier.getPoints() >= points && tier.getPoints() > _points) {
+				_points = tier.getPoints();
+				user.setTierLvl(tier.getLevel());
+			}
+		}
+		user.setTierPoints(points);
+		tierService.updateTierTask(tierTask);
+		userService.updateUser(user);
+	}
 
 }

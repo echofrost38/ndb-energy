@@ -64,4 +64,8 @@ public class TierDao extends BaseDao {
 		dynamoDBMapper.save(tierTask, updateConfig);
 		return tierTask;
 	}
+
+	public TierTask getTierTask(String userId) {
+		return dynamoDBMapper.load(TierTask.class, userId);
+	}
 }

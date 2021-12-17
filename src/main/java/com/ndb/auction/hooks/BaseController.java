@@ -18,6 +18,7 @@ import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.SumsubService;
+import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.UserService;
 import com.ndb.auction.web3.UserWalletService;
 
@@ -48,6 +49,9 @@ public class BaseController {
 
     @Autowired
     UserWalletService userWalletService;
+
+    @Autowired 
+    TierService tierService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

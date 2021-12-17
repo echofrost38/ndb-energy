@@ -5,6 +5,7 @@ import java.util.List;
 import com.ndb.auction.dao.TierDao;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.UserTier;
+import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,5 +73,18 @@ public class TierService {
 			fillTaskSetting();
 		}
 		return this.taskSetting;
+	}
+
+	// Tier Task
+	public TierTask createNewTierTask(TierTask tierTask) {
+		return tierDao.createNewTask(tierTask);
+	}
+
+	public TierTask updateTierTask(TierTask tierTask) {
+		return tierDao.updateTierTask(tierTask);
+	}
+
+	public TierTask getTierTask(String userId) {
+		return tierDao.getTierTask(userId);
 	}
 }

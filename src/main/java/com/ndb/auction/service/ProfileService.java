@@ -123,7 +123,6 @@ public class ProfileService extends BaseService implements IProfileService {
 		String compId = "";
 		List<AvatarComponent> purchasedComponents = new ArrayList<AvatarComponent>();
 
-		
 		for (AvatarSet avatarSet : set) {
 			groupId = avatarSet.getGroupId();
 			compId = avatarSet.getCompId();

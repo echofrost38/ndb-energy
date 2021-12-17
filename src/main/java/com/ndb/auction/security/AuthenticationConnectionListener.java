@@ -83,11 +83,11 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
         User user = userDao.getUserById(userId);
         String phone = user.getMobile();
         String smsContent = "You are offline now!";
-        SecurityContextHolder.clearContext();
         
         // Send SMS about offline
         try {
-            smsService.sendNormalSMS(phone, smsContent);
+//            String result = 
+            		smsService.sendNormalSMS(phone, smsContent);
 //            log.info("SMS result {}", result);
         } catch (Exception e) {
 //            log.info("SMS Error {}", e);
@@ -96,7 +96,7 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
         // Send Mail about offline
         try {
 			mailService.sendNormalEmail(user, "You are offline from NDB", smsContent);
-		} catch (Exception e) {
+		} catch (MessagingException | IOException | TemplateException e) {
 //            log.info("SMS Error {}", e);
 		}
     }   

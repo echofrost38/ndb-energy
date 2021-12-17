@@ -3,6 +3,7 @@ package com.ndb.auction.hooks;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.User;
+import com.ndb.auction.models.UserTier;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.sumsub.ApplicantResponse;
 import com.ndb.auction.models.sumsub.Review;
+import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.payload.ReviewResult;
 import com.ndb.auction.payload.SumsubPayload;
 import com.ndb.auction.service.SumsubService;
@@ -82,7 +86,22 @@ public class SumsubController extends BaseController {
 				user.getSecurity().replace("AML", true);
 
 				// update user tasks!!
-				
+				List<UserTier> tierList = tierService.getUserTiers();
+				TaskSetting taskSetting = tierService.getTaskSetting();
+				TierTask tierTask = tierService.getTierTask(userId);
+				tierTask.setVerification(true);
+				double points = user.getTierPoints();
+				points += taskSetting.getVerification();
+				double _points = 0.0;
+				for (UserTier tier : tierList) {
+					if(tier.getPoints() >= points && tier.getPoints() >= _points) {
+						_points = tier.getPoints();
+						user.setTierLvl(tier.getLevel());
+					}
+				}
+				user.setTierPoints(points);
+				tierService.updateTierTask(tierTask);
+	
 			} else {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}

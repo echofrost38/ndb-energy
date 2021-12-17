@@ -16,7 +16,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class UserResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
-    @PreAuthorize("isAuthenticated")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public User getUser() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String id = userDetails.getId();

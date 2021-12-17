@@ -18,6 +18,7 @@ import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.User;
+import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.interfaces.IUserService;
 
 import freemarker.template.TemplateException;
@@ -48,6 +49,10 @@ public class UserService extends BaseService implements IUserService {
 
 			// create user wallet in contract!
 			userWalletService.addNewUser(user.getId(), email, "");
+
+			// create Tier Task
+			TierTask tierTask = new TierTask(user.getId());
+			tierService.createNewTierTask(tierTask);
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";

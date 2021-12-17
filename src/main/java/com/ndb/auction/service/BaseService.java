@@ -82,6 +82,4 @@ public class BaseService {
     @Autowired
     public GeoLocationDao geoLocationDao;
 
-    @Autowired
-    public TierService tierService;
 }

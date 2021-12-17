@@ -21,10 +21,7 @@ import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
-import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.User;
-import com.ndb.auction.models.UserTier;
-import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
 import com.ndb.auction.utils.Sort;
@@ -133,37 +130,14 @@ public class BidService extends BaseService implements IBidService {
 			bid.setHoldingList(holdingList);
 
 			bidDao.placeBid(bid);
+			
 			updateBidRanking(userId, roundId);
 			return bid;
 		}
-		
+
 		// save with pending status
 		bidDao.placeBid(bid);
 		return bid;
-	}
-
-	private void addAuctionPoints(String userId, int roundNumber) {
-		TierTask tierTask = tierService.getTierTask(userId);
-		TaskSetting taskSetting = tierService.getTaskSetting();
-		List<UserTier> tiers = tierService.getUserTiers();
-
-		if(tierTask.getAuctions().contains(roundNumber)) {
-			return;
-		}
-		User user = userDao.getUserById(userId);
-		tierTask.getAuctions().add(roundNumber);
-		double points = user.getTierPoints();
-		points += taskSetting.getAuction();
-		double _points = points;
-		for (UserTier tier : tiers) {
-			if(tier.getPoints() >= points && tier.getPoints() > _points) {
-				_points = tier.getPoints();
-				user.setTierLvl(tier.getLevel());
-			}
-		}
-		user.setTierPoints(points);
-		tierService.updateTierTask(tierTask);
-		userDao.updateUser(user);
 	}
 
 	@Override
@@ -221,8 +195,6 @@ public class BidService extends BaseService implements IBidService {
 		
 		Auction currentRound = auctionDao.getAuctionById(roundId);
 		
-		addAuctionPoints(userId, currentRound.getNumber());
-
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);

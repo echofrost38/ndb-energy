@@ -88,7 +88,9 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 
 	// select avatar by user
 	
+
 	// purchase by user
+	
 	
 	// 
 }

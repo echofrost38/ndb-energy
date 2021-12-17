@@ -26,7 +26,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import graphql.kickstart.execution.subscriptions.SubscriptionSession;
 import graphql.kickstart.execution.subscriptions.apollo.ApolloSubscriptionConnectionListener;
 import graphql.kickstart.execution.subscriptions.apollo.OperationMessage;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class AuthenticationConnectionListener implements ApolloSubscriptionConnectionListener {
 
@@ -49,14 +51,14 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
 
     @Override
     public void onConnect(SubscriptionSession session, OperationMessage message) {
-//        log.info("onConnect with payload {}", message.getPayload());
+        log.info("onConnect with payload {}", message.getPayload());
 
 		@SuppressWarnings("unchecked")
 		var payload = (Map<String, String>) message.getPayload();
 
         // Get the JWT, perform authentication / rejection
         var jwt = payload.get("Authorization").substring(7);
-//        log.info("payload : {}", jwt);
+        log.info("payload : {}", jwt);
 
         String email = jwtUtils.getEmailFromJwtToken(jwt);
 
@@ -68,14 +70,14 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
 
     @Override
     public void onStart(SubscriptionSession session, OperationMessage message) {
-        // log.info("onStart with payload {}", message.getPayload());
+        log.info("onStart with payload {}", message.getPayload());
         var authentication = (Authentication) session.getUserProperties().get(AUTHENTICATION);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override
     public void onStop(SubscriptionSession session, OperationMessage message) {
-        // log.info("onStop with payload {}", message.getPayload());
+        log.info("onStop with payload {}", message.getPayload());
 
         PreAuthenticatedAuthenticationToken token = (PreAuthenticatedAuthenticationToken)session.getUserProperties().get(AUTHENTICATION);
         UserDetailsImpl userDetails = (UserDetailsImpl)token.getPrincipal();
@@ -88,21 +90,20 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
         // Send SMS about offline
         try {
             smsService.sendNormalSMS(phone, smsContent);
-//            log.info("SMS result {}", result);
         } catch (Exception e) {
-//            log.info("SMS Error {}", e);
+            log.info("SMS Error {}", e);
         }
 
         // Send Mail about offline
         try {
 			mailService.sendNormalEmail(user, "You are offline from NDB", smsContent);
 		} catch (Exception e) {
-//            log.info("SMS Error {}", e);
+            log.info("SMS Error {}", e);
 		}
     }   
 
     @Override
     public void onTerminate(SubscriptionSession session, OperationMessage message) {
-        // log.info("onTerminate with payload {}", message.getPayload());
+        log.info("onTerminate with payload {}", message.getPayload());
     }
 }

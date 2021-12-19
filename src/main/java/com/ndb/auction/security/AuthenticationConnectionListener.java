@@ -3,12 +3,7 @@ package com.ndb.auction.security;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import freemarker.template.TemplateException;
-
-import java.io.IOException;
 import java.util.Map;
-
-import javax.mail.MessagingException;
 
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.models.User;

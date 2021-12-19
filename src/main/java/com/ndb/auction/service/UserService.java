@@ -260,6 +260,17 @@ public class UserService extends BaseService implements IUserService {
 		return userDao.updateUser(user);
 	}
 
+	public int getUserCount() {
+		return userDao.getUserCount();
+	}
+
+	public List<User> getPaginatedUser(String key, int limit) {
+		if(key == null) {
+			return userDao.getFirstPageOfUser(limit);
+		}
+		return userDao.getPaginatedUser(key, limit);
+	}
+
 	///////////////////////// Geo Location /////////
 	public GeoLocation addDisallowed(String countryCode) {
 		return geoLocationDao.addDisallowedCountry(countryCode);

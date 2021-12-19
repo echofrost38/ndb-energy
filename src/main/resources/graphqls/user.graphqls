@@ -1,5 +1,10 @@
 extend type Query {
 	getUser : User
+    getUserCount : Int
+    getPaginatedUsers(
+        key: String,
+        limit: Int!
+    ) : [User]
 }
 
 extend type Mutation {

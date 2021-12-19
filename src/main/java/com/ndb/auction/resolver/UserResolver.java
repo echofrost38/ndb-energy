@@ -77,6 +77,18 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.changeRole(email, role);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public int getUserCount() {
+        return userService.getUserCount();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<User> getPaginatedUsers(String key, int limit) {
+        return userService.getPaginatedUser(key, limit);
+    }
+
+    
+
 //    @PreAuthorize("isAuthenticated")
 //    public String setAvatar(String prefix, String name) {
 //        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.Select;
 import com.ndb.auction.models.User;
 
 @Repository
@@ -49,6 +50,29 @@ public class UserDao extends BaseDao implements IUserDao {
 	@Override
 	public List<User> getUserList() {
 		return dynamoDBMapper.scan(User.class, new DynamoDBScanExpression());
+	}
+
+	public int getUserCount() {
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+		scanExpression.setSelect(Select.COUNT);
+		return dynamoDBMapper.count(User.class, scanExpression);
+	}
+
+	public List<User> getFirstPageOfUser(int limit) {
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+			.withLimit(limit);
+		return dynamoDBMapper.scanPage(User.class, scanExpression).getResults();
+	}
+
+	public List<User> getPaginatedUser(String exclusiveKey, int limit) {		
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put("id", new AttributeValue().withS(exclusiveKey));
+
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+			.withExclusiveStartKey(eav)
+			.withLimit(limit);
+
+		return dynamoDBMapper.scanPage(User.class, scanExpression).getResults();		
 	}
 
 	@Override

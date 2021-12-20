@@ -1,5 +1,5 @@
 type Subscription {
-    notifications : Notification
+    notifications: Notification
 }
 
 type Query {

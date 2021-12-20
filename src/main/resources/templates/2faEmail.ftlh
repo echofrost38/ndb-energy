@@ -11,7 +11,7 @@
 	<br/>
 	<div>Please verify your account with 2FA code.</div>
 	<div>
-		<h4>2 Factor Authentication Code : <span style="color: yellow;">${code}</span></h4>
+		<h4>2 Factor Authentication Code : <span style="color: black;">${code}</span></h4>
 	</div>
 </body>
 </html>

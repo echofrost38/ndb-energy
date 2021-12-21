@@ -89,4 +89,6 @@ app:
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
       - https://ndbsale.gatsbyjs.io/oauth2/signin   
-      - https://ndbsale.gatsbyjs.io/oauth2/signup         
+      - https://ndbsale.gatsbyjs.io/oauth2/signup    
+      - https://sale.ndb.money/oauth2/signin   
+      - https://sale.ndb.money/oauth2/signup     

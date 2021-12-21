@@ -34,7 +34,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
             .authorizationUri(r.getAuthorizationUri())
             .tokenUri(r.getTokenUri())
             .userInfoUri(r.getUserInfoUri())
-            .userNameAttributeName("sub")
+            .userNameAttributeName(r.getUserNameAttributeName())
             .jwkSetUri(r.getJwkSetUri())
             .clientName(r.getClientName())
             .build();

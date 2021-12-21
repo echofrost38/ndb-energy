@@ -17,22 +17,23 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.util.Optional;
+
+import javax.mail.MessagingException;
 
 @Slf4j
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    public final static String RANDOM_PASSWORD = "randomPassword.ftlh";
+    public final static String VERIFY_TEMPLATE = "verify.ftlh";
 
     @Autowired
     private UserDao userDao;
     
-    @Autowired
-    private UserService userService;
-
     @Autowired
     public TotpService totpService;
 
@@ -81,30 +82,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         User user = new User();
 
-        String provider = oAuth2UserRequest.getClientRegistration().getRegistrationId();
-        user.setProvider(AuthProvider.valueOf(provider));
+        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         user.setProviderId(oAuth2UserInfo.getId());
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setCountry(oAuth2UserInfo.getLocale());
-        user.getVerify().replace("email", true);
-        String rPassword = userService.getRandomPassword(10);
-        user.setPassword(rPassword);
-
-        // send Random Password to user
-        try {
-			mailService.sendVerifyEmail(user, user.getPassword(), RANDOM_PASSWORD);
-		} catch (Exception e) {
-			
-		}	
         // user.setImageUrl(oAuth2UserInfo.getImageUrl());
         return userDao.createUser(user);
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
         existingUser.setName(oAuth2UserInfo.getName());
-        existingUser.getVerify().replace("email", true);
         // existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
         return userDao.createUser(existingUser);
     }
+
+    @SuppressWarnings("unused")
+	private boolean sendEmailCode(User user) {
+		String code = totpService.getVerifyCode(user.getEmail());
+		try {
+			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);
+		} catch (MessagingException | IOException | TemplateException e) {
+			return false; // or exception
+		}	
+		return true;
+	}
 }

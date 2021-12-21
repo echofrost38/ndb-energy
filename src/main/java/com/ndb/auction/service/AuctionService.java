@@ -62,6 +62,10 @@ public class AuctionService extends BaseService implements IAuctionService {
 		return auctionDao.getAuctionById(id);
 	}
 
+	public Auction getAuctionByRound(int round) {
+		return auctionDao.getAuctionByRound(round);
+	}
+
 	@Override
 	public Auction updateAuctionByAdmin(Auction auction) {
 				

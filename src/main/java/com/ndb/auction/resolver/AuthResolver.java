@@ -72,15 +72,15 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 		try{
 			user = userService.getUserByEmail(email);
 		} catch(UserNotFoundException e) {
-			return new Credentials("Failed", "You are not registered");
+			return new Credentials("Failed", "Unregistered User");
 		}
 		
 		if(!encoder.matches(password, user.getPassword())) {
-			return new Credentials("Failed", "Your email and password do not match!");
+			return new Credentials("Failed", "password mismatch");
 		}
 		
 		if(!user.getVerify().get("email")) {
-			return new Credentials("Failed", "Please verify your email");
+			return new Credentials("Failed", "please verify");
 		}
 		
 		if(!user.getSecurity().get("2FA")) {

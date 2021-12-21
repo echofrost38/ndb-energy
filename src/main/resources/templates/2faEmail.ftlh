@@ -79,7 +79,7 @@
     </div>
     <footer>
         <p>© 2021 Voltamond SA. All rights reserved.</p>
-        <p>Ndb.money Info@ndb.technology +1 (650) 252 - 0002</p>
+        <p>Ndb.money   +41 (275) 083 211</p>
     </footer>
 </body>
 

@@ -30,7 +30,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		return auctionService.createNewAuction(auction);
 	}
 	
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public List<Auction> getAuctions() {
 		return auctionService.getAuctionList();
 	}
@@ -39,8 +39,13 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	public Auction getAuctionByNumber(int round) {
 		return auctionService.getAuctionByRound(round);
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	public List<Auction> getAuctionByStatus(int status) {
+		return auctionService.getAuctionByStatus(status);
+	}
 	
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("isAuthenticated()")
 	public Auction getAuctionById(String id) {
 		return auctionService.getAuctionById(id);
 	}

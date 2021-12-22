@@ -133,9 +133,9 @@ public class TotpService {
 	
     public String getUriForImage(String secret, String email) {
         QrData data = new QrData.Builder()
-                .label("NDB: https://sale.ndb.money")
+                .label(email)
                 .secret(secret)
-                .issuer(email)
+                .issuer("sale.ndb.money")
                 .algorithm(HashingAlgorithm.SHA1)
                 .digits(6)
                 .period(30)

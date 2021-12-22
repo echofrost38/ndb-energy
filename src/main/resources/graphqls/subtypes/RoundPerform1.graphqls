@@ -1,0 +1,5 @@
+type RoundPerform1 {
+    roundNumber: Int!,
+    tokenPrice: Float!,
+    soldAmount: Float!
+}

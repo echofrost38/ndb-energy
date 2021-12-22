@@ -2,7 +2,6 @@ package com.ndb.auction.resolver;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;

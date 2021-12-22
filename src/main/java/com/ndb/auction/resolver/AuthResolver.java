@@ -90,17 +90,13 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 			return new Credentials("Failed", "2FA Error");
 		}
 		
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(email, password));
-				
-		totpService.setTokenAuthCache(token, authentication);
-
+		totpService.setToken(token, password);
 		return new Credentials("Success", token);
 	}
 	
 	public Credentials confirm2FA(String email, String token, String code) {
-		Authentication authentication = totpService.getAuthfromToken(token);
-		if(authentication == null) {
+		String password = totpService.getPassword(token);
+		if(password.equals("")) {
 			return new Credentials("Failed", "Password expired");
 		}
 		
@@ -108,8 +104,10 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 			return new Credentials("Failed", "2FA code mismatch");
 		}
 		
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(email, password));
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
 		String jwt = jwtUtils.generateJwtToken(authentication);
 
 //		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();

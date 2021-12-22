@@ -2,17 +2,19 @@ package com.ndb.auction.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ndb.auction.models.User;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements OAuth2User, UserDetails {
 
 	private static final long serialVersionUID = 5558252995866998438L;
 	
@@ -24,6 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 	private String password;
 	
 	private Collection<? extends GrantedAuthority> authorities;
+	private Map<String, Object> attributes;
 	
 	public UserDetailsImpl(
 			String id, 
@@ -52,7 +55,13 @@ public class UserDetailsImpl implements UserDetails {
 				user.getPassword(), 
 				authorities);
 	}
-	
+
+	public static UserDetailsImpl build(User user, Map<String, Object> attributes) {
+        UserDetailsImpl userPrincipal = UserDetailsImpl.build(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
+    }
+
 	public String getId() {
 		return id;
 	}
@@ -104,6 +113,20 @@ public class UserDetailsImpl implements UserDetails {
 			return false;
 		UserDetailsImpl user = (UserDetailsImpl) o;
 		return Objects.equals(id, user.id);
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+	@Override
+	public String getName() {
+		return String.valueOf(id);
 	}
 
 }

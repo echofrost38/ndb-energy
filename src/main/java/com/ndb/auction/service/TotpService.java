@@ -1,5 +1,6 @@
 package com.ndb.auction.service;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.google.common.cache.CacheBuilder;
@@ -33,7 +34,7 @@ public class TotpService {
 
 	 private LoadingCache<String, String> otpCache;
 	 private LoadingCache<String, String> _2FACache;
-	 private LoadingCache<String, String> tokenCache;
+	 private LoadingCache<String, Authentication> tokenCache;
 	 
 	 public TotpService() {
 		 otpCache = CacheBuilder.newBuilder().
@@ -50,28 +51,28 @@ public class TotpService {
 				 });
 		 
 		 tokenCache = CacheBuilder.newBuilder().
-				 expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, String>() {
-					 public String load(String key) {
-						 return "";
+				 expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, Authentication>() {
+					 public Authentication load(String key) {
+						 return null;
 					 }
 				 });
 	 }
 	 
-	 public void setToken(String token, String password) {
-		 tokenCache.put(token, password);
-	 }
+
+	public void setTokenAuthCache(String token, Authentication auth) {
+		tokenCache.put(token, auth);
+	}
 	 
-	 // Get password with UUID token
-	 public String getPassword(String token) {
-		 String pass;
-		 try {
-			pass = tokenCache.get(token);
+	public Authentication getAuthfromToken(String token) {
+		Authentication auth;
+		try {
+			auth = tokenCache.get(token);
 			tokenCache.invalidate(token);
-			return pass;
-		 } catch (ExecutionException e) {
-			return "";
-		 }
-	 }
+			return auth;
+		} catch (ExecutionException e) {
+			return null;
+		}
+	}
 	 
 	 public String getVerifyCode(String key) {
 		 String code = generateOTP(key);

@@ -4,7 +4,6 @@ import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.exceptions.OAuth2AuthenticationProcessingException;
 import com.ndb.auction.models.user.AuthProvider;
 import com.ndb.auction.models.User;
-import com.ndb.auction.security.UserPrincipal;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfo;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
 
-        return UserPrincipal.create(user, oAuth2User.getAttributes());
+        return UserDetailsImpl.build(user, oAuth2User.getAttributes());
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {

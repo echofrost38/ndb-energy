@@ -40,7 +40,7 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 	
 	@Override
 	public Auction getAuctionByRound(Integer round) {
-		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		Map<String, AttributeValue> eav = new HashMap<>();
         eav.put(":val1", new AttributeValue().withN(round.toString()));
 
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
@@ -83,7 +83,7 @@ public class AuctionDao extends BaseDao implements IAuctionDao {
 
 	@Override
 	public List<Auction> getAuctionByStatus(Integer status) {
-		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		Map<String, AttributeValue> eav = new HashMap<>();
 		eav.put(":val1", new AttributeValue().withN(status.toString()));
 
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()

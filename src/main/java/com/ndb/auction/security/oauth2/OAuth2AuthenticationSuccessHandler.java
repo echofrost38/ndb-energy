@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
@@ -68,7 +67,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String token = tokenProvider.createToken(authentication);
 
         // Save token on cache
-        totpService.setToken(token, UUID.randomUUID().toString());
+        totpService.setTokenAuthCache(token, authentication);
         
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)

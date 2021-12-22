@@ -94,7 +94,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // send Random Password to user
         try {
-			mailService.sendVerifyEmail(user, user.getPassword(), RANDOM_PASSWORD);
+			mailService.sendVerifyEmail(user, rPassword, RANDOM_PASSWORD);
 		} catch (Exception e) {
 			
 		}	

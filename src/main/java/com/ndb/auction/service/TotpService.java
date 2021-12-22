@@ -131,11 +131,11 @@ public class TotpService {
         return generator.generate();
     }
 	
-    public String getUriForImage(String secret) {
+    public String getUriForImage(String secret, String email) {
         QrData data = new QrData.Builder()
-                .label("Two-factor-auth-test")
+                .label("NDB: https://sale.ndb.money")
                 .secret(secret)
-                .issuer("exampleTwoFactor")
+                .issuer(email)
                 .algorithm(HashingAlgorithm.SHA1)
                 .digits(6)
                 .period(30)

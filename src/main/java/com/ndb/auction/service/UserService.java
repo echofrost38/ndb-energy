@@ -110,7 +110,7 @@ public class UserService extends BaseService implements IUserService {
 			String secret = totpService.generateSecret();
 			user.setGoogleSecret(secret);
 			userDao.updateUser(user);
-			String qrUri = totpService.getUriForImage(secret);
+			String qrUri = totpService.getUriForImage(secret, user.getEmail());
 			return qrUri;
 		case "phone":
 			try {

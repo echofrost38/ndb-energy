@@ -35,11 +35,11 @@ public class AvatarDao extends BaseDao implements IAvatarDao {
 
 	@Override
 	public List<AvatarComponent> getAvatarComponentsByGid(String groupId) {
-		Map<String, AttributeValue> eav = new HashMap<>();
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		eav.put(":v1", new AttributeValue().withS(groupId));
 		DynamoDBQueryExpression<AvatarComponent> queryExpression = new DynamoDBQueryExpression<AvatarComponent>()
-				.withKeyConditionExpression("group_id = :v1")
-				.withExpressionAttributeValues(eav);
+		    .withKeyConditionExpression("group_id = :v1")
+		    .withExpressionAttributeValues(eav);
 		return dynamoDBMapper.query(AvatarComponent.class, queryExpression);
 	}
 
@@ -78,35 +78,35 @@ public class AvatarDao extends BaseDao implements IAvatarDao {
 
 	@Override
 	public AvatarProfile getAvatarProfileByName(String prefix) {
-		Map<String, AttributeValue> eav = new HashMap<>();
-		eav.put(":val1", new AttributeValue().withS(prefix));
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+        eav.put(":val1", new AttributeValue().withS(prefix));
+        
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+            .withFilterExpression("fname = :val1")
+            .withExpressionAttributeValues(eav);
 
-		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-				.withFilterExpression("fname = :val1")
-				.withExpressionAttributeValues(eav);
-
-		List<AvatarProfile> list = dynamoDBMapper.scan(AvatarProfile.class, scanExpression);
-		if (list.isEmpty())
+        List<AvatarProfile> list = dynamoDBMapper.scan(AvatarProfile.class, scanExpression);
+		if(list.size() == 0)
 			return null;
 		return list.get(0);
 	}
 
 	@Override
 	public List<AvatarComponent> updateAvatarComponents(List<AvatarComponent> components) {
-		dynamoDBMapper.batchWrite(components, new ArrayList<>(), updateConfig);
+		dynamoDBMapper.batchWrite(components, new ArrayList<AvatarComponent>(), updateConfig);
 		return components;
 	}
 
 	@Override
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
-		List<AvatarComponent> list = new ArrayList<>();
-
+		List<AvatarComponent> list = new ArrayList<AvatarComponent>();
+		
 		for (AvatarSet field : set) {
 			String groupId = field.getGroupId();
 			String compId = field.getCompId();
 			list.add(getAvatarComponent(groupId, compId));
 		}
-
+		
 		return list;
 	}
 

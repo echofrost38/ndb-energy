@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -28,6 +29,9 @@ public class UserService extends BaseService implements IUserService {
 
 	@Autowired
 	CryptoService cryptoService;
+  
+	@Autowired
+	PasswordEncoder encoder;
 
 	@Override
 	public String createUser(String email, String password, String country, Boolean tos) {
@@ -43,7 +47,7 @@ public class UserService extends BaseService implements IUserService {
 				return "Already exists, sent verify code";
 			}
 		} else {
-			user = new User(email, password, country, tos);			
+			user = new User(email, encoder.encode(password), country, tos);			
 			userDao.createUser(user);
 			user = userDao.getUserByEmail(email).get();
 
@@ -219,7 +223,7 @@ public class UserService extends BaseService implements IUserService {
 
 		if(totpService.check2FACode(email, code)) {
 			User user = getUserByEmail(email);
-			user.setPassword(newPass);
+			user.setPassword(encoder.encode(newPass));
 			
 			userDao.updateUser(user);
 		} else {
@@ -282,6 +286,14 @@ public class UserService extends BaseService implements IUserService {
 
 	public GeoLocation makeAllow(String countryCode) {
 		return geoLocationDao.makeAllow(countryCode);
+	}
+
+	public String encodePassword(String pass) {
+		return encoder.encode(pass);
+	}
+
+	public boolean checkMatchPassword(String pass, String encPass) {
+		return encoder.matches(pass, encPass);
 	}
 
 	///////////////////// user operation ///////////

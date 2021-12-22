@@ -41,7 +41,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String resetPassword(String email) {
         String rPassword = userService.getRandomPassword(10);
-        String encoded = encoder.encode(rPassword);
+        String encoded = userService.encodePassword(rPassword);
         User user = userService.getUserByEmail(email);
         user.setPassword(encoded);
         return userService.resetPassword(user, rPassword);
@@ -56,7 +56,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         }
 
         String rPassword = userService.getRandomPassword(10);
-        String encoded = encoder.encode(rPassword);
+        String encoded = userService.encodePassword(rPassword);
         user = new User(email, encoded, country, true);
 
         user.setAvatarPrefix(avatarName);

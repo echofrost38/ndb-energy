@@ -2,9 +2,6 @@ extend type Query {
 	checkRounds : String
 	getAuctions : [Auction]
 	getAuctionById(id: String!) : Auction!
-	getAuctionByNumber(
-		round: Int!
-	) : Auction
 }
 
 extend type Mutation {

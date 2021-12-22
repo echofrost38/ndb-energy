@@ -34,8 +34,6 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 		if(!ipChecking.isAllowed(ipAddress)) {
 			return "Not Allowed Location";
 		}
-		
-		password = encoder.encode(password);
 		return userService.createUser(email, password, country, true);
 	}
 	
@@ -72,15 +70,15 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 		try{
 			user = userService.getUserByEmail(email);
 		} catch(UserNotFoundException e) {
-			return new Credentials("Failed", "Unregistered User");
+			return new Credentials("Failed", "You are not registered");
 		}
 		
-		if(!encoder.matches(password, user.getPassword())) {
-			return new Credentials("Failed", "password mismatch");
+		if(!userService.checkMatchPassword(password, user.getPassword())) {
+			return new Credentials("Failed", "Your email and password do not match!");
 		}
 		
 		if(!user.getVerify().get("email")) {
-			return new Credentials("Failed", "please verify");
+			return new Credentials("Failed", "Please verify your email");
 		}
 		
 		if(!user.getSecurity().get("2FA")) {
@@ -128,7 +126,6 @@ public class AuthResolver extends BaseResolver implements GraphQLMutationResolve
 	}
 	
 	public String resetPassword(String email, String code, String newPassword) {
-		newPassword = encoder.encode(newPassword);
 		return userService.resetPassword(email, code, newPassword);
 	}
 

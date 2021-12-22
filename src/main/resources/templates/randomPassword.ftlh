@@ -71,9 +71,9 @@
         </svg>
     </header>
     <div class="container">
-        <div class="text">Greetings</div>
+        <div class="text">Welcome to signup NDB Auction</div>
         <br />
-        <div class="text">Please verify your account with 2FA code:</div>
+        <div class="text">Your NDB Auction password is:</div>
         <div class="number">${code}</div>
         <div>If this wasn’t you, please Ignore this message. </div>
     </div>

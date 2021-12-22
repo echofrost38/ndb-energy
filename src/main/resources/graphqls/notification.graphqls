@@ -1,5 +1,5 @@
 type Subscription {
-    notifications : Notification
+    notifications: Notification
 }
 
 type Query {
@@ -26,5 +26,6 @@ type Mutation {
 
 schema {
    query: Query,
-   mutation: Mutation
+   mutation: Mutation,
+   subscription: Subscription
 }

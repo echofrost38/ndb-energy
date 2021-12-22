@@ -29,10 +29,7 @@ public class BaseResolver {
     
     @Autowired
     BidService bidService;
-    
-	@Autowired
-	PasswordEncoder encoder;
-	
+  	
 	@Autowired
 	UserService userService;
 	

@@ -27,7 +27,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
-
+	
 	public UserDetailsImpl(
 			String id, 
 			String username, 
@@ -69,7 +69,6 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	public String getEmail() {
 		return email;
 	}
-
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -3,15 +3,10 @@ package com.ndb.auction.security.oauth2;
 import com.ndb.auction.config.AppProperties;
 import com.ndb.auction.security.TokenProvider;
 import com.ndb.auction.service.TotpService;
-import com.ndb.auction.service.UserDetailsImpl;
-import com.ndb.auction.service.UserService;
 import com.ndb.auction.exceptions.BadRequestException;
-import com.ndb.auction.models.User;
-import com.ndb.auction.models.user.AuthProvider;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,9 +26,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private TokenProvider tokenProvider;
 
     private AppProperties appProperties;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private TotpService totpService;
@@ -72,30 +64,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        String token = tokenProvider.createToken(authentication);
+
+        // Save token on cache
+        totpService.setTokenAuthCache(token, authentication);
         
-
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        String registrationId = oauthToken.getAuthorizedClientRegistrationId();
-
-        User user = userService.getUserByEmail(userPrincipal.getEmail());
-
-        String type = "token";
-        String data;
-
-        if(!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
-            type = "error";
-            data = "InvalidProvider." + user.getProvider();
-        } else if (!user.getSecurity().get("2FA")) {
-            type = "error";
-			data = "No2FA";
-		} else {
-            data = tokenProvider.createToken(userPrincipal);
-            // Save token on cache
-            totpService.setTokenAuthCache(data, authentication);
-        }
-
-        return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + data)
+        return UriComponentsBuilder.fromUriString(targetUrl + "/" + token)
                 // .queryParam("token", token)
                 .build().toUriString();
     }

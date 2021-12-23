@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.Notification2;
 
 @Repository
 public class NotificationDao extends BaseDao implements INotificationDao {
@@ -67,5 +68,45 @@ public class NotificationDao extends BaseDao implements INotificationDao {
     }
 
 	////////////////// version 2 ////////////////////////////////////////
-	
+	public Notification2 addNewNotification(Notification2 notification2) {
+		dynamoDBMapper.save(notification2);
+		return notification2;
+	}
+
+	public Notification2 setReadFlag(Notification2 notification2) {
+		notification2.setRead(true);
+		dynamoDBMapper.save(notification2, updateConfig);
+		return notification2;
+	}
+
+	public Notification2 getNotification2(String id, long timeStamp){
+		return dynamoDBMapper.load(Notification2.class, id, timeStamp);
+	}
+
+	public List<Notification2> getFirstNotificationsByUser(String userId) {
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":val1", new AttributeValue().withS(userId));
+		DynamoDBQueryExpression<Notification2> queryExpression = new DynamoDBQueryExpression<Notification2>()
+			.withKeyConditionExpression("user_id = :val1")
+			.withLimit(10)
+			.withExpressionAttributeValues(eav);
+		return dynamoDBMapper.queryPage(Notification2.class, queryExpression).getResults();
+	}
+
+	public List<Notification2> getMoreNotificationsByUser(String userId, long stamp) {
+		Map<String, AttributeValue> exclusiveKey = new HashMap<>();
+		exclusiveKey.put("user_id", new AttributeValue().withS(userId));
+		exclusiveKey.put("time_stamp", new AttributeValue().withN(Long.valueOf(stamp).toString()));
+
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":val1", new AttributeValue().withS(userId));
+
+		DynamoDBQueryExpression<Notification2> queryExpression = new DynamoDBQueryExpression<Notification2>()
+			.withExclusiveStartKey(exclusiveKey)
+			.withLimit(10)
+			.withKeyConditionExpression("user_id = :val")
+			.withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.queryPage(Notification2.class, queryExpression).getResults();
+	}
 }

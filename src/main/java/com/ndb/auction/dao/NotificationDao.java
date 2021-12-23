@@ -65,4 +65,7 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 
 		return dynamoDBMapper.scan(Notification.class, scanExpression);
     }
+
+	////////////////// version 2 ////////////////////////////////////////
+	
 }

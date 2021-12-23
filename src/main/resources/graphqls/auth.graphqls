@@ -1,4 +1,4 @@
-extend type Mutation {
+type Mutation {
 	signup(
 		email: String!,
 		password: String!,
@@ -82,7 +82,7 @@ extend type Mutation {
 	) : String
 }
 
-extend type Query {
+type Query {
 	getWalletById(
 		id: String!,
 		crypto: String!

@@ -3,13 +3,22 @@ package com.ndb.auction.security.oauth2;
 import com.ndb.auction.config.AppProperties;
 import com.ndb.auction.security.TokenProvider;
 import com.ndb.auction.service.TotpService;
+import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.service.UserService;
 import com.ndb.auction.exceptions.BadRequestException;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.AuthProvider;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -19,13 +28,16 @@ import java.net.URI;
 import java.util.Optional;
 
 import static com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-
+@Slf4j
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private TokenProvider tokenProvider;
 
     private AppProperties appProperties;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private TotpService totpService;
@@ -64,13 +76,33 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        String token = tokenProvider.createToken(authentication);
-
-        // Save token on cache
-        totpService.setTokenAuthCache(token, authentication);
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         
-        return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
+
+        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+        String registrationId = oauthToken.getAuthorizedClientRegistrationId();
+
+        User user = userService.getUserByEmail(userPrincipal.getEmail());
+
+        String type = "token";
+        String data;
+
+        
+        if(!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
+            type = "error";
+            data = "InvalidProvider." + user.getProvider();
+        } else if (!user.getSecurity().get("2FA")) {
+            type = "error";
+			data = "No2FA";
+		} else {
+            data = tokenProvider.createToken(userPrincipal);
+            // Save token on cache
+            totpService.setTokenAuthCache(data, authentication);
+        }
+        log.info("User: {}, Provider: {}, at: {}, data: {}", user.getEmail(), registrationId, LocalDateTime.now(), data);
+        
+        return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + data)
+                // .queryParam("token", token)
                 .build().toUriString();
     }
 

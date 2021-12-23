@@ -8,7 +8,9 @@ import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.NotificationTypeDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.Notification2;
 import com.ndb.auction.models.NotificationType;
+import com.ndb.auction.models.NotificationType2;
 import com.ndb.auction.models.User;
 
 import org.reactivestreams.Publisher;
@@ -21,7 +23,6 @@ import reactor.core.publisher.Sinks.EmitResult;
 @Component
 public class NotificationService {
 
-    
     final Sinks.Many<Notification> sink;
 
     @Autowired
@@ -147,4 +148,38 @@ public class NotificationService {
 		String userId = userDetails.getId();
         return notificationDao.getAllUnReadNotificationsByUser(userId);
     }
+
+    //////////////////////// version 2 ///////////////////////////
+    public Notification2 addNewNotification(String userId, int type, String title, String msg) {
+        Notification2 notification = new Notification2(userId, type, title, msg);
+        return notificationDao.addNewNotification(notification);
+    }
+
+    public List<Notification2> getPaginatedNotifications(String userId, Long stamp, int limit) {
+        if(stamp == null) {
+            return notificationDao.getFirstNotificationsByUser(userId, limit);
+        }
+        return notificationDao.getMoreNotificationsByUser(userId, stamp, limit);
+    }
+
+    public Notification2 setNotificationReadFlag(String userId, Long stamp) {
+        Notification2 notify = notificationDao.getNotification2(userId, stamp);
+        return notificationDao.setReadFlag(notify);
+    }
+
+    public List<Notification2> getUnreadNotification2s(String userId) {
+        return notificationDao.getUnreadNotifications(userId);
+    }
+
+    public NotificationType2 addNewNotificationType(int nType, String tName, boolean broadcast) {
+        NotificationType2 type2 = new NotificationType2(nType, tName, broadcast);
+        notificationTypeDao.addNewNotificationType(type2);
+        return type2;
+    }
+
+
+    public List<NotificationType2> getNotificationTypes() {
+        return notificationTypeDao.getNotificationTypes();
+    }
+
 }

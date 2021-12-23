@@ -17,7 +17,6 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
     @Autowired
     OAuth2RegistrationService oAuth2RegistrationService;
     
-    @SuppressWarnings("deprecation")
 	@Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         log.info(registrationId, "registrationId cannot be empty");
@@ -29,7 +28,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
             .clientSecret(r.getClientSecret())
             .clientAuthenticationMethod(new ClientAuthenticationMethod(r.getClientAuthenticationMethod()))
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .redirectUriTemplate("{baseUrl}/oauth2/callback/{registrationId}")
+            .redirectUri(r.getRedirectUriTemplate())
             .scope(r.getScope())
             .authorizationUri(r.getAuthorizationUri())
             .tokenUri(r.getTokenUri())

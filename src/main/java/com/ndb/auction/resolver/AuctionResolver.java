@@ -39,11 +39,6 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	public Auction getAuctionByNumber(int round) {
 		return auctionService.getAuctionByRound(round);
 	}
-
-	@PreAuthorize("isAuthenticated()")
-	public List<Auction> getAuctionByStatus(int status) {
-		return auctionService.getAuctionByStatus(status);
-	}
 	
 	@PreAuthorize("isAuthenticated()")
 	public Auction getAuctionById(String id) {

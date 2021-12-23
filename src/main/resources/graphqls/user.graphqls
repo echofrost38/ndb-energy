@@ -30,9 +30,6 @@ extend type Mutation {
         email: String!,
         role: String!
     ) : String
-    changePassword(
-        newPassword: String!
-    ) : String!
 }
 
 schema {

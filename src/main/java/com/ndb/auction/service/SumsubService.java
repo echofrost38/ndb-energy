@@ -329,12 +329,17 @@ public class SumsubService extends BaseService {
             }
         }
 
-        // check not required
-        if(kycThreshold == 0.0) { // Skip KYC verification
-            if(amlThreshold == 0.0 || amount < amlThreshold) {
-                // skip AML verification
-                return true;
-            } else {
+        if(amount > kycThreshold) {
+            if( amount < amlThreshold) {
+                try {
+                    if(!checkVerificationStatus(userId, SumsubService.KYC)) {
+                        return false;
+                    }
+                } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }   
+            } else if( amount >= amlThreshold) {
                 try {
                     if(!checkVerificationStatus(userId, SumsubService.AML)) {
                         return false;
@@ -344,27 +349,7 @@ public class SumsubService extends BaseService {
                     return false;
                 } 
             }
-        } else if (amount < kycThreshold || amlThreshold == 0.0) {
-            return true;
-        } else if (amount >= kycThreshold && amount < amlThreshold) {
-            try {
-                if(!checkVerificationStatus(userId, SumsubService.KYC)) {
-                    return false;
-                }
-            } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-                e.printStackTrace();
-                return false;
-            }   
-        } else {
-            try {
-                if(!checkVerificationStatus(userId, SumsubService.AML)) {
-                    return false;
-                }
-            } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-                e.printStackTrace();
-                return false;
-            } 
-        }
+        } 
 
         return true;
     }

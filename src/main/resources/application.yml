@@ -1,3 +1,78 @@
+spring:
+    security:
+      oauth2:
+        client:
+          registration:
+            google:
+              clientId: 217015743019-arfgls5skjg3tehl67gf8sitbf0rq9k9.apps.googleusercontent.com
+              clientSecret: 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
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              scope:
+                - email
+                - profile
+            facebook:
+              clientId: 433995704835713
+              clientSecret: 16c2632bd91bfacfaef51d9103412fa6
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              scope:
+                - email
+                - public_profile
+            linkedIn:
+              clientId: 771mrzk94hye1w
+              clientSecret: iIJFgBf9lCb18zYe
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              clientAuthenticationMethod: post
+              authorizationGrantType: authorization_code
+              scope:
+                - r_liteprofile
+                - r_emailaddress
+            twitter:
+              clientId: oXJIDGVdB0PDnMICDwKckyzKm
+              clientSecret: Z4BpN51kNsb2wbEfzDXm40v38W3I2P1u4H6fvfM6HQraVfry5j
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              provider: twitter
+              authorizationGrantType: authorization_code
+            apple:
+              clientId: apple-client-id
+              clientSecret: apple-client-secret
+              authorizationGrantType: authorization_code
+              redirectUri: '{baseUrl}/oauth2/callback/{registrationId}'
+              scope: openid, name, email
+              clientName: Apple
+              clientAuthenticationMethod: post
+            amazon: 
+              clientId: client-id
+              clientSecret: client-secret
+              redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+              authorizationGrantType: authorization_code
+              # code: SplxlOBezQQYbYS6WxSbIA
+              scope:
+                - profile
+                - postal_code
+          provider:
+            facebook:
+              authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+              tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+              userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+            linkedIn:
+              authorizationUri: https://www.linkedin.com/oauth/v2/authorization
+              userInfoUri: https://api.linkedin.com/v2/me
+              tokenUri: https://www.linkedin.com/oauth/v2/accessToken
+              userNameAttribute: id
+            twitter:
+              authorizationUri: https://api.twitter.com/oauth/authorize
+              tokenUri: https://api.twitter.com/oauth/token
+              userInfoUri: https://api.twitter.com/oauth/request_token
+            apple:
+              authorizationUri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+              tokenUri: https://appleid.apple.com/auth/token
+              jwkSetUri: https://appleid.apple.com/auth/keys
+              userNameAttribute: sub
+            amazon:
+              authorizationUri: https://www.amazon.com/ap/oa
+              tokenUri: https://api.amazon.co.uk/auth/o2/token
+              userInfoUri: https://api.amazon.com/user/profile
+              userNameAttribute: name
 app:
   auth:
     tokenSecret: 04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1

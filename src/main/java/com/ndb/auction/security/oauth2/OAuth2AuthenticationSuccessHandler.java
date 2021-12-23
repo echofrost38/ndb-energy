@@ -69,8 +69,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // Save token on cache
         totpService.setTokenAuthCache(token, authentication);
         
-        return UriComponentsBuilder.fromUriString(targetUrl + "/" + token)
-                // .queryParam("token", token)
+        return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("token", token)
                 .build().toUriString();
     }
 

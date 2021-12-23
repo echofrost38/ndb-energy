@@ -68,6 +68,7 @@ public class NotificationDao extends BaseDao implements INotificationDao {
     }
 
 	////////////////// version 2 ////////////////////////////////////////
+	
 	public Notification2 addNewNotification(Notification2 notification2) {
 		dynamoDBMapper.save(notification2);
 		return notification2;

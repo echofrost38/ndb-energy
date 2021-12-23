@@ -13,9 +13,4 @@ app:
       - http://localhost:4000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
-      - https://ndbsale.gatsbyjs.io/oauth2/signin   
-      - https://ndbsale.gatsbyjs.io/oauth2/signup    
-      - https://sale.ndb.money/oauth2/signin   
-      - https://sale.ndb.money/oauth2/signup
-      - https://api.ndb.money/oauth2/signin   
-      - https://api.ndb.money/oauth2/signup  
+      - https://sale.ndb.money/oauth2/redirect   

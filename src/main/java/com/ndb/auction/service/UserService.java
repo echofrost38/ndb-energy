@@ -110,7 +110,7 @@ public class UserService extends BaseService implements IUserService {
 			String secret = totpService.generateSecret();
 			user.setGoogleSecret(secret);
 			userDao.updateUser(user);
-			String qrUri = totpService.getUriForImage(secret, user.getEmail());
+			String qrUri = totpService.getUriForImage(secret);
 			return qrUri;
 		case "phone":
 			try {
@@ -233,12 +233,7 @@ public class UserService extends BaseService implements IUserService {
 		return "Success";
 	}
 	
-	public String changePassword(String id, String newPassword) {
-		User user = getUserById(id);
-		user.setPassword(encoder.encode(newPassword));
-		userDao.updateUser(user);
-		return "Success";
-	}
+	
 	
 	private boolean sendEmailCode(User user, String template) {
 		String code = totpService.getVerifyCode(user.getEmail());
@@ -304,11 +299,7 @@ public class UserService extends BaseService implements IUserService {
 	///////////////////// user operation ///////////
 	public String getRandomPassword(int len) {
 		// ASCII range – alphanumeric (0-9, a-z, A-Z)
-		
-		final String uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		final String lowers = "abcdefghijklmnopqrstuvwxyz";
-		final String numbers = "0123456789";
-		final String symbols = ",./<>?!@#$%^&*()_+-=";
+		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 		SecureRandom random = new SecureRandom();
 		StringBuilder sb = new StringBuilder();
@@ -316,20 +307,11 @@ public class UserService extends BaseService implements IUserService {
 		// each iteration of the loop randomly chooses a character from the given
 		// ASCII range and appends it to the `StringBuilder` instance
 
-		int randomIndex = random.nextInt(uppers.length());
-		sb.append(uppers.charAt(randomIndex));
-
-		for (int i = 1; i < len; i++)
+		for (int i = 0; i < len; i++)
 		{
-			randomIndex = random.nextInt(lowers.length());
-			sb.append(lowers.charAt(randomIndex));
+			int randomIndex = random.nextInt(chars.length());
+			sb.append(chars.charAt(randomIndex));
 		}
-
-		randomIndex = random.nextInt(numbers.length());
-		sb.append(numbers.charAt(randomIndex));
-
-		randomIndex = random.nextInt(symbols.length());
-		sb.append(symbols.charAt(randomIndex));
 
 		return sb.toString();
 	}

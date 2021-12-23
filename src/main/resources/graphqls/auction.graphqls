@@ -1,9 +1,6 @@
 extend type Query {
-	checkRounds: String
-	getAuctions: [Auction]
-	getAuctionByStatus(
-		status: Int!
-	) : [Auction]
+	checkRounds : String
+	getAuctions : [Auction]
 	getAuctionById(id: String!) : Auction!
 	getAuctionByNumber(
 		round: Int!

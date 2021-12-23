@@ -23,6 +23,7 @@ import dev.samstevens.totp.time.TimeProvider;
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -68,7 +69,7 @@ public class TotpService {
 			auth = tokenCache.get(token);
 			tokenCache.invalidate(token);
 			return auth;
-		} catch (Exception e) {
+		} catch (ExecutionException e) {
 			return null;
 		}
 	}
@@ -128,7 +129,7 @@ public class TotpService {
 	public String generateSecret() {
         SecretGenerator generator = new DefaultSecretGenerator();
         return generator.generate();
-    }	
+    }
 	
     public String getUriForImage(String secret, String email) {
         QrData data = new QrData.Builder()

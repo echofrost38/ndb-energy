@@ -41,7 +41,7 @@ public class IPChecking extends BaseService {
 				
 	}
 	
-	public Boolean isAllowed(String ip) {
+	public boolean isAllowed(String ip) {
 		String countryCode = getIpLocation(ip).getCountry_code();	
 		// Get Location 
 		if(countryCode == "") return true;

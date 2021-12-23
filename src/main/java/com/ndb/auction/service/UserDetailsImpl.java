@@ -17,60 +17,63 @@ import com.ndb.auction.models.User;
 public class UserDetailsImpl implements OAuth2User, UserDetails {
 
 	private static final long serialVersionUID = 5558252995866998438L;
-	
+
 	private String id;
 	private String username;
 	private String email;
-	
+
 	@JsonIgnore
 	private String password;
-	
+
+	@JsonIgnore
+	private String ipAddress;
+
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
 	public UserDetailsImpl(
-			String id, 
-			String username, 
-			String email, 
+			String id,
+			String username,
+			String email,
 			String password,
-			Collection<? extends GrantedAuthority> authorities
-			) 
-	{
+			String ipAddress,
+			Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.ipAddress = ipAddress;
 		this.authorities = authorities;
 	}
-	
+
 	public static UserDetailsImpl build(User user) {
 		List<GrantedAuthority> authorities = user.getRole().stream()
 				.map(role -> new SimpleGrantedAuthority(role))
 				.collect(Collectors.toList());
 
 		return new UserDetailsImpl(
-				user.getId(), 
-				user.getName(), 
+				user.getId(),
+				user.getName(),
 				user.getEmail(),
-				user.getPassword(), 
+				user.getPassword(),
+				null,
 				authorities);
 	}
 
 	public static UserDetailsImpl build(User user, Map<String, Object> attributes) {
-        UserDetailsImpl userPrincipal = UserDetailsImpl.build(user);
-        userPrincipal.setAttributes(attributes);
-        return userPrincipal;
-    }
+		UserDetailsImpl userPrincipal = UserDetailsImpl.build(user);
+		userPrincipal.setAttributes(attributes);
+		return userPrincipal;
+	}
 
 	public String getId() {
 		return id;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
 
-	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
@@ -105,7 +108,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -122,8 +125,8 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	}
 
 	public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+		this.attributes = attributes;
+	}
 
 	@Override
 	public String getName() {

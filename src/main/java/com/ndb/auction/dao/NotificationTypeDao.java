@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.ndb.auction.models.NotificationType;
-import com.ndb.auction.models.NotificationType2;
 
 @Repository
 public class NotificationTypeDao extends BaseDao {
@@ -28,7 +27,6 @@ public class NotificationTypeDao extends BaseDao {
 
 		return "Notification Type created successfully!";
     }
-	
 	private Integer getAvailableId() {
 		List<NotificationType> notificationList = getAllNotificationTypes();
 		if(notificationList.isEmpty())
@@ -62,15 +60,4 @@ public class NotificationTypeDao extends BaseDao {
 
 		return getAllNotificationTypes();
 	}
-
-	////////////////////// version 2 //////////////////////////
-	public NotificationType2 addNewNotificationType(NotificationType2 type2) {
-		dynamoDBMapper.save(type2);
-		return type2;
-	}
-
-	public List<NotificationType2> getNotificationTypes() {
-		return dynamoDBMapper.scan(NotificationType2.class, new DynamoDBScanExpression());
-	}
-
 }

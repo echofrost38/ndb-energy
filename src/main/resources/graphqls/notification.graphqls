@@ -1,22 +1,13 @@
-extend type Subscription {
+type Subscription {
     notifications: Notification
 }
 
-extend type Query {
+type Query {
     getAllNotificationTypes: [NotificationType]
     getAllUnReadNotifications: [Notification]
-    getNotifications(
-        userId: String!,
-        stamp: Float,
-        limit: Int!
-    ) : [Notification2]
-    getUnreadNotifications(
-        userId: String!
-    ) : [Notification2]
-    getNotificationTypes2 : [NotificationType2]
 }
 
-extend type Mutation {
+type Mutation {
     setNotificationRead(
         id: String
     ): Notification
@@ -30,21 +21,6 @@ extend type Mutation {
         id: Int!,
         name: String
     ): NotificationType
-    addNewNotification(
-        userId: String,
-        nType: Int,
-        title: String,
-        msg: String
-    ) : Notification2
-    setNotificationReadFlag(
-        userId: String!,
-        stamp: Float!
-    ) : Notification2
-    addNewNotificationType2(
-        nType: Int!,
-        tName: String!,
-        broadcast: Boolean!
-    ) : NotificationType2
 }
 
 

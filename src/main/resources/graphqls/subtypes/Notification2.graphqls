@@ -1,8 +1,0 @@
-type Notification2 {
-    userId: String,
-    timeStamp: Float,
-    nType: Int,
-    read: Boolean,
-    title: String,
-    msg: String
-}

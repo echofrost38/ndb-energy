@@ -39,6 +39,12 @@ extend type Mutation {
         tName: String!,
         broadcast: Boolean!
     ) : NotificationType2
+    addNewNotification(
+        userId: String!,
+        nType: Int!,
+        title: String!,
+        msg: String!
+    ) : Notification2
 }
 
 

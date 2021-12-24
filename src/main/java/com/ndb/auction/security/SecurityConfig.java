@@ -110,13 +110,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()
-				.tokenEndpoint()
-					.accessTokenResponseClient(authorizationCodeTokenResponseClient())
-					.and()
-				.authorizationEndpoint()
-					.baseUri("/oauth2/authorize")
-					.authorizationRequestRepository(cookieAuthorizationRequestRepository())
-					.and()
+			.authorizationEndpoint()
+				.baseUri("/oauth2/authorize")
+				.authorizationRequestRepository(cookieAuthorizationRequestRepository())
+				.and()
+			.tokenEndpoint()
+				.accessTokenResponseClient(authorizationCodeTokenResponseClient())
+				.and()
 				.redirectionEndpoint()
 					.baseUri("/oauth2/callback/*")
 					.and()
@@ -146,6 +146,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		return tokenResponseClient;
 	}
+	
 	private CorsConfigurationSource corsConfig() {
 	    CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowedOrigins(Arrays.asList("*"));

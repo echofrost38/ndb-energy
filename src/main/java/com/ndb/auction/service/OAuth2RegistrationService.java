@@ -43,5 +43,4 @@ public class OAuth2RegistrationService {
         init();
         return regist;
     }
-
 }

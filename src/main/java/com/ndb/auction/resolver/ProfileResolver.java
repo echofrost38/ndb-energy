@@ -135,5 +135,4 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     public List<KYCSetting> getKYCSetting() {
         return sumsubService.getKYCSettings();
     }
-
 }

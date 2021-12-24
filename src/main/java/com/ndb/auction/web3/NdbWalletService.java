@@ -1,12 +1,22 @@
 package com.ndb.auction.web3;
 
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.UUID;
 
 import com.ndb.auction.contracts.NdbWallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Wallet;
+import org.web3j.crypto.WalletFile;
+import org.web3j.crypto.WalletFile.Crypto;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
@@ -23,8 +33,8 @@ public class NdbWalletService {
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
 
-    private final int decimal = 12;
-    private final BigInteger bDecimal = new BigInteger("1000000000000");
+    // private final int decimal = 12;
+    // private final BigInteger bDecimal = new BigInteger("1000000000000");
 
     private NdbWallet ndbWallet;
 
@@ -64,6 +74,209 @@ public class NdbWalletService {
         return receipt;
     }
 
-    
+    public TransactionReceipt createWalletWithEmail(String email, String tokenType, String privateKey) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                System.out.println("Creating new wallet...");
+                receipt = ndbWallet.createWalletWithEmail(email, tokenType, privateKey).send();
+                System.out.println("New wallet is created: " + tokenType);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt createWalletWithId(String id, String tokenType, String privateKey) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                System.out.println("Creating new wallet...");
+                receipt = ndbWallet.createWalletWithId(id, tokenType, privateKey).send();
+                System.out.println("New wallet is created: " + tokenType);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public BigInteger getDecimals() {
+        BigInteger decimal = null;
+        try {
+            if (ndbWallet != null) {
+                decimal = ndbWallet.decimals().send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return decimal;
+    }
+
+    public TransactionReceipt increaseHoldBalanceWithEmail(String email, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.increaseHoldBalanceWithEmail(email, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt decreaseHoldBalanceWithId(String id, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.decreaseHoldBalanceWithId(id, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public BigInteger getHoldBalanceWithEmail(String email, String tokenType) {
+        BigInteger holdBalance = null;
+        try {
+            if (ndbWallet != null) {
+                holdBalance = ndbWallet.getHoldBalanceWithEmail(email, tokenType).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return holdBalance;
+    }
+
+    public BigInteger getHoldBalanceWithId(String id, String tokenType) {
+        BigInteger holdBalance = null;
+        try {
+            if (ndbWallet != null) {
+                holdBalance = ndbWallet.getHoldBalanceWithId(id, tokenType).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return holdBalance;
+    }
+
+    public String getOwner() {
+        String owner = null;
+        try {
+            if (ndbWallet != null) {
+                owner = ndbWallet.getOwner().send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return owner;
+    }
+
+    public String getPrivateKeyWithEmail(String email, String tokenType) {
+        String privateKey = null;
+        try {
+            if (ndbWallet != null) {
+                privateKey = ndbWallet.getPrivateKeyWithEmail(email, tokenType).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return privateKey;
+    }
+
+    public String getPrivateKeyWithId(String id, String tokenType) {
+        String privateKey = null;
+        try {
+            if (ndbWallet != null) {
+                privateKey = ndbWallet.getPrivateKeyWithId(id, tokenType).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return privateKey;
+    }
+
+    public TransactionReceipt decreaseHoldBalanceWithEmail(String email, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.decreaseHoldBalanceWithEmail(email, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt increaseHoldBalanceWithId(String id, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.increaseHoldBalanceWithId(id, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt setHoldBalanceWithEmail(String email, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.setHoldBalanceWithEmail(email, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt setHoldBalanceWithId(String id, String tokenType, BigInteger amount) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.setHoldBalanceWithId(id, tokenType, amount).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    public TransactionReceipt transferOwnerShip(String newOwner) {
+        TransactionReceipt receipt = null;
+        try {
+            if (ndbWallet != null) {
+                receipt = ndbWallet.transferOwnership(newOwner).send();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return receipt;
+    }
+
+    // Generate wallet address!
+    public String generateWalletAddress(String id, String tType) {
+        String seed = UUID.randomUUID().toString();
+        String address = null;
+        try {
+            ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+            BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
+
+            String sPrivatekeyInHex = privateKeyInDec.toString(16);
+            WalletFile wallet = Wallet.createLight(seed, ecKeyPair);
+            address = wallet.getAddress();
+
+            // save to database
+            // createWalletWithId(id, tokenType, privateKey);
+
+        } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException | CipherException e) {
+            e.printStackTrace();
+        }
+        return address;
+    }
 
 }

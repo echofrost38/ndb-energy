@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import org.reactivestreams.Publisher;
@@ -18,6 +19,7 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.Notification2;
 import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.NotificationType2;
+import com.ndb.auction.service.UserDetailsImpl;
 
 
 @Slf4j
@@ -66,28 +68,47 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     ///////////////////////////// version 2 ////////////////////////
+    
     public Notification2 addNewNotification(String userId, int nType, String title, String msg) {
         return notificationService.addNewNotification(userId, nType, title, msg);
     }
 
-    public List<Notification2> getNotifications(String userId, Long stamp, int limit) {
+    @PreAuthorize("isAuthenticated()")
+    public List<Notification2> getNotifications(Long stamp, int limit) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
         return notificationService.getPaginatedNotifications(userId, stamp, limit);
     }
 
-    public Notification2 setNotificationReadFlag(String userId, Long stamp) {
+    @PreAuthorize("isAuthenticated()")
+    public Notification2 setNotificationReadFlag(Long stamp) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
         return notificationService.setNotificationReadFlag(userId, stamp);
     }
 
-    public List<Notification2> getUnreadNotifications(String userId) {
+    @PreAuthorize("isAuthenticated()")
+    public List<Notification2> getUnreadNotifications() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
         return notificationService.getUnreadNotification2s(userId);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public NotificationType2 addNewNotificationType2(int nType, String tName, boolean broadcast) {
         return notificationService.addNewNotificationType(nType, tName, broadcast);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<NotificationType2> getNotificationTypes2() {
         return notificationService.getNotificationTypes();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public int changeNotifySetting(int nType, boolean status) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
+        return userService.changeNotifySetting(userId, nType, status);
     }
 
 }

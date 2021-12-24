@@ -127,7 +127,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.failureHandler(oAuth2AuthenticationFailureHandler);
 			// .and()
 			// .logout();
-         
         
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

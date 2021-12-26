@@ -71,10 +71,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public void populateEmailAddressFromLinkedIn(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) throws OAuth2AuthenticationException {
-		Assert.notNull(linkedInEmailEndpointUri, "LinkedIn email address end point required");
+        Assert.notNull(linkedInEmailEndpointUri, "LinkedIn email address end point required");
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + oAuth2UserRequest.getAccessToken().getTokenValue());
@@ -83,6 +83,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		List<?> list = (List<?>) response.getBody().get("elements");
 		Map map = (Map<?, ?>) ((Map<?, ?>) list.get(0)).get("handle~");
 		attributes.putAll(map);
+		log.info("populateEmailAddressFromLinkedIn", attributes);
 	}
 
     @SuppressWarnings("deprecation")

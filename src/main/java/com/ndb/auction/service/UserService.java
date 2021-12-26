@@ -362,7 +362,7 @@ public class UserService extends BaseService implements IUserService {
 			return "Failed";
 		}
 		
-		userWalletService.addNewUser(user.getId(), user.getEmail(), user.getName());
+		// ndbWalletService.createAccount(user.getId(), user.getEmail());
 
 		return "Success";
 	}

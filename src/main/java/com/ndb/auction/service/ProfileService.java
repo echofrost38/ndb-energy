@@ -91,6 +91,11 @@ public class ProfileService extends BaseService implements IProfileService {
 		
 		// update purchase list and user avatar set!!
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(prefix);
+
+		if(profile == null) {
+			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix");
+		}
+
 		List<AvatarSet> sets = profile.getAvatarSet();
 		List<AvatarComponent> components = avatarDao.getAvatarComponentsBySet(sets);
 		Map<String, List<String>> purchasedMap = user.getAvatarPurchase();

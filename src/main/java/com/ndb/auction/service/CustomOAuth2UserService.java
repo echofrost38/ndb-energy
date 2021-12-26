@@ -53,8 +53,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
-        log.info("oAuth2UserReguest {}", oAuth2UserRequest.getClientRegistration());
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
+        log.info("oAuth2UserReguest {}", oAuth2User);
 
         try {
             Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());

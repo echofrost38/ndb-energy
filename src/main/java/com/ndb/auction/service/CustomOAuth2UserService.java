@@ -83,7 +83,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		List<?> list = (List<?>) response.getBody().get("elements");
 		Map map = (Map<?, ?>) ((Map<?, ?>) list.get(0)).get("handle~");
 		attributes.putAll(map);
-		log.info("populateEmailAddressFromLinkedIn", attributes);
+		log.info("populateEmailAddressFromLinkedIn uri : {}, attributes : {}", linkedInEmailEndpointUri, attributes);
 	}
 
     @SuppressWarnings("deprecation")

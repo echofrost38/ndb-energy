@@ -93,7 +93,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             data = "InvalidProvider." + user.getProvider();
         } else if (!user.getSecurity().get("2FA")) {
             type = "error";
-			data = "No2FA";
+			data = "No2FA-" + user.getEmail();
 		} else {
             data = tokenProvider.createToken(userPrincipal);
             // Save token on cache

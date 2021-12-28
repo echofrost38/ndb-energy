@@ -107,7 +107,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @SuppressWarnings("deprecation")
     public UserDetailsImpl processUserDetails(String provider, Map<String, Object> attributes) {
-        log.info("ProcessOAuth2User {}", attributes);
+        log.info("processUserDetails {}", attributes);
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");

@@ -11,6 +11,8 @@ import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.AuthProvider;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -51,6 +53,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
+    @Autowired
+	AuthenticationManager authenticationManager;
 
     @Autowired
     OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider, AppProperties appProperties,
@@ -97,6 +101,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                 Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
                 userPrincipal = customOAuth2UserService.processUserDetails(registrationId, attributes);
+
+                authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userPrincipal, authentication.getCredentials()));
             } else {
                 return UriComponentsBuilder.fromUriString(targetUrl + "/error/unknown/registrationId").build().toUriString();
             }

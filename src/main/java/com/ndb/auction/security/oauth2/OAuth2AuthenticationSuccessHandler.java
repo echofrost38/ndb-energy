@@ -76,6 +76,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
+        log.info("UserPrincipal {}", authentication.getPrincipal());
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         
 
@@ -130,5 +131,5 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 return false;
             });
     }
-    
+
 }

@@ -84,24 +84,28 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
 
-        String type = "token";
+        String type = "success";
+        String dataType;
         String data;
 
         
         if(!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
             type = "error";
-            data = "InvalidProvider." + user.getProvider();
+            dataType = "InvalidProvider";
+            data = user.getProvider().toString();
         } else if (!user.getSecurity().get("2FA")) {
             type = "error";
-			data = "No2FA";
+            dataType = "No2FA";
+			data = user.getEmail();
 		} else {
+            dataType = "token";
             data = tokenProvider.createToken(userPrincipal);
             // Save token on cache
             totpService.setTokenAuthCache(data, authentication);
         }
         log.info("User: {}, Provider: {}, at: {}, data: {}", user.getEmail(), registrationId, LocalDateTime.now(), data);
         
-        return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + data)
+        return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + dataType + "/" + data)
                 // .queryParam("token", token)
                 .build().toUriString();
     }

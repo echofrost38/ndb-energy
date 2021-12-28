@@ -76,12 +76,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        log.info("UserPrincipal {}", authentication.getPrincipal());
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-        
-
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
+
+        log.info("targetURI : {} registrationID : {}, UserPrincipal {},", targetUrl, registrationId, authentication.getPrincipal());
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
 

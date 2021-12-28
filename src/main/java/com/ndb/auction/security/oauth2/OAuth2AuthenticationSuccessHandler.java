@@ -2,6 +2,7 @@ package com.ndb.auction.security.oauth2;
 
 import com.ndb.auction.config.AppProperties;
 import com.ndb.auction.security.TokenProvider;
+import com.ndb.auction.service.CustomOAuth2UserService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserDetailsImpl;
 import com.ndb.auction.service.UserService;
@@ -12,6 +13,7 @@ import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
@@ -41,6 +45,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Autowired
     private TotpService totpService;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
@@ -80,14 +87,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
 
         log.info("targetURI : {} registrationID : {}, UserPrincipal {},", targetUrl, registrationId, authentication.getPrincipal());
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+
+        UserDetailsImpl userPrincipal = new UserDetailsImpl();
+        
+        try {
+            userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        } catch (Exception e) {
+            if(registrationId.equalsIgnoreCase(AuthProvider.apple.toString())) { //In case of Apple
+                OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
+                userPrincipal = customOAuth2UserService.processUserDetails(registrationId, attributes);
+            } else {
+                return UriComponentsBuilder.fromUriString(targetUrl + "/error/unknown/registrationId").build().toUriString();
+            }
+        }
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
 
         String type = "success";
         String dataType;
         String data;
-
         
         if(!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
             type = "error";

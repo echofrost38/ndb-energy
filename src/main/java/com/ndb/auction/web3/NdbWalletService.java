@@ -10,7 +10,6 @@ import com.ndb.auction.contracts.NdbWallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
@@ -20,8 +19,6 @@ import org.web3j.crypto.WalletFile;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.gas.ContractGasProvider;
-import org.web3j.tx.gas.DefaultGasProvider;
 
 @Service
 public class NdbWalletService {
@@ -264,8 +261,10 @@ public class NdbWalletService {
     public String generateWalletAddress(String id, String tType) {
         String seed = UUID.randomUUID().toString();
         String address = null;
+        
         try {
             ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+            
             BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
 
             String sPrivatekeyInHex = privateKeyInDec.toString(16);

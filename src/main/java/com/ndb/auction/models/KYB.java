@@ -1,6 +1,5 @@
 package com.ndb.auction.models;
 
-import java.sql.Timestamp;
 import java.util.Set;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
@@ -38,9 +37,9 @@ public class KYB {
 	private String status;
 
 	@DynamoDBAttribute(attributeName = "reg_time")
-	private Timestamp regTime;
+	private Long regTime;
 
 	@DynamoDBAttribute(attributeName = "update_time")
-	private Timestamp updateTime;
+	private Long updateTime;
 	
 }

@@ -4,11 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.Part;
 
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarProfile;
-import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.KYB;
-import com.ndb.auction.models.SkillSet;
 import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,10 +43,10 @@ public class KYBResolver extends BaseResolver implements GraphQLQueryResolver, G
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public KYB updateFile(List<Part> fileList) {
+	public KYB updateFile(List<Part> files) {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		String userId = userDetails.getId();
-		return kybService.updateFile(userId, fileList);
+		return kybService.updateFile(userId, files);
 	}
 }

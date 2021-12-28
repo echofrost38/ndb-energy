@@ -1,12 +1,11 @@
 scalar Upload
 
 extend type Query {
-	getMyKYBSetting : KYBSetting
+	getMyKYBSetting : KYB
     getKYBSetting(
 		userId: String!
-	) : KYBSetting
-    getKYBSettingList(
-	) : [KYBSetting]
+	) : KYB
+    getKYBSettingList : [KYB]
 }
 
 extend type Mutation {
@@ -14,10 +13,10 @@ extend type Mutation {
         country: String!,
         companyName: String!,
         regNum: String!
-    ) : KYBSetting
+    ) : KYB
     updateFile (
         files: [Upload]!
-    ) : KYBSetting
+    ) : KYB
 }
 
 schema {

@@ -7,6 +7,11 @@ import com.ndb.auction.models.User;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfo;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,10 +19,15 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -37,14 +47,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
     public MailService mailService;
+
+	@Value("${linkedin.email-address-uri}")
+	private String linkedInEmailEndpointUri;
     
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
-        log.info("oAuth2UserReguest {}", oAuth2UserRequest);
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
+        log.info("oAuth2User {}", oAuth2User);
 
         try {
-            return processOAuth2User(oAuth2UserRequest, oAuth2User);
+            Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
+            String provider = oAuth2UserRequest.getClientRegistration().getRegistrationId();
+            if (provider.equalsIgnoreCase(AuthProvider.linkedin.toString())) {
+                populateEmailAddressFromLinkedIn(oAuth2UserRequest, attributes);
+            }
+            return processOAuth2User(oAuth2UserRequest, attributes);
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -53,9 +71,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void populateEmailAddressFromLinkedIn(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) throws OAuth2AuthenticationException {
+        Assert.notNull(linkedInEmailEndpointUri, "LinkedIn email address end point required");
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + oAuth2UserRequest.getAccessToken().getTokenValue());
+		HttpEntity<?> entity = new HttpEntity<>("", headers);
+		ResponseEntity<Map> response = restTemplate.exchange(linkedInEmailEndpointUri, HttpMethod.GET, entity, Map.class);
+		List<?> list = (List<?>) response.getBody().get("elements");
+		Map map = (Map<?, ?>) ((Map<?, ?>) list.get(0)).get("handle~");
+		attributes.putAll(map);
+		log.info("populateEmailAddressFromLinkedIn uri : {}, attributes : {}", linkedInEmailEndpointUri, attributes);
+	}
+
     @SuppressWarnings("deprecation")
-	private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
+	private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) {
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), attributes);
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
@@ -69,7 +102,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
         
-        return UserDetailsImpl.build(user, oAuth2User.getAttributes());
+        return UserDetailsImpl.build(user, attributes);
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {

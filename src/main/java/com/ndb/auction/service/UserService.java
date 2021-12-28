@@ -362,7 +362,7 @@ public class UserService extends BaseService implements IUserService {
 			return "Failed";
 		}
 		
-		// ndbWalletService.createAccount(user.getId(), user.getEmail());
+		userWalletService.addNewUser(user.getId(), user.getEmail(), user.getName());
 
 		return "Success";
 	}
@@ -382,18 +382,5 @@ public class UserService extends BaseService implements IUserService {
 		return "Success";
 	}
 
-	///////// change user notificatin setting ///////
-	public int changeNotifySetting(String userId, int nType, boolean status) {
-		User user = userDao.getUserById(userId);
-		int notifySetting = user.getNotifySetting();
-		if(status) {
-			notifySetting = notifySetting | (0x01 << nType);
-		} else {
-			notifySetting = notifySetting & ~(0x01 << nType);
-		}
-		user.setNotifySetting(notifySetting);
-		userDao.updateUser(user);
-		return nType;
-	}
 	
 }

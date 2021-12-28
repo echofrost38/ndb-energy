@@ -90,7 +90,7 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 		DynamoDBQueryExpression<Notification2> queryExpression = new DynamoDBQueryExpression<Notification2>()
 			.withKeyConditionExpression("user_id = :val1")
 			.withLimit(limit)
-			.withScanIndexForward(false)
+			
 			.withExpressionAttributeValues(eav);
 		return dynamoDBMapper.queryPage(Notification2.class, queryExpression).getResults();
 	}

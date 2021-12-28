@@ -5,10 +5,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.models.User;

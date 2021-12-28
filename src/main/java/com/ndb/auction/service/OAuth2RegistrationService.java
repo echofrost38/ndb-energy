@@ -39,9 +39,6 @@ public class OAuth2RegistrationService {
     }
 
     public OAuth2Registration createRegistration(OAuth2Registration registration) {
-        OAuth2Registration regist = oAuth2Dao.createRegistration(registration);
-        init();
-        return regist;
+        return oAuth2Dao.createRegistration(registration);
     }
-
 }

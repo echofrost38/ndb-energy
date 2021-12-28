@@ -10,6 +10,7 @@ import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.FinancialService;
+import com.ndb.auction.service.KYBService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
 import com.ndb.auction.service.ProfileService;
@@ -22,44 +23,44 @@ import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.SumsubService;
 
 public class BaseResolver {
-	
-    @Autowired
-    AuctionService auctionService;
-    
-    @Autowired
-    BidService bidService;
-  	
+
+	@Autowired
+	AuctionService auctionService;
+
+	@Autowired
+	BidService bidService;
+
 	@Autowired
 	UserService userService;
-	
+
 	@Autowired
 	AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	JwtUtils jwtUtils;
-	
+
 	@Autowired
 	TotpService totpService;
-    
+
 	@Autowired
 	StripeService stripeService;
-	
+
 	@Autowired
 	AvatarService avatarService;
 
 	@Autowired
 	ProfileService profileService;
 
-	@Autowired 
+	@Autowired
 	CryptoService cryptoService;
-	
+
 	@Autowired
 	SumsubService sumsubService;
 
 	@Autowired
 	NotificationService notificationService;
 
-	@Autowired 
+	@Autowired
 	StatService statService;
 
 	@Autowired
@@ -73,7 +74,11 @@ public class BaseResolver {
 
 	@Autowired
 	UserWalletService userWalletService;
-	
+
 	@Autowired
 	IPChecking ipChecking;
+
+	@Autowired
+	KYBService kybService;
+
 }

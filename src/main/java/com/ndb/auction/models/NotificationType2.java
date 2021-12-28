@@ -24,5 +24,4 @@ public class NotificationType2 {
 
     @DynamoDBAttribute(attributeName = "broadcast")
     private boolean broadcast;
-    
 }

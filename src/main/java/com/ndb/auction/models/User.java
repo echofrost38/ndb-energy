@@ -89,6 +89,7 @@ public class User {
 		this.security.put("2FA", false);
 		this.security.put("KYC", false);
 		this.security.put("AML", false);
+		this.security.put("KYB", false);
 		this.security.put("mobile", false);
 		
 		this.extWallet = new HashMap<String, String>();

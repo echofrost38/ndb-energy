@@ -1,0 +1,26 @@
+scalar Upload
+
+extend type Query {
+	getMyKYBSetting : KYBSetting
+    getKYBSetting(
+		userId: String!
+	) : KYBSetting
+    getKYBSettingList(
+	) : [KYBSetting]
+}
+
+extend type Mutation {
+    updateInfo (
+        country: String!,
+        companyName: String!,
+        regNum: String!
+    ) : KYBSetting
+    updateFile (
+        files: [Upload]!
+    ) : KYBSetting
+}
+
+schema {
+    query: Query,
+    mutation: Mutation
+}

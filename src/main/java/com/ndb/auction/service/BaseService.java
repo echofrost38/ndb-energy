@@ -11,7 +11,6 @@ import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.schedule.ScheduledTasks;
-import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,9 +75,6 @@ public class BaseService {
 
     @Autowired
     public UserWalletService userWalletService;
-
-    @Autowired
-    public NdbWalletService ndbWalletService;
 
     @Autowired
     public DirectSaleDao directSaleDao;

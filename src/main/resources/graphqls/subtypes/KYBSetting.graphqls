@@ -1,0 +1,7 @@
+type KYBSetting {
+    userId: String!,
+    country: String!,
+    companyName: String,
+    regNum: String,
+    status: String,
+}

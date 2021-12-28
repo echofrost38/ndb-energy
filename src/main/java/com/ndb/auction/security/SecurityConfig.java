@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.*;
@@ -14,21 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ndb.auction.security.jwt.AuthEntryPointJwt;
 import com.ndb.auction.security.jwt.AuthTokenFilter;
-import com.ndb.auction.security.oauth2.CustomAccessTokenResponseConverter;
 import com.ndb.auction.security.oauth2.CustomClientRegistrationRepository;
 import com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ndb.auction.security.oauth2.OAuth2AuthenticationFailureHandler;
@@ -117,9 +109,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.redirectionEndpoint()
 					.baseUri("/oauth2/callback/*")
 					.and()
-				.tokenEndpoint()
-					.accessTokenResponseClient(authorizationCodeTokenResponseClient())
-					.and()
 				.userInfoEndpoint()
 					.userService(customOAuth2UserService)
 					.and()
@@ -127,24 +116,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.failureHandler(oAuth2AuthenticationFailureHandler);
 			// .and()
 			// .logout();
+         
         
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-	
-	private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
-		OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
-				new OAuth2AccessTokenResponseHttpMessageConverter();
-		tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomAccessTokenResponseConverter());
-
-		RestTemplate restTemplate = new RestTemplate(Arrays.asList(
-				new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
-		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
-
-		DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
-		tokenResponseClient.setRestOperations(restTemplate);
-
-		return tokenResponseClient;
-	}
 	
 	private CorsConfigurationSource corsConfig() {
 	    CorsConfiguration configuration = new CorsConfiguration();

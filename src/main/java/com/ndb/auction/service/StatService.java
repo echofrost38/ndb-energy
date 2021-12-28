@@ -54,9 +54,8 @@ public class StatService extends BaseService {
 
             // Round Performance 2
             // Round Chance 
-			String roundId = round.getAuctionId();
-            int roundNumber = round.getNumber();
-			List<Bid> bidList = bidDao.getBidListByRound(roundId);
+			int roundNumber = round.getNumber();
+			List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
 			double priceArr[] = new double[bidList.size()];
 			int cnt = 0;
 			for (Bid bid : bidList) {
@@ -75,10 +74,9 @@ public class StatService extends BaseService {
                 cnt++;
 			}
 			std = standardDeviation.evaluate(priceArr);
-            if(!Double.isNaN(std)) {
-                RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
-                roundPerform2List.add(roundPerform2);
-            }
+			RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
+			roundPerform2List.add(roundPerform2);
+            
             winRate = win / total;
             failedRate = failed / total;
             RoundChance roundChance = new RoundChance(roundNumber, winRate, failedRate);
@@ -147,14 +145,13 @@ public class StatService extends BaseService {
             return null;
         }
 
-        List<RoundPerform2> list = new ArrayList<RoundPerform2>(this.roundPerform2List);
+        List<RoundPerform2> list = List.copyOf(this.roundPerform2List);
 
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if(rounds.size() == 1) {
 			Auction startedRound = rounds.get(0);
 			int roundNumber = startedRound.getNumber();
-            String roundId = startedRound.getAuctionId();
-			List<Bid> bidList = bidDao.getBidListByRound(roundId);
+			List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
 			double min = Double.MAX_VALUE, max = 0.0, std = 0.0;
 			StandardDeviation standardDeviation = new StandardDeviation();
 			double priceArr[] = new double[bidList.size()];
@@ -167,9 +164,6 @@ public class StatService extends BaseService {
 				cnt++;
 			}
 			std = standardDeviation.evaluate(priceArr);
-            if(Double.isNaN(std)) {
-                return list;
-            }
 			RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
 			list.add(roundPerform2);
 		} 
@@ -187,7 +181,7 @@ public class StatService extends BaseService {
             return null;
         }
 
-        List<RoundPerform1> list = new ArrayList<>(this.roundPerform1List);
+        List<RoundPerform1> list = List.copyOf(this.roundPerform1List);
 
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if(rounds.size() == 1) {
@@ -215,7 +209,7 @@ public class StatService extends BaseService {
         if(roundChanceList == null) {
             return null;
         }
-        List<RoundChance> list = new ArrayList<>(this.roundChanceList);
+        List<RoundChance> list = List.copyOf(this.roundChanceList);
 
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
         if(rounds.size() == 1) {

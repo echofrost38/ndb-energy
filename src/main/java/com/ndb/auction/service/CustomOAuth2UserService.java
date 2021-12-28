@@ -71,6 +71,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public void populateEmailAddressFromLinkedIn(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) throws OAuth2AuthenticationException {
         Assert.notNull(linkedInEmailEndpointUri, "LinkedIn email address end point required");

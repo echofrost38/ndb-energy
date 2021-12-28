@@ -130,4 +130,5 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 return false;
             });
     }
+    
 }

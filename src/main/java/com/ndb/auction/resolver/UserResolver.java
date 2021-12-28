@@ -47,7 +47,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String resetPassword(String email) {
+    public String resetPasswordByAdmin(String email) {
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
         User user = userService.getUserByEmail(email);

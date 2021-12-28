@@ -102,7 +102,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
                 userPrincipal = customOAuth2UserService.processUserDetails(registrationId, attributes);
 
-                authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userPrincipal, authentication.getCredentials()));
+                authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userPrincipal.getEmail(), "PASSWORD"));
             } else {
                 return UriComponentsBuilder.fromUriString(targetUrl + "/error/unknown/registrationId").build().toUriString();
             }

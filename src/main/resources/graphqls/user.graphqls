@@ -36,5 +36,6 @@ extend type Mutation {
 }
 
 schema {
-    query: Query
+    query: Query,
+    mutation: Mutation
 }

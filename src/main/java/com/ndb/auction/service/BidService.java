@@ -169,7 +169,8 @@ public class BidService extends BaseService implements IBidService {
 	@Override
 	public List<Bid> getBidListByRound(Integer round) {
 		// PaginatedScanList<> how to sort?
-		Bid[] bidList = bidDao.getBidListByRound(round).toArray(new Bid[0]);
+		Auction auction = auctionDao.getAuctionByRound(round);
+		Bid[] bidList = bidDao.getBidListByRound(auction.getAuctionId()).toArray(new Bid[0]);
 		Arrays.sort(bidList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
 		return Arrays.asList(bidList);
 	}

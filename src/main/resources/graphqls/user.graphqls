@@ -16,7 +16,7 @@ extend type Mutation {
     makeAllow(
         countryCode: String!
     ) : GeoLocation
-    resetPasswordByAdmin(
+    resetPassword(
         email: String!
     ) : String
     createNewUser(

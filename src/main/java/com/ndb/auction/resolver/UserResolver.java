@@ -95,10 +95,10 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.getPaginatedUser(key, limit);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    public String deleteAccount() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+    // @PreAuthorize("isAuthenticated()")
+    public String deleteAccount(String id) {
+        // UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // String id = userDetails.getId();
         return userService.deleteUser(id);
     }
 

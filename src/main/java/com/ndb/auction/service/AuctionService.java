@@ -2,7 +2,6 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -106,11 +105,8 @@ public class AuctionService extends BaseService implements IAuctionService {
 		}
 		// send notification
 		System.out.println("Auction Started, Please send me as Notification!");
-
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-		notificationService.sendNotification(
-			userDetails.getId(),
+		notificationService.broadcast(
 			Notification.N_AUCTION_START, 
 			"Auction Started", 
 			"Auction Started please bid!"
@@ -128,10 +124,8 @@ public class AuctionService extends BaseService implements IAuctionService {
 		}
 		auctionDao.endAuction(target);
 
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		notificationService.sendNotification(
-			userDetails.getId(),
+		// send notification
+		notificationService.broadcast(
 			Notification.N_AUCTION_END, 
 			"Auction Finished", 
 			"Please check you bid results"

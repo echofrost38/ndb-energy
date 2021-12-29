@@ -103,11 +103,11 @@ public class CryptoController extends BaseController {
                 userService.updateUser(user);
 
                 // send notification to user for payment result!!                
-                notificationService.sendNotification(
-                    user.getId(),
+                notificationService.send(
                     Notification.N_PAYMENT_RESULT,
                     "Payment Result", 
-                    "Please check you payment result"
+                    "Please check you payment result", 
+                    user.getId()
                 );
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());

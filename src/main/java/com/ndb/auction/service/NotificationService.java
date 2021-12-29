@@ -34,12 +34,6 @@ public class NotificationService {
     @Autowired
     public NotificationTypeDao notificationTypeDao;
 
-    @Autowired
-    private SMSService smsService;
-
-    @Autowired
-    public MailService mailService;
-
     public NotificationService() {
         this.sink = Sinks.many().multicast().onBackpressureBuffer();
     }
@@ -156,23 +150,6 @@ public class NotificationService {
     }
 
     //////////////////////// version 2 ///////////////////////////
-
-    public void sendNotification(String userId, int type, String title, String msg) {
-        addNewNotification(userId, type, title, msg);
-
-        User user = userDao.getUserById(userId);
-
-        // send SMS, Email, Notification here
-        try {
-            smsService.sendNormalSMS(user.getMobile(), title + "\n" + msg);
-        } catch (Exception e) {}
-       
-        try {
-			mailService.sendNormalEmail(user, title, msg);
-		} catch (Exception e) {}	
-    }
-
-
     public Notification2 addNewNotification(String userId, int type, String title, String msg) {
         Notification2 notification = new Notification2(userId, type, title, msg);
         return notificationDao.addNewNotification(notification);
@@ -190,10 +167,6 @@ public class NotificationService {
         return notificationDao.setReadFlag(notify);
     }
 
-    public String setNotificationReadFlagAll(String userId) {
-        return notificationDao.setReadFlagAll(userId);
-    }
-
     public List<Notification2> getUnreadNotification2s(String userId) {
         return notificationDao.getUnreadNotifications(userId);
     }
@@ -208,6 +181,5 @@ public class NotificationService {
     public List<NotificationType2> getNotificationTypes() {
         return notificationTypeDao.getNotificationTypes();
     }
-
 
 }

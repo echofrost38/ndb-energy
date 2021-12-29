@@ -121,12 +121,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             dataType = "No2FA";
 			data = user.getEmail();
 		} else {
-            dataType = "token";
-            data = tokenProvider.createToken(userPrincipal);
+            dataType = userService.signin2FA(user);
+            data = user.getEmail();
+            if (dataType.equals("error")) {
+                return UriComponentsBuilder.fromUriString(targetUrl + "/error/Failed/2FA Error").build().toUriString();
+            }
             // Save token on cache
-            totpService.setTokenAuthCache(data, authentication);
+            totpService.setTokenAuthCache(dataType, authentication);
         }
-        log.info("User: {}, Provider: {}, at: {}, data: {}", user.getEmail(), registrationId, LocalDateTime.now(), data);
         
         return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + dataType + "/" + data)
                 // .queryParam("token", token)

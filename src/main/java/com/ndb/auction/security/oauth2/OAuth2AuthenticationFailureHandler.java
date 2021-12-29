@@ -32,7 +32,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         log.info("onAuthenticationFailure!!! {}", exception.getLocalizedMessage());
 
-        targetUrl = UriComponentsBuilder.fromUriString(targetUrl + "/error/" + exception.getLocalizedMessage())
+        targetUrl = UriComponentsBuilder.fromUriString(targetUrl + "/error/" + exception.getLocalizedMessage() + "/1")
                 .build().toUriString();
 
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);

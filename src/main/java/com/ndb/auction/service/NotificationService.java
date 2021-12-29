@@ -167,6 +167,10 @@ public class NotificationService {
         return notificationDao.setReadFlag(notify);
     }
 
+    public String setNotificationReadFlagAll(String userId) {
+        return notificationDao.setReadFlagAll(userId);
+    }
+
     public List<Notification2> getUnreadNotification2s(String userId) {
         return notificationDao.getUnreadNotifications(userId);
     }
@@ -181,5 +185,6 @@ public class NotificationService {
     public List<NotificationType2> getNotificationTypes() {
         return notificationTypeDao.getNotificationTypes();
     }
+
 
 }

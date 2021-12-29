@@ -28,8 +28,8 @@ public class NdbWalletService {
     // Configuration
     // private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
     private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
-    private final String password = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
-    private final String contractAddress = "0x73bfe136feba2c73f441605752b2b8caab6843ec";
+    private final String password = "aacae1e3f6d8229ad02525a1c952c51925430ad5df73d062c78d769089dba1d4";
+    private final String contractAddress = "0x81c10Eeacf1cCcdA36D954e9e1b24f41D8318b21";
     // private final String contractAddress = "0x736680D21e2B0C63813FEBc4432891579C28EEe8";
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
@@ -298,10 +298,10 @@ public class NdbWalletService {
             // String sPrivatekeyInHex = privateKeyInDec.toString(16);
             // WalletFile wallet = Wallet.createLight(seed, ecKeyPair);
             // address = wallet.getAddress(); 
-            String privateKey = "215e3bf446f8a182683faf3570929d9a5c8f6459b9b0ebb1c36a25851224fa02";
+            String privateKey = "ac3ffc57465944b1309dcde8fc8ffa2dc417deaafe42f99538414aee7df957f1";
             Credentials credentials = Credentials.create(privateKey);
             
-            ERC20 erc20 = ERC20.load("0x73bfe136feba2c73f441605752b2b8caab6843ec", web3j, credentials, gasPrice, gasLimit);
+            ERC20 erc20 = ERC20.load("0x81c10Eeacf1cCcdA36D954e9e1b24f41D8318b21", web3j, credentials, gasPrice, gasLimit);
 
             return erc20.balanceOf("0x" + address).send();
 

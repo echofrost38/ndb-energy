@@ -75,12 +75,12 @@ public class StatService extends BaseService {
                 cnt++;
 			}
 			std = standardDeviation.evaluate(priceArr);
-            if(!Double.isNaN(std)) {
-                RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
-                roundPerform2List.add(roundPerform2);
-            }
-            winRate = win / total;
-            failedRate = failed / total;
+            std = Double.isNaN(std) ? 0.0 : std;
+            RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
+            roundPerform2List.add(roundPerform2);
+
+            winRate = total == 0.0 ? 0.0 : win / total;
+            failedRate = total == 0.0 ? 0.0 : failed / total;
             RoundChance roundChance = new RoundChance(roundNumber, winRate, failedRate);
             roundChanceList.add(roundChance);
 
@@ -123,8 +123,8 @@ public class StatService extends BaseService {
                 }
 
             }
-            winRate = win / total;
-            failedRate = failed / total;
+            winRate = total == 0.0 ? 0.0 : win / total;
+            failedRate = total == 0.0 ? 0.0 : failed / total;
             RoundChance chance = new RoundChance(roundNumber, winRate, failedRate);
             roundChanceList.add(chance);
 
@@ -167,9 +167,7 @@ public class StatService extends BaseService {
 				cnt++;
 			}
 			std = standardDeviation.evaluate(priceArr);
-            if(Double.isNaN(std)) {
-                return list;
-            }
+            std = Double.isNaN(std) ? 0.0 : std;
 			RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
 			list.add(roundPerform2);
 		} 
@@ -232,8 +230,8 @@ public class StatService extends BaseService {
                     failed += bid.getTotalPrice();
                 }
 
-                winRate = win / total;
-                failedRate = failed / total;
+                winRate = total == 0.0 ? 0.0 : win / total;
+            failedRate = total == 0.0 ? 0.0 : failed / total;
                 RoundChance chance = new RoundChance(roundNumber, winRate, failedRate);
                 list.add(chance);
             }

@@ -79,15 +79,7 @@ public class NotificationDao extends BaseDao implements INotificationDao {
 		dynamoDBMapper.save(notification2, updateConfig);
 		return notification2;
 	}
-	
-	public String setReadFlagAll(String userId) {
-		List<Notification2> unReadList = getUnreadNotifications(userId);
-		for (Notification2 unRead: unReadList) {
-			setReadFlag(unRead);
-		}
-		return "Success";
-	}
-	
+
 	public Notification2 getNotification2(String id, long timeStamp){
 		return dynamoDBMapper.load(Notification2.class, id, timeStamp);
 	}

@@ -62,7 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (provider.equalsIgnoreCase(AuthProvider.linkedin.toString())) {
                 populateEmailAddressFromLinkedIn(oAuth2UserRequest, attributes);
             }
-            return processOAuth2User(provider, attributes);
+            return processOAuth2User(oAuth2UserRequest, attributes);
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -86,9 +86,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	}
 
     @SuppressWarnings("deprecation")
-	private OAuth2User processOAuth2User(String provider, Map<String, Object> attributes) {
+	private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) {
         log.info("ProcessOAuth2User {}", attributes);
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), attributes);
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
@@ -99,36 +99,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userOptional.get();
             user = updateExistingUser(user, oAuth2UserInfo);
         } else {
-            user = registerNewUser(provider, oAuth2UserInfo);
+            user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
         
         return UserDetailsImpl.build(user, attributes);
     }
 
-    @SuppressWarnings("deprecation")
-    public UserDetailsImpl processUserDetails(String provider, Map<String, Object> attributes) {
-        log.info("processUserDetails {}", attributes);
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
-        if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
-            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
-        }
-
-        Optional<User> userOptional = userDao.getUserByEmail(oAuth2UserInfo.getEmail());
-        User user;
-        if(userOptional != null) {
-            user = userOptional.get();
-            user = updateExistingUser(user, oAuth2UserInfo);
-        } else {
-            user = registerNewUser(provider, oAuth2UserInfo);
-        }
-        
-        return UserDetailsImpl.build(user, attributes);
-    }
-
-
-    private User registerNewUser(String provider, OAuth2UserInfo oAuth2UserInfo) {
+    private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         User user = new User();
 
+        String provider = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         user.setProvider(AuthProvider.valueOf(provider));
         user.setProviderId(oAuth2UserInfo.getId());
         user.setName(oAuth2UserInfo.getName());

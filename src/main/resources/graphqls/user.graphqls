@@ -33,6 +33,9 @@ extend type Mutation {
     changePassword(
         newPassword: String!
     ) : String!
+    deleteAccount(
+        id: String!
+    ) : String!
 }
 
 schema {

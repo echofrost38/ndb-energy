@@ -1,8 +1,13 @@
 extend type Query {
-    getDepositAddress(
+    getInternalAddress(
         id: String,
         token: String,
         network: String
+    ) : String
+    getWalletBalance(
+        token: String,
+        network: String,
+        address: String
     ) : String
 }
 

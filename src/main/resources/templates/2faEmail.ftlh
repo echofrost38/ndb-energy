@@ -57,7 +57,7 @@
                     padding-top: 58px;
                 "
             >
-                XXXXXX
+                ${code}
             </div>
             <div
                 style="

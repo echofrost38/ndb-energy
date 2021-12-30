@@ -15,7 +15,7 @@
             style="
                 width: max-content;
                 height: auto;
-                padding-left: 61px;
+                padding-left: 30px;
                 font-family: 'Montserrat' !important;
                 overflow: hidden;
             "

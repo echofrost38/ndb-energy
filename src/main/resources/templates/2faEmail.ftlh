@@ -13,9 +13,8 @@
     <body>
         <div
             style="
-                width: 60%;
+                width: max-content;
                 height: auto;
-                margin-left: 20%;
                 padding-left: 61px;
                 font-family: 'Montserrat' !important;
                 overflow: hidden;
@@ -75,14 +74,14 @@
                     font-size: 10px;
                     line-height: 12px;
                     color: #1e1e1e;
-                    text-align: center;
                     opacity: 0.6;
                     padding-top: 141px;
                     padding-bottom: 39px;
+                    text-align: center;
                 "
             >
                 <div>© 2021 Voltamond SA. All rights reserved.</div>
-                <div style="margin-top: 6px; text-align: center">
+                <div style="margin-top: 6px">
                     <div style="margin-right: 14px; display: inline">
                         ndb.money
                     </div>

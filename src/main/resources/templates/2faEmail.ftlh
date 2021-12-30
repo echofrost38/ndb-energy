@@ -11,12 +11,12 @@
         <title>NDB Money</title>
     </head>
     <body>
-        <main
+        <div
             style="
-                width: 600px;
+                width: 60%;
                 height: auto;
-                margin: auto;
-                padding: 0px;
+                margin-left: 20%;
+                padding-left: 61px;
                 font-family: 'Montserrat' !important;
                 overflow: hidden;
             "
@@ -58,7 +58,7 @@
                     padding-top: 58px;
                 "
             >
-                ${code}
+                XXXXXX
             </div>
             <div
                 style="
@@ -92,6 +92,6 @@
                     <div style="display: inline">+1 (650) 252 - 0002</div>
                 </div>
             </div>
-        </main>
+        </div>
     </body>
 </html>

@@ -11,7 +11,15 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
 
 
     // Testing purpose 
-    public String getDepositAddress(String id, String token, String network) {
+    public String getInternalAddress(String id, String token, String network) {
         return ndbWalletService.generateWalletAddress(id, token);
+    }
+
+    public String getWalletBalance(String token, String network, String address) {
+        return ndbWalletService.getWalletBalance(token, network, address).toString();
+    }
+
+    public Boolean transferFunds(String token, String network, String address, int amount) {
+        return ndbWalletService.transferFunds(token, network, address, amount);
     }
 }

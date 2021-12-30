@@ -10,6 +10,7 @@ import com.ndb.auction.contracts.NdbWallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.ECKeyPair;
@@ -20,14 +21,22 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 
+
 @Service
 public class NdbWalletService {
     
+    // RPC URLs
+
+    // Contract address
+
+
     // Configuration
-    private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
-    // private final Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
-    private final String password = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
-    private final String contractAddress = "0x736680D21e2B0C63813FEBc4432891579C28EEe8";
+    // private final Web3j web3j = Web3j.build(new HttpService("https://bsc-dataseed.binance.org/"));
+    // private final Web3j web3j = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
+    private final Web3j web3j = Web3j.build(new HttpService("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"));
+    private final String password = "aacae1e3f6d8229ad02525a1c952c51925430ad5df73d062c78d769089dba1d4";
+    private final String contractAddress = "0x81c10Eeacf1cCcdA36D954e9e1b24f41D8318b21";
+    // private final String contractAddress = "0x736680D21e2B0C63813FEBc4432891579C28EEe8";
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
@@ -281,7 +290,52 @@ public class NdbWalletService {
         } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchProviderException | CipherException e) {
             e.printStackTrace();
         }
-        return address;
+        return "0x" + address;
+    }
+
+    @SuppressWarnings("deprecation")
+    public BigInteger getWalletBalance(String token, String network, String address) {
+        String seed = UUID.randomUUID().toString();
+        try {
+            // ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+            
+            // BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
+
+            // String sPrivatekeyInHex = privateKeyInDec.toString(16);
+            // WalletFile wallet = Wallet.createLight(seed, ecKeyPair);
+            // address = wallet.getAddress(); 
+            String privateKey = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
+            Credentials credentials = Credentials.create(privateKey);
+            
+            ERC20 erc20 = ERC20.load("0xB8c77482e45F1F44dE1745F52C74426C631bDD52", web3j, credentials, gasPrice, gasLimit);
+
+            return erc20.balanceOf("0x" + address).send();
+
+            // save to database
+            // createWalletWithId(id, tokenType, privateKey);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BigInteger.valueOf(-1);
+        }
+    }
+
+    public Boolean transferFunds(String token, String network, String address, int amount) {
+        try {
+            String privateKey = "ac3ffc57465944b1309dcde8fc8ffa2dc417deaafe42f99538414aee7df957f1";
+            Credentials credentials = Credentials.create(privateKey);
+            
+            @SuppressWarnings("deprecation")
+            ERC20 erc20 = ERC20.load("0x81c10Eeacf1cCcdA36D954e9e1b24f41D8318b21", web3j, credentials, gasPrice, gasLimit);
+
+            BigInteger _amount = BigInteger.valueOf(amount * 100);
+            erc20.transfer(address, _amount).send();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 

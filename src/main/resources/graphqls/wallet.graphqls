@@ -1,14 +1,24 @@
 extend type Query {
-    getDepositAddress(
+    getInternalAddress(
         id: String,
         token: String,
         network: String
     ) : String
+    getWalletBalance(
+        token: String,
+        network: String,
+        address: String
+    ) : String
 }
 
-# extend type Mutation {
-
-# }
+extend type Mutation {
+    transferFunds(
+        token: String,
+        network: String,
+        address: String,
+        amount: Int
+    ) : Boolean
+}
 
 schema {
     query: Query,

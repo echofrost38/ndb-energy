@@ -277,11 +277,11 @@ public class BidService extends BaseService implements IBidService {
 		auctionDao.updateAuctionStats(currentRound);
         
         // send Notification
-        notificationService.send(
+        notificationService.sendNotification(
+			userId,
 			Notification.N_BID_RANKING_UPDATED, 
 			"Bid Ranking Updated", 
-			"Bid ranking is updated, please check your bid ranking", 
-			userId
+			"Bid ranking is updated, please check your bid ranking"
 		);
 	}
 	
@@ -404,11 +404,12 @@ public class BidService extends BaseService implements IBidService {
 			userDao.updateUser(user);
 
 			// send notification
-	        notificationService.send(
+	        notificationService.sendNotification(
+				userId,
 				Notification.N_BID_CLOSED, 
 				"Bid Closed", 
-				"Please check you bid result", 
-			userId);
+				"Please check you bid result"
+			);
 	    }
 	}
 

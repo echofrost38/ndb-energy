@@ -1,6 +1,7 @@
 package com.ndb.auction.schedule;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +12,7 @@ import com.ndb.auction.service.StatService;
 
 @Component
 public class ScheduledTasks {
-	
+
 	@Autowired
 	AuctionService auctionService;
 
@@ -20,13 +21,13 @@ public class ScheduledTasks {
 
 	@Autowired
 	StatService statService;
-	
+
 	private Auction startedRound;
 	private Long startedCounter;
 
 	private Auction readyRound;
 	private Long readyCounter;
-	
+
 	public AuctionService getAuctionService() {
 		return auctionService;
 	}
@@ -75,21 +76,21 @@ public class ScheduledTasks {
 	}
 
 	public Integer setNewCountdown(Auction auction) {
-		
-		if(this.readyRound != null) {
+
+		if (this.readyRound != null) {
 			return -1;
 		}
-		
+
 		this.readyRound = auction;
 		this.readyCounter = auction.getStartedAt() - System.currentTimeMillis();
 		// convert into Seconds!!
-		this.readyCounter /= 1000; 
-		
+		this.readyCounter /= 1000;
+
 		return 1;
 	}
 
 	public void setStartRound(Auction auction) {
-		if(this.startedRound != null) {
+		if (this.startedRound != null) {
 			return;
 		}
 		this.startedRound = auction;
@@ -99,20 +100,20 @@ public class ScheduledTasks {
 
 	@Scheduled(fixedRate = 1000)
 	public void AuctionCounter() {
-		
+
 		// count down ( ready round )
-		if(readyRound != null && readyCounter > 0L) {
+		if (readyRound != null && readyCounter > 0L) {
 			readyCounter--;
 			System.out.println("Ready counter: " + readyCounter.toString());
-			if(readyCounter == 0) {
+			if (readyCounter == 0) {
 				// ended count down ! trigger to start this round!!
-				
+
 				startedRound = readyRound;
 				startedCounter = readyRound.getDuration();
-				
+
 				String id = readyRound.getAuctionId();
 				Auction nextRound = auctionService.startAuction(id);
-				if(nextRound != null) {
+				if (nextRound != null) {
 					readyRound = nextRound;
 					readyCounter = (nextRound.getStartedAt() - System.currentTimeMillis()) / 1000;
 				} else {
@@ -122,20 +123,21 @@ public class ScheduledTasks {
 		}
 
 		// check current started round
-		if(startedRound != null && startedCounter > 0L) {
+		if (startedRound != null && startedCounter > 0L) {
 			startedCounter--;
 			System.out.println("Started counter: " + startedCounter.toString());
-			if(startedCounter == 0) {
+			if (startedCounter == 0) {
 				// end round!
 				auctionService.endAuction(startedRound.getAuctionId());
-				
+
 				statService.updateRoundCache(startedRound.getNumber());
 
-				// bid processing 
-				// ********* checking delayed more 1s ************ 
+				// bid processing
+				// ********* checking delayed more 1s ************
 				bidService.closeBid(startedRound.getAuctionId());
 				startedRound = null;
 			}
 		}
 	}
+
 }

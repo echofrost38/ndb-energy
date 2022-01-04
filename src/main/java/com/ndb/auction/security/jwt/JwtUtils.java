@@ -1,14 +1,11 @@
 package com.ndb.auction.security.jwt;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import com.ndb.auction.service.UserDetailsImpl;
@@ -26,18 +23,10 @@ public class JwtUtils {
 	private int jwtExpirationMs;
 	
 	public String generateJwtToken(Authentication authentication) {
-		String email = "";
-		try {
-			UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();	
-			email = userPrincipal.getEmail();
-		} catch (Exception e) {
-			OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-			Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-			email = (String) attributes.get("email");
-		}
+		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
 		return Jwts.builder()
-				.setSubject(email)
+				.setSubject((userPrincipal.getEmail()))
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)

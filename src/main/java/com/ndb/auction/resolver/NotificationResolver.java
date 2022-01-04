@@ -88,13 +88,6 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String setNotificationReadFlagAll() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
-        return notificationService.setNotificationReadFlagAll(userId);
-    }
-
-    @PreAuthorize("isAuthenticated()")
     public List<Notification2> getUnreadNotifications() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();

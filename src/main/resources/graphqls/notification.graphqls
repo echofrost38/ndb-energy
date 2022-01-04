@@ -9,8 +9,8 @@ extend type Query {
         stamp: Float,
         limit: Int!
     ) : [Notification2]
-    getUnreadNotifications: [Notification2]
-    getNotificationTypes2: [NotificationType2]
+    getUnreadNotifications : [Notification2]
+    getNotificationTypes2 : [NotificationType2]
 }
 
 extend type Mutation {
@@ -30,7 +30,6 @@ extend type Mutation {
     setNotificationReadFlag(
         stamp: Float!
     ) : Notification2
-    setNotificationReadFlagAll: String
     changeNotifySetting(
         nType: Int!,
         status: Boolean

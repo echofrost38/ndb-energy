@@ -37,7 +37,7 @@ public class BaseService {
 
 	@Autowired
 	ScheduledTasks schedule;
-	
+
     @Autowired
     public AuctionDao auctionDao;
     

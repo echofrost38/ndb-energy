@@ -16,7 +16,7 @@ extend type Mutation {
     makeAllow(
         countryCode: String!
     ) : GeoLocation
-    resetPassword(
+    resetPasswordByAdmin(
         email: String!
     ) : String
     createNewUser(
@@ -33,8 +33,10 @@ extend type Mutation {
     changePassword(
         newPassword: String!
     ) : String!
+    deleteAccount : String!
 }
 
 schema {
-    query: Query
+    query: Query,
+    mutation: Mutation
 }

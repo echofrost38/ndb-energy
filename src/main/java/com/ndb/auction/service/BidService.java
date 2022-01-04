@@ -169,7 +169,8 @@ public class BidService extends BaseService implements IBidService {
 	@Override
 	public List<Bid> getBidListByRound(Integer round) {
 		// PaginatedScanList<> how to sort?
-		Bid[] bidList = bidDao.getBidListByRound(round).toArray(new Bid[0]);
+		Auction auction = auctionDao.getAuctionByRound(round);
+		Bid[] bidList = bidDao.getBidListByRound(auction.getAuctionId()).toArray(new Bid[0]);
 		Arrays.sort(bidList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
 		return Arrays.asList(bidList);
 	}
@@ -276,11 +277,11 @@ public class BidService extends BaseService implements IBidService {
 		auctionDao.updateAuctionStats(currentRound);
         
         // send Notification
-        notificationService.send(
+        notificationService.sendNotification(
+			userId,
 			Notification.N_BID_RANKING_UPDATED, 
 			"Bid Ranking Updated", 
-			"Bid ranking is updated, please check your bid ranking", 
-			userId
+			"Bid ranking is updated, please check your bid ranking"
 		);
 	}
 	
@@ -403,11 +404,12 @@ public class BidService extends BaseService implements IBidService {
 			userDao.updateUser(user);
 
 			// send notification
-	        notificationService.send(
+	        notificationService.sendNotification(
+				userId,
 				Notification.N_BID_CLOSED, 
 				"Bid Closed", 
-				"Please check you bid result", 
-			userId);
+				"Please check you bid result"
+			);
 	    }
 	}
 

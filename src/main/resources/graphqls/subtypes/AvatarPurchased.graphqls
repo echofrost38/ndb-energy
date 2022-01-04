@@ -1,4 +1,4 @@
 type AvatarPurchased {
     key: String,
-    value: [Int]
+    value: [String]
 }

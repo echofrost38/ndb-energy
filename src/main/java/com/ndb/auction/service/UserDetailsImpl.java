@@ -31,6 +31,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
+	public UserDetailsImpl() {}
 	public UserDetailsImpl(
 			String id,
 			String username,

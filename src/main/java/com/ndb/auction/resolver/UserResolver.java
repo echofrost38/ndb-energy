@@ -47,7 +47,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String resetPassword(String email) {
+    public String resetPasswordByAdmin(String email) {
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
         User user = userService.getUserByEmail(email);
@@ -95,7 +95,12 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.getPaginatedUser(key, limit);
     }
 
-    
+    @PreAuthorize("isAuthenticated()")
+    public String deleteAccount() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = userDetails.getId();
+        return userService.deleteUser(id);
+    }
 
 //    @PreAuthorize("isAuthenticated")
 //    public String setAvatar(String prefix, String name) {

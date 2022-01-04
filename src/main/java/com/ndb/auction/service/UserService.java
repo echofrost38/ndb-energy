@@ -280,6 +280,10 @@ public class UserService extends BaseService implements IUserService {
 		return userDao.getPaginatedUser(key, limit);
 	}
 
+	public String deleteUser(String id) {
+		return userDao.deleteUser(id).getEmail();
+	}
+
 	///////////////////////// Geo Location /////////
 	public GeoLocation addDisallowed(String countryCode) {
 		return geoLocationDao.addDisallowedCountry(countryCode);

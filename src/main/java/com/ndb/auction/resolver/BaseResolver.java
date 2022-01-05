@@ -22,6 +22,7 @@ import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.SumsubService;
+import com.ndb.auction.service.TokenAssetService;
 
 public class BaseResolver {
 
@@ -84,5 +85,8 @@ public class BaseResolver {
 
 	@Autowired
 	KYBService kybService;
+
+	@Autowired
+	TokenAssetService tokenAssetService;
 
 }

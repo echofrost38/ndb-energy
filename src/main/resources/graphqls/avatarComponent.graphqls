@@ -1,5 +1,3 @@
-scalar Upload
-
 extend type Query {
     getAvatarComponent(
         groupId: String!,
@@ -20,7 +18,10 @@ extend type Mutation {
         tierLevel: Int!,
         price: Float!,
         limited: Int!,
-        file: Upload!
+        svg: String!,
+        width: Int!,
+        top: Int!,
+        left: Int!
     ) : AvatarComponent
     updateComponent (
         groupId: String!,
@@ -28,7 +29,10 @@ extend type Mutation {
         tierLevel: Int,
         price: Float,
         limited: Int,
-        file: Upload
+        svg: String,
+        width: Int,
+        top: Int,
+        left: Int
     ) : AvatarComponent
 }
 

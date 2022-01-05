@@ -22,7 +22,8 @@ extend type Mutation {
         avatarSet: [AvatarSetInput],
         enemy: String,
         invention: String,
-        bio: String
+        bio: String,
+        hairColor: String
     ) : AvatarProfile
     updateAvatarProfile (
         id: String!,
@@ -33,7 +34,8 @@ extend type Mutation {
         avatarSet: [AvatarSetInput],
         enemy: String,
         invention: String,
-        bio: String
+        bio: String,
+        hairColor: String
     ) : AvatarProfile
 }
 

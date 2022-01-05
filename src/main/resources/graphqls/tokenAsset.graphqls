@@ -1,0 +1,23 @@
+extend type Query {
+    getTokenAssets(
+        orderBy: String
+    ) : [TokenAsset]
+}
+
+extend type Mutation {
+    createTokenAsset(
+        tokenName: String!,
+        tokenSymbol: String!,
+        network: String!,
+        address: String!,
+        symbol: String!
+    ) : Int!
+    deleteTokenAsset(
+        id: Int!
+    ) : Int!
+}
+
+schema {
+    query: Query,
+    mutation: Mutation
+}

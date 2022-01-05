@@ -1,4 +1,4 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models._bak;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;

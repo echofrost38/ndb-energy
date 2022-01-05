@@ -1,6 +1,6 @@
-package com.ndb.auction.models.user;
+package com.ndb.auction.models._bak.user;
 
-public enum  AuthProvider {
+public enum AuthProvider {
     local,
     google,
     facebook,

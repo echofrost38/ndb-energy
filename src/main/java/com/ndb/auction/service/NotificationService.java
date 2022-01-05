@@ -11,7 +11,7 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.Notification2;
 import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.NotificationType2;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;

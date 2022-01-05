@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 import com.ndb.auction.dao.UserDao;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.MailService;
 import com.ndb.auction.service.SMSService;

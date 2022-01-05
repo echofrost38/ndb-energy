@@ -1,4 +1,4 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models._bak;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
+import com.ndb.auction.models.AvatarSet;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.user.AuthProvider;
 import com.ndb.auction.models.user.AvatarPurchased;
 import com.ndb.auction.models.user.ExtWallet;

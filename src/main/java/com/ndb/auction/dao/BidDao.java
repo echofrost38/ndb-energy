@@ -89,8 +89,6 @@ public class BidDao extends BaseDao implements IBidDao {
 		return dynamoDBMapper.load(Bid.class, roundId, userId);
 	}
 
-	public List<Bid> getBidList() {
-		return dynamoDBMapper.scan(Bid.class, new DynamoDBScanExpression());
-	}
+	
 
 }

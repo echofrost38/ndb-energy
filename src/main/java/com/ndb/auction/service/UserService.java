@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
-import com.ndb.auction.models.User;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.interfaces.IUserService;
 
 import freemarker.template.TemplateException;

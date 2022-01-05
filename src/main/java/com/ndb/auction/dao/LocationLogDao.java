@@ -7,7 +7,7 @@ import java.util.Map;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.ndb.auction.models.LocationLog;
+import com.ndb.auction.models.user.UserLocationLog;
 
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +18,7 @@ public class LocationLogDao extends BaseDao {
         super(dynamoDBMapper);
     }
 
-    public LocationLog addLog(LocationLog log) {
+    public UserLocationLog addLog(UserLocationLog log) {
         dynamoDBMapper.save(log);
         return log;
     }
@@ -31,7 +31,7 @@ public class LocationLogDao extends BaseDao {
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression("user_id = :v1 and ip_address = :v2")
                 .withExpressionAttributeValues(eav);
-        return dynamoDBMapper.count(LocationLog.class, scanExpression);
+        return dynamoDBMapper.count(UserLocationLog.class, scanExpression);
     }
 
     public int getCountByCountryAndCity(String userId, String country, String city) {
@@ -43,20 +43,20 @@ public class LocationLogDao extends BaseDao {
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression("user_id = :v1 and country = :v2 and city = :v3")
                 .withExpressionAttributeValues(eav);
-        return dynamoDBMapper.count(LocationLog.class, scanExpression);
+        return dynamoDBMapper.count(UserLocationLog.class, scanExpression);
     }
 
-    public LocationLog getLogById(String userId, String logId) {
-        return dynamoDBMapper.load(LocationLog.class, userId, logId);
+    public UserLocationLog getLogById(String userId, String logId) {
+        return dynamoDBMapper.load(UserLocationLog.class, userId, logId);
     }
 
-    public List<LocationLog> getLogByUser(String userId) {
+    public List<UserLocationLog> getLogByUser(String userId) {
         Map<String, AttributeValue> eav = new HashMap<>();
         eav.put(":v1", new AttributeValue().withS(userId));
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression("user_id = :v1")
                 .withExpressionAttributeValues(eav);
-        return dynamoDBMapper.scan(LocationLog.class, scanExpression);
+        return dynamoDBMapper.scan(UserLocationLog.class, scanExpression);
     }
 
 }

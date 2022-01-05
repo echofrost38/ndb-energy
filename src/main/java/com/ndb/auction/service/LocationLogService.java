@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.dao.LocationLogDao;
 import com.ndb.auction.models.GeoLocation;
-import com.ndb.auction.models.LocationLog;
+import com.ndb.auction.models.user.UserLocationLog;
 import com.ndb.auction.payload.VpnAPI;
 import com.ndb.auction.utils.RemoteIpHelper;
 
@@ -36,7 +36,7 @@ public class LocationLogService extends BaseService {
                 .build();
     }
 
-    public boolean isProxyOrVPN(LocationLog log) {
+    public boolean isProxyOrVPN(UserLocationLog log) {
         return log.isVpn() || log.isProxy() || log.isTor() || log.isRelay();
     }
 
@@ -49,7 +49,7 @@ public class LocationLogService extends BaseService {
         return location.isAllowed();
     }
 
-    public LocationLog buildLog(HttpServletRequest request) {
+    public UserLocationLog buildLog(HttpServletRequest request) {
         String ip = RemoteIpHelper.getRemoteIpFrom(request);
         try {
             VpnAPI response = vpnAPI.get()
@@ -61,7 +61,7 @@ public class LocationLogService extends BaseService {
                     .bodyToMono(VpnAPI.class).block();
             if (response == null)
                 return null;
-            LocationLog log = new LocationLog();
+            UserLocationLog log = new UserLocationLog();
             log.setIpAddress(response.getIp());
             log.setVpn(response.getSecurity().getOrDefault("vpn", false));
             log.setProxy(response.getSecurity().getOrDefault("proxy", false));
@@ -83,7 +83,7 @@ public class LocationLogService extends BaseService {
         }
     }
 
-    public LocationLog addLog(LocationLog log) {
+    public UserLocationLog addLog(UserLocationLog log) {
         return locationLogDao.addLog(log);
     }
 
@@ -95,11 +95,11 @@ public class LocationLogService extends BaseService {
         return locationLogDao.getCountByCountryAndCity(userId, country, city);
     }
 
-    public LocationLog getLogById(String userId, String logId) {
+    public UserLocationLog getLogById(String userId, String logId) {
         return locationLogDao.getLogById(userId, logId);
     }
 
-    public List<LocationLog> getLogByUser(String userId) {
+    public List<UserLocationLog> getLogByUser(String userId) {
         return locationLogDao.getLogByUser(userId);
     }
 

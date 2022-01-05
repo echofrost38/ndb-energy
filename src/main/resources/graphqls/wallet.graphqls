@@ -9,12 +9,6 @@ extend type Query {
         network: String,
         address: String
     ) : String
-    getAllowance(
-        token: String,
-        network: String,
-        owner: String,
-        spender: String
-    ) : String
 }
 
 extend type Mutation {
@@ -22,19 +16,6 @@ extend type Mutation {
         token: String,
         network: String,
         address: String,
-        amount: Int
-    ) : Boolean
-    makeAllowance(
-        token: String,
-        network: String,
-        address: String,
-        amount: Int
-    ) : Boolean
-    transferFromFunds(
-        token: String,
-        network: String,
-        from: String,
-        to: String,
         amount: Int
     ) : Boolean
 }

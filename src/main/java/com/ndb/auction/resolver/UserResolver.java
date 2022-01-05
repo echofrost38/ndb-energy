@@ -3,7 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.GeoLocation;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,8 +65,11 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user = new User(email, encoded, country, true);
-
+        user=new User();
+        user.setEmail(email);
+        user.setPassword(encoded);
+        user.setCountry(country);
+        
         user.setAvatarPrefix(avatarName);
         user.setAvatarName(shortName);
 

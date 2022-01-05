@@ -1,6 +1,6 @@
 package com.ndb.auction.service.interfaces;
 
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 
 public interface IUserService {
 	

@@ -3,7 +3,7 @@ package com.ndb.auction.dao;
 import java.util.List;
 import java.util.Optional;
 
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.User;
 
 public interface IUserDao {
 	

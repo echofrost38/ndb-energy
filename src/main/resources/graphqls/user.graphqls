@@ -1,42 +1,28 @@
 extend type Query {
-	getUser : User
-    getUserCount : Int
-    getPaginatedUsers(
-        key: String,
-        limit: Int!
-    ) : [User]
+  getUser: User
+  getUserCount: Int
+  getPaginatedUsers(key: String, limit: Int!): [User]
 }
 
 extend type Mutation {
-    addDisallowed(
-        countryCode: String!
-    ) : GeoLocation
-    getDisallowed :
-        [GeoLocation]
-    makeAllow(
-        countryCode: String!
-    ) : GeoLocation
-    resetPasswordByAdmin(
-        email: String!
-    ) : String
-    createNewUser(
-        email: String!,
-        country: String!,
-        role: String!,
-        avatarName: String!,
-        shortName: String!
-    ) : String
-    changeRole(
-        email: String!,
-        role: String!
-    ) : String
-    changePassword(
-        newPassword: String!
-    ) : String!
-    deleteAccount : String!
+  addDisallowed(countryCode: String!): GeoLocation
+  getDisallowed: [GeoLocation]
+  makeAllow(countryCode: String!): GeoLocation
+  resetPasswordByAdmin(email: String!): String
+  createNewUser(
+    email: String!
+    country: String!
+    role: String!
+    avatarName: String!
+    shortName: String!
+  ): String
+  changeRole(email: String!, role: String!): String
+  changePassword(newPassword: String!): String!
+  deleteAccount: String!
+  confirmDeleteAccount(text: String!): String!
 }
 
 schema {
-    query: Query,
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }

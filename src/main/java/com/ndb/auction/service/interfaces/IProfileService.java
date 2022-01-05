@@ -6,7 +6,7 @@ import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.User;
 
 /**
  * 1. Airdrop Information

@@ -3,7 +3,7 @@ package com.ndb.auction.service;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.exceptions.OAuth2AuthenticationProcessingException;
 import com.ndb.auction.models.user.AuthProvider;
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.User;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfo;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;

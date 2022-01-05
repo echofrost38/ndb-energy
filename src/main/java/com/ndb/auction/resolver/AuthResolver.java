@@ -11,7 +11,8 @@ import java.util.Set;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Registration;
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.payload.Credentials;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -75,11 +76,11 @@ public class AuthResolver extends BaseResolver
 			return new Credentials("Failed", "Your email and password do not match!");
 		}
 
-		if (!user.getVerify().isEmailVerified()) {
+		if (!user.getVerify().get("email")) {
 			return new Credentials("Failed", "Please verify your email");
 		}
 
-		if (!user.getSecurity().isTfaEnabled()) {
+		if (!user.getSecurity().get("2FA")) {
 			return new Credentials("Failed", "Please set 2FA");
 		}
 
@@ -179,4 +180,7 @@ public class AuthResolver extends BaseResolver
 		return receipt.getLogs().get(0).getData();
 	}
 
+	public Wallet getWalletById(String id, String crypto) {
+		return userWalletService.getWalletById(id, crypto);
+	}
 }

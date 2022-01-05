@@ -5,7 +5,7 @@ import java.util.List;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models._bak.UserTier;
+import com.ndb.auction.models.UserTier;
 import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.stereotype.Repository;

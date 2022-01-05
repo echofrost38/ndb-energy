@@ -12,7 +12,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.Select;
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.User;
 
 @Repository
 public class UserDao extends BaseDao implements IUserDao {

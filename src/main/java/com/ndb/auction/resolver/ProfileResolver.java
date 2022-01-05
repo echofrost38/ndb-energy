@@ -10,8 +10,8 @@ import javax.servlet.http.Part;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.KYCSetting;
+import com.ndb.auction.models.User;
 import com.ndb.auction.models.sumsub.Applicant;
-import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;

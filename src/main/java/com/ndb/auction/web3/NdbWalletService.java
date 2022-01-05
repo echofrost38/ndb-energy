@@ -44,6 +44,18 @@ public class NdbWalletService {
     // private final int decimal = 12;
     // private final BigInteger bDecimal = new BigInteger("1000000000000");
 
+    // Token contract information
+    private final Web3j localNet = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
+    private final Web3j bep20net = Web3j.build(new HttpService("https://bsc-dataseed.binance.org/"));
+    private final Web3j erc20net = Web3j.build(new HttpService("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"));
+
+    private final String usdtBep20 = "0x55d398326f99059ff775485246999027b3197955";
+    private final String bnbBep20 = "0x55d398326f99059ff775485246999027b3197955";  
+    
+    private final String localToken = "0x9466f407A63f22c5f013e4EBB4403Ce9F3390D70";  
+    
+    
+
     private NdbWallet ndbWallet;
 
     @Autowired
@@ -304,12 +316,12 @@ public class NdbWalletService {
             // String sPrivatekeyInHex = privateKeyInDec.toString(16);
             // WalletFile wallet = Wallet.createLight(seed, ecKeyPair);
             // address = wallet.getAddress(); 
-            String privateKey = "05a30ce0d427acfc6a22588d5377f8346fb6cd1adfc6eda37411b6d2adeb11b9";
+            String privateKey = "5234f62a14e84939343cf45c03d7ab7aad422ae4a5354283c28db7d204e342d4";
             Credentials credentials = Credentials.create(privateKey);
             
-            ERC20 erc20 = ERC20.load("0xB8c77482e45F1F44dE1745F52C74426C631bDD52", web3j, credentials, gasPrice, gasLimit);
+            ERC20 usdtToken = ERC20.load(localToken, localNet, credentials, gasPrice, gasLimit);
 
-            return erc20.balanceOf("0x" + address).send();
+            return usdtToken.balanceOf(address).send();
 
             // save to database
             // createWalletWithId(id, tokenType, privateKey);
@@ -322,11 +334,11 @@ public class NdbWalletService {
 
     public Boolean transferFunds(String token, String network, String address, int amount) {
         try {
-            String privateKey = "ac3ffc57465944b1309dcde8fc8ffa2dc417deaafe42f99538414aee7df957f1";
+            String privateKey = "5234f62a14e84939343cf45c03d7ab7aad422ae4a5354283c28db7d204e342d4";
             Credentials credentials = Credentials.create(privateKey);
             
             @SuppressWarnings("deprecation")
-            ERC20 erc20 = ERC20.load("0x81c10Eeacf1cCcdA36D954e9e1b24f41D8318b21", web3j, credentials, gasPrice, gasLimit);
+            ERC20 erc20 = ERC20.load(localToken, localNet, credentials, gasPrice, gasLimit);
 
             BigInteger _amount = BigInteger.valueOf(amount * 100);
             erc20.transfer(address, _amount).send();

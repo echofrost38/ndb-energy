@@ -3,7 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models._bak.UserTier;
+import com.ndb.auction.models.UserTier;
 import com.ndb.auction.service.TierService;
 
 import org.springframework.beans.factory.annotation.Autowired;

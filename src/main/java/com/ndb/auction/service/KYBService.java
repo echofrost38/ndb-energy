@@ -10,7 +10,7 @@ import javax.servlet.http.Part;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.ndb.auction.dao.KYBDao;
-import com.ndb.auction.models.user.UserKyb;
+import com.ndb.auction.models.KYB;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +29,16 @@ public class KYBService extends BaseService {
         this.s3 = s3;
     }
 
-    public UserKyb getByUserId(String userId) {
+    public KYB getByUserId(String userId) {
         return kybDao.getByUserId(userId);
     }
 
-    public List<UserKyb> getAll() {
+    public List<KYB> getAll() {
         return kybDao.getAll();
     }
 
-    public UserKyb updateInfo(String userId, String country, String companyName, String regNum) {
-        UserKyb kyb = new UserKyb();
+    public KYB updateInfo(String userId, String country, String companyName, String regNum) {
+        KYB kyb = new KYB();
         kyb.setUserId(userId);
         kyb.setCountry(country);
         kyb.setCompanyName(companyName);
@@ -46,29 +46,17 @@ public class KYBService extends BaseService {
         return kybDao.addList(kyb);
     }
 
-    public UserKyb updateFile(int userId, List<Part> fileList) {
-        int count = fileList.size();
-        UserKyb kyb = new UserKyb();
-        kyb.setId(userId);
-        if (count == 0)
-            return kyb;
-        {
-            Part file = fileList.get(0);
+    public KYB updateFile(String userId, List<Part> fileList) {
+        Set<String> files = new HashSet<>();
+        for (Part file : fileList) {
             String fileName = file.getName();
-            String key = "kyb-" + userId + "-" + fileName;
-            uploadFileS3(key, file);
-            kyb.setAttach1Key(key);
-            kyb.setAttach1Filename(fileName);
+            String fullName = FilenameUtils.concat(userId, fileName);
+            uploadFileS3(fullName, file);
+            files.add(fileName);
         }
-        if (count > 1) {
-            Part file = fileList.get(1);
-            String fileName = file.getName();
-            String key = "kyb-" + userId + "-" + fileName;
-            uploadFileS3(key, file);
-            kyb.setAttach2Key(key);
-            kyb.setAttach2Filename(fileName);
-        }
-
+        KYB kyb = new KYB();
+        kyb.setUserId(userId);
+        kyb.setFiles(files);
         return kybDao.addList(kyb);
     }
 

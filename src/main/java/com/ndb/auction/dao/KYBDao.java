@@ -5,7 +5,7 @@ import java.util.List;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.ndb.auction.models.user.UserKyb;
+import com.ndb.auction.models.KYB;
 
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +16,7 @@ public class KYBDao extends BaseDao {
         super(dynamoDBMapper);
     }
 
-    public UserKyb addList(UserKyb kyb) {
+    public KYB addList(KYB kyb) {
         DynamoDBMapperConfig dynamoDBMapperConfig = new DynamoDBMapperConfig.Builder()
                 .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
                 .build();
@@ -24,12 +24,12 @@ public class KYBDao extends BaseDao {
         return kyb;
     }
 
-    public UserKyb getByUserId(String userId) {
-        return dynamoDBMapper.load(UserKyb.class, userId);
+    public KYB getByUserId(String userId) {
+        return dynamoDBMapper.load(KYB.class, userId);
     }
 
-    public List<UserKyb> getAll() {
-        return dynamoDBMapper.scan(UserKyb.class, new DynamoDBScanExpression());
+    public List<KYB> getAll() {
+        return dynamoDBMapper.scan(KYB.class, new DynamoDBScanExpression());
     }
 
 }

@@ -96,19 +96,10 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String deleteAccount() {        
-        return "To delete your account, please withdraw all your assets from NDB Wallet. Please note deleting process is irreversible.";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public String confirmDeleteAccount(String text) {
-        if (text.equals("delete")) {
-            UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            String id = userDetails.getId();
-            return userService.deleteUser(id);
-        } else {
-            return "failed";
-        }
+    public String deleteAccount() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = userDetails.getId();
+        return userService.deleteUser(id);
     }
 
 //    @PreAuthorize("isAuthenticated")

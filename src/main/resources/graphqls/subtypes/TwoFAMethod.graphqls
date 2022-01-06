@@ -1,9 +1,0 @@
-type TwoFAMethod {
-  key: String
-  value: Boolean
-}
-
-input TwoFAEntry {
-  key: String!
-  value: String!
-}

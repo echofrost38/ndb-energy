@@ -7,5 +7,6 @@ type AvatarProfile {
     avatarSet: [AvatarSet],
     enemy: String,
     invention: String,
-    bio: String
+    bio: String,
+    hairColor: String
 }

@@ -123,16 +123,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
             // Save token on cache
             totpService.setTokenAuthCache(dataType, authentication);
-
-            Map<String, Boolean> methods = user.getTwoStep();
-
-            for (Map.Entry<String, Boolean> method : methods.entrySet()) {
-                String key = method.getKey();
-                Boolean value = method.getValue();
-
-                if (!value) continue;
-                data += "*" + key;
-            }
         }
         
         return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + dataType + "/" + data)

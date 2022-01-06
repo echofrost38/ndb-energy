@@ -10,6 +10,8 @@ import com.ndb.auction.dao.NotificationDao;
 import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
 import com.ndb.auction.dao.UserDao;
+import com.ndb.auction.dao.oracle.InternalBalanceDao;
+import com.ndb.auction.dao.oracle.TokenAssetDao;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
@@ -88,4 +90,10 @@ public class BaseService {
 
     @Autowired
     public TierService tierService;
+
+    @Autowired
+    public TokenAssetDao tokenAssetDao;
+
+    @Autowired
+    public InternalBalanceDao balanceDao;
 }

@@ -106,7 +106,7 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
         return notificationService.addNewNotificationType(nType, tName, broadcast);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public List<NotificationType2> getNotificationTypes2() {
         return notificationService.getNotificationTypes();
     }

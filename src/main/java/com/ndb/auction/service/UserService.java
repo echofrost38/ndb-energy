@@ -193,11 +193,9 @@ public class UserService extends BaseService implements IUserService {
 					String code = totpService.get2FACode(user.getEmail() + key);//example@gmail.comemail
 					mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
 					userDao.updateUser(user);
-				} catch (Exception e) {
+				} catch (MessagingException | IOException | TemplateException e) {
 					return "error"; // or exception
 				}
-			default:
-				return "error";
 			}
 		}
 		return token;

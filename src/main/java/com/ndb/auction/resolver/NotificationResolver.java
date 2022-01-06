@@ -73,6 +73,11 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
         return notificationService.addNewNotification(userId, nType, title, msg);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String addNewBroadcast(int nType, String title, String msg) {
+        return notificationService.addNewBroadcast(nType, title, msg);
+    }
+
     @PreAuthorize("isAuthenticated()")
     public List<Notification2> getNotifications(Long stamp, int limit) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

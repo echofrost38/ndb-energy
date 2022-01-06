@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import javax.mail.MessagingException;
 
@@ -96,7 +98,6 @@ public class UserService extends BaseService implements IUserService {
 	public String request2FA(String email, String method, String phone) {
 		
 		User user = getUserByEmail(email);
-		user.setTwoStep(method);
 				
 		if(!user.getVerify().get("email")) {
 			throw new UnauthorizedException("Your account is not verified", "email");
@@ -133,7 +134,7 @@ public class UserService extends BaseService implements IUserService {
 		return null;
 	}
 	
-	public String confirmRequest2FA(String email, String code) {
+	public String confirmRequest2FA(String email, String method, String code) {
 		User user = getUserByEmail(email);
 		
 		if(!user.getVerify().get("email")) {
@@ -141,7 +142,7 @@ public class UserService extends BaseService implements IUserService {
 		}
 		
 		boolean status = false;
-		String method = user.getTwoStep();
+
 		if(method.equals("app")) {
 			status = totpService.verifyCode(code, user.getGoogleSecret());
 		} else if(method.equals("phone") || method.equals("email")){
@@ -150,6 +151,7 @@ public class UserService extends BaseService implements IUserService {
 		
 		if(status) {
 			user.getSecurity().replace("2FA", true);
+			user.getTwoStep().replace(method, true);
 			userDao.updateUser(user);
 			return "Success";
 		} else {
@@ -163,49 +165,65 @@ public class UserService extends BaseService implements IUserService {
 	    new Random().nextBytes(array);
 	    String token = UUID.randomUUID().toString();
 	    
-	    String method = user.getTwoStep();
-	    switch(method) {
-	    case "app":
-	    	if(user.getGoogleSecret() == "") {
-	    		return "error";
-	    	} else {
-	    		return token;
-	    	}
-	    case "phone":
-	    	try {
-				String code = totpService.get2FACode(user.getEmail());
-	    		String phone = user.getMobile();
-				userDao.updateUser(user);
-				smsService.sendSMS(phone, code);
-				return token;
-			} catch (IOException | TemplateException e) {
-				return "error";
+	    Map<String, Boolean> methods = user.getTwoStep();
+
+		for (Map.Entry<String, Boolean> method : methods.entrySet()) {
+			String key = method.getKey();
+			Boolean value = method.getValue();
+
+			if (!value) continue;
+
+			switch(key) {
+			case "app":
+				if(user.getGoogleSecret() == "") {
+					return "error";
+				} 
+				break;
+			case "phone":
+				try {
+					String code = totpService.get2FACode(user.getEmail() + key);//example@gmail.comphone
+					String phone = user.getMobile();
+					userDao.updateUser(user);
+					smsService.sendSMS(phone, code);
+				} catch (IOException | TemplateException e) {
+					return "error";
+				}
+				break;
+			case "email":
+				try {
+					String code = totpService.get2FACode(user.getEmail() + key);//example@gmail.comemail
+					mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
+					userDao.updateUser(user);
+				} catch (MessagingException | IOException | TemplateException e) {
+					return "error"; // or exception
+				}
+				break;
 			}
-	    case "email":
-	    	try {
-	    		String code = totpService.get2FACode(user.getEmail());
-	    		mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-				userDao.updateUser(user);
-				return token;
-			} catch (MessagingException | IOException | TemplateException e) {
-				return "error"; // or exception
-			}
-	    default:
-	    	return "error";
-	    }
-	    
+		}
+		return token;
 	}
 	
 	@Override
-	public boolean verify2FACode(String email, String code) {
+	public boolean verify2FACode(String email, Map<String, String> codeMap) {
+		boolean result = false;
 		User user = getUserByEmail(email);
-		String method = user.getTwoStep();
-		if(method.equals("app")) {
-			return totpService.verifyCode(code, user.getGoogleSecret());
-		} else if (method.equals("email") || method.equals("phone")) {
-			return totpService.check2FACode(email, code);
+		Map<String, Boolean> methods = user.getTwoStep();
+
+		for (Map.Entry<String, Boolean> method : methods.entrySet()) {
+			String key = method.getKey();
+			Boolean value = method.getValue();
+
+			if (!value) continue;
+
+			String code = codeMap.get(key);
+			if(key.equals("app")) {
+				return totpService.verifyCode(code, user.getGoogleSecret());
+			} else if (key.equals("email") || key.equals("phone")) {
+				return totpService.check2FACode(email + key, code);
+			}
 		}
-		return false;
+
+		return result;
 	}
 	
 	public boolean sendResetToken(String email) {

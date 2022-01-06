@@ -1,5 +1,7 @@
 package com.ndb.auction.service.interfaces;
 
+import java.util.Map;
+
 import com.ndb.auction.models.User;
 
 public interface IUserService {
@@ -15,5 +17,5 @@ public interface IUserService {
 	
 	String request2FA(String email, String method, String phone);
 	
-	boolean verify2FACode(String email, String code);
+	boolean verify2FACode(String email, Map<String, String> codeMap);
 }

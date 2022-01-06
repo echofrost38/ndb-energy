@@ -23,7 +23,6 @@ public class AvatarProfile {
 	private String enemy;
 	private String invention;
 	private String bio;
-	private String hairColor;
 	
 	public AvatarProfile() {
 		
@@ -37,8 +36,7 @@ public class AvatarProfile {
 		List<AvatarSet> avatarSet,
 		String enemy,
 		String invention,
-		String bio,
-		String hairColor
+		String bio
 	) {
 		this.name = name;
 		this.surname = surname;
@@ -48,7 +46,6 @@ public class AvatarProfile {
 		this.enemy = enemy;
 		this.invention = invention;
 		this.bio = bio;
-		this.hairColor = hairColor;
 	}
 
 	@DynamoDBHashKey(attributeName="id")
@@ -132,16 +129,5 @@ public class AvatarProfile {
 	public void setBio(String bio) {
 		this.bio = bio;
 	}
-
-	@DynamoDBAttribute(attributeName="hair_color")
-	public String getHairColor() {
-		return hairColor;
-	}
-
-	public void setHairColor(String hairColor) {
-		this.hairColor = hairColor;
-	}
-
-	
 
 }

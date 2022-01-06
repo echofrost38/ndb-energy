@@ -1,11 +1,5 @@
 package com.ndb.auction.resolver;
 
-import java.util.List;
-
-import com.ndb.auction.models.InternalBalance;
-import com.ndb.auction.service.UserDetailsImpl;
-
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -13,14 +7,6 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class WalletResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver{
-    
-    // get wallet balances 
-    // public List<InternalBalance> getBalances() {
-    //     UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    //     String id = userDetails.getId();
-    //     return balanceService.getBalancesByUserId(id, "FREE");
-    // }
-    
     // get deposit address 
 
 
@@ -36,17 +22,4 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     public Boolean transferFunds(String token, String network, String address, int amount) {
         return ndbWalletService.transferFunds(token, network, address, amount);
     }
-
-    public Boolean makeAllowance(String token, String network, String address, int amount) {
-        return ndbWalletService.makeAllowance(token, network, address, amount);
-    }
-
-    public Boolean transferFromFunds(String token, String network, String from, String to, int amount) {
-        return ndbWalletService.transferFromFunds(token, network, from, to, amount);
-    }
-
-    public String getAllowance(String token, String network, String owner, String spender) {
-        return ndbWalletService.getAllowance(token, network, owner, spender);
-    }
-
 }

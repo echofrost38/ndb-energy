@@ -1,8 +1,0 @@
-type TokenAsset {
-    id: Int,
-    tokenName: String,
-    tokenSymbol: String,
-    network: String,
-    address: String,
-    symbol: String
-}

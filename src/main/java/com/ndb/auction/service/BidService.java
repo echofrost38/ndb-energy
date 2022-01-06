@@ -484,8 +484,4 @@ public class BidService extends BaseService implements IBidService {
 		return originalBid;
 	}
 
-	public List<Bid> getBidList() {
-		return bidDao.getBidList();
-	}
-
 }

@@ -46,7 +46,7 @@ public class User {
 	private Boolean tos;
 	
 	private String password;
-	private String twoStep;
+	private Map<String, Boolean> twoStep;
 	private Map<String, Boolean> security;
 	private Map<String, Boolean> verify;
 	private String googleSecret;
@@ -100,6 +100,11 @@ public class User {
 		verify.put("email", false);
 		verify.put("mobile", false);
 		verify.put("identity", false); 
+
+		this.twoStep =  new HashMap<String, Boolean>();
+		twoStep.put("app", false);
+		twoStep.put("phone", false);
+		twoStep.put("email", false);  
 
 		this.avatarPurchase = new HashMap<String, List<String>>();
 
@@ -195,10 +200,10 @@ public class User {
 	// }
 	
 	@DynamoDBAttribute(attributeName="two_step")
-	public String getTwoStep() {
+	public Map<String, Boolean> getTwoStep() {
 		return twoStep;
 	}
-	public void setTwoStep(String twoStep) {
+	public void setTwoStep(Map<String, Boolean> twoStep) {
 		this.twoStep = twoStep;
 	}
 	

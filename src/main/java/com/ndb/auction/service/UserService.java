@@ -179,6 +179,7 @@ public class UserService extends BaseService implements IUserService {
 				if(user.getGoogleSecret() == "") {
 					return "error";
 				} 
+				break;
 			case "phone":
 				try {
 					String code = totpService.get2FACode(user.getEmail() + key);//example@gmail.comphone
@@ -188,6 +189,7 @@ public class UserService extends BaseService implements IUserService {
 				} catch (IOException | TemplateException e) {
 					return "error";
 				}
+				break;
 			case "email":
 				try {
 					String code = totpService.get2FACode(user.getEmail() + key);//example@gmail.comemail
@@ -196,6 +198,7 @@ public class UserService extends BaseService implements IUserService {
 				} catch (MessagingException | IOException | TemplateException e) {
 					return "error"; // or exception
 				}
+				break;
 			}
 		}
 		return token;

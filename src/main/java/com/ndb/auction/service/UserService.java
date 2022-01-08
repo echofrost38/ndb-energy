@@ -98,6 +98,8 @@ public class UserService extends BaseService implements IUserService {
 	public String request2FA(String email, String method, String phone) {
 		
 		User user = getUserByEmail(email);
+		user.getTwoStep().replace(method, true);
+		// user.setTwoStep(method);
 				
 		if(!user.getVerify().get("email")) {
 			throw new UnauthorizedException("Your account is not verified", "email");
@@ -151,7 +153,6 @@ public class UserService extends BaseService implements IUserService {
 		
 		if(status) {
 			user.getSecurity().replace("2FA", true);
-			user.getTwoStep().replace(method, true);
 			userDao.updateUser(user);
 			return "Success";
 		} else {

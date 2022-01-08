@@ -1,0 +1,7 @@
+type InternalWallet {
+    userId: Int,
+    bitcoin: String,
+    erc20: String,
+    bep20: String,
+    favouriteTokens: String
+}

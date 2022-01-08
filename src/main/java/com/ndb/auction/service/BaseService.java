@@ -11,6 +11,8 @@ import com.ndb.auction.dao.StripePaymentDao;
 import com.ndb.auction.dao.SumsubDao;
 import com.ndb.auction.dao.UserDao;
 import com.ndb.auction.dao.oracle.InternalBalanceDao;
+import com.ndb.auction.dao.oracle.InternalWalletDao;
+import com.ndb.auction.dao.oracle.ShuftiDao;
 import com.ndb.auction.dao.oracle.TokenAssetDao;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.web3.NdbWalletService;
@@ -96,4 +98,10 @@ public class BaseService {
 
     @Autowired
     public InternalBalanceDao balanceDao;
+
+    @Autowired
+    public InternalWalletDao walletDao;
+
+    @Autowired
+    public ShuftiDao shuftiDao;
 }

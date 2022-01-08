@@ -20,6 +20,11 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     //     String id = userDetails.getId();
     //     return balanceService.getBalancesByUserId(id, "FREE");
     // }
+
+    // Add favorite token 
+    public int addFavouriteToken(String token) {
+        return 0;
+    }
     
     // get deposit address 
 

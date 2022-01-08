@@ -79,7 +79,7 @@
     </div>
     <footer>
         <p>© 2021 Voltamond SA. All rights reserved.</p>
-        <p>ndb.money +41 (275) 083 211</p>
+        <p>Ndb.money   +41 (275) 083 211</p>
     </footer>
 </body>
 

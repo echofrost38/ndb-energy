@@ -13,6 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.dao.FinancialDao;
+import com.ndb.auction.dao.oracle.ShuftiDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
@@ -52,6 +53,9 @@ public class BaseController {
 
     @Autowired 
     TierService tierService;
+
+    @Autowired
+    ShuftiDao shuftiDao;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

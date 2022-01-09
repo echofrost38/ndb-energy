@@ -12,4 +12,5 @@ import lombok.Setter;
 public class ShuftiReference {
     private int userId;
     private String reference;
+    private String verificationType;
 }

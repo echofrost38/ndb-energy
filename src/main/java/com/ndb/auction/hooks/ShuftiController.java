@@ -3,6 +3,7 @@ package com.ndb.auction.hooks;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
+import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
 
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,13 @@ public class ShuftiController extends BaseController {
         }
         
         ShuftiResponse response = new Gson().fromJson(reqQuery, ShuftiResponse.class);
+        if(!response.getEvent().equals("verification.accepted")) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        String reference = response.getReference();
+        ShuftiReference shuftiResponse = shuftiDao.selectByReference(reference);
+        
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

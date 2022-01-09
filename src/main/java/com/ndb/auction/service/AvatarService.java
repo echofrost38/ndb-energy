@@ -10,11 +10,11 @@ import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
+import com.ndb.auction.models.Facts;
 import com.ndb.auction.models.SkillSet;
-import com.ndb.auction.service.interfaces.IAvatarService;
 
 @Service
-public class AvatarService extends BaseService implements IAvatarService{
+public class AvatarService extends BaseService {
 
 	// private AmazonS3 s3;
 	// private final String bucketName = "auctionupload";
@@ -36,7 +36,6 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return newComponent;
 	}
 
-	@Override
 	public List<AvatarComponent> getAvatarComponents() {
 		List<AvatarComponent> components = avatarDao.getAvatarComponents();
 		
@@ -48,7 +47,6 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return components;
 	}
 
-	@Override
 	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
 		List<AvatarComponent> components = avatarDao.getAvatarComponentsByGid(groupId);
 		// for (AvatarComponent avatarComponent : components) {
@@ -59,7 +57,6 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return components;
 	}
 
-	@Override
 	public AvatarComponent getAvatarComponent(String groupId, String sKey) {
 		AvatarComponent avatarComponent = avatarDao.getAvatarComponent(groupId, sKey);
 		// String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
@@ -87,9 +84,8 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return avatarDao.updateAvatarComponent(component);
 	}
 
-	@Override
 	public AvatarProfile createAvatarProfile(String name, String surname, String shortName,
-			List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio, String hairColor) {
+			List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factSet, String hairColor) {
 		
 		// check condition
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
@@ -97,11 +93,10 @@ public class AvatarService extends BaseService implements IAvatarService{
 			throw new AvatarNotFoundException("Already exists with '" + name + "'", "name");
 		}
 		
-		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio, hairColor);
+		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, factSet, hairColor);
 		return avatarDao.createAvatarProfile(profile);
 	}
 
-	@Override
 	public AvatarProfile updateAvatarProfile(
 			String id, 
 			String name, 
@@ -109,9 +104,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 			String shortName,
 			List<SkillSet> skillSet, 
 			List<AvatarSet> avatarSet, 
-			String enemy, 
-			String invention, 
-			String bio,
+			List<Facts> factSet,
 			String hairColor) 
 	{
 		AvatarProfile profile = avatarDao.getAvatarProfile(id);
@@ -123,32 +116,26 @@ public class AvatarService extends BaseService implements IAvatarService{
 		profile.setShortName(shortName);
 		profile.setSkillSet(skillSet);
 		profile.setAvatarSet(avatarSet);
-		profile.setEnemy(enemy);
-		profile.setInvention(invention);
-		profile.setBio(bio);
+		profile.setFactsSet(factSet);
 		profile.setHairColor(hairColor);
 		
 		return avatarDao.updateAvatarProfile(profile);
 	}
 
-	@Override
 	public List<AvatarProfile> getAvatarProfiles() {
 		return avatarDao.getAvatarProfiles();
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfile(String id) {
 		return avatarDao.getAvatarProfile(id);
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfileByName(String fname) {
 		return avatarDao.getAvatarProfileByName(fname);
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarDao.getAvatarComponentsBySet(set);

@@ -20,9 +20,7 @@ public class AvatarProfile {
 	private String shortName;
 	private List<SkillSet> skillSet;
 	private List<AvatarSet> avatarSet;
-	private String enemy;
-	private String invention;
-	private String bio;
+	private List<Facts> factsSet;
 	private String hairColor;
 	
 	public AvatarProfile() {
@@ -35,9 +33,7 @@ public class AvatarProfile {
 		String shortName,
 		List<SkillSet> skillSet,
 		List<AvatarSet> avatarSet,
-		String enemy,
-		String invention,
-		String bio,
+		List<Facts> factsSet,
 		String hairColor
 	) {
 		this.name = name;
@@ -45,10 +41,8 @@ public class AvatarProfile {
 		this.shortName = shortName;
 		this.skillSet = skillSet;
 		this.avatarSet = avatarSet;
-		this.enemy = enemy;
-		this.invention = invention;
-		this.bio = bio;
 		this.hairColor = hairColor;
+		this.factsSet = factsSet;
 	}
 
 	@DynamoDBHashKey(attributeName="id")
@@ -106,33 +100,6 @@ public class AvatarProfile {
 		this.avatarSet = avatarSet;
 	}
 
-	@DynamoDBAttribute(attributeName="enemy")
-	public String getEnemy() {
-		return enemy;
-	}
-
-	public void setEnemy(String enemy) {
-		this.enemy = enemy;
-	}
-
-	@DynamoDBAttribute(attributeName="invention")
-	public String getInvention() {
-		return invention;
-	}
-
-	public void setInvention(String invention) {
-		this.invention = invention;
-	}
-
-	@DynamoDBAttribute(attributeName="bio")
-	public String getBio() {
-		return bio;
-	}
-
-	public void setBio(String bio) {
-		this.bio = bio;
-	}
-
 	@DynamoDBAttribute(attributeName="hair_color")
 	public String getHairColor() {
 		return hairColor;
@@ -140,6 +107,15 @@ public class AvatarProfile {
 
 	public void setHairColor(String hairColor) {
 		this.hairColor = hairColor;
+	}
+
+	@DynamoDBAttribute(attributeName="fact_set")
+	public List<Facts> getFactsSet() {
+		return factsSet;
+	}
+
+	public void setFactsSet(List<Facts> factsSet) {
+		this.factsSet = factsSet;
 	}
 
 	

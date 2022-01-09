@@ -15,6 +15,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerificationResult {
-    private Document document;
-    private Address address;
+    private String background_checks;
 }

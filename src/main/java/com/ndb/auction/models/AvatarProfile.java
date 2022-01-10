@@ -1,9 +1,6 @@
-package com.ndb.auction.models.avatar;
+package com.ndb.auction.models;
 
 import java.util.List;
-
-import com.ndb.auction.models.BaseModel;
-import com.ndb.auction.models.SkillSet;
 
 import org.springframework.stereotype.Component;
 
@@ -22,9 +19,9 @@ public class AvatarProfile extends BaseModel {
 	private String shortName;
 	private List<SkillSet> skillSet;
 	private List<AvatarSet> avatarSet;
-	private String hairColor;
-	private List<Facts> factsSet;
-	private String details;
+	private String enemy;
+	private String invention;
+	private String bio;
 
 	public AvatarProfile(
 			String fname,
@@ -32,17 +29,17 @@ public class AvatarProfile extends BaseModel {
 			String shortName,
 			List<SkillSet> skillSet,
 			List<AvatarSet> avatarSet,
-			String hairColor,
-			List<Facts> factsSet,
-			String details) {
+			String enemy,
+			String invention,
+			String bio) {
 		this.fname = fname;
 		this.surname = surname;
 		this.shortName = shortName;
 		this.skillSet = skillSet;
 		this.avatarSet = avatarSet;
-		this.hairColor = hairColor;
-		this.factsSet = factsSet;
-		this.details = details;
+		this.enemy = enemy;
+		this.invention = invention;
+		this.bio = bio;
 	}
 
 }

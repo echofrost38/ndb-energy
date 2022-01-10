@@ -5,5 +5,5 @@ type AvatarComponent {
     price: Float,
     limited: Int,
     purchased: Int,
-    svg: String
+    base64Image: String
 }

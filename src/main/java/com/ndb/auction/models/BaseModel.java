@@ -1,5 +1,7 @@
 package com.ndb.auction.models;
 
+import java.sql.Timestamp;
+
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -13,8 +15,8 @@ import lombok.Setter;
 public abstract class BaseModel {
 
     protected int id;
-    protected long regDate;
-    protected long updateDate;
+    protected Timestamp regDate;
+    protected Timestamp updateDate;
     protected int deleted;
 
 }

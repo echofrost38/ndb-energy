@@ -1,4 +1,4 @@
-type Tier {
+type UserTier {
     level: Int!,
     name: String,
     point: Float

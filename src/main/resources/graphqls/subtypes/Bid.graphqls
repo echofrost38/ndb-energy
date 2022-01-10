@@ -1,6 +1,6 @@
 type Bid {
-	userId: Int,
-	roundId: Int,
+	userId: String,
+	roundId: String,
 	tokenAmount: Float,
 	totalPrice: Float,
 	tokenPrice: Float,

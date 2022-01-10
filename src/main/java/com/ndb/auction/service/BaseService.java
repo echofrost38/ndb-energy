@@ -9,7 +9,7 @@ import com.ndb.auction.dao.oracle.other.CryptoPaymentDao;
 import com.ndb.auction.dao.oracle.other.DirectSaleDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
-import com.ndb.auction.dao.oracle.other.StripePaymentDao;
+import com.ndb.auction.dao.oracle.other.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.other.SumsubDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
@@ -86,7 +86,7 @@ public class BaseService {
     public AvatarComponentDao avatarDao;
 
     @Autowired
-    public StripePaymentDao stripeDao;
+    public StripeTransactionDao stripeDao;
 
     @Autowired
     public CryptoPaymentDao cryptoDao;

@@ -1,0 +1,11 @@
+type UserVerify {
+    id: Int!,
+    regDate: Float,
+    updateDate: Float,
+    deleted: Int,
+    emailVerified: Boolean,
+    phoneVerified: Boolean,
+    kycVerified: Boolean,
+    amlVerified: Boolean,
+    kybVerified: Boolean
+}

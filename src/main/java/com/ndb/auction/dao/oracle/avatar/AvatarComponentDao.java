@@ -29,7 +29,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 		m.setPrice(rs.getLong("PRICE"));
 		m.setLimited(rs.getInt("LIMITED"));
 		m.setPurchased(rs.getInt("PURCHASED"));
-		m.setBase64Image(rs.getString("BASE64_IMAGE"));
+		m.setSvg(rs.getString("BASE64_IMAGE"));
 		return m;
 	}
 
@@ -37,7 +37,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID, COMP_ID, TIER_LEVEL, PRICE, LIMITED, PURCHASED, BASE64_IMAGE)"
 				+ "VALUES(?,?,?,?,?,?,?,?)";
 		jdbcTemplate.update(sql, m.getGroupId(), m.getCompId(), m.getTierLevel(), m.getPrice(), m.getLimited(),
-				m.getPurchased(), m.getBase64Image());
+				m.getPurchased(), m.getSvg());
 		return m;
 	}
 
@@ -75,7 +75,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 
 	public AvatarComponent updateAvatarComponent(AvatarComponent m) {
 		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, BASE64_IMAGE=? WHERE GROUP_ID=? AND COMP_ID=?";
-		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), m.getBase64Image(),
+		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), m.getSvg(),
 				m.getGroupId(), m.getCompId());
 		return m;
 	}

@@ -1,6 +1,6 @@
 package com.ndb.auction.models.user;
 
-import java.sql.Timestamp;
+import java.util.Set;
 
 import com.ndb.auction.models.BaseModel;
 import com.ndb.auction.models.Notification;
@@ -17,17 +17,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User extends BaseModel {
 
-	public static final String ROLE_SEPARATOR = ";";
-
 	private String email;
 	private String password;
 	private String name;
 	private String country;
 	private String phone;
-	private Timestamp birthday;
-	private Timestamp lastLoginDate;
-	private Timestamp lastPasswordChangeDate;
-	private String role;
+	private long birthday;
+	private long lastLoginDate;
+	private Set<String> role;
 	private int tierLevel;
 	private long tierPoint;
 	private String provider;
@@ -39,23 +36,19 @@ public class User extends BaseModel {
 	private UserVerify verify;
 
 	public User addRole(String value) {
-		if (role == null || role.isEmpty())
-			role = value;
-		else if (role.endsWith(ROLE_SEPARATOR))
-			role += value;
-		else
-			role += ROLE_SEPARATOR + value;
+		this.role.add(value);
 		return this;
 	}
 
 	public User removeRole(String value) {
-		if (role != null && !role.isEmpty())
-			role = role.replaceAll(ROLE_SEPARATOR + value, "").replaceAll(value + ROLE_SEPARATOR, "");
+		this.role.remove(value);
 		return this;
 	}
 
+	// 
+
 	public boolean allowNotification(Notification notification) {
-		return ((this.notifySetting >> (notification.getType() - 1)) & 0x01) > 0;
+		return ((this.notifySetting >> (notification.getNType() - 1)) & 0x01) > 0;
 	}
 
 }

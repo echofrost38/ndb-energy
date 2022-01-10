@@ -1,4 +1,6 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.avatar;
+
+import com.ndb.auction.models.BaseModel;
 
 import org.springframework.stereotype.Component;
 

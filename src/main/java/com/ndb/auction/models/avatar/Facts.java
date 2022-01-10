@@ -1,4 +1,6 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.avatar;
+
+import com.ndb.auction.models.BaseModel;
 
 import org.springframework.stereotype.Component;
 
@@ -10,11 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class BaseModel {
-
-    protected int id;
-    protected long regDate;
-    protected long updateDate;
-    protected int deleted;
-
+public class Facts extends BaseModel{
+    private String topic;
+    private String detail;
 }

@@ -30,17 +30,17 @@ public class UserDao extends BaseOracleDao {
 		m.setName(rs.getString("NAME"));
 		m.setCountry(rs.getString("COUNTRY"));
 		m.setPhone(rs.getString("PHONE"));
-		m.setBirthday(rs.getTimestamp("BIRTHDAY"));
-		m.setRegDate(rs.getTimestamp("REG_DATE"));
-		m.setLastLoginDate(rs.getTimestamp("LAST_LOGIN_DATE"));
-		m.setLastPasswordChangeDate(rs.getTimestamp("LAST_PASSWORD_CHANGE_DATE"));
-		m.setRole(rs.getString("ROLE"));
+		m.setBirthday(rs.getLong("BIRTHDAY"));
+		m.setRegDate(rs.getLong("REG_DATE"));
+		m.setLastLoginDate(rs.getLong("LAST_LOGIN_DATE"));
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
 		m.setTierPoint(rs.getInt("TIER_POINT"));
 		m.setProvider(rs.getString("PROVIDER"));
 		m.setProviderId(rs.getString("PROVIDER_ID"));
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
 		m.setDeleted(rs.getInt("DELETED"));
+		String roleString = rs.getString("ROLE");
+		m.setRole(rs.getString("ROLE"));
 		return m;
 	}
 

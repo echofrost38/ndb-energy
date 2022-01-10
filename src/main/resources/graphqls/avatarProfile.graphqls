@@ -20,9 +20,9 @@ extend type Mutation {
         shortName: String!,
         skillSet: [SkillSetInput]!,
         avatarSet: [AvatarSetInput],
-        factsSet: [FactsInput],
-        hairColor: String,
-        details: String
+        enemy: String,
+        invention: String,
+        bio: String
     ) : AvatarProfile
     updateAvatarProfile (
         id: String!,
@@ -31,9 +31,9 @@ extend type Mutation {
         shortName: String,
         skillSet: [SkillSetInput],
         avatarSet: [AvatarSetInput],
-        factsSet: [FactsInput],
-        hairColor: String,
-        details: String
+        enemy: String,
+        invention: String,
+        bio: String
     ) : AvatarProfile
 }
 

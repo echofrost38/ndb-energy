@@ -22,9 +22,9 @@ import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.User;
-import com.ndb.auction.models.UserTier;
+import com.ndb.auction.models._bak.UserTier;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.Wallet;
 import com.ndb.auction.service.interfaces.IBidService;
 import com.ndb.auction.utils.Sort;
@@ -482,10 +482,6 @@ public class BidService extends BaseService implements IBidService {
 		bidDao.updateBid(originalBid);
 		
 		return originalBid;
-	}
-
-	public List<Bid> getBidList() {
-		return bidDao.getBidList();
 	}
 
 }

@@ -3,7 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.GeoLocation;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,8 +65,11 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user = new User(email, encoded, country, true);
-
+        user=new User();
+        user.setEmail(email);
+        user.setPassword(encoded);
+        user.setCountry(country);
+        
         user.setAvatarPrefix(avatarName);
         user.setAvatarName(shortName);
 
@@ -96,19 +99,10 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String deleteAccount() {        
-        return "To delete your account, please withdraw all your assets from NDB Wallet. Please note deleting process is irreversible.";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public String confirmDeleteAccount(String text) {
-        if (text.equals("delete")) {
-            UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            String id = userDetails.getId();
-            return userService.deleteUser(id);
-        } else {
-            return "failed";
-        }
+    public String deleteAccount() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = userDetails.getId();
+        return userService.deleteUser(id);
     }
 
 //    @PreAuthorize("isAuthenticated")

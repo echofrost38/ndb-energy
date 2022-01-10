@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ndb.auction.dao.NotificationDao;
-import com.ndb.auction.dao.NotificationTypeDao;
-import com.ndb.auction.dao.UserDao;
+import com.ndb.auction.dao.oracle.other.NotificationDao;
+import com.ndb.auction.dao.oracle.other.NotificationTypeDao;
+import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Notification2;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.NotificationType;
-import com.ndb.auction.models.NotificationType2;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.NotificationType;
+import com.ndb.auction.models.user.User;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.EmitResult;
 
@@ -52,7 +54,7 @@ public class NotificationService {
      * @param userId : Receiver ID
 	 * @return void
 	 */
-    public void send(Integer type, String title, String msg, String userId) {
+    public void send(Integer type, String title, String msg, int userId) {
         
         Notification notification = new Notification(type, title, msg);
 		notification.setUserId(userId);
@@ -86,7 +88,7 @@ public class NotificationService {
 
         List<Notification> notifications = new ArrayList<Notification>();
 
-        List<User> userlist = userDao.getUserList();
+        List<User> userlist = userDao.selectAll(null);
         for (User user : userlist) {
             Notification n = new Notification(notification);
             n.setUserId(user.getId());
@@ -111,15 +113,15 @@ public class NotificationService {
     public Publisher<Notification> getNotificationPublisher() {
         
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userid = userDetails.getId();
-        User user = userDao.getUserById(userid);
+		int userId = userDetails.getId();
+        User user = userDao.selectById(userId);
 
         return sink.asFlux().filter(p -> {
             // log.info("notification userid : {}, current userid : {}", p.getUserId(), userid);
             // return p.getUserId().equals(userid);
             return p.isBroadcast() 
                 ? user.allowNotification(p)
-                : p.getUserId().equals(userid);
+                : p.getUserId()==userId;
         }); 
     }
 
@@ -144,27 +146,27 @@ public class NotificationService {
  
     public Notification setNotificationRead(String nId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userId = userDetails.getId();
+		int userId = userDetails.getId();
 
         return notificationDao.setReadStatus(userId, nId);
     }
 
     public List<Notification> getAllUnReadNotifications() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userId = userDetails.getId();
+		int userId = userDetails.getId();
         return notificationDao.getAllUnReadNotificationsByUser(userId);
     }
 
     //////////////////////// version 2 ///////////////////////////
 
-    public void sendNotification(String userId, int type, String title, String msg) {
+    public void sendNotification(int userId, int type, String title, String msg) {
         addNewNotification(userId, type, title, msg);
-        
-        User user = userDao.getUserById(userId);
+
+        User user = userDao.selectById(userId);
 
         // send SMS, Email, Notification here
         try {
-            smsService.sendNormalSMS(user.getMobile(), title + "\n" + msg);
+            smsService.sendNormalSMS(user.getPhone(), title + "\n" + msg);
         } catch (Exception e) {}
        
         try {
@@ -173,51 +175,39 @@ public class NotificationService {
     }
 
 
-    public Notification2 addNewNotification(String userId, int type, String title, String msg) {
-        Notification2 notification = new Notification2(userId, type, title, msg);
+    public Notification addNewNotification(int userId, int type, String title, String msg) {
+        Notification notification = new Notification(userId, type, title, msg);
         return notificationDao.addNewNotification(notification);
     }
 
-    public String addNewBroadcast(int type, String title, String msg) {
-        List<User>userlist = userDao.getUserList();
-
-        List<Notification2> notifications = new ArrayList<Notification2>();
-        for (User user : userlist) {
-            Notification2 notification2 = new Notification2(user.getId(), type, title, msg);
-            notifications.add(notification2);
-        }
-        notificationDao.pushNewBroadcast(notifications);
-        return "Success";
-    }
-
-    public List<Notification2> getPaginatedNotifications(String userId, Long stamp, int limit) {
+    public List<Notification> getPaginatedNotifications(int userId, Long stamp, int limit) {
         if(stamp == null) {
             return notificationDao.getFirstNotificationsByUser(userId, limit);
         }
         return notificationDao.getMoreNotificationsByUser(userId, stamp, limit);
     }
 
-    public Notification2 setNotificationReadFlag(String userId, Long stamp) {
-        Notification2 notify = notificationDao.getNotification2(userId, stamp);
+    public Notification setNotificationReadFlag(int userId, Long stamp) {
+        Notification notify = notificationDao.getNotification2(userId, stamp);
         return notificationDao.setReadFlag(notify);
     }
 
-    public String setNotificationReadFlagAll(String userId) {
+    public String setNotificationReadFlagAll(int userId) {
         return notificationDao.setReadFlagAll(userId);
     }
 
-    public List<Notification2> getUnreadNotification2s(String userId) {
+    public List<Notification> getUnreadNotification2s(int userId) {
         return notificationDao.getUnreadNotifications(userId);
     }
 
-    public NotificationType2 addNewNotificationType(int nType, String tName, boolean broadcast) {
-        NotificationType2 type2 = new NotificationType2(nType, tName, broadcast);
+    public NotificationType addNewNotificationType(int nType, String tName, boolean broadcast) {
+        NotificationType type2 = new NotificationType(nType, tName, broadcast);
         notificationTypeDao.addNewNotificationType(type2);
         return type2;
     }
 
 
-    public List<NotificationType2> getNotificationTypes() {
+    public List<NotificationType> getNotificationTypes() {
         return notificationTypeDao.getNotificationTypes();
     }
 

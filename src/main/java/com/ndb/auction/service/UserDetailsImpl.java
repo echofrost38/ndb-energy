@@ -12,13 +12,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.User;
 
 public class UserDetailsImpl implements OAuth2User, UserDetails {
 
 	private static final long serialVersionUID = 5558252995866998438L;
 
-	private String id;
+	private int id;
 	private String username;
 	private String email;
 
@@ -31,9 +31,11 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 	private Map<String, Object> attributes;
 
-	public UserDetailsImpl() {}
+	public UserDetailsImpl() {
+	}
+
 	public UserDetailsImpl(
-			String id,
+			int id,
 			String username,
 			String email,
 			String password,
@@ -67,7 +69,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 		return userPrincipal;
 	}
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 

@@ -7,16 +7,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Registration;
-import com.ndb.auction.models.User;
-import com.ndb.auction.models.user.TwoFAEntry;
-import com.ndb.auction.models.user.Wallet;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.Credentials;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -54,8 +49,8 @@ public class AuthResolver extends BaseResolver
 		return userService.request2FA(email, method, phone);
 	}
 
-	public String confirmRequest2FA(String email, String method, String code) {
-		return userService.confirmRequest2FA(email, method, code);
+	public String confirmRequest2FA(String email, String code) {
+		return userService.confirmRequest2FA(email, code);
 	}
 
 	public Credentials signin(String email, String password) {
@@ -80,11 +75,11 @@ public class AuthResolver extends BaseResolver
 			return new Credentials("Failed", "Your email and password do not match!");
 		}
 
-		if (!user.getVerify().get("email")) {
+		if (!user.getVerify().isEmailVerified()) {
 			return new Credentials("Failed", "Please verify your email");
 		}
 
-		if (!user.getSecurity().get("2FA")) {
+		if (!user.getSecurity().isTfaEnabled()) {
 			return new Credentials("Failed", "Please set 2FA");
 		}
 
@@ -98,20 +93,16 @@ public class AuthResolver extends BaseResolver
 
 		totpService.setTokenAuthCache(token, authentication);
 
-		return new Credentials("Success", token, user.getTwoStep());
+		return new Credentials("Success", token);
 	}
 
-	public Credentials confirm2FA(String email, String token, List<TwoFAEntry> code) {
-		Map<String, String> codeMap = new HashMap<String, String>();
-		for(TwoFAEntry entry : code) {
-			codeMap.put(entry.getKey(), entry.getValue());
-		}
+	public Credentials confirm2FA(String email, String token, String code) {
 		Authentication authentication = totpService.getAuthfromToken(token);
 		if (authentication == null) {
 			return new Credentials("Failed", "Password expired");
 		}
 
-		if (!userService.verify2FACode(email, codeMap)) {
+		if (!userService.verify2FACode(email, code)) {
 			return new Credentials("Failed", "2FA code mismatch");
 		}
 
@@ -188,7 +179,4 @@ public class AuthResolver extends BaseResolver
 		return receipt.getLogs().get(0).getData();
 	}
 
-	public Wallet getWalletById(String id, String crypto) {
-		return userWalletService.getWalletById(id, crypto);
-	}
 }

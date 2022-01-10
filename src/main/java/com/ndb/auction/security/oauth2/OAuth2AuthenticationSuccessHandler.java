@@ -7,8 +7,8 @@ import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.UserDetailsImpl;
 import com.ndb.auction.service.UserService;
 import com.ndb.auction.exceptions.BadRequestException;
-import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.AuthProvider;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -123,16 +123,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
             // Save token on cache
             totpService.setTokenAuthCache(dataType, authentication);
-
-            Map<String, Boolean> methods = user.getTwoStep();
-
-            for (Map.Entry<String, Boolean> method : methods.entrySet()) {
-                String key = method.getKey();
-                Boolean value = method.getValue();
-
-                if (!value) continue;
-                data += "*" + key;
-            }
         }
         
         return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + dataType + "/" + data)

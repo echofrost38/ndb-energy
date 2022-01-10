@@ -20,9 +20,9 @@ public class AvatarProfile {
 	private String shortName;
 	private List<SkillSet> skillSet;
 	private List<AvatarSet> avatarSet;
-	private List<Facts> factsSet;
-	private String hairColor;
-	private String details;
+	private String enemy;
+	private String invention;
+	private String bio;
 	
 	public AvatarProfile() {
 		
@@ -34,18 +34,18 @@ public class AvatarProfile {
 		String shortName,
 		List<SkillSet> skillSet,
 		List<AvatarSet> avatarSet,
-		List<Facts> factsSet,
-		String hairColor,
-		String details
+		String enemy,
+		String invention,
+		String bio
 	) {
 		this.name = name;
 		this.surname = surname;
 		this.shortName = shortName;
 		this.skillSet = skillSet;
 		this.avatarSet = avatarSet;
-		this.hairColor = hairColor;
-		this.factsSet = factsSet;
-		this.details = details;
+		this.enemy = enemy;
+		this.invention = invention;
+		this.bio = bio;
 	}
 
 	@DynamoDBHashKey(attributeName="id")
@@ -103,31 +103,31 @@ public class AvatarProfile {
 		this.avatarSet = avatarSet;
 	}
 
-	@DynamoDBAttribute(attributeName="hair_color")
-	public String getHairColor() {
-		return hairColor;
+	@DynamoDBAttribute(attributeName="enemy")
+	public String getEnemy() {
+		return enemy;
 	}
 
-	public void setHairColor(String hairColor) {
-		this.hairColor = hairColor;
+	public void setEnemy(String enemy) {
+		this.enemy = enemy;
 	}
 
-	@DynamoDBAttribute(attributeName="fact_set")
-	public List<Facts> getFactsSet() {
-		return factsSet;
+	@DynamoDBAttribute(attributeName="invention")
+	public String getInvention() {
+		return invention;
 	}
 
-	public void setFactsSet(List<Facts> factsSet) {
-		this.factsSet = factsSet;
+	public void setInvention(String invention) {
+		this.invention = invention;
 	}
 
-	@DynamoDBAttribute(attributeName="details")
-	public String getDetails() {
-		return details;
+	@DynamoDBAttribute(attributeName="bio")
+	public String getBio() {
+		return bio;
 	}
 
-	public void setDetails(String details) {
-		this.details = details;
+	public void setBio(String bio) {
+		this.bio = bio;
 	}
 
 }

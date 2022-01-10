@@ -2,9 +2,9 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import com.ndb.auction.dao.TierDao;
+import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.UserTier;
+import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,28 +17,28 @@ public class TierService {
     private TierDao tierDao;
 
     private TaskSetting taskSetting;
-	private List<UserTier> tierList;
+	private List<Tier> tierList;
 
     // User Tier
 	private synchronized void fillTierList() {
 		this.tierList = tierDao.getUserTiers();
 	}
 
-	public UserTier addNewUserTier(int level, String name, double points) {
-		UserTier tier = new UserTier(level, name, points);
+	public Tier addNewUserTier(int level, String name, long point) {
+		Tier tier = new Tier(level, name, point);
 		tierDao.addNewUserTier(tier);
 		fillTierList();
 		return tier;
 	}
 
-	public UserTier updateUserTier(int level, String name, double points) {
-		UserTier tier = new UserTier(level, name, points);
+	public Tier updateUserTier(int level, String name, long point) {
+		Tier tier = new Tier(level, name, point);
 		tierDao.updateUserTier(tier);
 		fillTierList();
 		return tier;
 	}
 
-	public List<UserTier> getUserTiers() {
+	public List<Tier> getUserTiers() {
 		if(this.tierList == null) {
 			fillTierList();
 		}
@@ -84,7 +84,7 @@ public class TierService {
 		return tierDao.updateTierTask(tierTask);
 	}
 
-	public TierTask getTierTask(String userId) {
+	public TierTask getTierTask(int userId) {
 		return tierDao.getTierTask(userId);
 	}
 }

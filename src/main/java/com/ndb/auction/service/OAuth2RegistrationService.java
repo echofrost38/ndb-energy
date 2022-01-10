@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.dao.OAuth2Dao;
+import com.ndb.auction.dao.oracle.other.OAuth2Dao;
 import com.ndb.auction.models.OAuth2Registration;
 
 import org.springframework.beans.factory.annotation.Autowired;

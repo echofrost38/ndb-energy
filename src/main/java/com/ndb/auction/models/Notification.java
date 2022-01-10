@@ -14,7 +14,6 @@ public class Notification {
     public final static Integer N_PAYMENT_RESULT = 3;
     public final static Integer N_BID_RANKING_UPDATED = 4;
     public final static Integer N_BID_CLOSED = 5;  
-	public final static Integer N_VERIFICATION = 6;
 
 	// Notification ID : this is unique for same broadcasting
 	private String id; // RangeKey

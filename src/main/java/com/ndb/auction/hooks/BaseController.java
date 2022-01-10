@@ -12,15 +12,18 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.FinancialDao;
-import com.ndb.auction.dao.oracle.ShuftiDao;
+import com.ndb.auction.dao.oracle.other.FinancialDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.TierService;
-import com.ndb.auction.service.UserService;
+import com.ndb.auction.service.user.UserAvatarService;
+import com.ndb.auction.service.user.UserKybService;
+import com.ndb.auction.service.user.UserSecurityService;
+import com.ndb.auction.service.user.UserService;
+import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,15 +36,27 @@ public class BaseController {
     @Autowired
     CryptoService cryptoService;
 
-    @Autowired 
+    @Autowired
     BidService bidService;
 
     @Autowired
     UserService userService;
 
     @Autowired
+    UserAvatarService userAvatarService;
+
+    @Autowired
+    UserKybService userKybService;
+
+    @Autowired
+    UserSecurityService userSecurityService;
+
+    @Autowired
+    UserVerifyService userVerifyService;
+
+    @Autowired
     NotificationService notificationService;
-    
+
     @Autowired
     SumsubService sumsubService;
 
@@ -51,24 +66,20 @@ public class BaseController {
     @Autowired
     UserWalletService userWalletService;
 
-    @Autowired 
-    TierService tierService;
-
     @Autowired
-    ShuftiDao shuftiDao;
+    TierService tierService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String HMAC_SHA_1 = "HmacSHA1";
 
-
     public String getBody(HttpServletRequest request) throws IOException {
 
         String body = null;
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bufferedReader = null;
-    
+
         try {
             InputStream inputStream = request.getInputStream();
             if (inputStream != null) {
@@ -92,7 +103,7 @@ public class BaseController {
                 }
             }
         }
-    
+
         body = stringBuilder.toString();
         return body;
     }
@@ -115,9 +126,9 @@ public class BaseController {
         }
         return result;
     }
-    
+
     public String buildHmacSHA1Signature(String value, String secret) {
-    	String result;
+        String result;
         try {
             Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_1);
             SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_1);

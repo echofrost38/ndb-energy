@@ -107,7 +107,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/sumsub/**").permitAll()
 				.antMatchers("/stripe/**").permitAll()
 				.antMatchers("/crypto/**").permitAll()
-				.antMatchers("/shufti/**").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()

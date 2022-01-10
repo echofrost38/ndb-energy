@@ -2,10 +2,11 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import javax.servlet.http.Part;
+
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
-import com.ndb.auction.models.Facts;
 import com.ndb.auction.models.SkillSet;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,32 +25,29 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		Integer tierLevel, 
 		Double price, 
 		Integer limited,
-		String svg,
-		int width,
-		int top,
-		int left
+		Part file
 	) {
-		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, svg, width, top, left);
+		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, file);
 	}
 	
 	// update component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
-		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, svg, width, top, left);
+	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file) {
+		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, file);
 	}
 
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factsSet, String hairColor, String details) 
+	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
 	{
-		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, factsSet, hairColor, details);
+		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
 	}
 	
 	// update existing avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factsSet, String hairColor, String details) 
+	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
 	{
-		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, factsSet, hairColor, details);
+		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
 	}
 	
 	// get avatar list

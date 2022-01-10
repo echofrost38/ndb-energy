@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
+import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.LocationLog;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -16,10 +17,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class LocationLogDao extends BaseOracleDao {
+import lombok.NoArgsConstructor;
 
-    private static final String TABLE_NAME = "TBL_LOCATION_LOG";
+@Repository
+@NoArgsConstructor
+@Table(name = "TBL_LOCATION_LOG")
+public class LocationLogDao extends BaseOracleDao {
 
     private static LocationLog extract(ResultSet rs) throws SQLException {
         LocationLog m = new LocationLog();
@@ -43,10 +46,6 @@ public class LocationLogDao extends BaseOracleDao {
         m.setFinalResult(rs.getString("FINAL_RESULT"));
         m.setRegDate(rs.getTimestamp("REG_DATE"));
         return m;
-    }
-
-    public LocationLogDao() {
-        super(TABLE_NAME);
     }
 
     public LocationLog addLog(LocationLog m) {

@@ -55,7 +55,7 @@ public class User extends BaseModel {
 	}
 
 	public boolean allowNotification(Notification notification) {
-		return ((this.notifySetting >> (notification.getType() - 1)) & 0x01) > 0;
+		return ((this.notifySetting >> (notification.getNType() - 1)) & 0x01) > 0;
 	}
 
 }

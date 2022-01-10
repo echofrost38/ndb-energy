@@ -6,16 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
+import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Bid;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class BidDao extends BaseOracleDao {
+import lombok.NoArgsConstructor;
 
-	private static final String TABLE_NAME = "TBL_BID";
+@Repository
+@NoArgsConstructor
+@Table(name = "TBL_BID")
+public class BidDao extends BaseOracleDao {
 
 	private static Bid extract(ResultSet rs) throws SQLException {
 		Bid m = new Bid();
@@ -35,10 +38,6 @@ public class BidDao extends BaseOracleDao {
 		m.setUpdatedAt(rs.getTimestamp("UPDATE_DATE").getTime());
 		m.setStatus(rs.getInt("STATUS"));
 		return m;
-	}
-
-	public BidDao() {
-		super(TABLE_NAME);
 	}
 
 	public Bid placeBid(Bid m) {

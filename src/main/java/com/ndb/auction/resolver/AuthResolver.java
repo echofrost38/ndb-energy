@@ -10,7 +10,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.Set;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.OAuth2Registration;
+import com.ndb.auction.models.OAuth2Setting;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.Credentials;
 
@@ -132,7 +132,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public OAuth2Registration addOAuth2Registration(
+	public OAuth2Setting addOAuth2Registration(
 			String registrationId,
 			String clientId,
 			String clientSecret,
@@ -146,7 +146,7 @@ public class AuthResolver extends BaseResolver
 			String userNameAttributeName,
 			String jwkSetUri,
 			String clientName) {
-		OAuth2Registration registration = new OAuth2Registration(
+		OAuth2Setting registration = new OAuth2Setting(
 				registrationId,
 				clientId,
 				clientSecret,

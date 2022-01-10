@@ -5,26 +5,25 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
+import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.GeoLocation;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class GeoLocationDao extends BaseOracleDao {
+import lombok.NoArgsConstructor;
 
-	private static final String TABLE_NAME = "TBL_GEO_LOCATION";
+@Repository
+@NoArgsConstructor
+@Table(name = "TBL_GEO_LOCATION")
+public class GeoLocationDao extends BaseOracleDao {
 
 	private static GeoLocation extract(ResultSet rs) throws SQLException {
 		GeoLocation m = new GeoLocation();
 		m.setCountryCode(rs.getString("COUNTRY_CODE"));
 		m.setAllowed(rs.getBoolean("IS_ALLOWED"));
 		return m;
-	}
-
-	public GeoLocationDao() {
-		super(TABLE_NAME);
 	}
 
 	// Add disallowed country

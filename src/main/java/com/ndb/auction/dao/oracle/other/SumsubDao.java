@@ -13,6 +13,8 @@ import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.sumsub.Applicant;
 
 @Repository
+@NoArgsConstructor
+@Table(name = "TBL_AVATAR_PROFILE_SKILL")
 public class SumsubDao extends BaseOracleDao {
 
 	private static final String TABLE_NAME = "TBL_USER";

@@ -159,7 +159,7 @@ public class NotificationService {
 
     public void sendNotification(String userId, int type, String title, String msg) {
         addNewNotification(userId, type, title, msg);
-
+        
         User user = userDao.getUserById(userId);
 
         // send SMS, Email, Notification here

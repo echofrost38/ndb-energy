@@ -21,7 +21,8 @@ extend type Mutation {
         skillSet: [SkillSetInput]!,
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],
-        hairColor: String
+        hairColor: String,
+        details: String
     ) : AvatarProfile
     updateAvatarProfile (
         id: String!,
@@ -31,7 +32,8 @@ extend type Mutation {
         skillSet: [SkillSetInput],
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],
-        hairColor: String
+        hairColor: String,
+        details: String
     ) : AvatarProfile
 }
 

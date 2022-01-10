@@ -85,7 +85,7 @@ public class AvatarService extends BaseService {
 	}
 
 	public AvatarProfile createAvatarProfile(String name, String surname, String shortName,
-			List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factSet, String hairColor) {
+			List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factSet, String hairColor, String details) {
 		
 		// check condition
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
@@ -93,7 +93,7 @@ public class AvatarService extends BaseService {
 			throw new AvatarNotFoundException("Already exists with '" + name + "'", "name");
 		}
 		
-		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, factSet, hairColor);
+		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, factSet, hairColor, details);
 		return avatarDao.createAvatarProfile(profile);
 	}
 
@@ -105,7 +105,8 @@ public class AvatarService extends BaseService {
 			List<SkillSet> skillSet, 
 			List<AvatarSet> avatarSet, 
 			List<Facts> factSet,
-			String hairColor) 
+			String hairColor,
+			String details) 
 	{
 		AvatarProfile profile = avatarDao.getAvatarProfile(id);
 		if(profile == null) {
@@ -118,7 +119,7 @@ public class AvatarService extends BaseService {
 		profile.setAvatarSet(avatarSet);
 		profile.setFactsSet(factSet);
 		profile.setHairColor(hairColor);
-		
+		profile.setDetails(details);
 		return avatarDao.updateAvatarProfile(profile);
 	}
 

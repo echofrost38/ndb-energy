@@ -22,6 +22,7 @@ public class AvatarProfile {
 	private List<AvatarSet> avatarSet;
 	private List<Facts> factsSet;
 	private String hairColor;
+	private String details;
 	
 	public AvatarProfile() {
 		
@@ -34,7 +35,8 @@ public class AvatarProfile {
 		List<SkillSet> skillSet,
 		List<AvatarSet> avatarSet,
 		List<Facts> factsSet,
-		String hairColor
+		String hairColor,
+		String details
 	) {
 		this.name = name;
 		this.surname = surname;
@@ -43,6 +45,7 @@ public class AvatarProfile {
 		this.avatarSet = avatarSet;
 		this.hairColor = hairColor;
 		this.factsSet = factsSet;
+		this.details = details;
 	}
 
 	@DynamoDBHashKey(attributeName="id")
@@ -118,6 +121,13 @@ public class AvatarProfile {
 		this.factsSet = factsSet;
 	}
 
-	
+	@DynamoDBAttribute(attributeName="details")
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
+	}
 
 }

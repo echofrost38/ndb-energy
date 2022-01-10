@@ -4,22 +4,22 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName="Crypto_tx")
+@DynamoDBTable(tableName = "Crypto_tx")
 public class CryptoTransaction {
-    public static final Integer INITIATED = 0;
-    public static final Integer CONFIRMED = 1;
-    public static final Integer CANCELED = 2;
+    public static final int INITIATED = 0;
+    public static final int CONFIRMED = 1;
+    public static final int CANCELED = 2;
 
     private String txnId;
     private String roundId;
-    private String userId;
+    private int userId;
     private String code;
 
-    private double amount; // usd
-    private double cryptoAmount;
+    private long amount; // usd
+    private long cryptoAmount;
     private String cryptoType;
 
-    private Integer status;
+    private int status;
 
     private String createdAt;
     private String updatedAt;
@@ -28,7 +28,8 @@ public class CryptoTransaction {
 
     }
 
-    public CryptoTransaction(String txnId, String roundId, String userId, String code, double amount, double cryptoAmount, String cryptoType, String createdAt) {
+    public CryptoTransaction(String txnId, String roundId, int userId, String code, long amount, long cryptoAmount,
+            String cryptoType, String createdAt) {
         this.code = code;
         this.txnId = txnId;
         this.roundId = roundId;
@@ -44,6 +45,7 @@ public class CryptoTransaction {
     public String getTxnId() {
         return txnId;
     }
+
     public void setTxnId(String txnId) {
         this.txnId = txnId;
     }
@@ -52,15 +54,17 @@ public class CryptoTransaction {
     public String getRoundId() {
         return roundId;
     }
+
     public void setRoundId(String roundId) {
         this.roundId = roundId;
     }
 
     @DynamoDBAttribute(attributeName = "user_id")
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
-    public void setUserId(String userId) {
+
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -68,23 +72,26 @@ public class CryptoTransaction {
     public String getCode() {
         return code;
     }
+
     public void setCode(String code) {
         this.code = code;
     }
 
     @DynamoDBAttribute(attributeName = "amount")
-    public double getAmount() {
+    public long getAmount() {
         return amount;
     }
-    public void setAmount(double amount) {
+
+    public void setAmount(long amount) {
         this.amount = amount;
     }
 
     @DynamoDBAttribute(attributeName = "crypto_amount")
-    public double getCryptoAmount() {
+    public long getCryptoAmount() {
         return cryptoAmount;
     }
-    public void setCryptoAmount(double cryptoAmount) {
+
+    public void setCryptoAmount(long cryptoAmount) {
         this.cryptoAmount = cryptoAmount;
     }
 
@@ -92,6 +99,7 @@ public class CryptoTransaction {
     public String getCryptoType() {
         return cryptoType;
     }
+
     public void setCryptoType(String cryptoType) {
         this.cryptoType = cryptoType;
     }
@@ -100,6 +108,7 @@ public class CryptoTransaction {
     public String getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
@@ -108,6 +117,7 @@ public class CryptoTransaction {
     public String getUpdatedAt() {
         return updatedAt;
     }
+
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }

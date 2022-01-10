@@ -14,10 +14,10 @@ public class FinancialTransaction {
     
     private String txnId; // from Conbase API
     private String code;
-    private String userId;
+    private int userId;
     private int transactionType;
     private double cryptoType;
-    private double cryptoAmount;
+    private long cryptoAmount;
     private Boolean isConfirmed;
     private long createdAt;
     private long confirmedAt;
@@ -29,7 +29,7 @@ public class FinancialTransaction {
     public FinancialTransaction(
         int type, 
         double cryptoType, 
-        double cryptoAmount
+        long cryptoAmount
     ) {
         this.transactionType = type;
         this.cryptoType = cryptoType;
@@ -57,12 +57,12 @@ public class FinancialTransaction {
     }
 
     @DynamoDBHashKey(attributeName = "user_id")
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
     
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -86,7 +86,7 @@ public class FinancialTransaction {
     public double getCryptoAmount() {
         return cryptoAmount;
     }
-    public void setCryptoAmount(double cryptoAmount) {
+    public void setCryptoAmount(long cryptoAmount) {
         this.cryptoAmount = cryptoAmount;
     }
 

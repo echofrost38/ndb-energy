@@ -47,11 +47,11 @@ public class SumsubService extends BaseService {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	
 	// create applicant
-	public String createApplicant(String userId, String levelName) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+	public String createApplicant(int userId, String levelName) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         
         // 
         List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
-        if(applicants.size() != 0) {
+        if(applicants.isEmpty()) {
             return applicants.get(0).getId();
         }
 
@@ -72,9 +72,9 @@ public class SumsubService extends BaseService {
         return applicantId;
     }
 
-    public String upgradeApplicant(String userId, String levelName) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public String upgradeApplicant(int userId, String levelName) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
-        if(applicants.size() == 0) {
+        if(applicants.isEmpty()) {
             return null;
         }
         Applicant applicant = applicants.get(0);
@@ -149,9 +149,9 @@ public class SumsubService extends BaseService {
 		return response.headers().get("X-Image-Id");
 	}
 	
-    public String requestChecking(String userId) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public String requestChecking(int userId) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
-        if(applicants.size() == 0) {
+        if(applicants.isEmpty()) {
             return null;
         }
         Applicant applicant = applicants.get(0);
@@ -255,7 +255,7 @@ public class SumsubService extends BaseService {
     	return sumsubDao.getApplicantById(applicantId);
     }
     
-    public boolean checkVerificationStatus(String userId, String level) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public boolean checkVerificationStatus(int userId, String level) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         List<Applicant> applicants = sumsubDao.getApplicantByUserId(userId);
         if(applicants.size() == 0) return false;
 
@@ -273,7 +273,7 @@ public class SumsubService extends BaseService {
         return false;
     }
 
-    public List<Applicant> getApplicantsByUserId(String userId) {
+    public List<Applicant> getApplicantsByUserId(int userId) {
     	return sumsubDao.getApplicantByUserId(userId);
     }
 
@@ -286,7 +286,7 @@ public class SumsubService extends BaseService {
         return sumsubDao.getKYCSettings();
     }
 
-    public boolean checkThreshold(String userId, String kind, double amount) {
+    public boolean checkThreshold(int userId, String kind, long amount) {
         List<KYCSetting> settings = sumsubDao.getKYCSettings();
         double kycThreshold = 0.0, amlThreshold = 0.0;
         for (KYCSetting kycSetting : settings) {

@@ -46,7 +46,7 @@ public class StripeService extends BaseService {
 	 * @param paymentMethodId
 	 * @return
 	 */
-	public PayResponse createNewPayment(String roundId, String userId, Long amount, String paymentIntentId, String paymentMethodId) {
+	public PayResponse createNewPayment(String roundId, int userId, Long amount, String paymentIntentId, String paymentMethodId) {
 		
 		PaymentIntent intent;
 		PayResponse response = new PayResponse();
@@ -76,7 +76,7 @@ public class StripeService extends BaseService {
 //                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
 				Bid bid = bidService.getBid(roundId, userId);
 				double usdAmount = ((double)amount)/100;
-				if(bid.getPendingIncrease()) {
+				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     if(pendingPrice > usdAmount) {
                         response.setError("Insufficient funds");
@@ -86,7 +86,7 @@ public class StripeService extends BaseService {
                     bidService.updateBid(userId, roundId, bid.getTempTokenAmount(), bid.getTempTokenPrice());
                     
                 } else {
-                    double totalPrice = bid.getTotalPrice();
+                    long totalPrice = bid.getTotalPrice();
                     if(totalPrice > usdAmount) {
                         response.setError("Insufficient funds");
 						return response;
@@ -140,12 +140,12 @@ public class StripeService extends BaseService {
 		return stripeDao.getTransactionsByRound(roundId);
 	}
 	
-	public List<StripeTransaction> getTransactionByUser(String userId) {
+	public List<StripeTransaction> getTransactionByUser(int userId) {
 		
 		return stripeDao.getTransactionsByUser(userId);
 	}
 	
-	public List<StripeTransaction> getTransactions(String roundId, String userId) {
+	public List<StripeTransaction> getTransactions(String roundId, int userId) {
 		return stripeDao.getTransactions(roundId, userId);
 	}
 	

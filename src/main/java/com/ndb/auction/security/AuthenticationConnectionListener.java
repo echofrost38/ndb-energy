@@ -1,22 +1,21 @@
 package com.ndb.auction.security;
 
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.stereotype.Component;
-
 import java.util.Map;
 
-import com.ndb.auction.dao.UserDao;
+import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.MailService;
 import com.ndb.auction.service.SMSService;
-import com.ndb.auction.service.UserDetailsImpl;
-import com.ndb.auction.service.UserDetailsServiceImpl;
+import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.stereotype.Component;
 
 import graphql.kickstart.execution.subscriptions.SubscriptionSession;
 import graphql.kickstart.execution.subscriptions.apollo.ApolloSubscriptionConnectionListener;
@@ -76,9 +75,9 @@ public class AuthenticationConnectionListener implements ApolloSubscriptionConne
 
         PreAuthenticatedAuthenticationToken token = (PreAuthenticatedAuthenticationToken)session.getUserProperties().get(AUTHENTICATION);
         UserDetailsImpl userDetails = (UserDetailsImpl)token.getPrincipal();
-        String userId = userDetails.getId();
-        User user = userDao.getUserById(userId);
-        String phone = user.getMobile();
+        int userId = userDetails.getId();
+        User user = userDao.selectById(userId);
+        String phone = user.getPhone();
         String smsContent = "You are offline now!";
         SecurityContextHolder.clearContext();
         

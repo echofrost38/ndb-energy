@@ -47,17 +47,17 @@ public class DirectSaleService extends BaseService {
     }
 
     // create empty direct sale
-    public DirectSale createNewDirectSale(String userId, double ndbPrice, double ndbAmount, int whereTo, String extAddr) {
+    public DirectSale createNewDirectSale(int userId, long ndbPrice, long ndbAmount, int whereTo, String extAddr) {
         String txnId = UUID.randomUUID().toString();
         DirectSale directSale = new DirectSale(userId, txnId, ndbPrice, ndbAmount, whereTo, extAddr);
         return directSaleDao.createEmptyDirectSale(directSale);
     }
 
     // stripe pay for Direct Sale
-    public PayResponse stripePayment(String userId, String txnId) throws StripeException {
+    public PayResponse stripePayment(int userId, String txnId) throws StripeException {
         // get Direct Sale object
         DirectSale directSale = directSaleDao.getDirectSale(userId, txnId);
-        double amount = directSale.getNdbPrice() * directSale.getNdbAmount();
+        long amount = directSale.getNdbPrice() * directSale.getNdbAmount();
         Long lAmount = Double.valueOf(amount * 100).longValue();
         PayResponse response = new PayResponse();
         PaymentIntentCreateParams params =
@@ -81,14 +81,14 @@ public class DirectSaleService extends BaseService {
         return response;
     }
 
-    public CryptoPayload cryptoPayment(String userId, String txnId) {
+    public CryptoPayload cryptoPayment(int userId, String txnId) {
         
         DirectSale directSale = directSaleDao.getDirectSale(userId, txnId);
         if(directSale == null) {
             return null;
         }
 
-        double amount = directSale.getNdbAmount() * directSale.getNdbPrice();
+        long amount = directSale.getNdbAmount() * directSale.getNdbPrice();
         /// Amount means the total USD price for NDB Token
         CoinbasePostBody data = new CoinbasePostBody(
             "Direct Sale",

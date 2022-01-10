@@ -34,7 +34,7 @@ import com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepos
 import com.ndb.auction.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.ndb.auction.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.ndb.auction.service.CustomOAuth2UserService;
-import com.ndb.auction.service.UserDetailsServiceImpl;
+import com.ndb.auction.service.user.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity

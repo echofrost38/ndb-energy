@@ -32,13 +32,19 @@ import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.ContractGasProvider;
 
 /**
- * <p>Auto generated code.
- * <p><strong>Do not modify!</strong>
- * <p>Please use the <a href="https://docs.web3j.io/command_line.html">web3j command line tools</a>,
- * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the 
- * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen module</a> to update.
+ * <p>
+ * Auto generated code.
+ * <p>
+ * <strong>Do not modify!</strong>
+ * <p>
+ * Please use the <a href="https://docs.web3j.io/command_line.html">web3j
+ * command line tools</a>,
+ * or the org.web3j.codegen.SolidityFunctionWrapperGenerator in the
+ * <a href="https://github.com/web3j/web3j/tree/master/codegen">codegen
+ * module</a> to update.
  *
- * <p>Generated with web3j version 1.4.1.
+ * <p>
+ * Generated with web3j version 1.4.1.
  */
 @SuppressWarnings("rawtypes")
 public class UserWallet extends Contract {
@@ -70,31 +76,39 @@ public class UserWallet extends Contract {
 
     public static final String FUNC_TRANSFEROWNERSHIP = "transferOwnership";
 
-    public static final Event OWNERSHIPTRANSFERRED_EVENT = new Event("OwnershipTransferred", 
-            Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Address>(true) {}));
-    ;
+    public static final Event OWNERSHIPTRANSFERRED_EVENT = new Event("OwnershipTransferred",
+            Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {
+            }, new TypeReference<Address>(true) {
+            }));;
 
     @Deprecated
-    protected UserWallet(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+    protected UserWallet(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice,
+            BigInteger gasLimit) {
         super(BINARY, contractAddress, web3j, credentials, gasPrice, gasLimit);
     }
 
-    protected UserWallet(String contractAddress, Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+    protected UserWallet(String contractAddress, Web3j web3j, Credentials credentials,
+            ContractGasProvider contractGasProvider) {
         super(BINARY, contractAddress, web3j, credentials, contractGasProvider);
     }
 
     @Deprecated
-    protected UserWallet(String contractAddress, Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+    protected UserWallet(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+            BigInteger gasPrice, BigInteger gasLimit) {
         super(BINARY, contractAddress, web3j, transactionManager, gasPrice, gasLimit);
     }
 
-    protected UserWallet(String contractAddress, Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+    protected UserWallet(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+            ContractGasProvider contractGasProvider) {
         super(BINARY, contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
-    public List<OwnershipTransferredEventResponse> getOwnershipTransferredEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, transactionReceipt);
-        ArrayList<OwnershipTransferredEventResponse> responses = new ArrayList<OwnershipTransferredEventResponse>(valueList.size());
+    public List<OwnershipTransferredEventResponse> getOwnershipTransferredEvents(
+            TransactionReceipt transactionReceipt) {
+        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT,
+                transactionReceipt);
+        ArrayList<OwnershipTransferredEventResponse> responses = new ArrayList<OwnershipTransferredEventResponse>(
+                valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             OwnershipTransferredEventResponse typedResponse = new OwnershipTransferredEventResponse();
             typedResponse.log = eventValues.getLog();
@@ -109,7 +123,8 @@ public class UserWallet extends Contract {
         return web3j.ethLogFlowable(filter).map(new Function<Log, OwnershipTransferredEventResponse>() {
             @Override
             public OwnershipTransferredEventResponse apply(Log log) {
-                Contract.EventValuesWithLog eventValues = extractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, log);
+                Contract.EventValuesWithLog eventValues = extractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT,
+                        log);
                 OwnershipTransferredEventResponse typedResponse = new OwnershipTransferredEventResponse();
                 typedResponse.log = log;
                 typedResponse.previousOwner = (String) eventValues.getIndexedValues().get(0).getValue();
@@ -119,46 +134,48 @@ public class UserWallet extends Contract {
         });
     }
 
-    public Flowable<OwnershipTransferredEventResponse> ownershipTransferredEventFlowable(DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
+    public Flowable<OwnershipTransferredEventResponse> ownershipTransferredEventFlowable(
+            DefaultBlockParameter startBlock, DefaultBlockParameter endBlock) {
         EthFilter filter = new EthFilter(startBlock, endBlock, getContractAddress());
         filter.addSingleTopic(EventEncoder.encode(OWNERSHIPTRANSFERRED_EVENT));
         return ownershipTransferredEventFlowable(filter);
     }
 
-    public RemoteFunctionCall<TransactionReceipt> addFreeAmount(String id, String crypto, BigInteger amount) {
+    public RemoteFunctionCall<TransactionReceipt> addFreeAmount(int id, String crypto, BigInteger amount) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_ADDFREEAMOUNT, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(crypto), 
-                new org.web3j.abi.datatypes.generated.Uint256(amount)), 
+                FUNC_ADDFREEAMOUNT,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(crypto),
+                        new org.web3j.abi.datatypes.generated.Uint256(amount)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteFunctionCall<TransactionReceipt> addHoldAmount(String id, String crypto, BigInteger amount) {
+    public RemoteFunctionCall<TransactionReceipt> addHoldAmount(int id, String crypto, BigInteger amount) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_ADDHOLDAMOUNT, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(crypto), 
-                new org.web3j.abi.datatypes.generated.Uint256(amount)), 
+                FUNC_ADDHOLDAMOUNT,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(crypto),
+                        new org.web3j.abi.datatypes.generated.Uint256(amount)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
-    public RemoteFunctionCall<TransactionReceipt> addNewUser(String id, String email, String name) {
+    public RemoteFunctionCall<TransactionReceipt> addNewUser(int id, String email, String name) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_ADDNEWUSER, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(email), 
-                new org.web3j.abi.datatypes.Utf8String(name)), 
+                FUNC_ADDNEWUSER,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(email),
+                        new org.web3j.abi.datatypes.Utf8String(name)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
     public RemoteFunctionCall<List> getCoinList() {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETCOINLIST, 
-                Arrays.<Type>asList(), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Utf8String>>() {}));
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETCOINLIST,
+                Arrays.<Type>asList(),
+                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Utf8String>>() {
+                }));
         return new RemoteFunctionCall<List>(function,
                 new Callable<List>() {
                     @Override
@@ -170,131 +187,147 @@ public class UserWallet extends Contract {
                 });
     }
 
-    public RemoteFunctionCall<String> getUserName(String id) {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETUSERNAME, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id)), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
+    public RemoteFunctionCall<String> getUserName(int id) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETUSERNAME,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id))),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {
+                }));
         return executeRemoteCallSingleValueReturn(function, String.class);
     }
 
-    public RemoteFunctionCall<Tuple2<BigInteger, BigInteger>> getWalletById(String id, String crypto) {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETBYID, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(crypto)), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}, new TypeReference<Uint256>() {}));
+    public RemoteFunctionCall<Tuple2<BigInteger, BigInteger>> getWalletById(int id, String crypto) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETBYID,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(crypto)),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {
+                }, new TypeReference<Uint256>() {
+                }));
         return new RemoteFunctionCall<Tuple2<BigInteger, BigInteger>>(function,
                 new Callable<Tuple2<BigInteger, BigInteger>>() {
                     @Override
                     public Tuple2<BigInteger, BigInteger> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
                         return new Tuple2<BigInteger, BigInteger>(
-                                (BigInteger) results.get(0).getValue(), 
+                                (BigInteger) results.get(0).getValue(),
                                 (BigInteger) results.get(1).getValue());
                     }
                 });
     }
 
-    public RemoteFunctionCall<BigInteger> getWalletSize(String id) {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETSIZE, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id)), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
+    public RemoteFunctionCall<BigInteger> getWalletSize(int id) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETSIZE,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id))),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {
+                }));
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);
     }
 
-    public RemoteFunctionCall<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>> getWallets(String id) {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETS, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id)), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Utf8String>>() {}, new TypeReference<DynamicArray<Uint256>>() {}, new TypeReference<DynamicArray<Uint256>>() {}));
+    public RemoteFunctionCall<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>> getWallets(int id) {
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_GETWALLETS,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id))),
+                Arrays.<TypeReference<?>>asList(new TypeReference<DynamicArray<Utf8String>>() {
+                }, new TypeReference<DynamicArray<Uint256>>() {
+                }, new TypeReference<DynamicArray<Uint256>>() {
+                }));
         return new RemoteFunctionCall<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>>(function,
                 new Callable<Tuple3<List<String>, List<BigInteger>, List<BigInteger>>>() {
                     @SuppressWarnings("unchecked")
-					@Override
+                    @Override
                     public Tuple3<List<String>, List<BigInteger>, List<BigInteger>> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
                         return new Tuple3<List<String>, List<BigInteger>, List<BigInteger>>(
-                                convertToNative((List<Utf8String>) results.get(0).getValue()), 
-                                convertToNative((List<Uint256>) results.get(1).getValue()), 
+                                convertToNative((List<Utf8String>) results.get(0).getValue()),
+                                convertToNative((List<Uint256>) results.get(1).getValue()),
                                 convertToNative((List<Uint256>) results.get(2).getValue()));
                     }
                 });
     }
 
-    public RemoteFunctionCall<TransactionReceipt> makeHold(String id, String crypto, BigInteger amount) {
+    public RemoteFunctionCall<TransactionReceipt> makeHold(int id, String crypto, BigInteger amount) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_MAKEHOLD, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(crypto), 
-                new org.web3j.abi.datatypes.generated.Uint256(amount)), 
+                FUNC_MAKEHOLD,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(crypto),
+                        new org.web3j.abi.datatypes.generated.Uint256(amount)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
     public RemoteFunctionCall<String> owner() {
-        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_OWNER, 
-                Arrays.<Type>asList(), 
-                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+        final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(FUNC_OWNER,
+                Arrays.<Type>asList(),
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {
+                }));
         return executeRemoteCallSingleValueReturn(function, String.class);
     }
 
-    public RemoteFunctionCall<TransactionReceipt> releaseHold(String id, String crypto, BigInteger amount) {
+    public RemoteFunctionCall<TransactionReceipt> releaseHold(int id, String crypto, BigInteger amount) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_RELEASEHOLD, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(id), 
-                new org.web3j.abi.datatypes.Utf8String(crypto), 
-                new org.web3j.abi.datatypes.generated.Uint256(amount)), 
+                FUNC_RELEASEHOLD,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Utf8String(String.valueOf(id)),
+                        new org.web3j.abi.datatypes.Utf8String(crypto),
+                        new org.web3j.abi.datatypes.generated.Uint256(amount)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
     public RemoteFunctionCall<TransactionReceipt> renounceOwnership() {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_RENOUNCEOWNERSHIP, 
-                Arrays.<Type>asList(), 
+                FUNC_RENOUNCEOWNERSHIP,
+                Arrays.<Type>asList(),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
     public RemoteFunctionCall<TransactionReceipt> transferOwnership(String newOwner) {
         final org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function(
-                FUNC_TRANSFEROWNERSHIP, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(160, newOwner)), 
+                FUNC_TRANSFEROWNERSHIP,
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Address(160, newOwner)),
                 Collections.<TypeReference<?>>emptyList());
         return executeRemoteCallTransaction(function);
     }
 
     @Deprecated
-    public static UserWallet load(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+    public static UserWallet load(String contractAddress, Web3j web3j, Credentials credentials, BigInteger gasPrice,
+            BigInteger gasLimit) {
         return new UserWallet(contractAddress, web3j, credentials, gasPrice, gasLimit);
     }
 
     @Deprecated
-    public static UserWallet load(String contractAddress, Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+    public static UserWallet load(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+            BigInteger gasPrice, BigInteger gasLimit) {
         return new UserWallet(contractAddress, web3j, transactionManager, gasPrice, gasLimit);
     }
 
-    public static UserWallet load(String contractAddress, Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+    public static UserWallet load(String contractAddress, Web3j web3j, Credentials credentials,
+            ContractGasProvider contractGasProvider) {
         return new UserWallet(contractAddress, web3j, credentials, contractGasProvider);
     }
 
-    public static UserWallet load(String contractAddress, Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+    public static UserWallet load(String contractAddress, Web3j web3j, TransactionManager transactionManager,
+            ContractGasProvider contractGasProvider) {
         return new UserWallet(contractAddress, web3j, transactionManager, contractGasProvider);
     }
 
-    public static RemoteCall<UserWallet> deploy(Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
+    public static RemoteCall<UserWallet> deploy(Web3j web3j, Credentials credentials,
+            ContractGasProvider contractGasProvider) {
         return deployRemoteCall(UserWallet.class, web3j, credentials, contractGasProvider, BINARY, "");
     }
 
-    public static RemoteCall<UserWallet> deploy(Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
+    public static RemoteCall<UserWallet> deploy(Web3j web3j, TransactionManager transactionManager,
+            ContractGasProvider contractGasProvider) {
         return deployRemoteCall(UserWallet.class, web3j, transactionManager, contractGasProvider, BINARY, "");
     }
 
     @Deprecated
-    public static RemoteCall<UserWallet> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
+    public static RemoteCall<UserWallet> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice,
+            BigInteger gasLimit) {
         return deployRemoteCall(UserWallet.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
     }
 
     @Deprecated
-    public static RemoteCall<UserWallet> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
+    public static RemoteCall<UserWallet> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice,
+            BigInteger gasLimit) {
         return deployRemoteCall(UserWallet.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
     }
 

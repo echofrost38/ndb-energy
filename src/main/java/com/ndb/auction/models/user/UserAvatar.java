@@ -1,8 +1,5 @@
 package com.ndb.auction.models.user;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ndb.auction.models.BaseModel;
 
 import org.springframework.stereotype.Component;
@@ -17,8 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserAvatar extends BaseModel {
 
-	private Map<String, List<String>> purchased;
+	private String purchased;
+	private String selected;
 	private String prefix;
-	private String title;
+	private String name;
 
 }

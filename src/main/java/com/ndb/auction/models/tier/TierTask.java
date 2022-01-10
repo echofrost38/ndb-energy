@@ -17,29 +17,27 @@ import lombok.Setter;
 @DynamoDBTable(tableName = "TierTasks")
 public class TierTask {
 
-    public TierTask(String userId) {
+    public TierTask(int userId) {
         this.userId = userId;
         this.verification = false;
-        this.wallet = 0.0;
-        this.auctions = new ArrayList<Integer>();
-        this.direct = 0.0;
-        this.staking = new ArrayList<StakeHist>();
+        this.auctions = new ArrayList<>();
+        this.staking = new ArrayList<>();
     }
 
     @DynamoDBHashKey(attributeName="user_id")
-    private String userId;
+    private int userId;
     
     @DynamoDBAttribute(attributeName="verification")
     private Boolean verification;
     
     @DynamoDBAttribute(attributeName="wallet")
-    private double wallet;
+    private long wallet;
     
     @DynamoDBAttribute(attributeName="auctions")
     private List<Integer> auctions;
    
     @DynamoDBAttribute(attributeName="direct")
-    private double direct;
+    private long direct;
     
     @DynamoDBAttribute(attributeName="staking")
     private List<StakeHist> staking;

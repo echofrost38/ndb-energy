@@ -12,7 +12,7 @@ import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,7 +29,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String setAvatar(String prefix, String name) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        int id = userDetails.getId();
         return profileService.setAvatar(id, prefix, name);
     }
 
@@ -37,7 +37,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public List<AvatarSet> updateAvatarSet(List<AvatarSet> components) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        int id = userDetails.getId();
         return profileService.updateAvatarSet(id, components);
     }
 
@@ -51,7 +51,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String createApplicant(String country, String docType, String levelName) {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
     	try {
 			String result = sumsubService.createApplicant(userId, levelName);
 			if(result == null) return "Failed";
@@ -59,8 +59,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 			e.printStackTrace();
 			return "Failed";
 		}
-    	User user = userService.getUserById(userId);
-    	userService.updateUser(user);
+    	// User user = userService.getUserById(userId);
+    	// userService.updateUser(user);    //TODO: why select and update?
     	
     	return "Success";
     }
@@ -68,7 +68,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String upgradeApplicant(String levelName) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         try {
 			String result = sumsubService.createApplicant(userId, levelName);
 			if(result == null) return "Failed";
@@ -82,7 +82,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String upload(String docType, String country, Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         List<Applicant> appList = sumsubService.getApplicantsByUserId(userId);
         if(appList.size() == 0) {
         	return null;
@@ -95,7 +95,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String uploadSelfie(String country, Part selfie) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         List<Applicant> appList = sumsubService.getApplicantsByUserId(userId);
         if(appList.size() == 0) {
         	return null;
@@ -108,7 +108,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     @PreAuthorize("isAuthenticated()")
     public String requestCheck()  throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         String result = sumsubService.requestChecking(userId);
     	return result;
     }

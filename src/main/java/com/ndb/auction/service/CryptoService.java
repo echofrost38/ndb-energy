@@ -67,7 +67,7 @@ public class CryptoService extends BaseService {
         return cryptoDao.deleteCoin(coin);
     }
 
-    public double getCryptoPriceBySymbol(String symbol) {
+    public int getCryptoPriceBySymbol(String symbol) {
         String symbolPair = symbol + "USDT";
         CoinPrice objs = binanceAPI.get()
 				.uri(uriBuilder -> uriBuilder.path("/ticker/price")
@@ -76,10 +76,10 @@ public class CryptoService extends BaseService {
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 		        .retrieve()
 		        .bodyToMono(CoinPrice.class).block();
-        return Double.valueOf(objs.getPrice());
+        return Integer.parseInt(objs.getPrice());
     }
 
-    public CryptoPayload createNewPayment(String roundId, String userId, double amount) {
+    public CryptoPayload createNewPayment(String roundId, int userId, long amount) {
         
         // round existing
         Auction round = auctionDao.getAuctionById(roundId);
@@ -110,7 +110,7 @@ public class CryptoService extends BaseService {
         String txnId = resBody.getId();
         String code = resBody.getCode();
         String createdAt = resBody.getCreated_at();
-        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, 0.0, null, createdAt);
+        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, 0, null, createdAt);
         cryptoDao.createNewPayment(tx);
         
         CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());
@@ -122,7 +122,7 @@ public class CryptoService extends BaseService {
         return cryptoDao.getTransactionById(id);
     }
 
-    public List<CryptoTransaction> getTransactionByUser(String userId) {
+    public List<CryptoTransaction> getTransactionByUser(int userId) {
         return cryptoDao.getTransactionByUser(userId);
     }
 
@@ -130,7 +130,7 @@ public class CryptoService extends BaseService {
         return cryptoDao.getTransactionByRound(roundId);
     }
 
-    public List<CryptoTransaction> getTransaction(String roundId, String userId) {
+    public List<CryptoTransaction> getTransaction(String roundId, int userId) {
         return cryptoDao.getTransaction(roundId, userId);
     }
 

@@ -2,9 +2,12 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.models.user.UserAvatar;
+import com.ndb.auction.models.user.UserVerify;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,22 +15,24 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import oracle.net.aso.l;
 
 @Component
 public class UserResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-    
+
     @PreAuthorize("isAuthenticated()")
     public User getUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
         return userService.getUserById(id);
     }
 
     @PreAuthorize("isAuthenticated()")
     public String changePassword(String newPassword) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
-
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
         return userService.changePassword(id, newPassword);
     }
 
@@ -48,37 +53,36 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String resetPasswordByAdmin(String email) {
-        String rPassword = userService.getRandomPassword(10);
-        String encoded = userService.encodePassword(rPassword);
-        User user = userService.getUserByEmail(email);
-        user.setPassword(encoded);
-        return userService.resetPassword(user, rPassword);
+        return userService.resetPasswordByAdmin(email);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createNewUser(String email, String country, String role, String avatarName, String shortName) {
-        
-        User user = userService.getUserByEmail(email);
-        if(user != null) {
+
+        User user = userService.getUserByEmail(email, false, false, false);
+        if (user != null) {
             return "Already Exists.";
         }
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user=new User();
+        user = new User();
         user.setEmail(email);
         user.setPassword(encoded);
         user.setCountry(country);
-        
-        user.setAvatarPrefix(avatarName);
-        user.setAvatarName(shortName);
 
-        user.getVerify().replace("email", true);
+        UserAvatar userAvatar = new UserAvatar();
+        userAvatar.setPrefix(avatarName);
+        userAvatar.setName(shortName);
+        user.setAvatar(userAvatar);
 
-		// check role
-		if(role.equals("ROLE_ADMIN")) {
-			user.getRole().add("ROLE_ADMIN");
-		}
+        UserVerify userVerify = new UserVerify();
+        userVerify.setEmailVerified(true);
+        user.setVerify(userVerify);
+
+        // check role
+        if (role.equals("ROLE_ADMIN"))
+            user.addRole(role);
 
         return userService.createNewUser(user, rPassword);
     }
@@ -94,21 +98,23 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<User> getPaginatedUsers(String key, int limit) {
-        return userService.getPaginatedUser(key, limit);
+    public List<User> getPaginatedUsers(int offset, int limit) {
+        return userService.getPaginatedUser(offset, limit);
     }
 
     @PreAuthorize("isAuthenticated()")
     public String deleteAccount() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
         return userService.deleteUser(id);
     }
 
-//    @PreAuthorize("isAuthenticated")
-//    public String setAvatar(String prefix, String name) {
-//        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String id = userDetails.getId();
-//        return profileService.setAvatar(id, prefix, name);
-//    }
+    // @PreAuthorize("isAuthenticated")
+    // public String setAvatar(String prefix, String name) {
+    // UserDetailsImpl userDetails =
+    // (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    // int id = userDetails.getId();
+    // return profileService.setAvatar(id, prefix, name);
+    // }
 }

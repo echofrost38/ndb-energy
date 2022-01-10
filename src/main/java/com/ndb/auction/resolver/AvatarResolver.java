@@ -23,7 +23,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	public AvatarComponent createNewComponent(
 		String groupId, 
 		Integer tierLevel, 
-		Double price, 
+		Long price, 
 		Integer limited,
 		Part file
 	) {
@@ -32,7 +32,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	
 	// update component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file) {
+	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Long price, Integer limited, Part file) {
 		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, file);
 	}
 

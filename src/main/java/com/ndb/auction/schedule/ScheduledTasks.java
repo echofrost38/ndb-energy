@@ -111,7 +111,7 @@ public class ScheduledTasks {
 				startedRound = readyRound;
 				startedCounter = readyRound.getDuration();
 
-				String id = readyRound.getAuctionId();
+				String id = readyRound.getId();
 				Auction nextRound = auctionService.startAuction(id);
 				if (nextRound != null) {
 					readyRound = nextRound;
@@ -128,13 +128,13 @@ public class ScheduledTasks {
 			System.out.println("Started counter: " + startedCounter.toString());
 			if (startedCounter == 0) {
 				// end round!
-				auctionService.endAuction(startedRound.getAuctionId());
+				auctionService.endAuction(startedRound.getId());
 
 				statService.updateRoundCache(startedRound.getNumber());
 
 				// bid processing
 				// ********* checking delayed more 1s ************
-				bidService.closeBid(startedRound.getAuctionId());
+				bidService.closeBid(startedRound.getRound());
 				startedRound = null;
 			}
 		}

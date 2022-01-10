@@ -31,7 +31,7 @@ public class AuthResolver extends BaseResolver
 		// if(!ipChecking.isAllowed(ipAddress)) {
 		// return "Not Allowed Location";
 		// }
-		return userService.createUser(email, password, country, true);
+		return userService.createUser(email, password, country);
 	}
 
 	public String verifyAccount(String email, String code) {
@@ -66,7 +66,7 @@ public class AuthResolver extends BaseResolver
 		// get user ( Not found exception is threw in service)
 		User user = null;
 		try {
-			user = userService.getUserByEmail(email);
+			user = userService.getUserByEmail(email, false, true, true);
 		} catch (UserNotFoundException e) {
 			return new Credentials("Failed", "You are not registered");
 		}
@@ -168,14 +168,13 @@ public class AuthResolver extends BaseResolver
 		return Mono.just("flux test: " + param);
 	}
 
-	public String addNewUser(String id, String email, String name) {
+	public String addNewUser(int id, String email, String name) {
 		TransactionReceipt receipt = userWalletService.addNewUser(id, email, name);
 		return receipt.getLogs().get(0).getData();
 	}
 
-	public String addHoldAmount(String id, String crypto, int amount) {
-		double _amount = (double) amount;
-		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, _amount);
+	public String addHoldAmount(int id, String crypto, long amount) {
+		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
 		return receipt.getLogs().get(0).getData();
 	}
 

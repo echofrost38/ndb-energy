@@ -7,12 +7,12 @@ extend type Mutation {
     addNewUserTier(
         level: Int!,
         name: String!,
-        points: Float!
+        point: Float!
     ) : UserTier
     updateUserTier(
         level: Int!,
         name: String,
-        points: Float
+        point: Float
     ) : UserTier
     deleteUserTier(
         level: Int!

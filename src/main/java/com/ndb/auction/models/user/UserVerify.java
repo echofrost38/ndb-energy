@@ -17,6 +17,7 @@ public class UserVerify extends BaseModel {
 	private boolean emailVerified;
 	private boolean phoneVerified;
 	private boolean kycVerified;
+	private boolean amlVerified;
 	private boolean kybVerified;
 
 }

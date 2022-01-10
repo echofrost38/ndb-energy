@@ -11,10 +11,10 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.ndb.auction.models.user.UserLocationLog;
+import com.ndb.auction.models.LocationLog;
 import com.ndb.auction.service.LocationLogService;
-import com.ndb.auction.service.UserDetailsImpl;
-import com.ndb.auction.service.UserDetailsServiceImpl;
+import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsServiceImpl;
 import com.ndb.auction.utils.RemoteIpHelper;
 
 import org.slf4j.Logger;
@@ -68,14 +68,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 			String ip = RemoteIpHelper.getRemoteIpFrom(request);
 			if (session == null || (ipFromSession = (String) session.getAttribute(SESSION_IP)) == null
 					|| !ip.equals(ipFromSession)) {
-				UserLocationLog location = locationLogService.buildLog(request);
+				LocationLog location = locationLogService.buildLog(request);
 				JsonObject errorObject;
 				if (location == null) {
 					if (userDetails != null) {
-						location = new UserLocationLog();
+						location = new LocationLog();
 						location.setUserId(userDetails.getId());
 						location.setIpAddress(ip);
-						location.setRegTime(new Timestamp(System.currentTimeMillis()));
 						locationLogService.addLog(location);
 						if (session == null)
 							session = request.getSession(true);

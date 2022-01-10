@@ -1,28 +1,24 @@
 package com.ndb.auction.models;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import org.springframework.stereotype.Component;
 
-@DynamoDBDocument
-public class AvatarSet {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-	public String groupId;
-	public String compId;
+@Component
+@Getter
+@Setter
+@NoArgsConstructor
+public class AvatarSet extends BaseModel {
 
-	@DynamoDBAttribute(attributeName = "group_id")
-	public String getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(String groupId) {
+	private int groupId;
+	private int compId;
+
+	public AvatarSet(int id, int groupId, int compId) {
+		this.id = id;
 		this.groupId = groupId;
-	}
-
-	@DynamoDBAttribute(attributeName = "comp_id")
-	public String getCompId() {
-		return compId;
-	}
-	public void setCompId(String compId) {
 		this.compId = compId;
 	}
-	
+
 }

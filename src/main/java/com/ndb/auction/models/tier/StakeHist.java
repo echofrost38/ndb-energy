@@ -18,5 +18,5 @@ public class StakeHist {
     private int expiredTime;
 
     @DynamoDBAttribute(attributeName="amount")
-    private double amount;
+    private long amount;
 }

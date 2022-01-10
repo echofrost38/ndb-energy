@@ -3,7 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models._bak.UserTier;
+import com.ndb.auction.models.Tier;
 import com.ndb.auction.service.TierService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +19,17 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
     private TierService tierService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public UserTier addNewUserTier(int level, String name, double points) {
-        return tierService.addNewUserTier(level, name, points);
+    public Tier addNewUserTier(int level, String name, long point) {
+        return tierService.addNewUserTier(level, name, point);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public UserTier updateUserTier(int level, String name, double points) {
-        return tierService.updateUserTier(level, name, points);
+    public Tier updateUserTier(int level, String name, long point) {
+        return tierService.updateUserTier(level, name, point);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<UserTier> getUserTiers() {
+    public List<Tier> getUserTiers() {
         return tierService.getUserTiers();
     }
 

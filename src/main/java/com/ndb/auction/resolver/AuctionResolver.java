@@ -21,10 +21,10 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		int number, 
 		String startedAt, 
 		long duration, 
-		double totalToken, 
-		double minPrice, 
+		long totalToken, 
+		long minPrice, 
 		List<AvatarSet> avatar, 
-		Double token
+		long token
 	) {
 		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatar, token);
 		return auctionService.createNewAuction(auction);
@@ -52,16 +52,16 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction updateAuction(
-		String id, 
+		int id, 
 		int number, 
 		long duration, 
-		double totalToken, 
-		double minPrice, 
+		long totalToken, 
+		long minPrice, 
 		List<AvatarSet> avatarSet, 
-		Double token
+		long token
 	) {
 		Auction auction = new Auction(number, null, duration, totalToken, minPrice, avatarSet, token);
-		auction.setAuctionId(id);
+		auction.setId(id);
 		return auctionService.updateAuctionByAdmin(auction);
 	}
 

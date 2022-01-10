@@ -13,7 +13,7 @@ import lombok.Setter;
 @DynamoDBDocument
 public class WalletTask {
     @DynamoDBAttribute(attributeName = "amount")
-    private int amount;
-    @DynamoDBAttribute(attributeName = "points")
-    private double points;
+    private long amount;
+    @DynamoDBAttribute(attributeName = "point")
+    private long point;
 }

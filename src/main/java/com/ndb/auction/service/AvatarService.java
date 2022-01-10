@@ -19,36 +19,33 @@ import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.SkillSet;
-import com.ndb.auction.service.interfaces.IAvatarService;
 
 @Service
-public class AvatarService extends BaseService implements IAvatarService{
+public class AvatarService extends BaseService {
 
 	private AmazonS3 s3;
 	private final String bucketName = "auctionupload";
-
 
 	public AvatarService(AmazonS3 s3) {
 		this.s3 = s3;
 	}
 
-	@Override
-	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, Part file) {
+	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Long price, Integer limited,
+			Part file) {
+		price = price == null ? 0 : price;
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited);
-		
 		AvatarComponent newComponent = avatarDao.createAvatarComponent(component);
 		String key = newComponent.getGroupId() + "-" + newComponent.getCompId();
-		if(!uploadFileS3(key, file)) {
+		if (!uploadFileS3(key, file)) {
 			throw new S3Exception("Cannot Upload Avatar File.", "file");
 		}
-		
+
 		return newComponent;
 	}
 
-	@Override
 	public List<AvatarComponent> getAvatarComponents() {
 		List<AvatarComponent> components = avatarDao.getAvatarComponents();
-		
+
 		for (AvatarComponent avatarComponent : components) {
 			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
 			String imageStr = downloadAvatarAccessories(key);
@@ -57,7 +54,6 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return components;
 	}
 
-	@Override
 	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
 		List<AvatarComponent> components = avatarDao.getAvatarComponentsByGid(groupId);
 		for (AvatarComponent avatarComponent : components) {
@@ -68,7 +64,6 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return components;
 	}
 
-	@Override
 	public AvatarComponent getAvatarComponent(String groupId, String sKey) {
 		AvatarComponent avatarComponent = avatarDao.getAvatarComponent(groupId, sKey);
 		String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
@@ -77,60 +72,57 @@ public class AvatarService extends BaseService implements IAvatarService{
 		return avatarComponent;
 	}
 
-	@Override
-	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Double price, Integer limited, Part file) {
+	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Long price, Integer limited,
+			Part file) {
 		AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
-		if(component == null) {
+		if (component == null) {
 			throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 		}
-		price = price == null ? 0 : price;
 		tierLevel = tierLevel == null ? 0 : tierLevel;
 		limited = limited == null ? 0 : limited;
+		price = price == null ? 0 : price;
 		component.setPrice(price);
 		component.setTierLevel(tierLevel);
 		component.setLimited(limited);
-		
+
 		// try delete and put object again
 		String key = component.getGroupId() + "-" + component.getCompId();
-		if(!deleteS3Object(key)) {
+		if (!deleteS3Object(key)) {
 			throw new S3Exception("Cannot update Avatar component.", "file");
 		}
-		if(file != null) {
-			if(!uploadFileS3(key, file)) {
+		if (file != null) {
+			if (!uploadFileS3(key, file)) {
 				throw new S3Exception("Cannot Upload Avatar File.", "file");
 			}
 		}
 		return avatarDao.updateAvatarComponent(component);
 	}
 
-	@Override
 	public AvatarProfile createAvatarProfile(String name, String surname, String shortName,
 			List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) {
-		
+
 		// check condition
 		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
-		if(profile != null) {
+		if (profile != null) {
 			throw new AvatarNotFoundException("Already exists with '" + name + "'", "name");
 		}
-		
+
 		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
 		return avatarDao.createAvatarProfile(profile);
 	}
 
-	@Override
 	public AvatarProfile updateAvatarProfile(
-			String id, 
-			String name, 
-			String surname, 
+			String id,
+			String name,
+			String surname,
 			String shortName,
-			List<SkillSet> skillSet, 
-			List<AvatarSet> avatarSet, 
-			String enemy, 
-			String invention, 
-			String bio) 
-	{
+			List<SkillSet> skillSet,
+			List<AvatarSet> avatarSet,
+			String enemy,
+			String invention,
+			String bio) {
 		AvatarProfile profile = avatarDao.getAvatarProfile(id);
-		if(profile == null) {
+		if (profile == null) {
 			throw new AvatarNotFoundException("Cannot find avatar profile.", "id");
 		}
 		profile.setName(name);
@@ -141,28 +133,24 @@ public class AvatarService extends BaseService implements IAvatarService{
 		profile.setEnemy(enemy);
 		profile.setInvention(invention);
 		profile.setBio(bio);
-		
+
 		return avatarDao.updateAvatarProfile(profile);
 	}
 
-	@Override
 	public List<AvatarProfile> getAvatarProfiles() {
 		return avatarDao.getAvatarProfiles();
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfile(String id) {
 		return avatarDao.getAvatarProfile(id);
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfileByName(String fname) {
 		return avatarDao.getAvatarProfileByName(fname);
 	}
 
-	@Override
 	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
 		return avatarDao.getAvatarComponentsBySet(set);
@@ -186,7 +174,7 @@ public class AvatarService extends BaseService implements IAvatarService{
 		}
 		InputStream finput = s3object.getObjectContent();
 		long length = s3object.getObjectMetadata().getContentLength();
-		byte[] imageBytes = new byte[(int)length];
+		byte[] imageBytes = new byte[(int) length];
 		try {
 			finput.read(imageBytes, 0, imageBytes.length);
 			finput.close();

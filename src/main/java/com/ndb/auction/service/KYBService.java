@@ -29,7 +29,7 @@ public class KYBService extends BaseService {
         this.s3 = s3;
     }
 
-    public UserKyb getByUserId(String userId) {
+    public UserKyb getByUserId(int userId) {
         return kybDao.getByUserId(userId);
     }
 
@@ -37,9 +37,9 @@ public class KYBService extends BaseService {
         return kybDao.getAll();
     }
 
-    public UserKyb updateInfo(String userId, String country, String companyName, String regNum) {
+    public UserKyb updateInfo(int userId, String country, String companyName, String regNum) {
         UserKyb kyb = new UserKyb();
-        kyb.setUserId(userId);
+        kyb.setId(userId);
         kyb.setCountry(country);
         kyb.setCompanyName(companyName);
         kyb.setRegNum(regNum);

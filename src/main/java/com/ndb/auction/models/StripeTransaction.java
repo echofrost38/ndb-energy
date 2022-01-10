@@ -17,7 +17,7 @@ public class StripeTransaction {
 	
 	// #1
 	private String roundId;
-	private String userId;
+	private int userId;
 
 	// #2
 	// private String bidId;
@@ -32,7 +32,7 @@ public class StripeTransaction {
 		
 	}
 	
-	public StripeTransaction(String roundId, String userId, Long amount, String paymentIntentId) {
+	public StripeTransaction(String roundId, int userId, Long amount, String paymentIntentId) {
 		this.roundId = roundId;
 		this.userId = userId;
 		this.amount = amount;
@@ -60,11 +60,11 @@ public class StripeTransaction {
 	}
 	
 	@DynamoDBAttribute(attributeName="user_id")
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 	

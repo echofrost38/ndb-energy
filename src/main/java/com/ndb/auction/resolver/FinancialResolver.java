@@ -11,7 +11,7 @@ import com.ndb.auction.models.DirectSale;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.service.SumsubService;
-import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +27,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     @PreAuthorize("isAuthenticated()")
     public CryptoPayload getDepositAddress(String txnId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         
         return directSaleService.cryptoPayment(userId, txnId);
     }
@@ -35,7 +35,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     @PreAuthorize("isAuthenticated()")
     public String deposit() {
         // UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // String userId = userDetails.getId();
+        // int userId = userDetails.getId();
 
         return "";
     }
@@ -43,16 +43,16 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     // Direct Sale NDT Token
     // will return transaction id
     @PreAuthorize("isAuthenticated()")
-    public String directSale(double amount, double price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String directSale(long amount, long price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         String response = "Failed";
         
         if(amount <= 0 || price <= 0) {
             throw new BadRequestException("Amount and Price must be larger than 0.");
         }
         // price mean USD price. 
-        double totalPrice = amount * price;
+        long totalPrice = amount * price;
 
         if(!sumsubService.checkThreshold(userId, "direct", totalPrice)) {
             throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
@@ -68,9 +68,9 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
 
     // Withdrawal
     @PreAuthorize("isAuthenticated()")
-    public String withdrawal(String cryptoType, double amount) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String withdrawal(String cryptoType, long amount) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
         
         // price converting
         double cryptoUnitPrice = cryptoService.getCryptoPriceBySymbol(cryptoType);

@@ -320,7 +320,7 @@ public class NdbWalletService {
         }
     }
 
-    public Boolean transferFunds(String token, String network, String address, int amount) {
+    public Boolean transferFunds(String token, String network, String address, long amount) {
         try {
             String privateKey = "ac3ffc57465944b1309dcde8fc8ffa2dc417deaafe42f99538414aee7df957f1";
             Credentials credentials = Credentials.create(privateKey);

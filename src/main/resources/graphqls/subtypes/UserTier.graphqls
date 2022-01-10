@@ -1,5 +1,5 @@
 type UserTier {
     level: Int!,
     name: String,
-    points: Float
+    point: Float
 }

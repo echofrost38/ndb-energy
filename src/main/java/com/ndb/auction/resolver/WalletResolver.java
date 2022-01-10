@@ -19,7 +19,7 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         return ndbWalletService.getWalletBalance(token, network, address).toString();
     }
 
-    public Boolean transferFunds(String token, String network, String address, int amount) {
+    public Boolean transferFunds(String token, String network, String address, long amount) {
         return ndbWalletService.transferFunds(token, network, address, amount);
     }
 }

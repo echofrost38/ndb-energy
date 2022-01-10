@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BaseModel {
+public abstract class BaseModel {
 
     protected int id;
     protected Timestamp regDate;

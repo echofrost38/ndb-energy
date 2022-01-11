@@ -21,7 +21,7 @@ public class AuctionAvatarDao extends BaseOracleDao {
 	private static AvatarSet extract(ResultSet rs) throws SQLException {
 		AvatarSet model = new AvatarSet();
 		model.setId(rs.getInt("ID"));
-		model.setGroupId(rs.getInt("GROUP_ID"));
+		model.setGroupId(rs.getString("GROUP_ID"));
 		model.setCompId(rs.getInt("COMP_ID"));
 		return model;
 	}

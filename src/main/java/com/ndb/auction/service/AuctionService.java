@@ -85,15 +85,13 @@ public class AuctionService extends BaseService {
 		// check already opened Round
 		List<Auction> list = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if (list.size() != 0) {
-			// there is already opened auction
-			return null; // or exception
+			throw new AuctionException("There is already opened round.", "id");
 		}
 
 		// check current auction is pending
 		Auction target = auctionDao.getAuctionById(id);
 		if (target.getStatus() != Auction.COUNTDOWN) {
-			// it isn't PENDING round
-			return null; // or exception
+			throw new AuctionException("It is not a pending round.", "id");
 		}
 
 		auctionDao.startAuction(target);

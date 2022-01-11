@@ -290,7 +290,7 @@ public class BidService extends BaseService {
 
 		Auction auction = auctionDao.getAuctionByRound(roundId);
 		List<AvatarSet> avatar = auctionAvatarDao.selectById(auction.getId());
-		List<AvatarComponent> avatarComponents = avatarDao.getAvatarComponentsBySet(avatar);
+		List<AvatarComponent> avatarComponents = avatarComponentDao.getAvatarComponentsBySet(avatar);
 		long avatarToken = auction.getToken();
 		long totalToken = auction.getTotalToken();
 

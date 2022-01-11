@@ -89,14 +89,14 @@ public class ProfileService extends BaseService {
 		}
 
 		// update purchase list and user avatar set!!
-		AvatarProfile profile = avatarDao.getAvatarProfileByName(prefix);
+		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(prefix);
 
 		if (profile == null) {
 			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix");
 		}
 
 		List<AvatarSet> sets = profile.getAvatarSet();
-		List<AvatarComponent> components = avatarDao.getAvatarComponentsBySet(sets);
+		List<AvatarComponent> components = avatarComponentDao.getAvatarComponentsBySet(sets);
 
 		String purchasedJsonString = userAvatar.getPurchased();
 		JsonObject purchasedJson = purchasedJsonString == null ? new JsonObject()
@@ -132,15 +132,15 @@ public class ProfileService extends BaseService {
 		}
 		long totalPrice = 0;
 		long price = 0;
-		int groupId = 0;
+		String groupId = "";
 		int compId = 0;
 		List<AvatarComponent> purchasedComponents = new ArrayList<>();
 
-		Map<String, List<String>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
+		Map<String, List<Integer>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
 		for (AvatarSet avatarSet : set) {
 			groupId = avatarSet.getGroupId();
 			compId = avatarSet.getCompId();
-			AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
+			AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 			if (component == null) {
 				throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 			}
@@ -152,7 +152,7 @@ public class ProfileService extends BaseService {
 			}
 
 			// check purchased
-			List<String> purchaseList = purchasedMap.get(groupId);
+			List<Integer> purchaseList = purchasedMap.get(groupId);
 			if (purchaseList == null) {
 				purchaseList = new ArrayList<>();
 				purchasedMap.put(String.valueOf(groupId), purchaseList);
@@ -184,7 +184,7 @@ public class ProfileService extends BaseService {
 		userAvatar.setSelected(gson.toJson(set));
 
 		// update component purchased ?
-		avatarDao.updateAvatarComponents(purchasedComponents);
+		avatarComponentDao.updateAvatarComponents(purchasedComponents);
 
 		return set;
 	}

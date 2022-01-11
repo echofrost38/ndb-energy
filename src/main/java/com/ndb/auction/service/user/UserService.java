@@ -407,7 +407,7 @@ public class UserService extends BaseService {
 		} else {
 			return "Failed";
 		}
-		userDao.updateRole(user.getId(), role);
+		userDao.updateRole(user.getId(), user.getRoleString());
 		return "Success";
 	}
 

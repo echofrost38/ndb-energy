@@ -18,7 +18,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid placeBid(
-		String roundId, 
+		int roundId, 
 		long tokenAmount, 
 		long tokenPrice, 
 		int payment, 
@@ -34,7 +34,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid updateBid(
-		String roundId, 
+		int roundId, 
 		long tokenAmount, 
 		long tokenPrice
 	) {
@@ -48,7 +48,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
-		String roundId, 
+		int roundId, 
 		long tokenAmount, 
 		long tokenPrice, 
 		Integer payment, 
@@ -89,7 +89,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Bid> getBidListById(String roundId) {
+	public List<Bid> getBidListById(int roundId) {
 		return bidService.getBidListByRoundId(roundId);
 	}
 
@@ -99,7 +99,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	}
 	
 	///////////////// for test 
-	public String closeBid(String roundId) {
+	public String closeBid(int roundId) {
 		bidService.closeBid(roundId);
 		return "Success";
 	}

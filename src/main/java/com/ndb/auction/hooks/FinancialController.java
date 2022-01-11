@@ -9,12 +9,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.ndb.auction.models.DirectSale;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
+import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.stripe.exception.SignatureVerificationException;
@@ -185,8 +185,8 @@ public class FinancialController extends BaseController {
     }
 
     private void addDirectSalepoint(int userId, long amount) {
-        TierTask tierTask = tierService.getTierTask(userId);
-        TaskSetting taskSetting = tierService.getTaskSetting();
+        TierTask tierTask = tierTaskService.getTierTask(userId);
+        TaskSetting taskSetting = taskSettingService.getTaskSetting();
         List<Tier> tiers = tierService.getUserTiers();
 
         long prevDirect = tierTask.getDirect();
@@ -204,7 +204,7 @@ public class FinancialController extends BaseController {
                 level = tier.getLevel();
             }
         }
-        tierService.updateTierTask(tierTask);
+        tierTaskService.updateTierTask(tierTask);
         userService.updateTier(userId, level, point);
     }
 

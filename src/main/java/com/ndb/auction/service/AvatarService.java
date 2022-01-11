@@ -2,15 +2,18 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
+import javax.servlet.http.Part;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarProfile;
-import com.ndb.auction.models.AvatarSet;
+import com.ndb.auction.exceptions.S3Exception;
 import com.ndb.auction.models.SkillSet;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarSet;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AvatarService extends BaseService {
@@ -22,7 +25,7 @@ public class AvatarService extends BaseService {
 		// this.s3 = s3;
 	}
 
-	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Long price, Integer limited,
+	public AvatarComponent createAvatarComponent(int groupId, Integer tierLevel, Long price, Integer limited,
 			Part file) {
 		price = price == null ? 0 : price;
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited);
@@ -113,7 +116,7 @@ public class AvatarService extends BaseService {
 		if (profile == null) {
 			throw new AvatarNotFoundException("Cannot find avatar profile.", "id");
 		}
-		profile.setName(name);
+		profile.setFname(name);
 		profile.setSurname(surname);
 		profile.setShortName(shortName);
 		profile.setSkillSet(skillSet);

@@ -1,11 +1,9 @@
 package com.ndb.auction.service.user;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,11 +50,9 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 	}
 
 	public static UserDetailsImpl build(User user) {
-		String[] roleArray = user.getRole().split(User.ROLE_SEPARATOR);
-		List<GrantedAuthority> authorities = Set.of(roleArray).stream()
-				.map(SimpleGrantedAuthority::new)
+		List<GrantedAuthority> authorities = user.getRole().stream()
+				.map(role -> new SimpleGrantedAuthority(role))
 				.collect(Collectors.toList());
-
 		return new UserDetailsImpl(
 				user.getId(),
 				user.getName(),

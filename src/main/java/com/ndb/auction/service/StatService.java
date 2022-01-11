@@ -55,8 +55,8 @@ public class StatService extends BaseService {
 
             // Round Performance 2
             // Round Chance
-            String roundId = round.getId();
-            int roundNumber = round.getNumber();
+            int roundId = round.getId();
+            int roundNumber = round.getRound();
             List<Bid> bidList = bidDao.getBidListByRound(roundId);
             double[] priceArr = new double[bidList.size()];
             int cnt = 0;
@@ -158,8 +158,8 @@ public class StatService extends BaseService {
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
         if (rounds.size() == 1) {
             Auction startedRound = rounds.get(0);
-            int roundNumber = startedRound.getNumber();
-            String roundId = startedRound.getId();
+            int roundNumber = startedRound.getRound();
+            int roundId = startedRound.getId();
             List<Bid> bidList = bidDao.getBidListByRound(roundId);
             long min = Long.MAX_VALUE, max = 0, std = 0;
             StandardDeviation standardDeviation = new StandardDeviation();
@@ -198,7 +198,7 @@ public class StatService extends BaseService {
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
         if (rounds.size() == 1) {
             Auction startedRound = rounds.get(0);
-            int roundNumber = startedRound.getNumber();
+            int roundNumber = startedRound.getRound();
             List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
             long win = 0;
             for (Bid bid : bidList) {
@@ -225,7 +225,7 @@ public class StatService extends BaseService {
 
         List<Auction> rounds = auctionDao.getAuctionByStatus(Auction.STARTED);
         if (rounds.size() == 1) {
-            int roundNumber = rounds.get(0).getNumber();
+            int roundNumber = rounds.get(0).getRound();
 
             List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
 

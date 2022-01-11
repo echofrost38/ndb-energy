@@ -1,18 +1,15 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.Part;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.ndb.auction.dao.KYBDao;
+import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.models.user.UserKyb;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +20,18 @@ public class KYBService extends BaseService {
     private static final String BUCKET_NAME = "auctionupload";
 
     @Autowired
-    private KYBDao kybDao;
+    private UserKybDao userKybDao;
 
     public KYBService(AmazonS3 s3) {
         this.s3 = s3;
     }
 
     public UserKyb getByUserId(int userId) {
-        return kybDao.getByUserId(userId);
+        return userKybDao.selectById(userId);
     }
 
     public List<UserKyb> getAll() {
-        return kybDao.getAll();
+        return userKybDao.selectAll(null);
     }
 
     public UserKyb updateInfo(int userId, String country, String companyName, String regNum) {
@@ -43,7 +40,8 @@ public class KYBService extends BaseService {
         kyb.setCountry(country);
         kyb.setCompanyName(companyName);
         kyb.setRegNum(regNum);
-        return kybDao.addList(kyb);
+        userKybDao.insertOrUpdate(kyb);
+        return kyb;
     }
 
     public UserKyb updateFile(int userId, List<Part> fileList) {
@@ -69,7 +67,8 @@ public class KYBService extends BaseService {
             kyb.setAttach2Filename(fileName);
         }
 
-        return kybDao.addList(kyb);
+        userKybDao.insertOrUpdate(kyb);
+        return kyb;
     }
 
     private boolean uploadFileS3(String key, Part file) {

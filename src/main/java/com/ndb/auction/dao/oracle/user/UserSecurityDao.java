@@ -2,13 +2,12 @@ package com.ndb.auction.dao.oracle.user;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.user.UserSecurity;
 
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -30,11 +29,13 @@ public class UserSecurityDao extends BaseOracleDao {
 		return m;
 	}
 
-	public List<UserSecurity> selectById(int userId) {
+	public UserSecurity selectById(int userId) {
 		String sql = "SELECT * FROM TBL_USER_SECURITY WHERE USER_ID=? ODER BY ID";
-		return jdbcTemplate.query(sql, new RowMapper<UserSecurity>() {
+		return jdbcTemplate.query(sql, new ResultSetExtractor<UserSecurity>() {
 			@Override
-			public UserSecurity mapRow(ResultSet rs, int rownumber) throws SQLException {
+			public UserSecurity extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
 				return extract(rs);
 			}
 		}, userId);

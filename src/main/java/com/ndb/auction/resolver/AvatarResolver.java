@@ -2,10 +2,10 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarProfile;
-import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.SkillSet;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarSet;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	// create new component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public AvatarComponent createNewComponent(
-		String groupId, 
+		int groupId, 
 		Integer tierLevel, 
 		Long price, 
 		Integer limited,

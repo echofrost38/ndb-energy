@@ -14,16 +14,16 @@ import com.google.gson.JsonParser;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.Wallet;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarSet;
+import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
@@ -148,8 +148,8 @@ public class BidService extends BaseService {
 	}
 
 	private void addAuctionpoint(int userId, int roundNumber) {
-		TierTask tierTask = tierService.getTierTask(userId);
-		TaskSetting taskSetting = tierService.getTaskSetting();
+		TierTask tierTask = tierTaskService.getTierTask(userId);
+		TaskSetting taskSetting = taskSettingService.getTaskSetting();
 		List<Tier> tiers = tierService.getUserTiers();
 
 		if (tierTask.getAuctions().contains(roundNumber)) {
@@ -167,7 +167,7 @@ public class BidService extends BaseService {
 				level = tier.getLevel();
 			}
 		}
-		tierService.updateTierTask(tierTask); // TODO: why update?
+		tierTaskService.updateTierTask(tierTask); // TODO: why update?
 		userDao.updateTier(userId, level, point);
 	}
 
@@ -179,7 +179,7 @@ public class BidService extends BaseService {
 		return Arrays.asList(bidList);
 	}
 
-	public List<Bid> getBidListByRoundId(String round) {
+	public List<Bid> getBidListByRoundId(int round) {
 		return bidDao.getBidListByRound(round);
 	}
 
@@ -192,13 +192,13 @@ public class BidService extends BaseService {
 		return bidDao.getBid(userId, round);
 	}
 
-	public Bid getBid(String roundId, int userId) {
-		return bidDao.getBid(roundId, userId);
+	public Bid getBid(int roundId, int userId) {
+		return bidDao.getBid(userId, roundId);
 	}
 
-	public Bid updateBid(int userId, String roundId, long tokenAmount, long tokenPrice) {
+	public Bid updateBid(int userId, int roundId, long tokenAmount, long tokenPrice) {
 
-		Bid bid = bidDao.getBid(roundId, userId);
+		Bid bid = bidDao.getBid(userId, roundId);
 
 		// check null
 		if (bid == null) {
@@ -218,11 +218,11 @@ public class BidService extends BaseService {
 	/**
 	 * It is called from Payment service with user id and round number.
 	 */
-	public void updateBidRanking(int userId, String roundId) {
+	public void updateBidRanking(int userId, int roundId) {
 
 		Auction currentRound = auctionDao.getAuctionById(roundId);
 
-		addAuctionpoint(userId, currentRound.getNumber());
+		addAuctionpoint(userId, currentRound.getRound());
 
 		// sorting must be updated!!!!
 		Bid bid = bidDao.getBid(roundId, userId);
@@ -262,10 +262,11 @@ public class BidService extends BaseService {
 				win -= availableToken;
 				fail += availableToken;
 			}
+			
+			bidDao.updateBid(newList[i]);
 		}
 
 		// Save new Bid status
-		bidDao.updateBidStatus(newList);
 
 		// update & save new auction stats
 		currentRound.setStats(new AuctionStats(qty, win, fail));
@@ -375,7 +376,7 @@ public class BidService extends BaseService {
 				JsonObject purchasedJson = JsonParser.parseString(purchasedJsonString).getAsJsonObject();
 				for (AvatarComponent component : avatarComponents)
 					block_c: {
-						JsonElement el = purchasedJson.get(component.getGroupId());
+						JsonElement el = purchasedJson.get(String.valueOf(component.getGroupId()));
 						if (el == null || el.isJsonNull()) {
 							roundAvatarWinner = false;
 							break;
@@ -419,7 +420,7 @@ public class BidService extends BaseService {
 		}
 	}
 
-	public Bid increaseBid(int userId, String roundId, long tokenAmount, long tokenPrice, int payType,
+	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice, int payType,
 			String cryptoType) {
 		Bid originalBid = bidDao.getBid(roundId, userId);
 		if (originalBid == null) {

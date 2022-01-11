@@ -1,6 +1,6 @@
 package com.ndb.auction.security.oauth2;
 
-import com.ndb.auction.models.OAuth2Registration;
+import com.ndb.auction.models.OAuth2Setting;
 import com.ndb.auction.service.OAuth2RegistrationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +20,20 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
 	@Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         
-        OAuth2Registration r = oAuth2RegistrationService.getByRegistrationId(registrationId);
+        OAuth2Setting r = oAuth2RegistrationService.getByRegistrationId(registrationId);
         log.info("OAuth2 Registration : {}", r);
 
         return ClientRegistration.withRegistrationId(registrationId)
             .clientId(r.getClientId())
             .clientSecret(r.getClientSecret())
-            .clientAuthenticationMethod(new ClientAuthenticationMethod(r.getClientAuthenticationMethod()))
+            .clientAuthenticationMethod(new ClientAuthenticationMethod(r.getClientAuthMethod()))
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .redirectUri(r.getRedirectUriTemplate())
             .scope(r.getScope())
-            .authorizationUri(r.getAuthorizationUri())
+            .authorizationUri(r.getAuthUri())
             .tokenUri(r.getTokenUri())
             .userInfoUri(r.getUserInfoUri())
-            .userNameAttributeName(r.getUserNameAttributeName())
+            .userNameAttributeName(r.getUserAttributeName())
             .jwkSetUri(r.getJwkSetUri())
             .clientName(r.getClientName())
             .build();

@@ -79,7 +79,7 @@ public class CryptoService extends BaseService {
         return Integer.parseInt(objs.getPrice());
     }
 
-    public CryptoPayload createNewPayment(String roundId, int userId, long amount) {
+    public CryptoPayload createNewPayment(int roundId, int userId, long amount) {
         
         // round existing
         Auction round = auctionDao.getAuctionById(roundId);
@@ -126,11 +126,11 @@ public class CryptoService extends BaseService {
         return cryptoDao.getTransactionByUser(userId);
     }
 
-    public List<CryptoTransaction> getTransactionByRound(String roundId) {
+    public List<CryptoTransaction> getTransactionByRound(int roundId) {
         return cryptoDao.getTransactionByRound(roundId);
     }
 
-    public List<CryptoTransaction> getTransaction(String roundId, int userId) {
+    public List<CryptoTransaction> getTransaction(int roundId, int userId) {
         return cryptoDao.getTransaction(roundId, userId);
     }
 

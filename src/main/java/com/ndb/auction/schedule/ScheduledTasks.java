@@ -108,9 +108,9 @@ public class ScheduledTasks {
 				// ended count down ! trigger to start this round!!
 
 				startedRound = readyRound;
-				startedCounter = readyRound.getDuration();
+				startedCounter = readyRound.getEndedAt() - readyRound.getStartedAt();
 
-				String id = readyRound.getId();
+				int id = readyRound.getId();
 				Auction nextRound = auctionService.startAuction(id);
 				if (nextRound != null) {
 					readyRound = nextRound;
@@ -129,7 +129,7 @@ public class ScheduledTasks {
 				// end round!
 				auctionService.endAuction(startedRound.getId());
 
-				statService.updateRoundCache(startedRound.getNumber());
+				statService.updateRoundCache(startedRound.getRound());
 
 				// bid processing
 				// ********* checking delayed more 1s ************

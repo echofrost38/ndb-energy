@@ -1,4 +1,6 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.tier;
+
+import com.ndb.auction.models.BaseModel;
 
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Tier {
+public class Tier extends BaseModel {
 
     private int level;
     private String name;

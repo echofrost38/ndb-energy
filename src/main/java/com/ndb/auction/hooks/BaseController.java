@@ -18,7 +18,9 @@ import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.SumsubService;
+import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
+import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.user.UserAvatarService;
 import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
@@ -68,6 +70,12 @@ public class BaseController {
 
     @Autowired
     TierService tierService;
+
+    @Autowired
+    TierTaskService tierTaskService;
+
+    @Autowired
+    TaskSettingService taskSettingService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

@@ -1,6 +1,5 @@
 package com.ndb.auction.service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,8 +93,8 @@ public class LocationLogService extends BaseService {
         return locationLogDao.getCountByCountryAndCity(userId, country, city);
     }
 
-    public LocationLog getLogById(int userId, String logId) {
-        return locationLogDao.getLogById(userId, logId);
+    public LocationLog getLogById(int id) {
+        return locationLogDao.getLogById(id);
     }
 
     public List<LocationLog> getLogByUser(int userId) {

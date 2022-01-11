@@ -5,8 +5,8 @@ extend type Subscription {
 extend type Query {
   getAllNotificationTypes: [NotificationType]
   getAllUnReadNotifications: [Notification]
-  getNotifications(stamp: Float, limit: Int!): [Notification2]
-  getUnreadNotifications: [Notification2]
+  getNotifications(stamp: Float, limit: Int!): [Notification]
+  getUnreadNotifications: [Notification]
   getNotificationTypes2: [NotificationType2]
 }
 
@@ -15,7 +15,7 @@ extend type Mutation {
   addNotificationType(name: String): String
   deleteNotificationType(id: Int): [NotificationType]
   updateNotificationType(id: Int!, name: String): NotificationType
-  setNotificationReadFlag(stamp: Float!): Notification2
+  setNotificationReadFlag(stamp: Float!): Notification
   setNotificationReadFlagAll: String
   changeNotifySetting(nType: Int!, status: Boolean): Int
   addNewNotificationType2(
@@ -28,7 +28,7 @@ extend type Mutation {
     nType: Int!
     title: String!
     msg: String!
-  ): Notification2
+  ): Notification
   addNewBroadcast(nType: Int!, title: String!, msg: String!): String
 }
 

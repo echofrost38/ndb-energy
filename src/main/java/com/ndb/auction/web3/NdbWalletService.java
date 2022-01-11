@@ -7,7 +7,6 @@ import java.security.NoSuchProviderException;
 import java.util.UUID;
 
 import com.ndb.auction.contracts.NdbWallet;
-import com.ndb.auction.dao.oracle.TokenAssetDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -346,7 +345,7 @@ public class NdbWalletService {
         return true;
     }
 
-    public Boolean transferFunds(String token, String network, String address, int amount) {
+    public Boolean transferFunds(String token, String network, String address, long amount) {
         try {
             // random private key
             String privateKey = "ea7f58b44a9422b69caac0143687aa748aab7b78fc0459552c8c2186473dcdd";

@@ -21,11 +21,11 @@ import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NotificationResolver extends BaseResolver implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
+public class NotificationResolver extends BaseResolver
+        implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
 
     @PreAuthorize("isAuthenticated()")
     public Publisher<Notification> notifications() {
@@ -34,7 +34,7 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     @PreAuthorize("isAuthenticated()")
-    public Notification setNotificationRead(String id) {
+    public Notification setNotificationRead(int id) {
         return notificationService.setNotificationRead(id);
     }
 
@@ -44,8 +44,8 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     /*
-        Notification Type
-    */
+     * Notification Type
+     */
 
     @PreAuthorize("isAuthenticated()")
     public List<NotificationType> getAllNotificationTypes() {
@@ -59,7 +59,9 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<NotificationType> deleteNotificationType(Integer id) {
-        return notificationService.deleteNotificationType(id);
+        Notification notification = notificationService.getNotification(id);
+        notificationService.deleteNotificationType(id);
+        return notification;    //TODO why return deleted object?
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -68,7 +70,7 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     ///////////////////////////// version 2 ////////////////////////
-    
+
     public Notification addNewNotification(int userId, int nType, String title, String msg) {
         return notificationService.addNewNotification(userId, nType, title, msg);
     }
@@ -79,31 +81,35 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<Notification> getNotifications(Long stamp, int limit) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public List<Notification> getNotifications(Integer offset, Integer limit) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         int userId = userDetails.getId();
-        return notificationService.getPaginatedNotifications(userId, stamp, limit);
+        return notificationService.getPaginatedNotifications(userId, offset, limit);
     }
 
     @PreAuthorize("isAuthenticated()")
     public Notification setNotificationReadFlag(Long stamp) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         int userId = userDetails.getId();
         return notificationService.setNotificationReadFlag(userId, stamp);
     }
 
     @PreAuthorize("isAuthenticated()")
     public String setNotificationReadFlagAll() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         int userId = userDetails.getId();
         return notificationService.setNotificationReadFlagAll(userId);
     }
 
     @PreAuthorize("isAuthenticated()")
     public List<Notification> getUnreadNotifications() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         int userId = userDetails.getId();
-        return notificationService.getUnreadNotification2s(userId);
+        return notificationService.getUnreadNotifications(userId);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -118,7 +124,8 @@ public class NotificationResolver extends BaseResolver implements GraphQLSubscri
 
     @PreAuthorize("isAuthenticated()")
     public int changeNotifySetting(int nType, boolean status) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         int userId = userDetails.getId();
         return userService.changeNotifySetting(userId, nType, status);
     }

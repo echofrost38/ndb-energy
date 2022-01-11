@@ -37,7 +37,7 @@ public class CryptoPaymentDao extends BaseOracleDao {
 		return null;
 	}
 
-	public List<CryptoTransaction> getTransactionByRound(String roundId) {
+	public List<CryptoTransaction> getTransactionByRound(int roundId) {
 		// Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		// eav.put(":v1", new AttributeValue().withS(roundId));
 		// DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
@@ -47,7 +47,7 @@ public class CryptoPaymentDao extends BaseOracleDao {
 		return null;
 	}
 
-	public List<CryptoTransaction> getTransaction(String roundId, int userId) {
+	public List<CryptoTransaction> getTransaction(int roundId, int userId) {
 		// Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
 		// eav.put(":v1", new AttributeValue().withS(roundId));
 		// eav.put(":v2", new AttributeValue().withS(String.valueOf(userId)));

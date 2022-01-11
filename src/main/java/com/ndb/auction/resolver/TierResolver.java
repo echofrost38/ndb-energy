@@ -3,8 +3,10 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.Tier;
+import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
+import com.ndb.auction.service.TierTaskService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +17,15 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class TierResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
+    
     @Autowired
     private TierService tierService;
+
+    @Autowired
+    private TierTaskService tierTaskService;
+
+    @Autowired
+    private TaskSettingService taskSettingService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Tier addNewUserTier(int level, String name, long point) {
@@ -40,16 +49,16 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting addNewSetting(TaskSetting setting) {
-        return tierService.addNewSetting(setting);
+        return taskSettingService.addNewSetting(setting);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting updateTaskSetting(TaskSetting setting) {
-        return tierService.updateTaskSetting(setting);
+        return taskSettingService.updateTaskSetting(setting);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting getTaskSetting() {
-        return tierService.getTaskSetting();
+        return taskSettingService.getTaskSetting();
     }
 }

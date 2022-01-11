@@ -1,6 +1,5 @@
 package com.ndb.auction.service.user;
 
-import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.service.BaseService;
 

@@ -1,100 +1,92 @@
 package com.ndb.auction.dao.oracle.other;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import com.ndb.auction.dao.oracle.BaseOracleDao;
+import com.ndb.auction.dao.oracle.Table;
+import com.ndb.auction.models.NotificationType;
+
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.ndb.auction.models.NotificationType;
-import com.ndb.auction.models.NotificationType;
+import lombok.NoArgsConstructor;
 
 @Repository
+@NoArgsConstructor
+@Table(name = "TBL_NOTIFICATION_TYPE")
 public class NotificationTypeDao extends BaseOracleDao {
 
-	private static final String TABLE_NAME = "TBL_USER";
-
-	private static User extract(ResultSet rs) throws SQLException {
-		User m = new User();
+	private static NotificationType extract(ResultSet rs) throws SQLException {
+		NotificationType m = new NotificationType();
 		m.setId(rs.getInt("ID"));
-		m.setEmail(rs.getString("EMAIL"));
-		m.setPassword(rs.getString("PASSWORD"));
-		m.setName(rs.getString("NAME"));
-		m.setCountry(rs.getString("COUNTRY"));
-		m.setPhone(rs.getString("PHONE"));
-		m.setBirthday(rs.getTimestamp("BIRTHDAY"));
-		m.setRegDate(rs.getTimestamp("REG_DATE"));
-		m.setLastLoginDate(rs.getTimestamp("LAST_LOGIN_DATE"));
-		m.setLastPasswordChangeDate(rs.getTimestamp("LAST_PASSWORD_CHANGE_DATE"));
-		m.setRole(rs.getString("ROLE"));
-		m.setTierLevel(rs.getInt("TIER_LEVEL"));
-		m.setTierPoint(rs.getInt("TIER_POINT"));
-		m.setProvider(rs.getString("PROVIDER"));
-		m.setProviderId(rs.getString("PROVIDER_ID"));
-		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
-		m.setDeleted(rs.getInt("DELETED"));
+		m.setNType(rs.getInt("N_TYPE"));
+		m.setTName(rs.getString("T_NAME"));
+		m.setBroadcast(rs.getBoolean("BROADCAST"));
 		return m;
 	}
 
-	private static final int MAX_NOTIFICATION = 100;
-
-	public UserDao() {
-		super(TABLE_NAME);
-	}
-
 	public String create(String name) {
-		NotificationType notificationType = new NotificationType();
-		notificationType.setName(name);
-		notificationType.setId(getAvailableId());
-		
-        dynamoDBMapper.save(notificationType);
-
+		String sql = "INSERT INTO TBL_NOTIFICATION_TYPE(ID, T_NAME)"
+				+ "VALUES((SELECT NVL(MAX(ID)+1,1) FROM TBL_NOTIFICATION_TYPE),?)";
+		jdbcTemplate.update(sql, name);
 		return "Notification Type created successfully!";
-    }
-	
-	private Integer getAvailableId() {
-		List<NotificationType> notificationList = getAllNotificationTypes();
-		if(notificationList.isEmpty())
-			return 1;
-
-		List<Integer> idList = notificationList.stream().map(NotificationType::getId).collect(Collectors.toList());
-		
-		for(Integer i = 1; i < MAX_NOTIFICATION; i++) {
-			if(!idList.contains(i))
-				return i;	
-		}
-		return 1;
-	}
-    
-    public NotificationType getNotificationTypeById(String id) {
-        return dynamoDBMapper.load(NotificationType.class, id);
-    }
-
-    public List<NotificationType> getAllNotificationTypes() {
-        return dynamoDBMapper.scan(NotificationType.class, new DynamoDBScanExpression());
-    }
-
-	public NotificationType updateNotificationType(NotificationType notificationType) {
-		dynamoDBMapper.save(notificationType, updateConfig);
-		return notificationType;
 	}
 
-	public List<NotificationType> deleteById(Integer id) {
-		NotificationType n = dynamoDBMapper.load(NotificationType.class, id);
-		dynamoDBMapper.delete(n);
-
-		return getAllNotificationTypes();
+	public NotificationType getNotificationTypeById(String id) {
+		String sql = "SELECT * FROM TBL_NOTIFICATION_TYPE WHERE ID=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<NotificationType>() {
+			@Override
+			public NotificationType extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, id);
 	}
 
-	////////////////////// version 2 //////////////////////////
-	public NotificationType addNewNotificationType(NotificationType type2) {
-		dynamoDBMapper.save(type2);
-		return type2;
+	public List<NotificationType> getAllNotificationTypes() {
+		String sql = "SELECT * FROM TBL_NOTIFICATION_TYPE ORDER BY ID";
+		return jdbcTemplate.query(sql, new RowMapper<NotificationType>() {
+			@Override
+			public NotificationType mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		});
 	}
 
-	public List<NotificationType> getNotificationTypes() {
-		return dynamoDBMapper.scan(NotificationType.class, new DynamoDBScanExpression());
+	public NotificationType updateNotificationType(NotificationType m) {
+		String sql = "UPDATE TBL_NOTIFICATION_TYPE SET N_TYPE=?, T_NAME=?, BROADCAST=? WHERE ID=?";
+		jdbcTemplate.update(sql, m.getNType(), m.getTName(), m.isBroadcast(), m.getId());
+		return m;
+	}
+
+	public NotificationType addNewNotificationType(NotificationType m) {
+		String sql = "INSERT INTO TBL_NOTIFICATION_TYPE(ID, N_TYPE, T_NAME, BROADCAST)"
+				+ "VALUES((SELECT NVL(MAX(ID)+1,1) FROM TBL_NOTIFICATION_TYPE),?,?,?)";
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(
+				new PreparedStatementCreator() {
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+						PreparedStatement ps = connection.prepareStatement(sql.toString(),
+								new String[] { "ID" });
+						int i = 1;
+						ps.setInt(i++, m.getNType());
+						ps.setString(i++, m.getTName());
+						ps.setBoolean(i++, m.isBroadcast());
+						return ps;
+					}
+				}, keyHolder);
+		m.setId(keyHolder.getKey().intValue());
+		return m;
 	}
 
 }

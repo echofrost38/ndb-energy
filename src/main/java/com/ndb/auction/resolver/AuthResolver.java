@@ -1,21 +1,22 @@
 package com.ndb.auction.resolver;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.OAuth2Registration;
+import com.ndb.auction.models.OAuth2Setting;
 import com.ndb.auction.models.user.TwoFAEntry;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.Credentials;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -45,8 +46,8 @@ public class AuthResolver extends BaseResolver
 		return userService.request2FA(email, method, phone);
 	}
 
-	public String confirmRequest2FA(String email, String method, String code) {
-		return userService.confirmRequest2FA(email, method, code);
+	public String confirmRequest2FA(String email, String code) {
+		return userService.confirmRequest2FA(email, code);
 	}
 
 	public Credentials signin(String email, String password) {
@@ -132,8 +133,8 @@ public class AuthResolver extends BaseResolver
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public OAuth2Registration addOAuth2Registration(
-			String registrationId,
+	public OAuth2Setting addOAuth2Registration(
+			int registrationId,
 			String clientId,
 			String clientSecret,
 			String clientAuthenticationMethod,
@@ -146,7 +147,7 @@ public class AuthResolver extends BaseResolver
 			String userNameAttributeName,
 			String jwkSetUri,
 			String clientName) {
-		OAuth2Registration registration = new OAuth2Registration(
+		OAuth2Setting registration = new OAuth2Setting(
 				registrationId,
 				clientId,
 				clientSecret,

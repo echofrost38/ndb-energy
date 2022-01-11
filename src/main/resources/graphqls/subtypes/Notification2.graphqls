@@ -1,4 +1,4 @@
-type Notification2 {
+type Notification {
     userId: String,
     timeStamp: Float,
     nType: Int,

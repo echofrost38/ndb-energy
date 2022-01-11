@@ -2,11 +2,12 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.avatar.AvatarSet;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import com.ndb.auction.models.Auction;
-s
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
@@ -45,7 +46,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public Auction getAuctionById(String id) {
+	public Auction getAuctionById(int id) {
 		return auctionService.getAuctionById(id);
 	}
 	

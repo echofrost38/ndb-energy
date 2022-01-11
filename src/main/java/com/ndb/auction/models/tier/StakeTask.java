@@ -1,19 +1,18 @@
 package com.ndb.auction.models.tier;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Component
 @Getter
 @Setter
 @NoArgsConstructor
-@DynamoDBDocument
 public class StakeTask {
-    @DynamoDBAttribute(attributeName = "expired_time")
+
     private int expiredTime;
-    @DynamoDBAttribute(attributeName = "ratio")
-    private double ratio;
+    private float ratio;
+
 }

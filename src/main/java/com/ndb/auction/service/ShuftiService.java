@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Base64;
 
 import com.ndb.auction.models.Shufti.ShuftiReference;
-import com.nimbusds.oauth2.sdk.id.ClientID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,11 +1,5 @@
 package com.ndb.auction.resolver;
 
-import java.util.List;
-
-import com.ndb.auction.models.InternalBalance;
-import com.ndb.auction.service.UserDetailsImpl;
-
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;

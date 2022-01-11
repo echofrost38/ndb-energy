@@ -18,23 +18,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamoDBTable(tableName = "TaskSetting")
-public class TaskSetting {
+public class TaskSetting extends BaseModel {
 
-    @DynamoDBHashKey(attributeName="setting_id")
-    private String settingId;
-
-    @DynamoDBAttribute(attributeName="verification")
-    private double verification;
-
-    @DynamoDBAttribute(attributeName="wallet")
-    private List<WalletTask> walletTasks;
-
-    @DynamoDBAttribute(attributeName="auction")
-    private double auction;
-
-    @DynamoDBAttribute(attributeName="direct")
-    private double direct;
-
-    @DynamoDBAttribute(attributeName="staking")
-    private List<StakeTask> stakingTasks;
+    private long verification;
+    private List<WalletTask> wallet;
+    private long auction;
+    private long direct;
+    private List<StakeTask> staking;
 }

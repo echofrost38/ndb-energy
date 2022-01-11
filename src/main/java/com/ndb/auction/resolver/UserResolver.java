@@ -2,7 +2,6 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
-import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import oracle.net.aso.l;
 
 @Component
 public class UserResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {

@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.sumsub.ApplicantResponse;
 import com.ndb.auction.models.sumsub.Review;
+import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserVerify;
@@ -89,8 +89,8 @@ public class SumsubController extends BaseController {
 
 				// update user tasks!!
 				List<Tier> tierList = tierService.getUserTiers();
-				TaskSetting taskSetting = tierService.getTaskSetting();
-				TierTask tierTask = tierService.getTierTask(userId);
+				TaskSetting taskSetting = taskSettingService.getTaskSetting();
+				TierTask tierTask = tierTaskService.getTierTask(userId);
 				tierTask.setVerification(true);
 				long point = user.getTierPoint();
 				point += taskSetting.getVerification();
@@ -102,7 +102,7 @@ public class SumsubController extends BaseController {
 						level = tier.getLevel();
 					}
 				}
-				tierService.updateTierTask(tierTask);
+				tierTaskService.updateTierTask(tierTask);
 				userService.updateTier(userId, level, point);
 			} else {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

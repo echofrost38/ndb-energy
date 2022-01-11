@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -12,12 +11,12 @@ import com.google.gson.JsonParser;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarProfile;
-import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.Wallet;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 
@@ -103,7 +102,7 @@ public class ProfileService extends BaseService {
 		JsonObject purchasedJson = purchasedJsonString == null ? new JsonObject()
 				: JsonParser.parseString(purchasedJsonString).getAsJsonObject();
 		for (AvatarComponent component : components) {
-			String group = component.getGroupId();
+			String group =String.valueOf(component.getGroupId());
 			JsonElement el = purchasedJson.get(group);
 			JsonArray array;
 			if (el == null || el.isJsonNull())
@@ -133,8 +132,8 @@ public class ProfileService extends BaseService {
 		}
 		long totalPrice = 0;
 		long price = 0;
-		String groupId = "";
-		String compId = "";
+		int groupId = 0;
+		int compId = 0;
 		List<AvatarComponent> purchasedComponents = new ArrayList<>();
 
 		Map<String, List<String>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
@@ -156,7 +155,7 @@ public class ProfileService extends BaseService {
 			List<String> purchaseList = purchasedMap.get(groupId);
 			if (purchaseList == null) {
 				purchaseList = new ArrayList<>();
-				purchasedMap.put(groupId, purchaseList);
+				purchasedMap.put(String.valueOf(groupId), purchaseList);
 			}
 
 			if (purchaseList.contains(compId)) {

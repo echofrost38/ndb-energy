@@ -2,10 +2,8 @@ package com.ndb.auction.service.user;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -59,7 +57,7 @@ public class UserService extends BaseService {
 
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
-			tierService.createNewTierTask(tierTask);
+			tierTaskService.createNewTierTask(tierTask);
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";
@@ -403,7 +401,9 @@ public class UserService extends BaseService {
 		if (role.equals("admin")) {
 			user.addRole("ROLE_ADMIN");
 		} else if (role.equals("user")) {
-			user.setRole("ROLE_USER");
+			Set<String> roles = new HashSet<>();
+			roles.add("ROLE_USER");
+			user.setRole(roles);
 		} else {
 			return "Failed";
 		}

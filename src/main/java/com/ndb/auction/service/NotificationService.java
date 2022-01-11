@@ -180,7 +180,23 @@ public class NotificationService {
         return notificationDao.addNewNotification(notification);
     }
 
+<<<<<<< HEAD
+    public String addNewBroadcast(int type, String title, String msg) {
+        List<User>userlist = userDao.getUserList();
+
+        List<Notification2> notifications = new ArrayList<Notification2>();
+        for (User user : userlist) {
+            Notification2 notification2 = new Notification2(user.getId(), type, title, msg);
+            notifications.add(notification2);
+        }
+        notificationDao.pushNewBroadcast(notifications);
+        return "Success";
+    }
+
+    public List<Notification2> getPaginatedNotifications(String userId, Long stamp, int limit) {
+=======
     public List<Notification> getPaginatedNotifications(int userId, Long stamp, int limit) {
+>>>>>>> 85500e0f38e673d00d75cf89a1586e0abc2e4b62
         if(stamp == null) {
             return notificationDao.getFirstNotificationsByUser(userId, limit);
         }

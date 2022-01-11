@@ -2,8 +2,6 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
-import javax.servlet.http.Part;
-
 import com.ndb.auction.models.AvatarComponent;
 import com.ndb.auction.models.AvatarProfile;
 import com.ndb.auction.models.AvatarSet;
@@ -25,29 +23,32 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		Integer tierLevel, 
 		Long price, 
 		Integer limited,
-		Part file
+		String svg,
+		int width,
+		int top,
+		int left
 	) {
-		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, file);
+		return avatarService.createAvatarComponent(groupId, tierLevel, price, limited, svg, width, top, left);
 	}
 	
 	// update component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Long price, Integer limited, Part file) {
-		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, file);
+	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
+		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, svg, width, top, left);
 	}
 
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
+	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio, String hairColor) 
 	{
-		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
+		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio, hairColor);
 	}
 	
 	// update existing avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio) 
+	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio, String hairColor) 
 	{
-		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, enemy, invention, bio);
+		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, enemy, invention, bio, hairColor);
 	}
 	
 	// get avatar list

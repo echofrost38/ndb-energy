@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
-import com.ndb.auction.models.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarProfile;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -30,15 +30,14 @@ public class AvatarProfileDao extends BaseOracleDao {
 		m.setFname(rs.getString("FNAME"));
 		m.setSurname(rs.getString("SURNAME"));
 		m.setShortName(rs.getString("SHORT_NAME"));
-		m.setEnemy(rs.getString("ENEMY"));
-		m.setInvention(rs.getString("INVENTION"));
-		m.setBio(rs.getString("BIO"));
+		m.setHairColor(rs.getString("HAIR_COLOR"));
+		m.setDetails(rs.getString("DETAILS"));
 		return m;
 	}
 
 	public AvatarProfile createAvatarProfile(AvatarProfile m) {
-		String sql = "INSERT INTO TBL_AVATAR_PROFILE(ID, FNAME, SURNAME, SHORT_NAME, ENEMY, INVENTION, BIO)"
-				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO TBL_AVATAR_PROFILE(ID, FNAME, SURNAME, SHORT_NAME, HAIR_COLOR, DETAILS)"
+				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 				new PreparedStatementCreator() {
@@ -50,9 +49,8 @@ public class AvatarProfileDao extends BaseOracleDao {
 						ps.setString(i++, m.getFname());
 						ps.setString(i++, m.getSurname());
 						ps.setString(i++, m.getShortName());
-						ps.setString(i++, m.getEnemy());
-						ps.setString(i++, m.getInvention());
-						ps.setString(i++, m.getBio());
+						ps.setString(i++, m.getHairColor());
+						ps.setString(i++, m.getDetails());
 						return ps;
 					}
 				}, keyHolder);
@@ -61,9 +59,8 @@ public class AvatarProfileDao extends BaseOracleDao {
 	}
 
 	public AvatarProfile updateAvatarProfile(AvatarProfile m) {
-		String sql = "UPDATE TBL_AVATAR_PROFILE SET FNAME=?, SURNAME=?, SHORT_NAME=?, ENEMY=?, INVENTION=?, BIO=? WHERE ID=?";
-		jdbcTemplate.update(sql, m.getFname(), m.getSurname(), m.getShortName(), m.getEnemy(), m.getInvention(),
-				m.getBio(), m.getId());
+		String sql = "UPDATE TBL_AVATAR_PROFILE SET FNAME=?, SURNAME=?, SHORT_NAME=?, HAIR_COLOR=?, DETAILS=? WHERE ID=?";
+		jdbcTemplate.update(sql, m.getFname(), m.getSurname(), m.getShortName(), m.getHairColor(), m.getDetails(), m.getId());
 		return m;
 	}
 

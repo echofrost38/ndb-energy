@@ -25,8 +25,8 @@ public class UserVerifyDao extends BaseOracleDao {
 		m.setKycVerified(rs.getBoolean("KYC_VERIFIED"));
 		m.setAmlVerified(rs.getBoolean("AML_VERIFIED"));
 		m.setKybVerified(rs.getBoolean("KYB_VERIFIED"));
-		m.setRegDate(rs.getTimestamp("REG_DATE"));
-		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE"));
+		m.setRegDate(rs.getLong("REG_DATE"));
+		m.setUpdateDate(rs.getLong("UPDATE_DATE"));
 		return m;
 	}
 

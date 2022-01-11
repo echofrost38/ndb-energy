@@ -6,8 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.AvatarSet;
-
+s
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 

@@ -1,6 +1,6 @@
 package com.ndb.auction.security.oauth2;
 
-import com.ndb.auction.models.OAuth2Setting;
+import com.ndb.auction.models.OAuth2Registration;
 import com.ndb.auction.service.OAuth2RegistrationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class CustomClientRegistrationRepository implements ClientRegistrationRep
 	@Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         
-        OAuth2Setting r = oAuth2RegistrationService.getByRegistrationId(registrationId);
+        OAuth2Registration r = oAuth2RegistrationService.getByRegistrationId(registrationId);
         log.info("OAuth2 Registration : {}", r);
 
         return ClientRegistration.withRegistrationId(registrationId)

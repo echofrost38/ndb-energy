@@ -1,6 +1,9 @@
 type Auction {
-	auctionId: String,
-	number: Int,
+	id: Int!,
+	regDate: Float,
+	updateDate: Float,
+	deleted: Int,
+	round: Int,
 	startedAt: Float,
 	endedAt: Float,
 	totalToken: Float,

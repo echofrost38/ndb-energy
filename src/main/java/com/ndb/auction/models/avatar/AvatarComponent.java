@@ -1,4 +1,4 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.avatar;
 
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class AvatarComponent {
 	private Long price;
 	private Integer limited;
 	private Integer purchased;
-	private String base64Image;
+	private String svg;
 
 	public AvatarComponent(int groupId, Integer tierLevel, Long price, Integer limited) {
 		this.groupId = groupId;

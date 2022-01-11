@@ -1,7 +1,5 @@
 package com.ndb.auction.models;
 
-import java.sql.Timestamp;
-
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;

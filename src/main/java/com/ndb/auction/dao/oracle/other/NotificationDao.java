@@ -1,136 +1,156 @@
 package com.ndb.auction.dao.oracle.other;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
-import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.user.User;
 
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import lombok.NoArgsConstructor;
-
 @Repository
-@NoArgsConstructor
-@Table(name = "TBL_NOTIFICATION")
 public class NotificationDao extends BaseOracleDao {
 
-	private static Notification extract(ResultSet rs) throws SQLException {
-		Notification m = new Notification();
+	private static final String TABLE_NAME = "TBL_USER";
+
+	private static User extract(ResultSet rs) throws SQLException {
+		User m = new User();
 		m.setId(rs.getInt("ID"));
-		m.setUserId(rs.getInt("USER_ID"));
-		m.setTimeStamp(rs.getTimestamp("TIMESTAMP").getTime());
-		m.setNType(rs.getInt("N_TYPE"));
-		m.setRead(rs.getBoolean("READ"));
-		m.setTitle(rs.getString("TITLE"));
-		m.setMsg(rs.getString("MSG"));
+		m.setEmail(rs.getString("EMAIL"));
+		m.setPassword(rs.getString("PASSWORD"));
+		m.setName(rs.getString("NAME"));
+		m.setCountry(rs.getString("COUNTRY"));
+		m.setPhone(rs.getString("PHONE"));
+		m.setBirthday(rs.getLong("BIRTHDAY"));
+		m.setRegDate(rs.getLong("REG_DATE"));
+		m.setLastLoginDate(rs.getLong("LAST_LOGIN_DATE"));
+		// m.setRole(rs.getString("ROLE"));
+		m.setTierLevel(rs.getInt("TIER_LEVEL"));
+		m.setTierPoint(rs.getInt("TIER_POINT"));
+		m.setProvider(rs.getString("PROVIDER"));
+		m.setProviderId(rs.getString("PROVIDER_ID"));
+		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
+		m.setDeleted(rs.getInt("DELETED"));
 		return m;
+	}
+
+	public NotificationDao() {
+		super(TABLE_NAME);
 	}
 
 	public List<Notification> getNotificationsByUser(int userId) {
-		String sql = "SELECT * FROM TBL_NOTIFICATION WHERE USER_ID=?";
-		return jdbcTemplate.query(sql, new RowMapper<Notification>() {
-			@Override
-			public Notification mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":v1", new AttributeValue().withS(String.valueOf(userId)));
+		
+		DynamoDBQueryExpression<Notification> queryExpression = new DynamoDBQueryExpression<Notification>()
+		    .withKeyConditionExpression("user_id = :v1")
+		    .withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.query(Notification.class, queryExpression);
 	}
 
 	public void pushNewNotifications(List<Notification> list) {
-		for (Notification m : list) {
-			addNewNotification(m);
+		// each Notification has userId & auto generated id
+		dynamoDBMapper.batchSave(list);
+	}
+
+	public void pushNewNotification(Notification notification) {
+		dynamoDBMapper.save(notification);	
+	}
+
+	public Notification setReadStatus(int userId, String nId) {
+		Notification notification = dynamoDBMapper.load(Notification.class, userId, nId);
+		if(notification == null) {
+			return null; // or exception
 		}
+		
+		notification.setRead(true);
+		dynamoDBMapper.save(notification, updateConfig);
+		return notification;
 	}
 
-	public void addNewNotification(Notification m) {
-		String sql = "INSERT INTO TBL_NOTIFICATION(ID, USER_ID, TIMESTAMP, N_TYPE, READ, TITLE, MSG)"
-				+ "VALUES(SEQ_NOTIFICATION.NEXTVAL, ?, SYSDATE, ?, ?, ?, ?)";
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		jdbcTemplate.update(
-				new PreparedStatementCreator() {
-					@Override
-					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-						PreparedStatement ps = connection.prepareStatement(sql.toString(),
-								new String[] { "ID" });
-						int i = 1;
-						ps.setInt(i++, m.getUserId());
-						ps.setInt(i++, m.getNType());
-						ps.setBoolean(i++, m.isRead());
-						ps.setString(i++, m.getTitle());
-						ps.setString(i++, m.getMsg());
-						return ps;
-					}
-				}, keyHolder);
-		m.setId(keyHolder.getKey().intValue());
+    public List<Notification> getAllUnReadNotificationsByUser(int userId) {
+		Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+		eav.put(":v1", new AttributeValue().withS(String.valueOf(userId)));
+		eav.put(":v2", new AttributeValue().withN("0"));
+		
+		DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+		    .withFilterExpression("user_id = :v1 and read_flag = :v2")
+		    .withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.scan(Notification.class, scanExpression);
+    }
+
+	////////////////// version 2 ////////////////////////////////////////
+	
+	public Notification addNewNotification(Notification notification2) {
+		dynamoDBMapper.save(notification2);
+		return notification2;
 	}
 
-	public Notification setReadFlag(Notification m) {
-		m.setRead(true);
-		String sql = "UPDATE TBL_NOTIFICATION SET READ=? WHERE ID=?";
-		jdbcTemplate.update(sql, m.isRead(), m.getId());
-		return m;
+	public Notification setReadFlag(Notification notification2) {
+		notification2.setRead(true);
+		dynamoDBMapper.save(notification2, updateConfig);
+		return notification2;
 	}
-
+	
 	public String setReadFlagAll(int userId) {
-		String sql = "UPDATE TBL_NOTIFICATION SET READ=1 WHERE USER_ID=? ORDER BY ID DESC";
-		jdbcTemplate.update(sql, userId);
+		List<Notification> unReadList = getUnreadNotifications(userId);
+		for (Notification unRead: unReadList) {
+			setReadFlag(unRead);
+		}
 		return "Success";
 	}
-
-	public Notification getNotification(int id) {
-		String sql = "SELECT * FROM TBL_NOTIFICATION WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<Notification>() {
-			@Override
-			public Notification extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
-		}, id);
+	
+	public Notification getNotification2(int id, long timeStamp){
+		return dynamoDBMapper.load(Notification.class, id, timeStamp);
 	}
 
-	public List<Notification> getFirstNotificationsByUser(int userId, Integer offset, Integer limit) {
-		String sql = "SELECT * FROM TBL_NOTIFICATION WHERE USER_ID=? ORDER BY ID DESC";
-		if (offset != null)
-			sql += " OFFSET ? ROWS";
-		if (limit != null)
-			sql += " FETCH NEXT ? ROWS ONLY";
-		return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-			@Override
-			public void setValues(PreparedStatement ps) throws SQLException {
-				int i = 1;
-				ps.setInt(i++, userId);
-				if (offset != null)
-					ps.setInt(i++, offset);
-				if (limit != null)
-					ps.setInt(i++, limit);
-			}
-		}, new RowMapper<Notification>() {
-			@Override
-			public Notification mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+	public List<Notification> getFirstNotificationsByUser(int userId, int limit) {
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":val1", new AttributeValue().withS(String.valueOf(userId)));
+		DynamoDBQueryExpression<Notification> queryExpression = new DynamoDBQueryExpression<Notification>()
+			.withKeyConditionExpression("user_id = :val1")
+			.withLimit(limit)
+			.withScanIndexForward(false)
+			.withExpressionAttributeValues(eav);
+		return dynamoDBMapper.queryPage(Notification.class, queryExpression).getResults();
+	}
+
+	public List<Notification> getMoreNotificationsByUser(int userId, long stamp, int limit) {
+		Map<String, AttributeValue> exclusiveKey = new HashMap<>();
+		exclusiveKey.put("user_id", new AttributeValue().withS(String.valueOf(userId)));
+		exclusiveKey.put("time_stamp", new AttributeValue().withN(Long.valueOf(stamp).toString()));
+
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":val1", new AttributeValue().withS(String.valueOf(userId)));
+
+		DynamoDBQueryExpression<Notification> queryExpression = new DynamoDBQueryExpression<Notification>()
+			.withExclusiveStartKey(exclusiveKey)
+			.withLimit(limit)
+			.withScanIndexForward(false)
+			.withKeyConditionExpression("user_id = :val1")
+			.withExpressionAttributeValues(eav);
+
+		return dynamoDBMapper.queryPage(Notification.class, queryExpression).getResults();
 	}
 
 	public List<Notification> getUnreadNotifications(int userId) {
-		String sql = "SELECT * FROM TBL_NOTIFICATION WHERE USER_ID=? AND READ=0 ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, new RowMapper<Notification>() {
-			@Override
-			public Notification mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":val1", new AttributeValue().withS(String.valueOf(userId)));
+		eav.put(":val2", new AttributeValue().withN("0"));
+
+		DynamoDBQueryExpression<Notification> queryExpression = new DynamoDBQueryExpression<Notification>()
+			.withKeyConditionExpression("user_id = :val1")
+			.withFilterExpression("n_read = :val2")
+			.withExpressionAttributeValues(eav);
+		return dynamoDBMapper.query(Notification.class, queryExpression);
 	}
 }

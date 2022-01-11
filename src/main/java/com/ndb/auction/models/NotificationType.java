@@ -10,10 +10,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class NotificationType extends BaseModel {
+public class NotificationType {
 
     private int nType;
     private String tName;
     private boolean broadcast;
-
+    
 }

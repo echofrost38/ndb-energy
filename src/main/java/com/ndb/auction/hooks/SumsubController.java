@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
 import com.ndb.auction.models.TaskSetting;
+import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.sumsub.ApplicantResponse;
 import com.ndb.auction.models.sumsub.Review;
-import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserVerify;

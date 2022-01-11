@@ -92,6 +92,11 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	public List<Bid> getBidListById(String roundId) {
 		return bidService.getBidListByRoundId(roundId);
 	}
+
+	@PreAuthorize("isAuthenticated()")
+	public List<Bid> getBidList() {
+		return bidService.getBidList();
+	}
 	
 	///////////////// for test 
 	public String closeBid(String roundId) {

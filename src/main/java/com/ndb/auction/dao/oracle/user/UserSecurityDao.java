@@ -2,12 +2,13 @@ package com.ndb.auction.dao.oracle.user;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.user.UserSecurity;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -20,39 +21,38 @@ public class UserSecurityDao extends BaseOracleDao {
 	private static UserSecurity extract(ResultSet rs) throws SQLException {
 		UserSecurity m = new UserSecurity();
 		m.setId(rs.getInt("ID"));
+		m.setUserId(rs.getInt("USER_ID"));
 		m.setAuthType(rs.getString("AUTH_TYPE"));
 		m.setTfaEnabled(rs.getBoolean("TFA_ENABLED"));
 		m.setTfaSecret(rs.getString("TFA_SECRET"));
-		m.setRegDate(rs.getTimestamp("REG_DATE"));
-		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE"));
+		m.setRegDate(rs.getLong("REG_DATE"));
+		m.setUpdateDate(rs.getLong("UPDATE_DATE"));
 		return m;
 	}
 
-	public UserSecurity selectById(int id) {
-		String sql = "SELECT * FROM TBL_USER_SECURITY WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<UserSecurity>() {
+	public List<UserSecurity> selectById(int userId) {
+		String sql = "SELECT * FROM TBL_USER_SECURITY WHERE USER_ID=? ODER BY ID";
+		return jdbcTemplate.query(sql, new RowMapper<UserSecurity>() {
 			@Override
-			public UserSecurity extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
+			public UserSecurity mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		}, id);
+		}, userId);
 	}
 
 	public int insert(UserSecurity m) {
-		String sql = "INSERT INTO TBL_USER_SECURITY(ID,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE)"
+		String sql = "INSERT INTO TBL_USER_SECURITY(SEC_USER_SECURITY.NEXTVAL,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
 				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getId(), m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret());
+		return jdbcTemplate.update(sql, m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId());
 	}
 
 	public int insertOrUpdate(UserSecurity m) {
 		String sql = "MERGE INTO TBL_USER_SECURITY USING DUAL ON (id=?)"
-				+ "WHEN MATCHED THEN UPDATE SET AUTH_TYPE=?,TFA_ENABLED=?,TFA_SECRET=?,UPDATE_DATE=SYSDATE"
-				+ "WHEN NOT MATCHED THEN INSERT(ID,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE)"
+				+ "WHEN MATCHED THEN UPDATE SET AUTH_TYPE=?,TFA_ENABLED=?,TFA_SECRET=?,UPDATE_DATE=SYSDATE, USER_ID=?"
+				+ "WHEN NOT MATCHED THEN INSERT(SEC_USER_SECURITY.NEXTVAL,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
 				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getId(), m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getId(),
-				m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret());
+		return jdbcTemplate.update(sql, m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId(), m.getId(),
+				m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId());
 	}
 
 	public int updateTfaEnabled(int id, boolean tfaEnabled) {
@@ -63,6 +63,11 @@ public class UserSecurityDao extends BaseOracleDao {
 	public int updateTfaSecret(int id, String tfaSecret) {
 		String sql = "UPDATE TBL_USER_SECURITY SET TFA_SECRET=? WHERE ID=?";
 		return jdbcTemplate.update(sql, tfaSecret, id);
+	}
+
+	public int updateSecretAndAuthType(int id, String tfaSecret, String authType) {
+		String sql = "UPDATE TBL_USER_SECURITY SET TFA_SECRET=?, AUTH_TYPE=? WHERE ID=?";
+		return jdbcTemplate.update(sql, tfaSecret, authType, id);
 	}
 
 }

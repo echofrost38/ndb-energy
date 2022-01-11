@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.models.Tier;
 import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.beans.factory.annotation.Autowired;

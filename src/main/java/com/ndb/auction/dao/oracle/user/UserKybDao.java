@@ -30,8 +30,8 @@ public class UserKybDao extends BaseOracleDao {
 		model.setAttach2Key(rs.getString("ATTACH2_KEY"));
 		model.setAttach2Filename(rs.getString("ATTACH2_FILENAME"));
 		model.setStatus(rs.getString("STATUS"));
-		model.setRegDate(rs.getTimestamp("REG_TIME"));
-		model.setUpdateDate(rs.getTimestamp("UPDATE_TIME"));
+		model.setRegDate(rs.getLong("REG_TIME"));
+		model.setUpdateDate(rs.getLong("UPDATE_TIME"));
 		return model;
 	}
 

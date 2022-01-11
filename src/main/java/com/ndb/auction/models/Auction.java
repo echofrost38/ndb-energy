@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.ndb.auction.models.avatar.AvatarSet;
+
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;

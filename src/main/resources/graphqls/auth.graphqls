@@ -1,101 +1,59 @@
 type Mutation {
-	signup(
-		email: String!,
-		password: String!,
-		country: String!
-	) : String!
-	verifyAccount(
-		email: String!,
-		code: String!,
-	) : String!
-	resendVerifyCode (
-		email: String
-	) : String!
-	request2FA (
-		email: String!,
-		method: String!,
-		phone: String
-	) : String!
-	confirmRequest2FA(
-		email: String!,
-		code: String!
-	) : String!
-	signin(
-		email: String!,
-		password: String!
-	) : Credentials!
-	confirm2FA(
-		email: String!,
-		token: String!,
-		code: String!
-	) : Credentials!
-	forgotPassword (
-		email: String!
-	) : String!
-	resetPassword (
-		email: String!,
-		code: String!,
-		newPassword: String!
-	) : String!
-	addOAuth2Registration (
-		registrationId: String!,
-		clientId: String,
-		clientSecret: String,
-		clientAuthenticationMethod: String,
-		authorizationGrantType: String,
-		redirectUriTemplate: String,
-		scope: [String],
-		authorizationUri: String,
-		tokenUri: String,
-		userInfoUri: String,
-		userNameAttributeName: String,
-		jwkSetUri: String,
-		clientName: String
-	) : OAuth2Registration
-	# updateOAuth2Registration (
-	# 	registrationId: String!,
-	# 	clientId: String,
-	# 	clientSecret: String,
-	# 	clientAuthenticationMethod: String,
-	# 	authorizationGrantType: String,
-	# 	redirectUriTemplate: String,
-	# 	scope: [String],
-	# 	authorizationUri: String,
-	# 	tokenUri: String,
-	# 	userInfoUri: String,
-	# 	userNameAttributeName: String,
-	# 	jwkSetUri: String,
-	# 	clientName: String,
-	# ) : OAuth2Registration
-	# deleteOAuth2Registration (
-	# 	registrationId: String!
-	# ) : OAuth2Registration
-	addNewUser(
-		id: String!,
-		email: String!,
-		name: String!
-	) : String
-	addHoldAmount(
-		id: String!,
-		crypto: String!,
-		amount: Int!
-	) : String
+  signup(email: String!, password: String!, country: String!): String!
+  verifyAccount(email: String!, code: String!): String!
+  resendVerifyCode(email: String): String!
+  request2FA(email: String!, method: String!, phone: String): String!
+  confirmRequest2FA(email: String!, method: String!, code: String!): String!
+  signin(email: String!, password: String!): Credentials!
+  confirm2FA(email: String!, token: String!, code: [TwoFAEntry]): Credentials!
+  forgotPassword(email: String!): String!
+  resetPassword(email: String!, code: String!, newPassword: String!): String!
+  addOAuth2Registration(
+    registrationId: String!
+    clientId: String
+    clientSecret: String
+    clientAuthenticationMethod: String
+    authorizationGrantType: String
+    redirectUriTemplate: String
+    scope: [String]
+    authorizationUri: String
+    tokenUri: String
+    userInfoUri: String
+    userNameAttributeName: String
+    jwkSetUri: String
+    clientName: String
+  ): OAuth2Registration
+  # updateOAuth2Registration (
+  # 	registrationId: String!,
+  # 	clientId: String,
+  # 	clientSecret: String,
+  # 	clientAuthenticationMethod: String,
+  # 	authorizationGrantType: String,
+  # 	redirectUriTemplate: String,
+  # 	scope: [String],
+  # 	authorizationUri: String,
+  # 	tokenUri: String,
+  # 	userInfoUri: String,
+  # 	userNameAttributeName: String,
+  # 	jwkSetUri: String,
+  # 	clientName: String,
+  # ) : OAuth2Registration
+  # deleteOAuth2Registration (
+  # 	registrationId: String!
+  # ) : OAuth2Registration
+  addNewUser(id: String!, email: String!, name: String!): String
+  addHoldAmount(id: String!, crypto: String!, amount: Int!): String
 }
 
 type Query {
-	getWalletById(
-		id: String!,
-		crypto: String!
-	) : Wallet
+  getWalletById(id: String!, crypto: String!): Wallet
 }
 
 type Subscription {
-   	fluxTest(
-   		param: String!
-   	)  : String
+  fluxTest(param: String!): String
 }
 
 schema {
-   mutation: Mutation,
-   query: Query,
+  mutation: Mutation
+  query: Query
 }

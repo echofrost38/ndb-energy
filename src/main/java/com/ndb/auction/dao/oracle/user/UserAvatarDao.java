@@ -24,8 +24,8 @@ public class UserAvatarDao extends BaseOracleDao {
 		m.setSelected(rs.getString("SELECTED"));
 		m.setPrefix(rs.getString("PREFIX"));
 		m.setName(rs.getString("NAME"));
-		m.setRegDate(rs.getTimestamp("REG_DATE"));
-		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE"));
+		m.setRegDate(rs.getLong("REG_DATE"));
+		m.setUpdateDate(rs.getLong("UPDATE_DATE"));
 		return m;
 	}
 

@@ -5,18 +5,15 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
-import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.DirectSale;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
-import lombok.NoArgsConstructor;
-
 @Repository
-@NoArgsConstructor
-@Table(name = "TBL_DIRECT_SALE")
 public class DirectSaleDao extends BaseOracleDao {
+
+    private static final String TABLE_NAME = "TBL_DIRECT_SALE";
 
     private static DirectSale extract(ResultSet rs) throws SQLException {
         DirectSale m = new DirectSale();
@@ -36,6 +33,10 @@ public class DirectSaleDao extends BaseOracleDao {
         m.setCryptoPrice(rs.getLong("CRYPTO_PRICE"));
         m.setCryptoAmount(rs.getLong("CRYPTO_AMOUNT"));
         return m;
+    }
+
+    public DirectSaleDao() {
+        super(TABLE_NAME);
     }
 
     // create new empty transaction

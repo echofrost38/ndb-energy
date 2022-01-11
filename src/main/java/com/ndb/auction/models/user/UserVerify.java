@@ -5,14 +5,20 @@ import com.ndb.auction.models.BaseModel;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Component
 @Getter
 @Setter
-@NoArgsConstructor
 public class UserVerify extends BaseModel {
+
+	public UserVerify () {
+		this.emailVerified = false;
+		this.phoneVerified = false;
+		this.kybVerified = false;
+		this.kycVerified = false;
+		this.amlVerified = false;
+	}
 
 	private boolean emailVerified;
 	private boolean phoneVerified;

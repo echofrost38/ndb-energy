@@ -41,6 +41,7 @@ extend type Query {
 	getBidListById(
 		roundId: String
 	) : [Bid]
+	getBidList : [Bid]
 }
 
 

@@ -1,5 +1,21 @@
 package com.ndb.auction.service;
 
+<<<<<<< HEAD
+import com.ndb.auction.dao.AuctionDao;
+import com.ndb.auction.dao.AvatarDao;
+import com.ndb.auction.dao.BidDao;
+import com.ndb.auction.dao.CryptoPaymentDao;
+import com.ndb.auction.dao.DirectSaleDao;
+import com.ndb.auction.dao.GeoLocationDao;
+import com.ndb.auction.dao.NotificationDao;
+import com.ndb.auction.dao.StripePaymentDao;
+import com.ndb.auction.dao.SumsubDao;
+import com.ndb.auction.dao.UserDao;
+import com.ndb.auction.dao.oracle.InternalBalanceDao;
+import com.ndb.auction.dao.oracle.InternalWalletDao;
+import com.ndb.auction.dao.oracle.ShuftiDao;
+import com.ndb.auction.dao.oracle.TokenAssetDao;
+=======
 import com.google.gson.Gson;
 import com.ndb.auction.dao.oracle.auction.AuctionAvatarDao;
 import com.ndb.auction.dao.oracle.auction.AuctionDao;
@@ -9,13 +25,14 @@ import com.ndb.auction.dao.oracle.other.CryptoPaymentDao;
 import com.ndb.auction.dao.oracle.other.DirectSaleDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
-import com.ndb.auction.dao.oracle.other.StripeTransactionDao;
+import com.ndb.auction.dao.oracle.other.StripePaymentDao;
 import com.ndb.auction.dao.oracle.other.SumsubDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
+>>>>>>> 85500e0f38e673d00d75cf89a1586e0abc2e4b62
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
@@ -86,7 +103,7 @@ public class BaseService {
     public AvatarComponentDao avatarDao;
 
     @Autowired
-    public StripeTransactionDao stripeDao;
+    public StripePaymentDao stripeDao;
 
     @Autowired
     public CryptoPaymentDao cryptoDao;
@@ -111,4 +128,16 @@ public class BaseService {
 
     @Autowired
     public TierService tierService;
+
+    @Autowired
+    public TokenAssetDao tokenAssetDao;
+
+    @Autowired
+    public InternalBalanceDao balanceDao;
+
+    @Autowired
+    public InternalWalletDao walletDao;
+
+    @Autowired
+    public ShuftiDao shuftiDao;
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -98,17 +99,27 @@ public class UserService extends BaseService {
 		}
 
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
-		
+		UserSecurity currentSecurity = null;
 		// check there is any 2FA. 
 		if(userSecurities.size() == 0) {
 			// add new security
-			UserSecurity userSecurity = new UserSecurity(user.getId(), method, false, "");
+			currentSecurity = new UserSecurity(user.getId(), method, false, "");
 		} else {
 			// check already exists
-			
+			for (UserSecurity userSecurity : userSecurities) {
+				if(userSecurity.getAuthType().equals(method)) {
+					currentSecurity = userSecurity;
+				}
+			}
+			if(currentSecurity == null) {
+				// there is no security with that method
+				currentSecurity = new UserSecurity(user.getId(), method, false, "");
+			} else {
+				return "Already set";
+			}
 		}
+		currentSecurity = userSecurityDao.insert(currentSecurity);
 		
-		userSecurity.setAuthType(method);
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
 		if (userVerify == null || !userVerify.isEmailVerified()) {
@@ -121,7 +132,7 @@ public class UserService extends BaseService {
 		switch (method) {
 			case "app":
 				String tfaSecret = totpService.generateSecret();
-				userSecurityDao.updateTfaSecret(user.getId(), tfaSecret);
+				userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
 				String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
 				return qrUri;
 			case "phone":
@@ -146,7 +157,7 @@ public class UserService extends BaseService {
 	public String confirmRequest2FA(String email, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw Not Found Exception
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
@@ -154,8 +165,13 @@ public class UserService extends BaseService {
 			throw new UnauthorizedException("Your account is not verified", "email");
 		}
 
-		UserSecurity userSecurity = userSecurityDao.selectById(user.getId());
-
+		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
+		if(userSecurities.size() == 0) {
+			throw new UnauthorizedException("There is no proper 2FA setting.", "code");
+		}
+		
+		// Assume 
+		UserSecurity userSecurity = userSecurities.get(0);
 		boolean status = false;
 		String method;
 		if (userSecurity != null && (method = userSecurity.getAuthType()) != null) {
@@ -180,62 +196,65 @@ public class UserService extends BaseService {
 		new Random().nextBytes(array);
 		String token = UUID.randomUUID().toString();
 
-		UserSecurity userSecurity = userSecurityDao.selectById(user.getId());
-		String method;
-		if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
-			return "error";
-		switch (method) {
-			case "app":
-				if (userSecurity.getTfaSecret() == null || userSecurity.getTfaSecret().isEmpty()) {
-					return "error";
-				} else {
-					return token;
-				}
-			case "phone":
-				try {
-					String code = totpService.get2FACode(user.getEmail());
-					String phone = user.getPhone();
-					// userDao.updateUser(user); // TODO: why update?
-					smsService.sendSMS(phone, code);
-					return token;
-				} catch (IOException | TemplateException e) {
-					return "error";
-				}
-			case "email":
-				try {
-					String code = totpService.get2FACode(user.getEmail());
-					mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-					// userDao.updateUser(user); // TODO: why update?
-					return token;
-				} catch (MessagingException | IOException | TemplateException e) {
-					return "error"; // or exception
-				}
-			default:
+		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
+		for (UserSecurity userSecurity : userSecurities) {
+			String method;
+			if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
 				return "error";
+			switch (method) {
+				case "app":
+					if (userSecurity.getTfaSecret() == null || userSecurity.getTfaSecret().isEmpty()) {
+						return "error";
+					} 
+				case "phone":
+					try {
+						String code = totpService.get2FACode(user.getEmail() + method);
+						String phone = user.getPhone();
+						smsService.sendSMS(phone, code);
+					} catch (IOException | TemplateException e) {
+						return "error";
+					}
+				case "email":
+					try {
+						String code = totpService.get2FACode(user.getEmail() + method);
+						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
+					} catch (MessagingException | IOException | TemplateException e) {
+						return "error"; // or exception
+					}
+				default:
+					return "error";
+			}
 		}
-
+		return token;
 	}
 
-	public boolean verify2FACode(String email, String code) {
+	public boolean verify2FACode(String email, Map<String, String> codeMap) {
+		boolean result = false;
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
-		UserSecurity userSecurity = userSecurityDao.selectById(user.getId());
-		String method;
-		if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
-			return false;
-		if (method.equals("app")) {
-			return totpService.verifyCode(code, userSecurity.getTfaSecret());
-		} else if (method.equals("email") || method.equals("phone")) {
-			return totpService.check2FACode(email, code);
+		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
+		for (UserSecurity userSecurity : userSecurities) {
+			String method;
+			if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
+				return false;
+			if (method.equals("app")) {
+				result = totpService.verifyCode(codeMap.get(method), userSecurity.getTfaSecret());
+			} else if (method.equals("email") || method.equals("phone")) {
+				result = totpService.check2FACode(email + method, codeMap.get(method));
+			}
+			if(!result) return false;
 		}
-		return false;
+		
+		return true;
 	}
 
 	public boolean sendResetToken(String email) {
 		User user = userDao.selectByEmail(email);
-
+		if (user == null) {
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
+		}
 		String code = totpService.get2FACode(email);
 		try {
 			mailService.sendVerifyEmail(user, code, RESET_TEMPLATE);
@@ -250,7 +269,7 @@ public class UserService extends BaseService {
 		if (totpService.check2FACode(email, code)) {
 			User user = userDao.selectByEmail(email);
 			if (user == null) {
-				// throw
+				throw new UserNotFoundException("Cannot find user by " + email, "email");
 			}
 			userDao.updatePassword(user.getId(), encoder.encode(newPass));
 		} else {
@@ -274,19 +293,6 @@ public class UserService extends BaseService {
 			return false; // or exception
 		}
 		return true;
-	}
-
-	public User getUserByEmail(String email, boolean includeAvatar, boolean includeSecurity, boolean includeVerify) {
-		User user = userDao.selectByEmail(email);
-		if (user == null)
-			throw new UserNotFoundException("We were unable to find a user with the provided credentials", "email");
-		if (includeAvatar)
-			user.setAvatar(userAvatarDao.selectById(user.getId()));
-		if (includeSecurity)
-			user.setSecurity(userSecurityDao.selectById(user.getId()));
-		if (includeVerify)
-			user.setVerify(userVerifyDao.selectById(user.getId()));
-		return user;
 	}
 
 	public User getUserById(int id) {
@@ -364,7 +370,7 @@ public class UserService extends BaseService {
 
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 		String rPassword = getRandomPassword(10);
 		String encoded = encodePassword(rPassword);
@@ -403,7 +409,7 @@ public class UserService extends BaseService {
 	public String changeRole(String email, String role) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 
 		if (role.equals("admin")) {
@@ -415,7 +421,7 @@ public class UserService extends BaseService {
 		} else {
 			return "Failed";
 		}
-		userDao.updateRole(user.getId(), role);
+		userDao.updateRole(user.getId(), user.getRoleString());
 		return "Success";
 	}
 
@@ -423,7 +429,7 @@ public class UserService extends BaseService {
 	public int changeNotifySetting(int userId, int nType, boolean status) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
-			// throw
+			throw new UserNotFoundException("Cannot find user", "userId");
 		}
 
 		int notifySetting = user.getNotifySetting();

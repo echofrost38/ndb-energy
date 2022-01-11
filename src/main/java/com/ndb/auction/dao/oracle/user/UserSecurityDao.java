@@ -1,5 +1,7 @@
 package com.ndb.auction.dao.oracle.user;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -8,7 +10,10 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.user.UserSecurity;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -40,10 +45,27 @@ public class UserSecurityDao extends BaseOracleDao {
 		}, userId);
 	}
 
-	public int insert(UserSecurity m) {
+	public UserSecurity insert(UserSecurity m) {
 		String sql = "INSERT INTO TBL_USER_SECURITY(SEC_USER_SECURITY.NEXTVAL,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
 				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId());
+
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    @Override
+                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                        PreparedStatement ps = connection.prepareStatement(sql.toString(),
+                                new String[] { "ID" });
+                        int i = 1;
+                        ps.setString(i++, m.getAuthType());
+                        ps.setBoolean(i++, m.isTfaEnabled());
+                        ps.setString(i++, m.getTfaSecret());
+                        ps.setInt(i++, m.getUserId());
+                        return ps;
+                    }
+                }, keyHolder);
+        m.setId(keyHolder.getKey().intValue());
+        return m;
 	}
 
 	public int insertOrUpdate(UserSecurity m) {

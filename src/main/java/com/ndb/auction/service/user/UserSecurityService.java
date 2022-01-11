@@ -14,7 +14,7 @@ public class UserSecurityService extends BaseService {
 		return userSecurityDao.selectByUserId(userId);
 	}
 
-	public int insert(UserSecurity m) {
+	public UserSecurity insert(UserSecurity m) {
 		return userSecurityDao.insert(m);
 	}
 

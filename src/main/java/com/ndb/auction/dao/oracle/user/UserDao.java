@@ -44,7 +44,10 @@ public class UserDao extends BaseOracleDao {
 		m.setProviderId(rs.getString("PROVIDER_ID"));
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
 		m.setDeleted(rs.getInt("DELETED"));
-		m.setRoleString(rs.getString("ROLE"));
+
+		String roleString = rs.getString("ROLE");
+		// m.setRole(rs.getString("ROLE"));
+		
 		return m;
 	}
 
@@ -92,7 +95,7 @@ public class UserDao extends BaseOracleDao {
 			if (whereMap.get("email") != null) {
 				where.append(" AND EMAIL LIKE ?");
 			}
-			if (!where.isEmpty())
+			if (where.length()>0)
 				sql += " WHERE" + where.substring(4);
 		}
 		return jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -123,7 +126,7 @@ public class UserDao extends BaseOracleDao {
 			if (whereMap.get("email") != null) {
 				where.append(" AND EMAIL LIKE ?");
 			}
-			if (!where.isEmpty())
+			if (where.length() > 0)
 				sql += " WHERE" + where.substring(4);
 		}
 		if (orderby == null)
@@ -161,7 +164,7 @@ public class UserDao extends BaseOracleDao {
 				+ "ROLE, TIER_LEVEL, TIER_POINT, PROVIDER, PROVIDER_ID, NOTIFY_SETTING, DELETED)"
 				+ "VALUES(SEQ_USER.NEXTVAL,?,?,?,?,?,SYSDATE,SYSDATE,SYSDATE,?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(sql, m.getEmail(), m.getPassword(), m.getName(), m.getCountry(), m.getPhone(),
-				m.getBirthday(), m.getLastLoginDate(), m.getRoleString(), m.getTierLevel(), m.getTierPoint(), m.getProvider(),
+				m.getBirthday(), m.getLastLoginDate(), m.getRole(), m.getTierLevel(), m.getTierPoint(), m.getProvider(),
 				m.getProviderId(), m.getNotifySetting(), m.getDeleted());
 	}
 

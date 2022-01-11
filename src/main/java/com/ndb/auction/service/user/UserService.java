@@ -53,7 +53,7 @@ public class UserService extends BaseService {
 			userDao.insert(user);
 
 			// create user wallet in contract!
-			userWalletService.addNewUser(user.getId(), email, "");
+			// userWalletService.addNewUser(user.getId(), email, "");
 
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
@@ -66,13 +66,11 @@ public class UserService extends BaseService {
 	public boolean verifyAccount(String email, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw Not Found Exception
-			return false;
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 
 		if (!totpService.checkVerifyCode(email, code)) {
-			// throw Unauthorized Exception
-			return false;
+			throw new UnauthorizedException("Your account is not verified", "email");
 		}
 
 		if (userVerifyDao.updateEmailVerified(user.getId(), true) < 1) {
@@ -87,7 +85,7 @@ public class UserService extends BaseService {
 	public String resendVerifyCode(String email) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			return "Not Found";
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";
@@ -96,10 +94,20 @@ public class UserService extends BaseService {
 	public String request2FA(String email, String method, String phone) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			// throw Not Found Exception
+			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 
-		UserSecurity userSecurity = userSecurityDao.selectById(user.getId());
+		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
+		
+		// check there is any 2FA. 
+		if(userSecurities.size() == 0) {
+			// add new security
+			UserSecurity userSecurity = new UserSecurity(user.getId(), method, false, "");
+		} else {
+			// check already exists
+			
+		}
+		
 		userSecurity.setAuthType(method);
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
@@ -407,7 +415,7 @@ public class UserService extends BaseService {
 		} else {
 			return "Failed";
 		}
-		userDao.updateRole(user.getId(), user.getRoleString());
+		userDao.updateRole(user.getId(), role);
 		return "Success";
 	}
 

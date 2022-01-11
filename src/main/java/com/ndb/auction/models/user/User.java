@@ -17,8 +17,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class User extends BaseModel {
 
-	public static final String ROLE_SEPARATOR = ",";
-
 	private String email;
 	private String password;
 	private String name;
@@ -37,22 +35,10 @@ public class User extends BaseModel {
 	private UserSecurity security;
 	private UserVerify verify;
 
-	public User(String email, String encodedPass, String country) {
+	public User (String email, String encodedPass, String country) {
 		this.email = email;
 		this.password = encodedPass;
 		this.country = country;
-	}
-
-	public User setRoleString(String value) {
-		if (value != null)
-			this.role = Set.of(value.split(ROLE_SEPARATOR));
-		return this;
-	}
-
-	public String getRoleString() {
-		if (this.role == null)
-			return null;
-		return String.join(ROLE_SEPARATOR, this.role);
 	}
 
 	public User addRole(String value) {
@@ -65,7 +51,7 @@ public class User extends BaseModel {
 		return this;
 	}
 
-	//
+	// 
 
 	public boolean allowNotification(Notification notification) {
 		return ((this.notifySetting >> (notification.getNType() - 1)) & 0x01) > 0;

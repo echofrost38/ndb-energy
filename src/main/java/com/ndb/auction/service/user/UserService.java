@@ -183,7 +183,7 @@ public class UserService extends BaseService {
 		}
 
 		if (status) {
-			userSecurityDao.updateTfaEnabled(user.getId(), true);
+			userSecurityDao.updateTfaEnabled(userSecurity.getId(), true);
 			return "Success";
 		} else {
 			return "Failed";
@@ -311,6 +311,10 @@ public class UserService extends BaseService {
 		if (userDao.updateDeleted(id) > 0)
 			return "Success";
 		return "Failed";
+	}
+
+	public User getUserByEmail(String email) {
+		return userDao.selectByEmail(email);
 	}
 
 	///////////////////////// Geo Location /////////

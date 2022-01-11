@@ -1,7 +1,5 @@
 package com.ndb.auction.models.user;
 
-import java.sql.Timestamp;
-
 import com.ndb.auction.models.BaseModel;
 
 import org.springframework.stereotype.Component;

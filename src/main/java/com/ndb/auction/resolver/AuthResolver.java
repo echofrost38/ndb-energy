@@ -1,14 +1,16 @@
 package com.ndb.auction.resolver;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Setting;
 import com.ndb.auction.models.user.TwoFAEntry;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.user.UserSecurity;
+import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.Credentials;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,32 +54,33 @@ public class AuthResolver extends BaseResolver
 
 	public Credentials signin(String email, String password) {
 
-		// Geo IP checking
-		// HttpServletRequest request =
-		// ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
-		// String ipAddress = RemoteIpHelper.getRemoteIpFrom(request);
-		// if(!ipChecking.isAllowed(ipAddress)) {
-		// return new Credentials("Failed", "Not Allowed Location");
-		// }
-
 		// get user ( Not found exception is threw in service)
-		User user = null;
-		try {
-			user = userService.getUserByEmail(email, false, true, true);
-		} catch (UserNotFoundException e) {
+		User user = userService.getUserByEmail(email);
+		if(user == null) {
 			return new Credentials("Failed", "You are not registered");
-		}
+		} 
 
 		if (!userService.checkMatchPassword(password, user.getPassword())) {
 			return new Credentials("Failed", "Your email and password do not match!");
 		}
-
-		if (!user.getVerify().isEmailVerified()) {
+		UserVerify userVerify = userVerifyService.selectById(user.getId());
+		if (!userVerify.isEmailVerified()) {
 			return new Credentials("Failed", "Please verify your email");
 		}
 
-		if (!user.getSecurity().isTfaEnabled()) {
+		List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
+		if(userSecurities.size() == 0) {
 			return new Credentials("Failed", "Please set 2FA");
+		}
+
+		List<String> twoStep = new ArrayList<>();
+
+		for (UserSecurity userSecurity : userSecurities) {
+			if(userSecurity.isTfaEnabled()) {
+				twoStep.add(userSecurity.getAuthType());
+			} else {
+				return new Credentials("Failed", "Please set 2FA");
+			}
 		}
 
 		String token = userService.signin2FA(user);
@@ -90,7 +93,7 @@ public class AuthResolver extends BaseResolver
 
 		totpService.setTokenAuthCache(token, authentication);
 
-		return new Credentials("Success", token, user.getTwoStep());
+		return new Credentials("Success", token, twoStep);
 	}
 
 	public Credentials confirm2FA(String email, String token, List<TwoFAEntry> code) {
@@ -111,12 +114,6 @@ public class AuthResolver extends BaseResolver
 
 		String jwt = jwtUtils.generateJwtToken(authentication);
 
-		// UserDetailsImpl userDetails = (UserDetailsImpl)
-		// authentication.getPrincipal();
-		// List<String> roles = userDetails.getAuthorities().stream().map(item ->
-		// item.getAuthority())
-		// .collect(Collectors.toList());
-		// return new Credentials(email, jwt);
 		return new Credentials("Success", jwt);
 	}
 

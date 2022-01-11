@@ -2,74 +2,39 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import javax.servlet.http.Part;
-
-import com.amazonaws.services.s3.AmazonS3;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
-import com.ndb.auction.exceptions.S3Exception;
 import com.ndb.auction.models.SkillSet;
 import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarFacts;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AvatarService extends BaseService {
 
-	// private AmazonS3 s3;
-	// private final String bucketName = "auctionupload";
-
-	public AvatarService(AmazonS3 s3) {
-		// this.s3 = s3;
-	}
-
-	public AvatarComponent createAvatarComponent(int groupId, Integer tierLevel, Long price, Integer limited,
-			Part file) {
+	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Long price, Integer limited, String svg, int width, int top, int left) {
 		price = price == null ? 0 : price;
-		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited);
-		AvatarComponent newComponent = avatarDao.createAvatarComponent(component);
-		String key = newComponent.getGroupId() + "-" + newComponent.getCompId();
-		if (!uploadFileS3(key, file)) {
-			throw new S3Exception("Cannot Upload Avatar File.", "file");
-		}
-
+		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited, svg, width, top, left);
+		AvatarComponent newComponent = avatarComponentDao.createAvatarComponent(component);
 		return newComponent;
 	}
 
 	public List<AvatarComponent> getAvatarComponents() {
-		List<AvatarComponent> components = avatarDao.getAvatarComponents();
-
-		for (AvatarComponent avatarComponent : components) {
-			String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-			String imageStr = downloadAvatarAccessories(key);
-			avatarComponent.setBase64Image(imageStr);
-		}
-		return components;
+		return avatarComponentDao.getAvatarComponents();
 	}
 
-	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
-		List<AvatarComponent> components = avatarDao.getAvatarComponentsByGid(groupId);
-		// for (AvatarComponent avatarComponent : components) {
-		// 	String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-		// 	String imageStr = downloadAvatarAccessories(key);
-		// 	avatarComponent.setBase64Image(imageStr);
-		// }
-		return components;
+	public List<AvatarComponent> getAvatarComponentsByGroupId(String groupId) {
+		return avatarComponentDao.getAvatarComponentsByGid(groupId);
 	}
 
-	public AvatarComponent getAvatarComponent(String groupId, String sKey) {
-		AvatarComponent avatarComponent = avatarDao.getAvatarComponent(groupId, sKey);
-		// String key = avatarComponent.getGroupId() + "-" + avatarComponent.getCompId();
-		// String imageStr = downloadAvatarAccessories(key);
-		// avatarComponent.setBase64Image(imageStr);
-		return avatarComponent;
+	public AvatarComponent getAvatarComponent(String groupId, int compId) {
+		return avatarComponentDao.getAvatarComponent(groupId, compId);
 	}
 
-	public AvatarComponent updateAvatar(String groupId, String compId, Integer tierLevel, Long price, Integer limited,
-			Part file) {
-		AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
+	public AvatarComponent updateAvatarComponent(String groupId, int compId, Integer tierLevel, Long price, Integer limited, String svg, int width, int top, int left) {
+		AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 		if (component == null) {
 			throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 		}
@@ -79,40 +44,59 @@ public class AvatarService extends BaseService {
 		component.setPrice(price);
 		component.setTierLevel(tierLevel);
 		component.setLimited(limited);
-		component.setBase64Image(svg);
+		component.setSvg(svg);
 		component.setWidth(width);
 		component.setTop(top);
 		component.setLeft(left);
 		
-		return avatarDao.updateAvatarComponent(component);
+		return avatarComponentDao.updateAvatarComponent(component);
 	}
 
 	public AvatarProfile createAvatarProfile(String name, String surname, String shortName,
-			List<SkillSet> skillSet, List<AvatarSet> avatarSet, String enemy, String invention, String bio, String hairColor) {
+			List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factsSet, String hairColor, String details) {
 		
 		// check condition
-		AvatarProfile profile = avatarDao.getAvatarProfileByName(name);
+		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(name);
 		if (profile != null) {
 			throw new AvatarNotFoundException("Already exists with '" + name + "'", "name");
 		}
 		
-		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, enemy, invention, bio, hairColor);
-		return avatarDao.createAvatarProfile(profile);
+		profile = new AvatarProfile(name, surname, shortName, skillSet, avatarSet, hairColor, factsSet, details);
+		profile = avatarProfileDao.createAvatarProfile(profile);
+		int profileId = profile.getId();
+
+		for (SkillSet skill : skillSet) {
+			skill.setId(profileId);
+			avatarSkillDao.insert(skill);
+		}
+		profile.setSkillSet(skillSet);
+
+		for (AvatarFacts avatarFacts : factsSet) {
+			avatarFacts.setProfileId(profileId);
+			avatarFactDao.insert(avatarFacts);
+		}
+		profile.setFactsSet(factsSet);
+
+		for (AvatarSet _avatarSet : avatarSet) {
+			_avatarSet.setId(profileId);
+			avatarSetDao.insert(_avatarSet);
+		}
+		profile.setAvatarSet(avatarSet);
+		return profile;
 	}
 
-	public AvatarProfile updateAvatarProfile(
-			String id,
+	public Boolean updateAvatarProfile(
+			int id,
 			String name,
 			String surname,
 			String shortName,
 			List<SkillSet> skillSet, 
 			List<AvatarSet> avatarSet, 
-			String enemy, 
-			String invention, 
-			String bio,
-			String hairColor) 
+			List<AvatarFacts> factSet,
+			String hairColor,
+			String details) 
 	{
-		AvatarProfile profile = avatarDao.getAvatarProfile(id);
+		AvatarProfile profile = avatarProfileDao.getAvatarProfile(id);
 		if (profile == null) {
 			throw new AvatarNotFoundException("Cannot find avatar profile.", "id");
 		}
@@ -121,75 +105,51 @@ public class AvatarService extends BaseService {
 		profile.setShortName(shortName);
 		profile.setSkillSet(skillSet);
 		profile.setAvatarSet(avatarSet);
-		profile.setEnemy(enemy);
-		profile.setInvention(invention);
-		profile.setBio(bio);
+		profile.setDetails(details);
 		profile.setHairColor(hairColor);
 		
-		return avatarDao.updateAvatarProfile(profile);
+		avatarProfileDao.updateAvatarProfile(profile);
+		avatarFactDao.update(id, factSet);
+		avatarSkillDao.update(id, skillSet);
+		avatarSetDao.update(id, avatarSet);
+
+		return true;
 	}
 
 	public List<AvatarProfile> getAvatarProfiles() {
-		return avatarDao.getAvatarProfiles();
+		List<AvatarProfile> profileList = avatarProfileDao.getAvatarProfiles();
+
+		for (AvatarProfile profile : profileList) {
+			profile.setFactsSet(avatarFactDao.selectByProfileId(profile.getId()));
+			profile.setSkillSet(avatarSkillDao.selectById(profile.getId()));
+			profile.setAvatarSet(avatarSetDao.selectById(profile.getId()));
+		}
+		
+		return profileList;
 	}
 
-	@PreAuthorize("isAuthenticated()")
-	public AvatarProfile getAvatarProfile(String id) {
-		return avatarDao.getAvatarProfile(id);
+	public AvatarProfile getAvatarProfile(int id) {
+		AvatarProfile profile = avatarProfileDao.getAvatarProfile(id);
+		profile.setFactsSet(avatarFactDao.selectByProfileId(profile.getId()));
+		profile.setSkillSet(avatarSkillDao.selectById(profile.getId()));
+		profile.setAvatarSet(avatarSetDao.selectById(profile.getId()));
+		return profile;
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	public AvatarProfile getAvatarProfileByName(String fname) {
-		return avatarDao.getAvatarProfileByName(fname);
+		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(fname);
+		profile.setFactsSet(avatarFactDao.selectByProfileId(profile.getId()));
+		profile.setSkillSet(avatarSkillDao.selectById(profile.getId()));
+		profile.setAvatarSet(avatarSetDao.selectById(profile.getId()));
+		return profile;
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
-		return avatarDao.getAvatarComponentsBySet(set);
+		return avatarComponentDao.getAvatarComponentsBySet(set);
 	}
 
-	// private boolean deleteS3Object(String key) {
-	// 	try {
-	// 		s3.deleteObject(bucketName, key);
-	// 	} catch (Exception e) {
-	// 		return false;
-	// 	}
-	// 	return true;
-	// }
-
-	// private String downloadAvatarAccessories(String key) {
-	// 	S3Object s3object = null;
-	// 	try {
-	// 		s3object = s3.getObject(bucketName, key);
-	// 	} catch (Exception e) {
-	// 		return "";
-	// 	}
-	// 	InputStream finput = s3object.getObjectContent();
-	// 	long length = s3object.getObjectMetadata().getContentLength();
-	// 	byte[] imageBytes = new byte[(int)length];
-	// 	try {
-	// 		finput.read(imageBytes, 0, imageBytes.length);
-	// 		finput.close();
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	// 		return "";
-	// 	}
-	// 	return Base64.encodeBase64String(imageBytes);
-	// }
-
-	// private boolean uploadFileS3(String key, Part file) {
-	// 	// upload avatar component into Amazon S3 bucket!
-	// 	InputStream content;
-	// 	try {
-	// 		content = file.getInputStream();
-	// 		ObjectMetadata metadata = new ObjectMetadata();
-	// 		metadata.setContentLength(file.getSize());
-	// 		s3.putObject(bucketName, key, content, metadata);
-	// 	} catch (IOException e) {
-	// 		e.printStackTrace();
-	// 		return false;
-	// 	}
-	// 	return true;
-	// }
+	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
+		return avatarComponentDao.getAvatarComponentsByGid(groupId);
+	}
 
 }

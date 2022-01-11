@@ -21,7 +21,7 @@ public class AvatarProfileSetDao extends BaseOracleDao {
 	private static AvatarSet extract(ResultSet rs) throws SQLException {
 		AvatarSet m = new AvatarSet();
 		m.setId(rs.getInt("ID"));
-		m.setGroupId(rs.getInt("GROUP_ID"));
+		m.setGroupId(rs.getString("GROUP_ID"));
 		m.setCompId(rs.getInt("COMP_ID"));
 		return m;
 	}

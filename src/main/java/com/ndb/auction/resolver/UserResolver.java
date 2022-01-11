@@ -57,7 +57,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String createNewUser(String email, String country, String role, String avatarName, String shortName) {
 
-        User user = userService.getUserByEmail(email, false, false, false);
+        User user = userService.getUserByEmail(email);
         if (user != null) {
             return "Already Exists.";
         }
@@ -108,11 +108,4 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.deleteUser(id);
     }
 
-    // @PreAuthorize("isAuthenticated")
-    // public String setAvatar(String prefix, String name) {
-    // UserDetailsImpl userDetails =
-    // (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    // int id = userDetails.getId();
-    // return profileService.setAvatar(id, prefix, name);
-    // }
 }

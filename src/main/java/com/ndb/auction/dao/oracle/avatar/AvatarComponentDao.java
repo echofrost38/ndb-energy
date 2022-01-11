@@ -23,26 +23,29 @@ public class AvatarComponentDao extends BaseOracleDao {
 
 	private static AvatarComponent extract(ResultSet rs) throws SQLException {
 		AvatarComponent m = new AvatarComponent();
-		m.setGroupId(rs.getInt("GROUP_ID"));
+		m.setGroupId(rs.getString("GROUP_ID"));
 		m.setCompId(rs.getInt("COMP_ID"));
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
 		m.setPrice(rs.getLong("PRICE"));
 		m.setLimited(rs.getInt("LIMITED"));
 		m.setPurchased(rs.getInt("PURCHASED"));
-		m.setSvg(rs.getString("BASE64_IMAGE"));
+		m.setSvg(rs.getString("SVG"));
+		m.setWidth(rs.getInt("WIDTH"));
+		m.setTop(rs.getInt("TOP"));
+		m.setLeft(rs.getInt("LEFT"));
 		return m;
 	}
 
 	public AvatarComponent createAvatarComponent(AvatarComponent m) {
-		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID, COMP_ID, TIER_LEVEL, PRICE, LIMITED, PURCHASED, BASE64_IMAGE)"
-				+ "VALUES(?,?,?,?,?,?,?,?)";
-		jdbcTemplate.update(sql, m.getGroupId(), m.getCompId(), m.getTierLevel(), m.getPrice(), m.getLimited(),
-				m.getPurchased(), m.getSvg());
+		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID, COMP_ID, TIER_LEVEL, PRICE, LIMITED, PURCHASED, SVG,WIDTH,TOP,LEFT)"
+				+ "VALUES(?,SEQ_AVATAR_COMPONENT.NEXTVAL,?,?,?,?,?,?)";
+		jdbcTemplate.update(sql, m.getGroupId(), m.getTierLevel(), m.getPrice(), m.getLimited(),
+				m.getPurchased(), m.getSvg(), m.getWidth(), m.getTop(), m.getLeft());
 		return m;
 	}
 
 	public List<AvatarComponent> getAvatarComponents() {
-		String sql = "SELECT * FROM TBL_AVATAR_COMPONENT";
+		String sql = "SELECT * FROM TBL_AVATAR_COMPONENT ORDER BY GROUP_ID";
 		return jdbcTemplate.query(sql, new RowMapper<AvatarComponent>() {
 			@Override
 			public AvatarComponent mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -52,7 +55,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 	}
 
 	public List<AvatarComponent> getAvatarComponentsByGid(String groupId) {
-		String sql = "SELECT * FROM TBL_AVATAR_COMPONENT WHERE GROUP_ID=?";
+		String sql = "SELECT * FROM TBL_AVATAR_COMPONENT WHERE GROUP_ID=? ORDER BY COMP_ID";
 		return jdbcTemplate.query(sql, new RowMapper<AvatarComponent>() {
 			@Override
 			public AvatarComponent mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -61,7 +64,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 		}, groupId);
 	}
 
-	public AvatarComponent getAvatarComponent(int groupId, int sKey) {
+	public AvatarComponent getAvatarComponent(String groupId, int sKey) {
 		String sql = "SELECT * FROM TBL_AVATAR_COMPONENT WHERE GROUP_ID=? AND COMP_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<AvatarComponent>() {
 			@Override
@@ -74,9 +77,9 @@ public class AvatarComponentDao extends BaseOracleDao {
 	}
 
 	public AvatarComponent updateAvatarComponent(AvatarComponent m) {
-		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, BASE64_IMAGE=? WHERE GROUP_ID=? AND COMP_ID=?";
+		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, SVG=?,WIDTH=?,TOP=?,LEFT=? WHERE GROUP_ID=? AND COMP_ID=?";
 		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), m.getSvg(),
-				m.getGroupId(), m.getCompId());
+				m.getGroupId(), m.getCompId(), m.getWidth(), m.getTop(), m.getLeft());
 		return m;
 	}
 
@@ -84,7 +87,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 		List<AvatarComponent> list = new ArrayList<>();
 
 		for (AvatarSet field : set) {
-			int groupId = field.getGroupId();
+			String groupId = field.getGroupId();
 			int compId = field.getCompId();
 			list.add(getAvatarComponent(groupId, compId));
 		}

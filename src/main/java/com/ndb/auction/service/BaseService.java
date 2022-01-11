@@ -8,6 +8,10 @@ import com.ndb.auction.dao.oracle.TokenAssetDao;
 import com.ndb.auction.dao.oracle.auction.AuctionAvatarDao;
 import com.ndb.auction.dao.oracle.auction.AuctionDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarComponentDao;
+import com.ndb.auction.dao.oracle.avatar.AvatarProfileDao;
+import com.ndb.auction.dao.oracle.avatar.AvatarProfileFactsDao;
+import com.ndb.auction.dao.oracle.avatar.AvatarProfileSetDao;
+import com.ndb.auction.dao.oracle.avatar.AvatarProfileSkillDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
 import com.ndb.auction.dao.oracle.other.CryptoPaymentDao;
 import com.ndb.auction.dao.oracle.other.DirectSaleDao;
@@ -87,7 +91,19 @@ public class BaseService {
     public SMSService smsService;
 
     @Autowired
-    public AvatarComponentDao avatarDao;
+    public AvatarComponentDao avatarComponentDao;
+
+    @Autowired
+    public AvatarProfileDao avatarProfileDao;
+
+    @Autowired
+    public AvatarProfileSkillDao avatarSkillDao;
+
+    @Autowired
+    public AvatarProfileFactsDao avatarFactDao;
+
+    @Autowired
+    public AvatarProfileSetDao avatarSetDao;
 
     @Autowired
     public StripeTransactionDao stripeDao;

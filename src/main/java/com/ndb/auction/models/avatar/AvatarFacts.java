@@ -12,7 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Facts extends BaseModel{
+public class AvatarFacts extends BaseModel{
+    private int profileId;
     private String topic;
     private String detail;
 }

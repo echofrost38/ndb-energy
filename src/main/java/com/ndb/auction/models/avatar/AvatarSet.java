@@ -14,10 +14,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AvatarSet extends BaseModel {
 
-	private int groupId;
+	private String groupId;
 	private int compId;
 
-	public AvatarSet(int id, int groupId, int compId) {
+	public AvatarSet(int id, String groupId, int compId) {
 		this.id = id;
 		this.groupId = groupId;
 		this.compId = compId;

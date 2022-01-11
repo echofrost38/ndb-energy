@@ -37,7 +37,7 @@ public class AvatarProfileDao extends BaseOracleDao {
 
 	public AvatarProfile createAvatarProfile(AvatarProfile m) {
 		String sql = "INSERT INTO TBL_AVATAR_PROFILE(ID, FNAME, SURNAME, SHORT_NAME, HAIR_COLOR, DETAILS)"
-				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?,?,?)";
+				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 				new PreparedStatementCreator() {
@@ -74,7 +74,7 @@ public class AvatarProfileDao extends BaseOracleDao {
 		});
 	}
 
-	public AvatarProfile getAvatarProfile(String id) {
+	public AvatarProfile getAvatarProfile(int id) {
 		String sql = "SELECT * FROM TBL_AVATAR_PROFILE WHERE ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<AvatarProfile>() {
 			@Override

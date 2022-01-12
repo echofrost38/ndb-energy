@@ -23,8 +23,8 @@ public class DirectSaleDao extends BaseOracleDao {
         m.setUserId(rs.getInt("USER_ID"));
         m.setTxnId(rs.getString("TXN_ID"));
         m.setPayType(rs.getInt("PAY_TYPE"));
-        m.setNdbPrice(rs.getLong("NDB_PRICE"));
-        m.setNdbAmount(rs.getLong("NDB_AMOUNT"));
+        m.setNdbPrice(rs.getString("NDB_PRICE"));
+        m.setNdbAmount(rs.getString("NDB_AMOUNT"));
         m.setWhereTo(rs.getInt("WHERE_TO"));
         m.setExtAddr(rs.getString("EXT_ADDR"));
         m.setConfirmed(rs.getBoolean("IS_CONFIRMED"));
@@ -33,20 +33,19 @@ public class DirectSaleDao extends BaseOracleDao {
         m.setPaymentIntentId(rs.getString("PAYMENT_INTENT_ID"));
         m.setCode(rs.getString("CODE"));
         m.setCryptoType(rs.getString("CRYPTO_TYPE"));
-        m.setCryptoPrice(rs.getLong("CRYPTO_PRICE"));
-        m.setCryptoAmount(rs.getLong("CRYPTO_AMOUNT"));
+        m.setCryptoAmount(rs.getString("CRYPTO_AMOUNT"));
         return m;
     }
 
     // create new empty transaction
     public DirectSale createEmptyDirectSale(DirectSale m) {
         String sql = "INSERT INTO TBL_DIRECT_SALE(USER_ID, TXN_ID, PAY_TYPE, NDB_PRICE, NDB_AMOUNT, WHERE_TO, EXT_ADDR, "
-                + "IS_CONFIRMED, CREATED_DATE, COMFIRMED_DATE, PAYMENT_INTENT_ID, CODE, CRYPTO_TYPE, CRYPTO_PRICE, CRYPTO_AMOUNT)"
-                + "VALUES(SEQ_AUCTION.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?)";
+                + "IS_CONFIRMED, CREATED_DATE, COMFIRMED_DATE, PAYMENT_INTENT_ID, CODE, CRYPTO_TYPE, CRYPTO_AMOUNT)"
+                + "VALUES(SEQ_AUCTION.NEXTVAL,?,?,?,?,?,?,?,?,?,?)";
         jdbcTemplate.update(sql, m.getUserId(), m.getTxnId(), m.getPayType(), m.getNdbPrice(), m.getNdbAmount(),
                 m.getWhereTo(), m.getExtAddr(), m.isConfirmed(), new Timestamp(m.getCreatedAt()),
                 new Timestamp(m.getConfirmedAt()), m.getPaymentIntentId(), m.getCode(), m.getCryptoType(),
-                m.getCryptoPrice(), m.getCryptoAmount());
+                 m.getCryptoAmount());
         return m;
     }
 
@@ -90,12 +89,12 @@ public class DirectSaleDao extends BaseOracleDao {
 
     public DirectSale updateDirectSale(DirectSale m) {
         String sql = "UPDATE TBL_DIRECT_SALE SET PAY_TYPE=?, NDB_PRICE=?, NDB_AMOUNT=?, WHERE_TO=?, EXT_ADDR=?, "
-                + "IS_CONFIRMED=?, CREATED_DATE=?, COMFIRMED_DATE=?, PAYMENT_INTENT_ID=?, CODE=?, CRYPTO_TYPE=?, CRYPTO_PRICE=?, CRYPTO_AMOUNT=? "
+                + "IS_CONFIRMED=?, CREATED_DATE=?, COMFIRMED_DATE=?, PAYMENT_INTENT_ID=?, CODE=?, CRYPTO_TYPE=?, CRYPTO_AMOUNT=? "
                 + "WHERE USER_ID=? AND TXN_ID=?";
         jdbcTemplate.update(sql, m.getPayType(), m.getNdbPrice(), m.getNdbAmount(),
                 m.getWhereTo(), m.getExtAddr(), m.isConfirmed(), new Timestamp(m.getCreatedAt()),
                 new Timestamp(m.getConfirmedAt()), m.getPaymentIntentId(), m.getCode(), m.getCryptoType(),
-                m.getCryptoPrice(), m.getCryptoAmount(), m.getUserId(), m.getTxnId());
+                m.getCryptoAmount(), m.getUserId(), m.getTxnId());
         return m;
     }
 

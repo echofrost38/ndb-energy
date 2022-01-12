@@ -20,8 +20,8 @@ public class CryptoTransaction {
     private int userId;
     private String code;
 
-    private long amount; // usd
-    private long cryptoAmount;
+    private String amount; // usd
+    private String cryptoAmount;
     private String cryptoType;
 
     private int status;
@@ -29,7 +29,7 @@ public class CryptoTransaction {
     private String createdAt;
     private String updatedAt;
 
-    public CryptoTransaction(String txnId, int roundId, int userId, String code, long amount, long cryptoAmount,
+    public CryptoTransaction(String txnId, int roundId, int userId, String code, String amount, String cryptoAmount,
             String cryptoType, String createdAt) {
         this.code = code;
         this.txnId = txnId;

@@ -74,7 +74,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	@PreAuthorize("isAuthenticated()")
 	public CryptoPayload createCryptoPayment(
 		int roundId, 
-		long amount
+		String amount
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
@@ -83,16 +83,16 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public CryptoTransaction getCryptoTransactionByCode(String code) {
-		return cryptoService.getTransactionById(code);
+		return cryptoService.getTransactionByCode(code);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactionByAdmin(int userId) {
+	public List<CryptoTransaction> getBidCryptoTransactionByAdmin(int userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<CryptoTransaction> getCryptoTransactionByUser() {
+	public List<CryptoTransaction> getBidCryptoTransactionByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 		return cryptoService.getTransactionByUser(userId);

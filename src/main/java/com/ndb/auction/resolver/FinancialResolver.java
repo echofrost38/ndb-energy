@@ -58,7 +58,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
             throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
         }
         
-        DirectSale directSale = directSaleService.createNewDirectSale(userId, price, amount, whereTo, extAddr);
+        DirectSale directSale = directSaleService.createNewDirectSale(userId, String.valueOf(price), String.valueOf(amount), whereTo, extAddr);
         if(directSale == null) {
             throw new BadRequestException("We cannot make the direct sale.");
         }

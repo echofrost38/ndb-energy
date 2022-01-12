@@ -110,11 +110,6 @@ public class AuctionService extends BaseService {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 
-		TaskRunner taskRunner = new TaskRunner();
-		BroadcastNotification broadcastNotification = new BroadcastNotification();
-		taskRunner.addNewTask(broadcastNotification);
-		taskRunner.run();
-
 		notificationService.sendNotification(
 				userDetails.getId(),
 				Notification.N_AUCTION_START,

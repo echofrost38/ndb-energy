@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jnr.posix.Crypt;
+
 /**
  * TODOs
  * 1. processing lack of payment!!!
@@ -63,7 +65,7 @@ public class CryptoController extends BaseController {
             if (payments.getStatus().equals("CONFIRMED")) {
                 String code = data.getCode();
 
-                CryptoTransaction txn = cryptoService.getTransactionById(code);
+                CryptoTransaction txn = cryptoService.getTransactionByCode(code);
 
                 Map<String, CoinbasePricing> paymentValues = payments.getValue();
 
@@ -90,16 +92,14 @@ public class CryptoController extends BaseController {
                 }
 
                 String cryptoType = cryptoPricing.getCurrency();
-                long cryptoAmount = Long.parseLong(cryptoPricing.getAmount());
-
-                txn.setCryptoAmount(cryptoAmount);
-                txn.setCryptoType(cryptoType);
-                txn.setStatus(CryptoTransaction.CONFIRMED);
-                cryptoService.updateTransaction(txn);
+                String cryptoAmount = cryptoPricing.getAmount();
+                cryptoService.updateTransaction(code, CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);
 
                 // wallet update confirmed amount make hold
                 User user = userService.getUserById(txn.getUserId());
-                userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
+                
+                // Change crypto Hold amount!!!!!!!!!!!!!!!
+                // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
 
                 // send notification to user for payment result!!
                 notificationService.sendNotification(

@@ -55,7 +55,7 @@ public class BroadcastNotification implements BackgroundTask {
                 mailService.sendNormalEmail(user, title, msg);
             } catch (Exception e) {
             }
-            
+
         }
     }
 

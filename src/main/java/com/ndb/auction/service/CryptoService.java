@@ -79,7 +79,7 @@ public class CryptoService extends BaseService {
         return Integer.parseInt(objs.getPrice());
     }
 
-    public CryptoPayload createNewPayment(int roundId, int userId, long amount) {
+    public CryptoPayload createNewPayment(int roundId, int userId, String amount) {
         
         // round existing
         Auction round = auctionDao.getAuctionById(roundId);
@@ -110,32 +110,31 @@ public class CryptoService extends BaseService {
         String txnId = resBody.getId();
         String code = resBody.getCode();
         String createdAt = resBody.getCreated_at();
-        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, 0, null, createdAt);
-        cryptoDao.createNewPayment(tx);
+        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, "0", null, createdAt);
+        cryptoDao.insert(tx);
         
         CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());
         
         return payload;
     }
 
-    public CryptoTransaction getTransactionById(String id) {
-        return cryptoDao.getTransactionById(id);
+    public CryptoTransaction getTransactionByCode(String code) {
+        return cryptoDao.selectByCode(code);
     }
 
     public List<CryptoTransaction> getTransactionByUser(int userId) {
-        return cryptoDao.getTransactionByUser(userId);
+        return cryptoDao.selectByUserId(userId);
     }
 
     public List<CryptoTransaction> getTransactionByRound(int roundId) {
-        return cryptoDao.getTransactionByRound(roundId);
+        return cryptoDao.selectByRoundId(roundId);
     }
 
     public List<CryptoTransaction> getTransaction(int roundId, int userId) {
         return cryptoDao.getTransaction(roundId, userId);
     }
 
-    public CryptoTransaction updateTransaction(CryptoTransaction tx) {
-        cryptoDao.updateCryptoTransaction(tx);
-        return tx;
+    public int updateTransaction(String code, int status, String cryptoAmount, String cryptoType) {
+        return cryptoDao.updateTransactionStatus(code, status, cryptoAmount, cryptoType);
     }
 }

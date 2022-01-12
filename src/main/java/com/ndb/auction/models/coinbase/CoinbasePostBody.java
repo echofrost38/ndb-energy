@@ -11,13 +11,13 @@ public class CoinbasePostBody {
             String name,
             String description,
             String pricingType,
-            long price) {
+            String price) {
         this.name = name;
         this.description = description;
         this.pricing_type = pricingType;
         this.local_price = new CoinbasePricing();
         local_price.setCurrency("usd");
-        local_price.setAmount(String.valueOf(price));
+        local_price.setAmount(price);
     }
 
     public String getName() {

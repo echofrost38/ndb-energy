@@ -79,8 +79,10 @@ public class FinancialController extends BaseController {
                 PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
                 Long received = paymentIntent.getAmountReceived();
                 DirectSale directSale = directSaleService.getDirectSaleByPayment(paymentIntent.getId());
-                long amount = directSale.getNdbAmount() * directSale.getNdbPrice();
-
+                double ndbPrice = Double.valueOf(directSale.getNdbPrice());
+                double ndbAmount = Double.valueOf(directSale.getNdbAmount());
+                double amount = ndbPrice * ndbAmount; 
+                
                 // decimals
                 Long lAmount = Double.valueOf(amount * 100).longValue();
                 if (received < lAmount) {
@@ -148,13 +150,16 @@ public class FinancialController extends BaseController {
                 if (tx == null) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
-                long payAmount = tx.getNdbAmount() * tx.getNdbPrice();
 
+                double ndbPrice = Double.valueOf(tx.getNdbPrice());
+                double ndbAmount = Double.valueOf(tx.getNdbAmount());
+                double payAmount = ndbPrice * ndbAmount; 
+                
                 Map<String, CoinbasePricing> paymentValues = payments.getValue();
                 CoinbasePricing cryptoPricing = paymentValues.get("crypto");
                 CoinbasePricing usdPricing = paymentValues.get("local");
 
-                long usdAmount = Integer.parseInt(usdPricing.getAmount());
+                double usdAmount = Double.valueOf(usdPricing.getAmount());
                 if (payAmount > usdAmount) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
@@ -162,7 +167,7 @@ public class FinancialController extends BaseController {
                 tx.setConfirmedAt(System.currentTimeMillis());
                 tx.setConfirmed(true);
                 tx.setCryptoType(cryptoPricing.getCurrency());
-                tx.setCryptoAmount(Integer.parseInt(cryptoPricing.getAmount()));
+                tx.setCryptoAmount(cryptoPricing.getAmount());
                 directSaleService.updateDirectSale(tx);
 
                 // update Tier Setting!!!!

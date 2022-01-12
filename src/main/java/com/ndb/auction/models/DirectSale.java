@@ -24,8 +24,8 @@ public class DirectSale extends BaseModel {
 
     // stripe and coinbase, ndb wallet
     private int payType;
-    private long ndbPrice;
-    private long ndbAmount;
+    private String ndbPrice;
+    private String ndbAmount;
     private int whereTo;
 
     private String extAddr;
@@ -41,14 +41,13 @@ public class DirectSale extends BaseModel {
     // for coinbase
     private String code;
     private String cryptoType;
-    private long cryptoPrice;
-    private long cryptoAmount;
+    private String cryptoAmount;
 
     public DirectSale(
         int userId,
         String txnId,
-        long ndbPrice,
-        long ndbAmount,
+        String ndbPrice,
+        String ndbAmount,
         int whereTo,
         String extAddr
     ) {

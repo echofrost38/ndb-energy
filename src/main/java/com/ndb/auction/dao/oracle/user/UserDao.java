@@ -3,6 +3,7 @@ package com.ndb.auction.dao.oracle.user;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +36,9 @@ public class UserDao extends BaseOracleDao {
 		m.setName(rs.getString("NAME"));
 		m.setCountry(rs.getString("COUNTRY"));
 		m.setPhone(rs.getString("PHONE"));
-		m.setBirthday(rs.getLong("BIRTHDAY"));
-		m.setRegDate(rs.getLong("REG_DATE"));
-		m.setLastLoginDate(rs.getLong("LAST_LOGIN_DATE"));
+		m.setBirthday(rs.getTimestamp("BIRTHDAY").getTime());
+		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
+		m.setLastLoginDate(rs.getTimestamp("LAST_LOGIN_DATE").getTime());
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
 		m.setTierPoint(rs.getLong("TIER_POINT"));
 		m.setProvider(rs.getString("PROVIDER"));
@@ -159,9 +160,9 @@ public class UserDao extends BaseOracleDao {
 	public int insert(User m) {
 		String sql = "INSERT INTO TBL_USER(ID, EMAIL, PASSWORD, NAME, COUNTRY, PHONE, BIRTHDAY, REG_DATE, LAST_LOGIN_DATE, LAST_PASSWORD_CHANGE_DATE, "
 				+ "ROLE, TIER_LEVEL, TIER_POINT, PROVIDER, PROVIDER_ID, NOTIFY_SETTING, DELETED)"
-				+ "VALUES(SEQ_USER.NEXTVAL,?,?,?,?,?,SYSDATE,SYSDATE,SYSDATE,?,?,?,?,?,?,?)";
+				+ "VALUES(SEQ_USER.NEXTVAL,?,?,?,?,?,?,SYSDATE,SYSDATE,SYSDATE,?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(sql, m.getEmail(), m.getPassword(), m.getName(), m.getCountry(), m.getPhone(),
-				m.getBirthday(), m.getLastLoginDate(), m.getRoleString(), m.getTierLevel(), m.getTierPoint(), m.getProvider(),
+		m.getBirthday()==null?null:new Timestamp(m.getBirthday()),  m.getRoleString(), m.getTierLevel(), m.getTierPoint(), m.getProvider(),
 				m.getProviderId(), m.getNotifySetting(), m.getDeleted());
 	}
 

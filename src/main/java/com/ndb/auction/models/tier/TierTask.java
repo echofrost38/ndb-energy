@@ -31,8 +31,15 @@ public class TierTask {
         this.staking = new ArrayList<>();
     }
 
+    public String getAuctionsString() {
+        List<String> list=new ArrayList<String>();
+        for(Integer i:this.auctions)
+            list.add(i.toString());
+        return String.join(AUCTION_SEPARATOR, list);
+    }
+
     public void setAuctionsByString(String input) {
-        String[] array = input.split(",");
+        String[] array = input.split(AUCTION_SEPARATOR);
         List<Integer> list = new ArrayList<>();
         for (String s : array) {
             try {

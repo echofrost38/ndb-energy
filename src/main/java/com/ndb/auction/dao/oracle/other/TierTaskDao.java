@@ -43,8 +43,8 @@ public class TierTaskDao extends BaseOracleDao {
 		String sql = "MERGE INTO TBL_TIER_TASK USING DUAL ON (USER_ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET VERIFICATION=?, WALLET=?, AUCTIONS=?, DIRECT=?"
 				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, VERIFICATION, WALLET, AUCTIONS, DIRECT)"
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?)";
-		return jdbcTemplate.update(sql, m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctions(),
+				+ "VALUES(?,?,?,?,?)";
+		return jdbcTemplate.update(sql, m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctionsString(),
 				m.getDirect(), m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctions(), m.getDirect());
 	}
 

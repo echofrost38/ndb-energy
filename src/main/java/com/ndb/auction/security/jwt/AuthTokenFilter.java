@@ -1,7 +1,6 @@
 package com.ndb.auction.security.jwt;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

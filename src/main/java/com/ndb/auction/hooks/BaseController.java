@@ -17,7 +17,6 @@ import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
-import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.TierTaskService;
@@ -58,9 +57,6 @@ public class BaseController {
 
     @Autowired
     NotificationService notificationService;
-
-    @Autowired
-    SumsubService sumsubService;
 
     @Autowired
     FinancialDao financialDao;

@@ -1,13 +1,15 @@
 package com.ndb.auction.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.ndb.auction.background.BroadcastNotification;
+import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
-import com.ndb.auction.dao.oracle.other.NotificationTypeDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -18,6 +20,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class NotificationService {
 
+    private Map<String, Integer> typeMap;
+
+    public NotificationService() {
+        typeMap = new HashMap<String, Integer>();
+        typeMap.put("BID RANKING UPDATED", 0);
+        typeMap.put("NEW ROUND STARTED", 1);
+        typeMap.put("ROUND FINISHED", 2);
+        typeMap.put("BID CLOSED", 3);
+        typeMap.put("PAYMENT RESULT", 4);
+        typeMap.put("KYC VERIFIED", 5);
+    }
+
     @Autowired
     public UserDao userDao;
 
@@ -25,61 +39,17 @@ public class NotificationService {
     public NotificationDao notificationDao;
 
     @Autowired
-    public NotificationTypeDao notificationTypeDao;
-
-    @Autowired
     private SMSService smsService;
 
     @Autowired
     public MailService mailService;
 
-    // for notificaion type Cache
-    private List<NotificationType> typeList;
+    @Autowired
+    private TaskRunner taskRunner;
 
-    private void clearChache() {
-        typeList.clear();
-    }
-
-    private synchronized void buildCache() {
-        clearChache();
-        this.typeList = notificationTypeDao.getAllNotificationTypes();
-    }
-
-    public NotificationService() {
-        this.typeList = null;
-    }
-
-    public List<NotificationType> getAllNotificationTypes() {
-        if(this.typeList == null) {
-            buildCache();
-        }
-        return this.typeList;
-    }
-
-    public String addNotificationType(String name) {
-        notificationTypeDao.create(name);
-        buildCache();
-        return name;
-    }
-
-    public int deleteNotificationType(int id) {
-        int result = notificationTypeDao.deleteById(id);
-        buildCache();
-        return result;
-    }
-
-    public NotificationType updateNotificationType(Integer id, String name) {
-        NotificationType notificationType = new NotificationType();
-        notificationType.setId(id);
-        notificationType.setTName(name);
-        notificationTypeDao.updateNotificationType(notificationType);
-        buildCache();
-        return notificationType;
-    }
-
-    public NotificationType getNotificationByName(String name) {
-        return notificationTypeDao.getNotificationTypeByName(name);
-    }
+    public Map<String, Integer> getTypeMap() {
+        return this.typeMap;
+    } 
 
     public Notification setNotificationRead(int nId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
@@ -95,8 +65,6 @@ public class NotificationService {
         int userId = userDetails.getId();
         return notificationDao.getUnreadNotifications(userId);
     }
-
-    //////////////////////// version 2 ///////////////////////////
 
     public void sendNotification(int userId, int type, String title, String msg) {
         User user = userDao.selectById(userId);
@@ -116,6 +84,12 @@ public class NotificationService {
             mailService.sendNormalEmail(user, title, msg);
         } catch (Exception e) {
         }
+    }
+
+    public void broadcastNotification(int type, String title, String msg) {
+        Notification m = new Notification( 0, type, title, msg);
+        BroadcastNotification broadcast = new BroadcastNotification(m);
+        taskRunner.addNewTask(broadcast);
     }
 
     public Notification addNewNotification(int userId, int type, String title, String msg) {
@@ -155,15 +129,4 @@ public class NotificationService {
     public List<Notification> getUnreadNotifications(int userId) {
         return notificationDao.getUnreadNotifications(userId);
     }
-
-    public NotificationType addNewNotificationType(int nType, String tName, boolean broadcast) {
-        NotificationType type2 = new NotificationType(nType, tName, broadcast);
-        notificationTypeDao.addNewNotificationType(type2);
-        return type2;
-    }
-
-    public List<NotificationType> getNotificationTypes() {
-        return notificationTypeDao.getAllNotificationTypes();
-    }
-
 }

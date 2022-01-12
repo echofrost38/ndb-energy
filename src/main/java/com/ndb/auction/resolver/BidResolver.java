@@ -26,9 +26,9 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int userId = userDetails.getId();
-		if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
-			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
-		}
+		// if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
+		// 	throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		// }
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 	
@@ -40,9 +40,9 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int id = userDetails.getId();
-		if(!sumsubService.checkThreshold(id, "bid", tokenAmount * tokenPrice)) {
-			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
-		}
+		// if(!sumsubService.checkThreshold(id, "bid", tokenAmount * tokenPrice)) {
+		// 	throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		// }
 		return bidService.updateBid(id, roundId, tokenAmount, tokenPrice);
 	}
 	

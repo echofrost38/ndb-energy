@@ -18,7 +18,6 @@ import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Wallet;
@@ -279,11 +278,10 @@ public class BidService extends BaseService {
 		auctionDao.updateAuctionStats(currentRound);
 
 		// send Notification
-		NotificationType notifyType = notificationService.getNotificationByName("BID_RANKING_UPDATED");
 		notificationService.sendNotification(
 				userId,
-				notifyType.getId(),
-				"Bid Ranking Updated",
+				Notification.BID_RANKING_UPDATED,
+				"BID RANKING UPDATED",
 				"Bid ranking is updated, please check your bid ranking");
 	}
 
@@ -341,11 +339,11 @@ public class BidService extends BaseService {
 					Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
 
 					long hold = wallet.getHolding();
-					if (hold > cryptoAmount) {
-						userWalletService.releaseHold(userId, cryptoType, cryptoAmount);
-					} else {
-						continue;
-					}
+					// if (hold > cryptoAmount) {
+					// 	userWalletService.releaseHold(userId, cryptoType, cryptoAmount);
+					// } else {
+					// 	continue;
+					// }
 				}
 			}
 
@@ -403,25 +401,24 @@ public class BidService extends BaseService {
 				}
 
 				if (totalToken < token) {
-					userWalletService.addFreeAmount(userId, "NDB", totalToken);
+					// userWalletService.addFreeAmount(userId, "NDB", totalToken);
 					totalToken = 0;
 				} else {
-					userWalletService.addFreeAmount(userId, "NDB", totalToken);
+					// userWalletService.addFreeAmount(userId, "NDB", totalToken);
 					totalToken -= token;
 				}
 
 			}
 
 			// userDao.updateUser(user); //TODO: why update?
+			notificationService.sendNotification(
+				bid.getUserId(), 
+				Notification.BID_CLOSED, 
+				"BID CLOSED", 
+				String.format("Your Bid closed. You %s", bid.getStatus() == Bid.WINNER ? "won!" : "failed")
+			);
 
-			broadcast notification
-			// send notification
-			// NotificationType notifyType = notificationService.getNotificationByName("BID_CLOSED");
-			// notificationService.sendNotification(
-			// 		userId,
-			// 		notifyType.getId(),
-			// 		"Bid Closed",
-			// 		"Please check you bid result");
+			
 		}
 	}
 

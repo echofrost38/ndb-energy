@@ -1,6 +1,7 @@
 package com.ndb.auction.service;
 
 import com.google.gson.Gson;
+import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
 import com.ndb.auction.dao.oracle.ShuftiDao;
@@ -49,6 +50,9 @@ public class BaseService {
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
 
     protected static Gson gson = new Gson();
+
+    @Autowired
+    TaskRunner taskRunner;
 
     @Autowired
     ScheduledTasks schedule;

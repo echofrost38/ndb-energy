@@ -49,17 +49,6 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
     public String createApplicant(String country, String docType, String levelName) {
-    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-    	try {
-			String result = sumsubService.createApplicant(userId, levelName);
-			if(result == null) return "Failed";
-		} catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-			e.printStackTrace();
-			return "Failed";
-		}
-    	// User user = userService.getUserById(userId);
-    	// userService.updateUser(user);    //TODO: why select and update?
     	
     	return "Success";
     }
@@ -68,13 +57,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     public String upgradeApplicant(String levelName) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        try {
-			String result = sumsubService.createApplicant(userId, levelName);
-			if(result == null) return "Failed";
-		} catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-			e.printStackTrace();
-			return "Failed";
-		}
+   
         return "Success";
     }
     
@@ -82,56 +65,39 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     public String upload(String docType, String country, Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        List<Applicant> appList = sumsubService.getApplicantsByUserId(userId);
-        if(appList.size() == 0) {
-        	return null;
-        }
-        String applicantId = appList.get(0).getId();
-    	String imageId = sumsubService.addDocument(applicantId, country, docType, file);
-    	return imageId;
+    	return "";
     }
     
     @PreAuthorize("isAuthenticated()")
     public String uploadSelfie(String country, Part selfie) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        List<Applicant> appList = sumsubService.getApplicantsByUserId(userId);
-        if(appList.size() == 0) {
-        	return null;
-        }
-        String applicantId = appList.get(0).getId();
-        String imageId = sumsubService.addDocument(applicantId, country, "SELFIE", selfie);
-    	return imageId;
+    	return "imageId";
     }
     
     @PreAuthorize("isAuthenticated()")
     public String requestCheck()  throws InvalidKeyException, NoSuchAlgorithmException, IOException {
     	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        String result = sumsubService.requestChecking(userId);
-    	return result;
+    	return "result";
     }
     
     @PreAuthorize("isAuthenticated()")
     public String gettingApplicantData(String applicantId) {
     	String levelName = "";
-    	try {
-			levelName = sumsubService.gettingApplicantData(applicantId).getReview().getLevelName();
-		} catch (InvalidKeyException | NoSuchAlgorithmException | IOException | NullPointerException e) {
-			e.printStackTrace();
-			return "";
-		}
     	return levelName;
     }
     
     // Admin
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public KYCSetting updateKYCSetting(String kind, double withdraw, double deposit, double bid, double direct) {
-        return sumsubService.updateKYCSetting(kind, withdraw, deposit, bid, direct);
+        // return sumsubService.updateKYCSetting(kind, withdraw, deposit, bid, direct);
+        return null;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<KYCSetting> getKYCSetting() {
-        return sumsubService.getKYCSettings();
+        // return sumsubService.getKYCSettings();
+        return null;
     }
 }

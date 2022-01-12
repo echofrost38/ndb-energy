@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gson.Gson;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.CryptoTransaction;
-import com.ndb.auction.models.NotificationType;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
@@ -100,10 +100,9 @@ public class CryptoController extends BaseController {
                 // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
 
                 // send notification to user for payment result!!
-                NotificationType notifyType = notificationService.getNotificationByName("PAYMENT_CONFIRMED");
                 notificationService.sendNotification(
                         user.getId(),
-                        notifyType.getId(),
+                        Notification.PAYMENT_RESULT,
                         "PAYMENT CONFIRMED",
                         "You have deposited " + cryptoAmount + cryptoType + ".");
 

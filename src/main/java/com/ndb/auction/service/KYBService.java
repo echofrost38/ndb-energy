@@ -16,14 +16,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class KYBService extends BaseService {
 
-    private AmazonS3 s3;
     private static final String BUCKET_NAME = "auctionupload";
 
     @Autowired
     private UserKybDao userKybDao;
 
-    public KYBService(AmazonS3 s3) {
-        this.s3 = s3;
+    public KYBService() {
     }
 
     public UserKyb getByUserId(int userId) {
@@ -72,14 +70,14 @@ public class KYBService extends BaseService {
     }
 
     private boolean uploadFileS3(String key, Part file) {
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(file.getSize());
-            s3.putObject(BUCKET_NAME, key, file.getInputStream(), metadata);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ObjectMetadata metadata = new ObjectMetadata();
+        //     metadata.setContentLength(file.getSize());
+        //     // s3.putObject(BUCKET_NAME, key, file.getInputStream(), metadata);
+        //     return true;
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
         return false;
     }
 

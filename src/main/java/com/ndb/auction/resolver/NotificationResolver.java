@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 @Component
@@ -29,32 +28,6 @@ public class NotificationResolver extends BaseResolver
     public List<Notification> getAllUnReadNotifications() {
         return notificationService.getAllUnReadNotifications();
     }
-
-    /*
-     * Notification Type
-     */
-
-    @PreAuthorize("isAuthenticated()")
-    public List<NotificationType> getAllNotificationTypes() {
-        return notificationService.getAllNotificationTypes();
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String addNotificationType(String name) {
-        return notificationService.addNotificationType(name);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public int deleteNotificationType(Integer id) {
-        return notificationService.deleteNotificationType(id);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public NotificationType updateNotificationType(Integer id, String name) {
-        return notificationService.updateNotificationType(id, name);
-    }
-
-    ///////////////////////////// version 2 ////////////////////////
 
     public Notification addNewNotification(int userId, int nType, String title, String msg) {
         return notificationService.addNewNotification(userId, nType, title, msg);
@@ -92,16 +65,6 @@ public class NotificationResolver extends BaseResolver
                 .getPrincipal();
         int userId = userDetails.getId();
         return notificationService.getUnreadNotifications(userId);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public NotificationType addNewNotificationType2(int nType, String tName, boolean broadcast) {
-        return notificationService.addNewNotificationType(nType, tName, broadcast);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<NotificationType> getNotificationTypes2() {
-        return notificationService.getNotificationTypes();
     }
 
     @PreAuthorize("isAuthenticated()")

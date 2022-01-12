@@ -86,7 +86,7 @@ public class NotificationDao extends BaseOracleDao {
 	public Notification setReadFlag(int id, int userId) {
 		String sql = "UPDATE TBL_NOTIFICATION SET READ=? WHERE ID=? AND USER_ID=?";
 		if (jdbcTemplate.update(sql, id, userId) > 0)
-			return getNotification(id);
+		return getNotification(id);
 		return null;
 	}
 

@@ -96,7 +96,7 @@ public class FinancialController extends BaseController {
 
                 // real moving of NDB
                 if (directSale.getWhereTo() == DirectSale.INTERNAL) {
-                    userWalletService.addFreeAmount(directSale.getUserId(), "NDB", directSale.getNdbAmount());
+                    // userWalletService.addFreeAmount(directSale.getUserId(), "NDB", directSale.getNdbAmount());
                 } else if (directSale.getWhereTo() == DirectSale.EXTERNAL) {
 
                 } else {
@@ -104,7 +104,7 @@ public class FinancialController extends BaseController {
                 }
 
                 // User Tier!!
-                addDirectSalepoint(directSale.getUserId(), amount);
+                // addDirectSalepoint(directSale.getUserId(), amount);
 
                 break;
             }
@@ -171,12 +171,12 @@ public class FinancialController extends BaseController {
                 directSaleService.updateDirectSale(tx);
 
                 // update Tier Setting!!!!
-                addDirectSalepoint(tx.getUserId(), payAmount);
+                // addDirectSalepoint(tx.getUserId(), payAmount);
 
                 // Real moving of NDB
                 if (tx.getWhereTo() == DirectSale.INTERNAL) {
                     // add free ndb into ndb wallet
-                    userWalletService.addFreeAmount(tx.getUserId(), "NDB", tx.getNdbAmount());
+                    // userWalletService.addFreeAmount(tx.getUserId(), "NDB", tx.getNdbAmount());
                 } else if (tx.getWhereTo() == DirectSale.EXTERNAL) {
                     //
                 } else {

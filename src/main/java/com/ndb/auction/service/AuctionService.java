@@ -2,17 +2,13 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import com.ndb.auction.background.BroadcastNotification;
-import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 @Service
 @RequiredArgsConstructor
@@ -104,17 +100,13 @@ public class AuctionService extends BaseService {
 			nextRound.setStatus(Auction.COUNTDOWN);
 			auctionDao.updateAuctionStats(nextRound);
 		}
-		// send notification
-		System.out.println("Auction Started, Please send me as Notification!");
 
-		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
-
-		notificationService.sendNotification(
-				userDetails.getId(),
-				Notification.N_AUCTION_START,
-				"Auction Started",
-				"Auction Started please bid!");
+		// create new background tasks
+		String sRound = String.valueOf(target.getRound());
+		notificationService.broadcastNotification(
+			Notification.NEW_ROUND_STARTED, 
+			"NEW ROUND STARTED", 
+			"Auction Round " + sRound + " has been started.");
 
 		return nextRound;
 	}
@@ -127,14 +119,9 @@ public class AuctionService extends BaseService {
 		}
 		auctionDao.endAuction(target);
 
-		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
-
-		notificationService.sendNotification(
-				userDetails.getId(),
-				Notification.N_AUCTION_END,
-				"Auction Finished",
-				"Please check you bid results");
+		String msg = String.format("ROUND %d FINISHED.", target.getRound());
+		String title = "ROUND FINISHED";
+		notificationService.broadcastNotification(Notification.ROUND_FINISHED, title, msg);
 
 		return target;
 	}

@@ -24,7 +24,6 @@ import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
-import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.TokenAssetService;
 
 public class BaseResolver {
@@ -58,9 +57,6 @@ public class BaseResolver {
 
 	@Autowired
 	CryptoService cryptoService;
-
-	@Autowired
-	SumsubService sumsubService;
 
 	@Autowired
 	NotificationService notificationService;

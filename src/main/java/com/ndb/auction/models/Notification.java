@@ -12,6 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Notification extends BaseModel {
 
+    public static final int BID_RANKING_UPDATED = 0;
+    public static final int NEW_ROUND_STARTED = 1;
+    public static final int ROUND_FINISHED = 2;
+    public static final int BID_CLOSED = 3;
+    public static final int PAYMENT_RESULT = 4;
+    public static final int KYC_VERIFIED = 5;
+
     private int userId;
     private Long timeStamp;
     private int nType;

@@ -109,8 +109,7 @@ public class CryptoService extends BaseService {
         CoinbaseBody resBody = res.getData();
         String txnId = resBody.getId();
         String code = resBody.getCode();
-        String createdAt = resBody.getCreated_at();
-        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, "0", null, createdAt);
+        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, "0", null);
         cryptoDao.insert(tx);
         
         CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());

@@ -30,6 +30,8 @@ public class CryptoPaymentDao extends BaseOracleDao {
 		m.setCryptoAmount(rs.getString("CRYPTO_AMOUNT"));
 		m.setStatus(rs.getInt("STATUS"));
 		m.setCode(rs.getString("CODE"));
+		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
+		m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		return m;
 	}
 

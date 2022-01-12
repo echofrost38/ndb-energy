@@ -26,11 +26,11 @@ public class CryptoTransaction {
 
     private int status;
 
-    private String createdAt;
-    private String updatedAt;
+    private long createdAt;
+    private long updatedAt;
 
     public CryptoTransaction(String txnId, int roundId, int userId, String code, String amount, String cryptoAmount,
-            String cryptoType, String createdAt) {
+            String cryptoType) {
         this.code = code;
         this.txnId = txnId;
         this.roundId = roundId;
@@ -38,7 +38,6 @@ public class CryptoTransaction {
         this.amount = amount;
         this.cryptoAmount = cryptoAmount;
         this.cryptoType = cryptoType;
-        this.createdAt = createdAt;
         this.status = INITIATED;
     }
 

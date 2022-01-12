@@ -1,5 +1,6 @@
 package com.ndb.auction.models.user;
 
+import java.sql.Timestamp;
 import java.util.Set;
 
 import com.ndb.auction.models.BaseModel;
@@ -62,6 +63,18 @@ public class User extends BaseModel {
 
 	public User removeRole(String value) {
 		this.role.remove(value);
+		return this;
+	}
+
+	public Timestamp getBirthdayTimestamp() {
+		if (this.birthday == null || this.birthday == 0)
+			return null;
+		return new Timestamp(this.birthday);
+	}
+
+	public User setBirthdayTimestamp(Timestamp timestamp) {
+		if (timestamp != null)
+			this.birthday = timestamp.getTime();
 		return this;
 	}
 

@@ -45,7 +45,7 @@ public class TierTaskDao extends BaseOracleDao {
 				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, VERIFICATION, WALLET, AUCTIONS, DIRECT)"
 				+ "VALUES(?,?,?,?,?)";
 		return jdbcTemplate.update(sql, m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctionsString(),
-				m.getDirect(), m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctions(), m.getDirect());
+				m.getDirect(), m.getUserId(), m.getVerification(), m.getWallet(), m.getAuctionsString(), m.getDirect());
 	}
 
 }

@@ -48,11 +48,11 @@ public class NdbWalletService {
 
     // Token contract information
     private final Web3j localNet = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
-    private final Web3j bep20net = Web3j.build(new HttpService("https://bsc-dataseed.binance.org/"));
-    private final Web3j erc20net = Web3j.build(new HttpService("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"));
+    // private final Web3j bep20net = Web3j.build(new HttpService("https://bsc-dataseed.binance.org/"));
+    // private final Web3j erc20net = Web3j.build(new HttpService("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"));
 
-    private final String usdtBep20 = "0x55d398326f99059ff775485246999027b3197955";
-    private final String bnbBep20 = "0x55d398326f99059ff775485246999027b3197955";  
+    // private final String usdtBep20 = "0x55d398326f99059ff775485246999027b3197955";
+    // private final String bnbBep20 = "0x55d398326f99059ff775485246999027b3197955";  
     
     private final String localToken = "0x67ecf1728A482D4899B57bEd4460152c50c80d54";  
     
@@ -294,7 +294,7 @@ public class NdbWalletService {
             WalletFile wallet = Wallet.createLight(seed, ecKeyPair);
             address = wallet.getAddress(); 
 
-            Credentials credentials = Credentials.create(password);
+            // Credentials credentials = Credentials.create(password);
             
             System.out.println(sPrivatekeyInHex);
 
@@ -309,7 +309,7 @@ public class NdbWalletService {
 
     @SuppressWarnings("deprecation")
     public BigInteger getWalletBalance(String token, String network, String address) {
-        String seed = UUID.randomUUID().toString();
+        // String seed = UUID.randomUUID().toString();
         try {
             // ECKeyPair ecKeyPair = Keys.createEcKeyPair();
             

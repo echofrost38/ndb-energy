@@ -1,7 +1,5 @@
 package com.ndb.auction.models;
 
-import com.ndb.auction.dao.oracle.Column;
-
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
+import com.ndb.auction.background.BroadcastNotification;
+import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
@@ -107,6 +109,11 @@ public class AuctionService extends BaseService {
 
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
+
+		TaskRunner taskRunner = new TaskRunner();
+		BroadcastNotification broadcastNotification = new BroadcastNotification();
+		taskRunner.addNewTask(broadcastNotification);
+		taskRunner.run();
 
 		notificationService.sendNotification(
 				userDetails.getId(),

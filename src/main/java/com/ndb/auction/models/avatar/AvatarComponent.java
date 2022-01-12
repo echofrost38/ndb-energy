@@ -35,4 +35,8 @@ public class AvatarComponent {
 		this.left = left;
 	}
 
+	public void increasePurchase() {
+		this.purchased++;
+	}
+
 }

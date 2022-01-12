@@ -2,7 +2,6 @@ package com.ndb.auction.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.other.NotificationTypeDao;
@@ -12,7 +11,6 @@ import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -67,59 +65,6 @@ public class NotificationService {
             // do something here, since emission failed
             // log.info("Send to {} message is failed!", userId);
         }
-    }
-
-    /**
-     * create new payment and check confirm status
-     * 
-     * @param type  : Notification Type
-     * @param title : Notification Title
-     * @param msg   : Notification Content
-     * @return void
-     */
-    public void broadcast(Integer type, String title, String msg) {
-
-        Notification notification = new Notification(0, type, title, msg);
-        // notification.setBroadcast(true);
-
-        List<Notification> notifications = new ArrayList<>();
-
-        List<User> userlist = userDao.selectAll(null);
-        for (User user : userlist) {
-            Notification n = new Notification(user.getId(), type, title, msg);
-
-            // Here, check if user allowed this notification.
-            if (user.allowNotification(notification))
-                notifications.add(n);
-        }
-
-        // Save in DB
-        notificationDao.pushNewNotifications(notifications);
-
-        // Publish
-        EmitResult result = sink.tryEmitNext(notification);
-
-        if (result.isFailure()) {
-            // do something here, since emission failed
-            // log.info("Broadcast message is failed!");
-        }
-    }
-
-    public Publisher<Notification> getNotificationPublisher() {
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        int userId = userDetails.getId();
-        User user = userDao.selectById(userId);
-
-        return sink.asFlux().filter(p -> {
-            // log.info("notification userid : {}, current userid : {}", p.getUserId(),
-            // userid);
-            // return p.getUserId().equals(userid);
-            return p.isBroadcast()
-                    ? user.allowNotification(p)
-                    : p.getUserId() == userId;
-        });
     }
 
     public List<NotificationType> getAllNotificationTypes() {

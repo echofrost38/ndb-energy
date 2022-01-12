@@ -183,8 +183,9 @@ public class ProfileService extends BaseService {
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
 
-		// update component purchased ?
-		avatarComponentDao.updateAvatarComponents(purchasedComponents);
+		for (AvatarComponent avatarComponent : purchasedComponents) {
+			avatarComponentDao.updateAvatarComponent(avatarComponent);
+		}
 
 		return set;
 	}

@@ -1,13 +1,7 @@
 package com.ndb.auction.dao.oracle.other;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.models.Coin;
 import com.ndb.auction.models.CryptoTransaction;

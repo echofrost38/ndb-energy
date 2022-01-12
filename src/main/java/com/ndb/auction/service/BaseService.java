@@ -18,7 +18,6 @@ import com.ndb.auction.dao.oracle.other.DirectSaleDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.other.StripeTransactionDao;
-import com.ndb.auction.dao.oracle.other.SumsubDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -113,9 +112,6 @@ public class BaseService {
 
     @Autowired
     public NotificationService notificationService;
-
-    @Autowired
-    public SumsubDao sumsubDao;
 
     @Autowired
     public UserWalletService userWalletService;

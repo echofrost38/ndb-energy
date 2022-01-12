@@ -3,6 +3,9 @@ package com.ndb.auction.background;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class TaskRunner implements Runnable{
 
     private final static int MAX_QUEUE_SIZE = 10;

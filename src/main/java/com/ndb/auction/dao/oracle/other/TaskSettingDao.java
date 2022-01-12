@@ -2,15 +2,12 @@ package com.ndb.auction.dao.oracle.other;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.models.tier.TierTask;
 
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -28,19 +25,22 @@ public class TaskSettingDao extends BaseOracleDao {
 		return m;
 	}
 
-	// Task Setting
-	public TaskSetting addNewSetting(TaskSetting setting) {
-		dynamoDBMapper.save(setting);
-		return setting;
-	}
-
 	public TaskSetting updateSetting(TaskSetting setting) {
-		dynamoDBMapper.save(setting, updateConfig);
+		String sql = "UPDATE TBL_TASK_SETTING SET VERIFICATION=?, AUCTION=?, DIRECT=?, AUCTION=SYSDATE";
+		jdbcTemplate.update(sql, setting.getVerification(), setting.getAuction(), setting.getDirect());
 		return setting;
 	}
 
 	public TaskSetting getTaskSettings() {
-		return dynamoDBMapper.load(TaskSetting.class, "Setting");
+		String sql = "SELECT * FROM TBL_TASK_SETTING";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<TaskSetting>() {
+			@Override
+			public TaskSetting extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		});
 	}
 
 }

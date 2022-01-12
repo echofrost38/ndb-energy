@@ -5,6 +5,7 @@ import com.ndb.auction.security.TokenProvider;
 import com.ndb.auction.service.CustomOAuth2UserService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.exceptions.BadRequestException;
 import com.ndb.auction.models.user.AuthProvider;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,6 +44,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserSecurityService userSecurityService;
 
     @Autowired
     private TotpService totpService;
@@ -108,7 +113,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
         }
 
-        User user = userService.getUserByEmail(userPrincipal.getEmail(), false, true, false);
+        User user = userService.getUserByEmail(userPrincipal.getEmail());
         UserSecurity userSecurity;
 
         String type = "success";
@@ -132,14 +137,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // Save token on cache
             totpService.setTokenAuthCache(dataType, authentication);
 
-            Map<String, Boolean> methods = user.getTwoStep();
-
-            for (Map.Entry<String, Boolean> method : methods.entrySet()) {
-                String key = method.getKey();
-                Boolean value = method.getValue();
-
-                if (!value) continue;
-                data += "*" + key;
+            List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
+            
+            for (UserSecurity security : userSecurities) {
+                data += "*" + security.getAuthType();
             }
         }
 

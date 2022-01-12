@@ -17,13 +17,6 @@ public class TierTask {
 
     public static final String AUCTION_SEPARATOR = ",";
 
-    public TierTask(int userId) {
-        this.userId = userId;
-        this.verification = false;
-        this.auctions = new ArrayList<>();
-        this.staking = new ArrayList<>();
-    }
-
     private int userId;
     private Boolean verification;
     private long wallet;
@@ -31,7 +24,14 @@ public class TierTask {
     private long direct;
     private List<StakeHist> staking;
 
-    public void setAuctions(String input) {
+    public TierTask(int userId) {
+        this.userId = userId;
+        this.verification = false;
+        this.auctions = new ArrayList<>();
+        this.staking = new ArrayList<>();
+    }
+
+    public void setAuctionsByString(String input) {
         String[] array = input.split(",");
         List<Integer> list = new ArrayList<>();
         for (String s : array) {

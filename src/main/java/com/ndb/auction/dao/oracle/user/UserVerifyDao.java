@@ -50,14 +50,13 @@ public class UserVerifyDao extends BaseOracleDao {
 	}
 
 	public int insertOrUpdate(UserVerify m) {
-		String sql = "MERGE INTO TBL_USER_VERIFY USING DUAL ON (id=?)"
+		String sql = "MERGE INTO TBL_USER_VERIFY USING DUAL ON (ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET EMAIL_VERIFIED=?,PHONE_VERIFIED=?,KYC_VERIFIED=?,AML_VERIFIED=?,KYB_VERIFIED=?,UPDATE_DATE=SYSDATE"
 				+ "WHEN NOT MATCHED THEN INSERT(ID,EMAIL_VERIFIED,PHONE_VERIFIED,KYC_VERIFIED,AML_VERIFIED,KYB_VERIFIED,REG_DATE,UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.isEmailVerified(), m.isPhoneVerified(), m.isKycVerified(),
 				m.isAmlVerified(), m.isKybVerified(), m.getId(), m.isEmailVerified(), m.isPhoneVerified(),
-				m.isKycVerified(),
-				m.isAmlVerified(), m.isKybVerified());
+				m.isKycVerified(), m.isAmlVerified(), m.isKybVerified());
 	}
 
 	public int updateEmailVerified(int id, boolean value) {

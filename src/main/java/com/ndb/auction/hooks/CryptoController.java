@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gson.Gson;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.CryptoTransaction;
-import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import jnr.posix.Crypt;
 
 /**
  * TODOs
@@ -102,11 +100,12 @@ public class CryptoController extends BaseController {
                 // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
 
                 // send notification to user for payment result!!
+                NotificationType notifyType = notificationService.getNotificationByName("PAYMENT_CONFIRMED");
                 notificationService.sendNotification(
                         user.getId(),
-                        Notification.N_PAYMENT_RESULT,
-                        "Payment Result",
-                        "Please check you payment result");
+                        notifyType.getId(),
+                        "PAYMENT CONFIRMED",
+                        "You have deposited " + cryptoAmount + cryptoType + ".");
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             }

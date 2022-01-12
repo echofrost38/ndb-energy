@@ -18,6 +18,7 @@ import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Wallet;
@@ -278,9 +279,10 @@ public class BidService extends BaseService {
 		auctionDao.updateAuctionStats(currentRound);
 
 		// send Notification
+		NotificationType notifyType = notificationService.getNotificationByName("BID_RANKING_UPDATED");
 		notificationService.sendNotification(
 				userId,
-				Notification.N_BID_RANKING_UPDATED,
+				notifyType.getId(),
 				"Bid Ranking Updated",
 				"Bid ranking is updated, please check your bid ranking");
 	}
@@ -291,8 +293,8 @@ public class BidService extends BaseService {
 		Auction auction = auctionDao.getAuctionByRound(roundId);
 		List<AvatarSet> avatar = auctionAvatarDao.selectById(auction.getId());
 		List<AvatarComponent> avatarComponents = avatarComponentDao.getAvatarComponentsBySet(avatar);
-		long avatarToken = auction.getToken();
-		long totalToken = auction.getTotalToken();
+		double avatarToken = auction.getToken();
+		double totalToken = auction.getTotalToken();
 
 		// Assume all status already confirmed when new bid is placed
 		List<Bid> _bidList = bidDao.getBidListByRound(roundId);
@@ -329,11 +331,12 @@ public class BidService extends BaseService {
 					continue;
 				}
 				if (bid.getStatus() == Bid.WINNER) {
-					totalPrice += cryptoTransaction.getAmount();
+					String sAmount = cryptoTransaction.getAmount();
+					totalPrice += Long.valueOf(sAmount);
 				} else {
 					// hold -> release
 					String cryptoType = cryptoTransaction.getCryptoType();
-					long cryptoAmount = cryptoTransaction.getCryptoAmount();
+					String cryptoAmount = cryptoTransaction.getCryptoAmount();
 
 					Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
 
@@ -411,12 +414,14 @@ public class BidService extends BaseService {
 
 			// userDao.updateUser(user); //TODO: why update?
 
+			broadcast notification
 			// send notification
-			notificationService.sendNotification(
-					userId,
-					Notification.N_BID_CLOSED,
-					"Bid Closed",
-					"Please check you bid result");
+			// NotificationType notifyType = notificationService.getNotificationByName("BID_CLOSED");
+			// notificationService.sendNotification(
+			// 		userId,
+			// 		notifyType.getId(),
+			// 		"Bid Closed",
+			// 		"Please check you bid result");
 		}
 	}
 

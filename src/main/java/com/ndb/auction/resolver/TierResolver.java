@@ -6,6 +6,7 @@ import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
+import com.ndb.auction.service.TierTaskService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,9 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
     
     @Autowired
     private TierService tierService;
+
+    @Autowired
+    private TierTaskService tierTaskService;
 
     @Autowired
     private TaskSettingService taskSettingService;
@@ -45,7 +49,7 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting addNewSetting(TaskSetting setting) {
-        return taskSettingService.updateTaskSetting(setting);
+        return taskSettingService.addNewSetting(setting);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

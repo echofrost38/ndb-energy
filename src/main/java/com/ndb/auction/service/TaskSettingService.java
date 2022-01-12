@@ -23,6 +23,12 @@ public class TaskSettingService {
 		this.taskSetting = taskSettingDao.getTaskSettings();
 	}
 	
+	public TaskSetting addNewSetting(TaskSetting setting) {
+		taskSettingDao.addNewSetting(setting);
+		fillTaskSetting();
+		return this.taskSetting;
+	}
+
 	public TaskSetting updateTaskSetting(TaskSetting setting) {
 		taskSettingDao.updateSetting(setting);
 		fillTaskSetting();

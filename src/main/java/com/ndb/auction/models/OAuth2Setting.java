@@ -1,7 +1,5 @@
 package com.ndb.auction.models;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;

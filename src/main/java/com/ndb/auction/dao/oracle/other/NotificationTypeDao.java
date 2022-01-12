@@ -52,6 +52,18 @@ public class NotificationTypeDao extends BaseOracleDao {
 		}, id);
 	}
 
+	public NotificationType getNotificationTypeByName(String name) {
+		String sql = "SELECT * FROM TBL_NOTIFICATION_TYPE WHERE T_NAME=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<NotificationType>() {
+			@Override
+			public NotificationType extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, name);
+	}
+
 	public List<NotificationType> getAllNotificationTypes() {
 		String sql = "SELECT * FROM TBL_NOTIFICATION_TYPE ORDER BY ID";
 		return jdbcTemplate.query(sql, new RowMapper<NotificationType>() {

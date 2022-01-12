@@ -15,13 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import reactor.core.publisher.Sinks;
-import reactor.core.publisher.Sinks.EmitResult;
-
 @Component
 public class NotificationService {
-
-    final Sinks.Many<Notification> sink;
 
     @Autowired
     public UserDao userDao;
@@ -38,52 +33,52 @@ public class NotificationService {
     @Autowired
     public MailService mailService;
 
-    public NotificationService() {
-        this.sink = Sinks.many().multicast().onBackpressureBuffer();
+    // for notificaion type Cache
+    private List<NotificationType> typeList;
+
+    private void clearChache() {
+        typeList.clear();
     }
 
-    /**
-     * create new payment and check confirm status
-     * 
-     * @param type   : Notification Type
-     * @param title  : Notification Title
-     * @param msg    : Notification Content
-     * @param userId : Receiver ID
-     * @return void
-     */
-    public void send(Integer type, String title, String msg, int userId) {
+    private synchronized void buildCache() {
+        clearChache();
+        this.typeList = notificationTypeDao.getAllNotificationTypes();
+    }
 
-        Notification notification = new Notification(userId, type, title, msg);
-        notification.setUserId(userId);
-        // notification.setBroadcast(false);
-        notificationDao.addNewNotification(notification);
-
-        // Publish
-        EmitResult result = sink.tryEmitNext(notification);
-
-        if (result.isFailure()) {
-            // do something here, since emission failed
-            // log.info("Send to {} message is failed!", userId);
-        }
+    public NotificationService() {
+        this.typeList = null;
     }
 
     public List<NotificationType> getAllNotificationTypes() {
-        return notificationTypeDao.getAllNotificationTypes();
+        if(this.typeList == null) {
+            buildCache();
+        }
+        return this.typeList;
     }
 
     public String addNotificationType(String name) {
-        return notificationTypeDao.create(name);
+        notificationTypeDao.create(name);
+        buildCache();
+        return name;
     }
 
     public int deleteNotificationType(int id) {
-        return notificationTypeDao.deleteById(id);
+        int result = notificationTypeDao.deleteById(id);
+        buildCache();
+        return result;
     }
 
     public NotificationType updateNotificationType(Integer id, String name) {
         NotificationType notificationType = new NotificationType();
         notificationType.setId(id);
         notificationType.setTName(name);
-        return notificationTypeDao.updateNotificationType(notificationType);
+        notificationTypeDao.updateNotificationType(notificationType);
+        buildCache();
+        return notificationType;
+    }
+
+    public NotificationType getNotificationByName(String name) {
+        return notificationTypeDao.getNotificationTypeByName(name);
     }
 
     public Notification setNotificationRead(int nId) {
@@ -104,10 +99,13 @@ public class NotificationService {
     //////////////////////// version 2 ///////////////////////////
 
     public void sendNotification(int userId, int type, String title, String msg) {
-        addNewNotification(userId, type, title, msg);
-
         User user = userDao.selectById(userId);
 
+        if((user.getNotifySetting() & (0x01 << type)) == 0) {
+            return;
+        }
+
+        addNewNotification(userId, type, title, msg);
         // send SMS, Email, Notification here
         try {
             smsService.sendNormalSMS(user.getPhone(), title + "\n" + msg);

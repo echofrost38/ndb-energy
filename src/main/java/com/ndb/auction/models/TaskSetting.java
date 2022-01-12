@@ -19,8 +19,8 @@ import lombok.Setter;
 public class TaskSetting extends BaseModel {
 
     private long verification;
+    private List<WalletTask> wallet;
     private long auction;
     private long direct;
-    private List<WalletTask> wallet;
     private List<StakeTask> staking;
 }

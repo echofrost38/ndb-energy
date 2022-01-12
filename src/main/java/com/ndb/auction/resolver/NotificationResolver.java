@@ -4,34 +4,21 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import org.reactivestreams.Publisher;
-
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.models.NotificationType;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotificationResolver extends BaseResolver
         implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
-
-    @PreAuthorize("isAuthenticated()")
-    public Publisher<Notification> notifications() {
-        log.info("Incoming new User in Subscription => msg at: {}", LocalDateTime.now());
-        return notificationService.getNotificationPublisher();
-    }
 
     @PreAuthorize("isAuthenticated()")
     public Notification setNotificationRead(int id) {
@@ -58,10 +45,8 @@ public class NotificationResolver extends BaseResolver
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<NotificationType> deleteNotificationType(Integer id) {
-        Notification notification = notificationService.getNotification(id);
-        notificationService.deleteNotificationType(id);
-        return notification;    //TODO why return deleted object?
+    public int deleteNotificationType(Integer id) {
+        return notificationService.deleteNotificationType(id);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -89,11 +74,8 @@ public class NotificationResolver extends BaseResolver
     }
 
     @PreAuthorize("isAuthenticated()")
-    public Notification setNotificationReadFlag(Long stamp) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        int userId = userDetails.getId();
-        return notificationService.setNotificationReadFlag(userId, stamp);
+    public Notification setNotificationReadFlag(int id) {
+        return notificationService.setNotificationRead(id);
     }
 
     @PreAuthorize("isAuthenticated()")

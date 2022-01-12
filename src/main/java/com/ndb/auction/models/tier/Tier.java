@@ -16,9 +16,9 @@ public class Tier extends BaseModel {
 
     private int level;
     private String name;
-    private long point;
+    private Long point;
 
-    public Tier(int level, String name, long point) {
+    public Tier(int level, String name, Long point) {
         this.level = level;
         this.name = name;
         this.point = point;

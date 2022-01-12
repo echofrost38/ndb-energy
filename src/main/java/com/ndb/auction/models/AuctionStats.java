@@ -10,14 +10,14 @@ import lombok.Setter;
 @Setter
 public class AuctionStats {
 
-	private long qty;
-	private long win;
-	private long fail;
+	private Long qty;
+	private Long win;
+	private Long fail;
 
 	public AuctionStats() {
 	}
 
-	public AuctionStats(long qty, long win, long fail) {
+	public AuctionStats(Long qty, Long win, Long fail) {
 		this.qty = qty;
 		this.win = win;
 		this.fail = fail;

@@ -1,5 +1,0 @@
-type NotificationType2 {
-    nType: Int!,
-    tName: String!,
-    broadcast: Boolean!
-}

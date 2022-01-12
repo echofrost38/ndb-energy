@@ -171,7 +171,7 @@ public class AuthResolver extends BaseResolver
 		return receipt.getLogs().get(0).getData();
 	}
 
-	public String addHoldAmount(int id, String crypto, long amount) {
+	public String addHoldAmount(int id, String crypto, Long amount) {
 		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
 		return receipt.getLogs().get(0).getData();
 	}

@@ -19,9 +19,9 @@ public class TierTask {
 
     private int userId;
     private Boolean verification;
-    private long wallet;
+    private Long wallet;
     private List<Integer> auctions;
-    private long direct;
+    private Long direct;
     private List<StakeHist> staking;
 
     public TierTask(int userId) {

@@ -32,8 +32,8 @@ public class DirectSale extends BaseModel {
 
     private boolean isConfirmed;
 
-    private long createdAt;
-    private long confirmedAt;
+    private Long createdAt;
+    private Long confirmedAt;
 
     // for stripe
     private String paymentIntentId;

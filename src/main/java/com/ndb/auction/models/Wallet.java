@@ -13,11 +13,11 @@ import lombok.Setter;
 public class Wallet {
 
 	private String key;
-	private long total;
-	private long free;
-	private long holding;
+	private Long total;
+	private Long free;
+	private Long holding;
 
-	public Wallet(String key, long free, long hold) {
+	public Wallet(String key, Long free, Long hold) {
 		this.key = key;
 		this.free = free;
 		this.holding = hold;

@@ -33,25 +33,25 @@ public class Bid {
 	
     private int userId;
     private int roundId;
-    private long tokenAmount;
+    private Long tokenAmount;
     
-    private long totalPrice;
-    private long tokenPrice;
+    private Long totalPrice;
+    private Long tokenPrice;
 
-    private long tempTokenAmount;
-    private long tempTokenPrice;
-    private long delta;
+    private Long tempTokenAmount;
+    private Long tempTokenPrice;
+    private Long delta;
     private boolean pendingIncrease;
 
     private Map<String, BidHolding> holdingList;
 
     private int payType;
     private String cryptoType;
-    private long placedAt;
-    private long updatedAt; 
+    private Long placedAt;
+    private Long updatedAt; 
     private int status;
     
-    public Bid(int userId, int roundId, long tokenAmount, long tokenPrice) {
+    public Bid(int userId, int roundId, Long tokenAmount, Long tokenPrice) {
     	this.userId = userId;
     	this.roundId = roundId;
     	this.tokenAmount = tokenAmount;

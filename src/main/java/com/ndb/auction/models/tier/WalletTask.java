@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WalletTask {
 
-    private long amount;
-    private long point;
+    private int amount;
+    private Long point;
 
 }

@@ -1,15 +1,15 @@
-type OAuth2Registration {
-    registrationId: String!,
+type OAuth2Setting {
+    id: Int!,
     clientId: String,
     clientSecret: String,
-    clientAuthenticationMethod: String,
-    authorizationGrantType: String,
+    clientAuthMethod: String,
+    authGrantType: String,
     redirectUriTemplate: String,
     scope: [String],
-    authorizationUri: String,
+    authUri: String,
     tokenUri: String,
     userInfoUri: String,
-    userNameAttributeName: String,
+    userAttributeName: String,
     jwkSetUri: String,
     clientName: String,
 }

@@ -39,7 +39,7 @@ public class UserDao extends BaseOracleDao {
 		m.setRegDate(rs.getLong("REG_DATE"));
 		m.setLastLoginDate(rs.getLong("LAST_LOGIN_DATE"));
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
-		m.setTierPoint(rs.getInt("TIER_POINT"));
+		m.setTierPoint(rs.getLong("TIER_POINT"));
 		m.setProvider(rs.getString("PROVIDER"));
 		m.setProviderId(rs.getString("PROVIDER_ID"));
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));

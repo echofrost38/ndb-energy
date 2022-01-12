@@ -6,31 +6,31 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 @DynamoDBDocument
 public class BidHolding {
     
-    private long crypto;
-    private long usd; // crypto * price
+    private Long crypto;
+    private Long usd; // crypto * price
 
     public BidHolding() {
 
     }
 
-    public BidHolding(long crypto, long usd) {
+    public BidHolding(Long crypto, Long usd) {
         this.crypto = crypto;
         this.usd = usd;
     }
 
     @DynamoDBAttribute(attributeName = "crypto")
-    public long getCrypto() {
+    public Long getCrypto() {
         return crypto;
     }
-    public void setCrypto(long crypto) {
+    public void setCrypto(Long crypto) {
         this.crypto = crypto;
     }
 
     @DynamoDBAttribute(attributeName = "usd")
-    public long getUsd() {
+    public Long getUsd() {
         return usd;
     }
-    public void setUsd(long usd) {
+    public void setUsd(Long usd) {
         this.usd = usd;
     }
 

@@ -18,9 +18,9 @@ import lombok.Setter;
 @DynamoDBTable(tableName = "TaskSetting")
 public class TaskSetting extends BaseModel {
 
-    private long verification;
-    private long auction;
-    private long direct;
+    private Long verification;
+    private Long auction;
+    private Long direct;
     private List<WalletTask> wallet;
     private List<StakeTask> staking;
 }

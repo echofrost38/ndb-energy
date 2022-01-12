@@ -87,12 +87,12 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getBidCryptoTransactionByAdmin(int userId) {
+	public List<CryptoTransaction> getCryptoTransactionByAdmin(int userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<CryptoTransaction> getBidCryptoTransactionByUser() {
+	public List<CryptoTransaction> getCryptoTransactionByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 		return cryptoService.getTransactionByUser(userId);

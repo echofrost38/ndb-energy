@@ -1,8 +1,13 @@
-type Facts {
+type AvatarFacts {
     id: Int!,
     regDate: Float,
     updateDate: Float,
     deleted: Int,
+    topic: String,
+    detail: String
+}
+
+input FactsInput {
     topic: String,
     detail: String
 }

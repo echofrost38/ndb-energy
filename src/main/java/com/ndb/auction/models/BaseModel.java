@@ -13,8 +13,8 @@ import lombok.Setter;
 public abstract class BaseModel {
 
     protected int id;
-    protected long regDate;
-    protected long updateDate;
+    protected Long regDate;
+    protected Long updateDate;
     protected int deleted;
 
 }

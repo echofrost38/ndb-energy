@@ -17,10 +17,10 @@ public class FinancialTransaction {
     private int userId;
     private int transactionType;
     private double cryptoType;
-    private long cryptoAmount;
+    private Long cryptoAmount;
     private Boolean isConfirmed;
-    private long createdAt;
-    private long confirmedAt;
+    private Long createdAt;
+    private Long confirmedAt;
 
     public FinancialTransaction() {
 
@@ -29,7 +29,7 @@ public class FinancialTransaction {
     public FinancialTransaction(
         int type, 
         double cryptoType, 
-        long cryptoAmount
+        Long cryptoAmount
     ) {
         this.transactionType = type;
         this.cryptoType = cryptoType;
@@ -86,7 +86,7 @@ public class FinancialTransaction {
     public double getCryptoAmount() {
         return cryptoAmount;
     }
-    public void setCryptoAmount(long cryptoAmount) {
+    public void setCryptoAmount(Long cryptoAmount) {
         this.cryptoAmount = cryptoAmount;
     }
 
@@ -99,18 +99,18 @@ public class FinancialTransaction {
     }
 
     @DynamoDBAttribute(attributeName = "created_at")
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(long createdAt) {
+    public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
     }
 
     @DynamoDBAttribute(attributeName = "confirmed_at")
-    public long getConfirmedAt() {
+    public Long getConfirmedAt() {
         return confirmedAt;
     }
-    public void setConfirmedAt(long confirmedAt) {
+    public void setConfirmedAt(Long confirmedAt) {
         this.confirmedAt = confirmedAt;
     }
     

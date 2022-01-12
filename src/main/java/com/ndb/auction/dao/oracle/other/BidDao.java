@@ -24,12 +24,12 @@ public class BidDao extends BaseOracleDao {
 		Bid m = new Bid();
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setRoundId(rs.getInt("ROUND_ID"));
-		m.setTokenAmount(rs.getInt("TOKEN_AMOUNT"));
-		m.setTotalPrice(rs.getInt("TOTAL_PRICE"));
-		m.setTokenPrice(rs.getInt("TOKEN_PRICE"));
-		m.setTempTokenAmount(rs.getInt("TEMP_TOKEN_AMOUNT"));
-		m.setTempTokenPrice(rs.getInt("TEMP_TOKEN_PRICE"));
-		m.setDelta(rs.getInt("DELTA"));
+		m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
+		m.setTotalPrice(rs.getLong("TOTAL_PRICE"));
+		m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
+		m.setTempTokenAmount(rs.getLong("TEMP_TOKEN_AMOUNT"));
+		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
+		m.setDelta(rs.getLong("DELTA"));
 		m.setPendingIncrease(rs.getBoolean("PENDING_INCREASE"));
 		m.setHoldingList(gson.fromJson(rs.getString("HOLDING"), Map.class));
 		m.setPayType(rs.getInt("PAY_TYPE"));

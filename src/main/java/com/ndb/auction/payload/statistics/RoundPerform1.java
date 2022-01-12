@@ -3,10 +3,10 @@ package com.ndb.auction.payload.statistics;
 public class RoundPerform1 {
     
     private int roundNumber;
-    private long tokenPrice;
+    private Long tokenPrice;
     private double soldAmount;
 
-    public RoundPerform1 (int number, long tokenPrice, double soldAmount) {
+    public RoundPerform1 (int number, Long tokenPrice, double soldAmount) {
         this.roundNumber = number;
         this.tokenPrice = tokenPrice;
         this.soldAmount = soldAmount;
@@ -21,7 +21,7 @@ public class RoundPerform1 {
     public double getTokenPrice() {
         return tokenPrice;
     }
-    public void setTokenPrice(long tokenPrice) {
+    public void setTokenPrice(Long tokenPrice) {
         this.tokenPrice = tokenPrice;
     }
     public double getSoldAmount() {

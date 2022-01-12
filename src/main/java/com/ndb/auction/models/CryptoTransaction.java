@@ -26,8 +26,8 @@ public class CryptoTransaction {
 
     private int status;
 
-    private long createdAt;
-    private long updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
 
     public CryptoTransaction(String txnId, int roundId, int userId, String code, String amount, String cryptoAmount,
             String cryptoType) {

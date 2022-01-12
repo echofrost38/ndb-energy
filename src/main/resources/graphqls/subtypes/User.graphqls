@@ -11,7 +11,7 @@ type User {
    birthday: Float,
    lastLoginDate: Float,
    role: [String],
-   tierLevel: int,
+   tierLevel: Int,
    tierPoint: Float,
    provider: String,
    providerId: String,

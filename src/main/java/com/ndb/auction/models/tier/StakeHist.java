@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StakeHist {
 
-    private long expiredTime;
-    private long amount;
+    private Long expiredTime;
+    private Long amount;
 
 }

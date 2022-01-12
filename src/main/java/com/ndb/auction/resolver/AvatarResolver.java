@@ -40,7 +40,16 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factSet, String hairColor, String details) 
+	public AvatarProfile createNewAvatar(
+		String name, 
+		String surname, 
+		String shortName, 
+		List<SkillSet> skillSet, 
+		List<AvatarSet> avatarSet, 
+		List<AvatarFacts> factSet, 
+		String hairColor, 
+		String details
+	) 
 	{
 		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, factSet, hairColor, details);
 	}

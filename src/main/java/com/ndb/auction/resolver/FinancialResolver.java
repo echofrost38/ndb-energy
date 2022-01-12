@@ -42,7 +42,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
     // Direct Sale NDT Token
     // will return transaction id
     @PreAuthorize("isAuthenticated()")
-    public String directSale(long amount, long price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String directSale(Long amount, Long price, int whereTo, String extAddr) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         String response = "Failed";
@@ -51,7 +51,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
             throw new BadRequestException("Amount and Price must be larger than 0.");
         }
         // price mean USD price. 
-        long totalPrice = amount * price;
+        Long totalPrice = amount * price;
 
         // if(!sumsubService.checkThreshold(userId, "direct", totalPrice)) {
         //     throw new UnauthorizedException("You must verify your identity to buy more than " + totalPrice + ".", "amount");
@@ -67,7 +67,7 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
 
     // Withdrawal
     @PreAuthorize("isAuthenticated()")
-    public String withdrawal(String cryptoType, long amount) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public String withdrawal(String cryptoType, Long amount) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         // UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // int userId = userDetails.getId();
         

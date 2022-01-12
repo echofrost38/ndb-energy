@@ -20,11 +20,11 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	public Auction createAuction(
 		int number, 
 		String startedAt, 
-		long duration, 
-		long totalToken, 
-		long minPrice, 
+		Long duration, 
+		Long totalToken, 
+		Long minPrice, 
 		List<AvatarSet> avatar, 
-		long token
+		Long token
 	) {
 		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatar, token);
 		return auctionService.createNewAuction(auction);
@@ -54,11 +54,11 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	public Auction updateAuction(
 		int id, 
 		int number, 
-		long duration, 
-		long totalToken, 
-		long minPrice, 
+		Long duration, 
+		Long totalToken, 
+		Long minPrice, 
 		List<AvatarSet> avatarSet, 
-		long token
+		Long token
 	) {
 		Auction auction = new Auction(number, null, duration, totalToken, minPrice, avatarSet, token);
 		auction.setId(id);

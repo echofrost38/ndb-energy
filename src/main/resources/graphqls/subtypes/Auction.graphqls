@@ -11,6 +11,6 @@ type Auction {
 	avatar: [AvatarSet],
 	token: Float,
 	sold: Float,
-	stats: Stats,
+	stats: AuctionStats,
 	status: Int,
 }

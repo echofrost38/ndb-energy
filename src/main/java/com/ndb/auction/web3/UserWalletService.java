@@ -149,7 +149,7 @@ public class UserWalletService {
             BigInteger bHold = tuple2.component2();
             int hold = bHold.divide(bDecimal).intValue();
             
-            wallet = new Wallet(crypto, free, hold);
+            // wallet = new Wallet(crypto, free, hold);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -171,8 +171,8 @@ public class UserWalletService {
                 BigInteger bHold = holdList.get(i);
                 int hold = bHold.divide(bDecimal).intValue();
 
-                Wallet wallet = new Wallet(keyList.get(i), free, hold);
-                wallets.add(wallet);
+                // Wallet wallet = new Wallet(keyList.get(i), free, hold);
+                // wallets.add(wallet);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

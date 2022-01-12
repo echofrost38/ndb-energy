@@ -24,11 +24,11 @@ public class User extends BaseModel {
 	private String name;
 	private String country;
 	private String phone;
-	private long birthday;
-	private long lastLoginDate;
+	private Long birthday;
+	private Long lastLoginDate;
 	private Set<String> role;
 	private int tierLevel;
-	private long tierPoint;
+	private Long tierPoint;
 	private String provider;
 	private String providerId;
 	private int notifySetting;

@@ -1,12 +1,12 @@
 type CryptoTransaction {
     txnId: String!,
-    roundId: String!,
-    userId: String!,
+    roundId: Int!,
+    userId: Int!,
     code: String!,
-    amount: Float!,
-    cryptoAmount: Float,
+    amount: String!,
+    cryptoAmount: String,
     cryptoType: String,
     status: Int,
-    createdAt: String,
-    updatedAt: String
+    createdAt: Float,
+    updatedAt: Float
 }

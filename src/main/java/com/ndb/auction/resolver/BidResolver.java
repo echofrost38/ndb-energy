@@ -19,8 +19,8 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	@PreAuthorize("isAuthenticated()")
 	public Bid placeBid(
 		int roundId, 
-		long tokenAmount, 
-		long tokenPrice, 
+		Long tokenAmount, 
+		Long tokenPrice, 
 		int payment, 
 		String cryptoType
 	) {
@@ -35,8 +35,8 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	@PreAuthorize("isAuthenticated()")
 	public Bid updateBid(
 		int roundId, 
-		long tokenAmount, 
-		long tokenPrice
+		Long tokenAmount, 
+		Long tokenPrice
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int id = userDetails.getId();
@@ -49,8 +49,8 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
 		int roundId, 
-		long tokenAmount, 
-		long tokenPrice, 
+		Long tokenAmount, 
+		Long tokenPrice, 
 		Integer payment, 
 		String cryptoType
 		) {

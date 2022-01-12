@@ -2,8 +2,6 @@ package com.ndb.auction.models;
 
 import java.util.List;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.ndb.auction.models.tier.StakeTask;
 import com.ndb.auction.models.tier.WalletTask;
@@ -21,8 +19,8 @@ import lombok.Setter;
 public class TaskSetting extends BaseModel {
 
     private long verification;
-    private List<WalletTask> wallet;
     private long auction;
     private long direct;
+    private List<WalletTask> wallet;
     private List<StakeTask> staking;
 }

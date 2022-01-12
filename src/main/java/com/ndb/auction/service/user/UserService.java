@@ -58,7 +58,7 @@ public class UserService extends BaseService {
 
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
-			tierTaskService.createNewTierTask(tierTask);
+			tierTaskService.updateTierTask(tierTask);
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";
@@ -100,18 +100,18 @@ public class UserService extends BaseService {
 
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
 		UserSecurity currentSecurity = null;
-		// check there is any 2FA. 
-		if(userSecurities.size() == 0) {
+		// check there is any 2FA.
+		if (userSecurities.size() == 0) {
 			// add new security
 			currentSecurity = new UserSecurity(user.getId(), method, false, "");
 		} else {
 			// check already exists
 			for (UserSecurity userSecurity : userSecurities) {
-				if(userSecurity.getAuthType().equals(method)) {
+				if (userSecurity.getAuthType().equals(method)) {
 					currentSecurity = userSecurity;
 				}
 			}
-			if(currentSecurity == null) {
+			if (currentSecurity == null) {
 				// there is no security with that method
 				currentSecurity = new UserSecurity(user.getId(), method, false, "");
 			} else {
@@ -119,7 +119,7 @@ public class UserService extends BaseService {
 			}
 		}
 		currentSecurity = userSecurityDao.insert(currentSecurity);
-		
+
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
 		if (userVerify == null || !userVerify.isEmailVerified()) {
@@ -166,11 +166,11 @@ public class UserService extends BaseService {
 		}
 
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
-		if(userSecurities.size() == 0) {
+		if (userSecurities.size() == 0) {
 			throw new UnauthorizedException("There is no proper 2FA setting.", "code");
 		}
-		
-		// Assume 
+
+		// Assume
 		UserSecurity userSecurity = userSecurities.get(0);
 		boolean status = false;
 		String method;
@@ -205,7 +205,7 @@ public class UserService extends BaseService {
 				case "app":
 					if (userSecurity.getTfaSecret() == null || userSecurity.getTfaSecret().isEmpty()) {
 						return "error";
-					} 
+					}
 				case "phone":
 					try {
 						String code = totpService.get2FACode(user.getEmail() + method);
@@ -244,9 +244,10 @@ public class UserService extends BaseService {
 			} else if (method.equals("email") || method.equals("phone")) {
 				result = totpService.check2FACode(email + method, codeMap.get(method));
 			}
-			if(!result) return false;
+			if (!result)
+				return false;
 		}
-		
+
 		return true;
 	}
 

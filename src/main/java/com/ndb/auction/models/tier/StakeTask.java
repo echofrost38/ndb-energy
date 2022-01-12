@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StakeTask {
 
-    private int expiredTime;
+    private long expiredTime;
     private float ratio;
 
 }

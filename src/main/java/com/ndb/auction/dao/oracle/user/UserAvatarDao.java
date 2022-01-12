@@ -60,10 +60,10 @@ public class UserAvatarDao extends BaseOracleDao {
 	}
 
 	public int insertOrUpdate(UserAvatar m) {
-		String sql = "MERGE INTO TBL_USER_AVATAR USING DUAL ON (id=?)"
-				+ "WHEN MATCHED THEN UPDATE SET PURCHASED=?,PREFIX=?,NAME=?,UPDATE_DATE=SYSDATE"
-				+ "WHEN NOT MATCHED THEN INSERT(ID,PURCHASED,PREFIX,NAME,REG_DATE,UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
+		String sql = "MERGE INTO TBL_USER_AVATAR USING DUAL ON (ID=?)"
+				+ "WHEN MATCHED THEN UPDATE SET PURCHASED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE"
+				+ "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
+				+ "VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(), m.getPrefix(), m.getName(), m.getId(),
 				m.getPurchased(), m.getPrefix(), m.getName());
 	}

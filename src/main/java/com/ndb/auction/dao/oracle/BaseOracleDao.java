@@ -39,7 +39,12 @@ public abstract class BaseOracleDao {
 
 	public int deleteById(int id) {
 		String sql = "DELETE FROM " + tableName + " WHERE ID=?";
-		return jdbcTemplate.queryForObject(sql, Integer.class, id);
+		return jdbcTemplate.update(sql, id);
+	}
+
+	public int deleteAll() {
+		String sql = "DELETE FROM " + tableName;
+		return jdbcTemplate.update(sql);
 	}
 
 }

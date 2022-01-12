@@ -69,10 +69,10 @@ public class UserKybDao extends BaseOracleDao {
 	}
 
 	public int insertOrUpdate(UserKyb m) {
-		String sql = "MERGE INTO TBL_USER_KYB USING DUAL ON (id=?)"
+		String sql = "MERGE INTO TBL_USER_KYB USING DUAL ON (ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET COUNTRY=?,COMPANY_NAME=?,REG_NUM=?,ATTACH1_KEY=?,ATTACH1_FILENAME=?,ATTACH2_KEY=?,ATTACH2_FILENAME=?,STATUS=?,UPDATE_DATE=SYSDATE"
 				+ "WHEN NOT MATCHED THEN INSERT(ID,COUNTRY,COMPANY_NAME,REG_NUM,ATTACH1_KEY,ATTACH1_FILENAME,ATTACH2_KEY,ATTACH2_FILENAME,STATUS,REG_TIME,UPDATE_TIME)"
-				+ "VALUES(?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.getCountry(), m.getCompanyName(), m.getRegNum(), m.getAttach1Key(),
 				m.getAttach1Filename(), m.getAttach2Key(), m.getAttach2Filename(), m.getStatus(), m.getId(),
 				m.getCountry(), m.getCompanyName(), m.getRegNum(), m.getAttach1Key(),

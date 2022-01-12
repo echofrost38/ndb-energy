@@ -69,10 +69,10 @@ public class UserSecurityDao extends BaseOracleDao {
 	}
 
 	public int insertOrUpdate(UserSecurity m) {
-		String sql = "MERGE INTO TBL_USER_SECURITY USING DUAL ON (id=?)"
+		String sql = "MERGE INTO TBL_USER_SECURITY USING DUAL ON (ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET AUTH_TYPE=?,TFA_ENABLED=?,TFA_SECRET=?,UPDATE_DATE=SYSDATE, USER_ID=?"
 				+ "WHEN NOT MATCHED THEN INSERT(SEC_USER_SECURITY.NEXTVAL,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
-				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId(), m.getId(),
 				m.getAuthType(), m.isTfaEnabled(), m.getTfaSecret(), m.getUserId());
 	}

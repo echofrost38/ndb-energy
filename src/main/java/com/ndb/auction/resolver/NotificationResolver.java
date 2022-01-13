@@ -29,15 +29,6 @@ public class NotificationResolver extends BaseResolver
         return notificationService.getAllUnReadNotifications();
     }
 
-    public Notification addNewNotification(int userId, int nType, String title, String msg) {
-        return notificationService.addNewNotification(userId, nType, title, msg);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String addNewBroadcast(int nType, String title, String msg) {
-        return notificationService.addNewBroadcast(nType, title, msg);
-    }
-
     @PreAuthorize("isAuthenticated()")
     public List<Notification> getNotifications(Integer offset, Integer limit) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()

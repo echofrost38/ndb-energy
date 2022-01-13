@@ -18,7 +18,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	// not sure => % of total amount for all rounds, previous min price!!
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction createAuction(
-		int number, 
+		int round, 
 		String startedAt, 
 		Long duration, 
 		Long totalToken, 
@@ -26,7 +26,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		List<AvatarSet> avatar, 
 		Long token
 	) {
-		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatar, token);
+		Auction auction = new Auction(round, startedAt, duration, totalToken, minPrice, avatar, token);
 		return auctionService.createNewAuction(auction);
 	}
 	
@@ -53,14 +53,14 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction updateAuction(
 		int id, 
-		int number, 
+		int round, 
 		Long duration, 
 		Long totalToken, 
 		Long minPrice, 
 		List<AvatarSet> avatarSet, 
 		Long token
 	) {
-		Auction auction = new Auction(number, null, duration, totalToken, minPrice, avatarSet, token);
+		Auction auction = new Auction(round, null, duration, totalToken, minPrice, avatarSet, token);
 		auction.setId(id);
 		return auctionService.updateAuctionByAdmin(auction);
 	}

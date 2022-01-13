@@ -1,7 +1,7 @@
 extend type Query {
     getAvatarComponent(
         groupId: String!,
-        compId: String!
+        compId: Int!
     ): AvatarComponent
     getAvatarComponentsByGroup (
         groupId: String!

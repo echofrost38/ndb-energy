@@ -37,8 +37,8 @@ public class AvatarComponentDao extends BaseOracleDao {
 	}
 
 	public AvatarComponent createAvatarComponent(AvatarComponent m) {
-		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID, COMP_ID, TIER_LEVEL, PRICE, LIMITED, PURCHASED, SVG,WIDTH,TOP,LEFT)"
-				+ "VALUES(?,SEQ_AVATAR_COMPONENT.NEXTVAL,?,?,?,?,?,?)";
+		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID,COMP_ID,TIER_LEVEL,PRICE,LIMITED,PURCHASED,SVG,WIDTH,TOP,LEFT)"
+				+ "VALUES(?,SEQ_AVATAR_COMPONENT.NEXTVAL,?,?,?,?,?,?,?,?)";
 		jdbcTemplate.update(sql, m.getGroupId(), m.getTierLevel(), m.getPrice(), m.getLimited(),
 				m.getPurchased(), m.getSvg(), m.getWidth(), m.getTop(), m.getLeft());
 		return m;
@@ -77,9 +77,9 @@ public class AvatarComponentDao extends BaseOracleDao {
 	}
 
 	public AvatarComponent updateAvatarComponent(AvatarComponent m) {
-		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, SVG=?,WIDTH=?,TOP=?,LEFT=? WHERE GROUP_ID=? AND COMP_ID=?";
+		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, SVG=TO_CLOB(?),WIDTH=?,TOP=?,LEFT=? WHERE GROUP_ID=? AND COMP_ID=?";
 		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), m.getSvg(),
-				m.getGroupId(), m.getCompId(), m.getWidth(), m.getTop(), m.getLeft());
+				 m.getWidth(), m.getTop(), m.getLeft(), m.getGroupId(), m.getCompId());
 		return m;
 	}
 

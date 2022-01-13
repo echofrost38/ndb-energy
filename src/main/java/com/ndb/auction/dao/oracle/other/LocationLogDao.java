@@ -44,12 +44,12 @@ public class LocationLogDao extends BaseOracleDao {
         m.setLongitude(rs.getFloat("LONGITUDE"));
         m.setVpnapiResponse(rs.getString("VPNAPI_RESPONSE"));
         m.setFinalResult(rs.getString("FINAL_RESULT"));
-        m.setRegDate(rs.getLong("REG_DATE"));
+        m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
         return m;
     }
 
     public LocationLog addLog(LocationLog m) {
-        String sql = "INSERT INTO TBL_LOCATION_LOG(ID, USER_ID, IP_ADDRESS, IS_VPN, IS_PROXY, IS_TOR, IS_RELAY "
+        String sql = "INSERT INTO TBL_LOCATION_LOG(ID, USER_ID, IP_ADDRESS, IS_VPN, IS_PROXY, IS_TOR, IS_RELAY,"
                 + "CITY, REGION, COUNTRY, CONTINENT, REGION_CODE, COUNTRY_CODE, CONTINENT_CODE, "
                 + "LATITUDE, LONGITUDE, VPNAPI_RESPONSE, FINAL_RESULT, REG_DATE)"
                 + "VALUES(SEQ_LOCATION_LOG.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE)";

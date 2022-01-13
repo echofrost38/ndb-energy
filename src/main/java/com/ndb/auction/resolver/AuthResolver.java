@@ -91,7 +91,7 @@ public class AuthResolver extends BaseResolver
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(email, password));
 
-		totpService.setTokenAuthCache(token, authentication);
+		totpService.setTokenAuthCache(token, authentication);	
 
 		return new Credentials("Success", token, twoStep);
 	}

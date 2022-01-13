@@ -1,6 +1,6 @@
 input SkillSetInput {
-    skill: String,
-    skillRate: Int
+    name: String,
+    rate: Int
 }
 
 extend type Query {
@@ -15,7 +15,7 @@ extend type Query {
 
 extend type Mutation {
     createNewAvatar(
-        name: String!,
+        fname: String!,
         surname: String!,
         shortName: String!,
         skillSet: [SkillSetInput]!,

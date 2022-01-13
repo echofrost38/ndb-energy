@@ -51,6 +51,9 @@ public class UserService extends BaseService {
 			user.setEmail(email);
 			user.setPassword(encoder.encode(password));
 			user.setCountry(country);
+			Set<String> roles = new HashSet<String>();
+			roles.add("ROLE_USER");
+			user.setRole(roles);
 			userDao.insert(user);
 
 			// create user wallet in contract!

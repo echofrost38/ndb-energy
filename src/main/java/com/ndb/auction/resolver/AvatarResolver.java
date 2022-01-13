@@ -41,9 +41,8 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public AvatarProfile createNewAvatar(
-		String name, 
+		String fname, 
 		String surname, 
-		String shortName, 
 		List<SkillSet> skillSet, 
 		List<AvatarSet> avatarSet, 
 		List<AvatarFacts> factSet, 
@@ -51,14 +50,14 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		String details
 	) 
 	{
-		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, factSet, hairColor, details);
+		return avatarService.createAvatarProfile(fname, surname, skillSet, avatarSet, factSet, hairColor, details);
 	}
 	
 	// update existing avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Boolean updateAvatarProfile(int id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factSet, String hairColor, String details) 
 	{
-		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, factSet, hairColor, details);
+		return avatarService.updateAvatarProfile(id, name, shortName, skillSet, avatarSet, factSet, hairColor, details);
 	}
 	
 	// get avatar list

@@ -78,7 +78,7 @@ public class UserService extends BaseService {
 			UserVerify userVerify = new UserVerify();
 			userVerify.setId(user.getId());
 			userVerify.setEmailVerified(true);
-			userVerifyDao.insertOrUpdate(userVerify);
+			userVerifyDao.insert(userVerify);
 		}
 		return true;
 	}
@@ -206,6 +206,7 @@ public class UserService extends BaseService {
 					if (userSecurity.getTfaSecret() == null || userSecurity.getTfaSecret().isEmpty()) {
 						return "error";
 					}
+					break;
 				case "phone":
 					try {
 						String code = totpService.get2FACode(user.getEmail() + method);
@@ -214,6 +215,7 @@ public class UserService extends BaseService {
 					} catch (IOException | TemplateException e) {
 						return "error";
 					}
+					break;
 				case "email":
 					try {
 						String code = totpService.get2FACode(user.getEmail() + method);
@@ -221,6 +223,7 @@ public class UserService extends BaseService {
 					} catch (MessagingException | IOException | TemplateException e) {
 						return "error"; // or exception
 					}
+					break;
 				default:
 					return "error";
 			}

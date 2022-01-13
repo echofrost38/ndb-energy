@@ -25,8 +25,8 @@ public class UserVerifyDao extends BaseOracleDao {
 		m.setKycVerified(rs.getBoolean("KYC_VERIFIED"));
 		m.setAmlVerified(rs.getBoolean("AML_VERIFIED"));
 		m.setKybVerified(rs.getBoolean("KYB_VERIFIED"));
-		m.setRegDate(rs.getLong("REG_DATE"));
-		m.setUpdateDate(rs.getLong("UPDATE_DATE"));
+		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
+		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE").getTime());
 		return m;
 	}
 
@@ -53,7 +53,7 @@ public class UserVerifyDao extends BaseOracleDao {
 		String sql = "MERGE INTO TBL_USER_VERIFY USING DUAL ON (ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET EMAIL_VERIFIED=?,PHONE_VERIFIED=?,KYC_VERIFIED=?,AML_VERIFIED=?,KYB_VERIFIED=?,UPDATE_DATE=SYSDATE"
 				+ "WHEN NOT MATCHED THEN INSERT(ID,EMAIL_VERIFIED,PHONE_VERIFIED,KYC_VERIFIED,AML_VERIFIED,KYB_VERIFIED,REG_DATE,UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.isEmailVerified(), m.isPhoneVerified(), m.isKycVerified(),
 				m.isAmlVerified(), m.isKybVerified(), m.getId(), m.isEmailVerified(), m.isPhoneVerified(),
 				m.isKycVerified(), m.isAmlVerified(), m.isKybVerified());

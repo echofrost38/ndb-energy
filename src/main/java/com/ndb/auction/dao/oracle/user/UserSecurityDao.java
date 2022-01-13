@@ -30,13 +30,13 @@ public class UserSecurityDao extends BaseOracleDao {
 		m.setAuthType(rs.getString("AUTH_TYPE"));
 		m.setTfaEnabled(rs.getBoolean("TFA_ENABLED"));
 		m.setTfaSecret(rs.getString("TFA_SECRET"));
-		m.setRegDate(rs.getLong("REG_DATE"));
-		m.setUpdateDate(rs.getLong("UPDATE_DATE"));
+		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
+		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE").getTime());
 		return m;
 	}
 
 	public List<UserSecurity> selectByUserId(int userId) {
-		String sql = "SELECT * FROM TBL_USER_SECURITY WHERE USER_ID=? ODER BY ID";
+		String sql = "SELECT * FROM TBL_USER_SECURITY WHERE USER_ID=? ORDER BY ID";
 		return jdbcTemplate.query(sql, new RowMapper<UserSecurity>() {
 			@Override
 			public UserSecurity mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -46,8 +46,8 @@ public class UserSecurityDao extends BaseOracleDao {
 	}
 
 	public UserSecurity insert(UserSecurity m) {
-		String sql = "INSERT INTO TBL_USER_SECURITY(SEC_USER_SECURITY.NEXTVAL,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
-				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
+		String sql = "INSERT INTO TBL_USER_SECURITY(ID,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
+				+ "VALUES(SEC_USER_SECURITY.NEXTVAL,?,?,?,SYSDATE,SYSDATE,?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(

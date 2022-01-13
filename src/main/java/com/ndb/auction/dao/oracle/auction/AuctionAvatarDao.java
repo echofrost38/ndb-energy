@@ -33,7 +33,7 @@ public class AuctionAvatarDao extends BaseOracleDao {
 			public AvatarSet mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		}, id);
+		});
 	}
 
 	public int insert(AvatarSet m) {

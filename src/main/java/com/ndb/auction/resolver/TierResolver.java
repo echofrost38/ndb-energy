@@ -24,13 +24,13 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
     private TaskSettingService taskSettingService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Tier addNewUserTier(int level, String name, Long point, String svg) {
-        return tierService.addNewUserTier(level, name, point, svg);
+    public Tier addNewUserTier(int level, String name, Long point) {
+        return tierService.addNewUserTier(level, name, point);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Tier updateUserTier(int level, String name, Long point, String svg) {
-        return tierService.updateUserTier(level, name, point, svg);
+    public Tier updateUserTier(int level, String name, Long point) {
+        return tierService.updateUserTier(level, name, point);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

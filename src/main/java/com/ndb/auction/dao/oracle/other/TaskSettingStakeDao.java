@@ -21,7 +21,7 @@ public class TaskSettingStakeDao extends BaseOracleDao {
 	private static StakeTask extract(ResultSet rs) throws SQLException {
 		StakeTask model = new StakeTask();
 		model.setExpiredTime(rs.getLong("EXPIRED_TIME"));
-		model.setRatio(rs.getDouble("RATIO"));
+		model.setRatio(rs.getFloat("RATIO"));
 		return model;
 	}
 

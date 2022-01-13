@@ -20,18 +20,17 @@ public class TierDao extends BaseOracleDao {
 
 	private static Tier extract(ResultSet rs) throws SQLException {
 		Tier m = new Tier();
-		m.setLevel(rs.getInt("T_LEVEL"));
+		m.setLevel(rs.getInt("LEVEL"));
 		m.setName(rs.getString("NAME"));
 		m.setPoint(rs.getLong("POINT"));
-		m.setSvg(rs.getString("SVG"));
 		return m;
 	}
 
 	// User Tier
 	public Tier addNewUserTier(Tier m) {
-		String sql = "INSERT INTO TBL_TIER(T_LEVEL, NAME, POINT, SVG)"
-				+ "VALUES(?,?,?,?)";
-		jdbcTemplate.update(sql, m.getLevel(), m.getName(), m.getPoint(), m.getSvg());
+		String sql = "INSERT INTO TBL_TIER(LEVEL, NAME, POINT)"
+				+ "VALUES(?,?,?)";
+		jdbcTemplate.update(sql, m.getLevel(), m.getName(), m.getPoint());
 		return m;
 	}
 
@@ -46,13 +45,13 @@ public class TierDao extends BaseOracleDao {
 	}
 
 	public Tier updateUserTier(Tier m) {
-		String sql = "UPDATE TBL_TIER SET NAME=?, POINT=?, SVG=? WHERE T_LEVEL=?";
-		jdbcTemplate.update(sql, m.getName(), m.getPoint(), m.getSvg(), m.getLevel());
+		String sql = "UPDATE TBL_TIER SET NAME=?, POINT=? WHERE LEVEL=?";
+		jdbcTemplate.update(sql, m.getName(), m.getPoint(), m.getLevel());
 		return m;
 	}
 
 	public int deleteUserTier(int level) {
-		String sql = "DELETE FROM TBL_TIER WHERE T_LEVEL=?";
+		String sql = "DELETE FROM TBL_TIER WHERE LEVEL=?";
 		jdbcTemplate.update(sql, level);
 		return level;
 	}

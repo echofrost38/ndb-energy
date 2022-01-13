@@ -13,6 +13,6 @@ import lombok.Setter;
 public class WalletTask {
 
     private int amount;
-    private double point;
+    private Long point;
 
 }

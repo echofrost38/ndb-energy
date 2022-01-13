@@ -4,7 +4,7 @@ extend type Query {
 	getAuctionByStatus(
 		status: Int!
 	) : [Auction]
-	getAuctionById(id: Int!) : Auction
+	getAuctionById(id: String!) : Auction!
 	getAuctionByNumber(
 		round: Int!
 	) : Auction
@@ -12,7 +12,7 @@ extend type Query {
 
 extend type Mutation {
 	createAuction(
-		round: Int!, 
+		number: Int!, 
 		startedAt: String!,  
 		duration: Float!,
 		totalToken: Float!, 
@@ -22,7 +22,7 @@ extend type Mutation {
 	) : Auction
 	updateAuction(
 		id: String!
-		round: Int, 
+		number: Int, 
 		duration: Float,  
 		totalToken: Float, 
 		minPrice: Float,

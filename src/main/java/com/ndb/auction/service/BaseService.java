@@ -14,7 +14,7 @@ import com.ndb.auction.dao.oracle.avatar.AvatarProfileFactsDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSetDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSkillDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
-import com.ndb.auction.dao.oracle.other.CryptoPaymentDao;
+import com.ndb.auction.dao.oracle.other.CryptoTransactionDao;
 import com.ndb.auction.dao.oracle.other.DirectSaleDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
@@ -112,7 +112,7 @@ public class BaseService {
     public StripeTransactionDao stripeDao;
 
     @Autowired
-    public CryptoPaymentDao cryptoDao;
+    public CryptoTransactionDao cryptoTransactionDao;
 
     @Autowired
     public NotificationService notificationService;

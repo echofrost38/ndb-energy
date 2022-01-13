@@ -1,9 +1,9 @@
 package com.ndb.auction.dao.oracle.user;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +11,12 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.user.User;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -157,13 +160,35 @@ public class UserDao extends BaseOracleDao {
 		});
 	}
 
-	public int insert(User m) {
+	public User insert(User m) {
 		String sql = "INSERT INTO TBL_USER(ID, EMAIL, PASSWORD, NAME, COUNTRY, PHONE, BIRTHDAY, REG_DATE, LAST_LOGIN_DATE, LAST_PASSWORD_CHANGE_DATE, "
 				+ "ROLE, TIER_LEVEL, TIER_POINT, PROVIDER, PROVIDER_ID, NOTIFY_SETTING, DELETED)"
 				+ "VALUES(SEQ_USER.NEXTVAL,?,?,?,?,?,?,SYSDATE,SYSDATE,SYSDATE,?,?,?,?,?,?,?)";
-		return jdbcTemplate.update(sql, m.getEmail(), m.getPassword(), m.getName(), m.getCountry(), m.getPhone(),
-				m.getBirthdayTimestamp(), m.getRoleString(), m.getTierLevel(), m.getTierPoint(), m.getProvider(),
-				m.getProviderId(), m.getNotifySetting(), m.getDeleted());
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(
+				new PreparedStatementCreator() {
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+						PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+						int i = 1;
+						ps.setString(i++, m.getEmail());
+						ps.setString(i++, m.getPassword());
+						ps.setString(i++, m.getName());
+						ps.setString(i++, m.getCountry());
+						ps.setString(i++, m.getPhone());
+						ps.setTimestamp(i++, m.getBirthdayTimestamp());
+						ps.setString(i++, m.getRoleString());
+						ps.setInt(i++, m.getTierLevel());
+						ps.setLong(i++, m.getTierPoint() == null ? 0 : m.getTierPoint());
+						ps.setString(i++, m.getProvider());
+						ps.setString(i++, m.getProviderId());
+						ps.setInt(i++, m.getNotifySetting());
+						ps.setInt(i++, m.getDeleted());
+						return ps;
+					}
+				}, keyHolder);
+		m.setId(keyHolder.getKey().intValue());
+		return m;
 	}
 
 	public int updatePassword(int id, String password) {

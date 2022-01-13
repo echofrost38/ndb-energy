@@ -7,8 +7,6 @@ import java.util.List;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.tier.StakeHist;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.models.tier.TierTask;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;

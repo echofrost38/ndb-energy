@@ -9,13 +9,6 @@ extend type Mutation {
   setNotificationReadFlag(stamp: Float!): Notification
   setNotificationReadFlagAll: String
   changeNotifySetting(nType: Int!, status: Boolean): Int
-  addNewNotification(
-    userId: String!
-    nType: Int!
-    title: String!
-    msg: String!
-  ): Notification
-  addNewBroadcast(nType: Int!, title: String!, msg: String!): String
 }
 
 schema {

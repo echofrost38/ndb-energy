@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Repository
 @NoArgsConstructor
 @Table(name = "TBL_CRYPTO_TRANSACTION")
-public class CryptoTransactionDao extends BaseOracleDao {
+public class CryptoPaymentDao extends BaseOracleDao {
 
 	private static CryptoTransaction extract(ResultSet rs) throws SQLException {
 		CryptoTransaction m = new CryptoTransaction();
@@ -37,22 +37,8 @@ public class CryptoTransactionDao extends BaseOracleDao {
 
 	public int insert(CryptoTransaction m) {
 		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
-				+ " VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getAmount(),
-				m.getCryptoType(), m.getCryptoAmount(), m.getStatus());
-	}
-
-	public List<CryptoTransaction> selectAll(String orderby) {
-		String sql = "SELECT * FROM TBL_CRYPTO_TRANSACTION";
-		if (orderby == null)
-			orderby = "ID";
-		sql += " ORDER BY " + orderby;
-		return jdbcTemplate.query(sql, new RowMapper<CryptoTransaction>() {
-			@Override
-			public CryptoTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+			+" VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
+		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getAmount(), m.getCryptoType(), m.getCryptoAmount().toString(), m.getStatus());
 	}
 
 	public CryptoTransaction selectByCode(String code) {
@@ -100,16 +86,21 @@ public class CryptoTransactionDao extends BaseOracleDao {
 	public int updateTransactionStatus(String code, int status, String cryptoAmount, String cryptoType) {
 		String sql = "UPDATE TBL_CRYPTO_TRANSACTION SET STATUS=?, UPDATE_AT=SYSDATE,CRYPTO_AMOUNT=?,CRYPTO_TYPE=? WHERE CODE=?";
 		return jdbcTemplate.update(sql, status, cryptoAmount, cryptoType, code);
+	} 
+
+	// for crypto coin
+	public List<Coin> getCoins() {
+		// return dynamoDBMapper.scan(Coin.class, new DynamoDBScanExpression());
+		return null;
 	}
 
-	public int deleteByTxnId(String txnId) {
-		String sql = "DELETE FROM TBL_CRYPTO_TRANSACTION WHERE TXN_ID=?";
-		return jdbcTemplate.update(sql, txnId);
+	public Coin addNewCoin(Coin coin) {
+		// dynamoDBMapper.save(coin);
+		return coin;
 	}
 
-	public int deleteExpired(double days) {
-		String sql = "DELETE FROM TBL_CRYPTO_TRANSACTION WHERE SYSDATE-CREATED_AT>?";
-		return jdbcTemplate.update(sql, days);
+	public Coin deleteCoin(Coin coin) {
+		// dynamoDBMapper.delete(coin);
+		return coin;
 	}
-
 }

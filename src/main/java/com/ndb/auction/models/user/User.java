@@ -1,6 +1,7 @@
 package com.ndb.auction.models.user;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 
 import com.ndb.auction.models.BaseModel;
@@ -35,7 +36,7 @@ public class User extends BaseModel {
 	private int notifySetting;
 
 	private UserAvatar avatar;
-	private UserSecurity security;
+	private List<UserSecurity> security;
 	private UserVerify verify;
 
 	public User(String email, String encodedPass, String country) {

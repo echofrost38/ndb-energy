@@ -86,6 +86,7 @@ public class ProfileService extends BaseService {
 		userAvatar = userAvatarDao.selectById(id);
 		if (userAvatar == null) {
 			userAvatar = new UserAvatar();
+			userAvatar.setId(id);
 		}
 
 		// update purchase list and user avatar set!!
@@ -95,7 +96,7 @@ public class ProfileService extends BaseService {
 			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix");
 		}
 
-		List<AvatarSet> sets = profile.getAvatarSet();
+		List<AvatarSet> sets = avatarSetDao.selectById(profile.getId());
 		List<AvatarComponent> components = avatarComponentDao.getAvatarComponentsBySet(sets);
 
 		String purchasedJsonString = userAvatar.getPurchased();

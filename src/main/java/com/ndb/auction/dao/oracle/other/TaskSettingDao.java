@@ -19,14 +19,14 @@ public class TaskSettingDao extends BaseOracleDao {
 
 	private static TaskSetting extract(ResultSet rs) throws SQLException {
 		TaskSetting m = new TaskSetting();
-		m.setVerification(rs.getLong("VERIFICATION"));
-		m.setAuction(rs.getLong("AUCTION"));
-		m.setDirect(rs.getLong("DIRECT"));
+		m.setVerification(rs.getDouble("VERIFICATION"));
+		m.setAuction(rs.getDouble("AUCTION"));
+		m.setDirect(rs.getDouble("DIRECT"));
 		return m;
 	}
 
 	public TaskSetting updateSetting(TaskSetting setting) {
-		String sql = "UPDATE TBL_TASK_SETTING SET VERIFICATION=?, AUCTION=?, DIRECT=?, AUCTION=SYSDATE";
+		String sql = "UPDATE TBL_TASK_SETTING SET VERIFICATION=?, AUCTION=?, DIRECT=?, UPDATE_DATE=SYSDATE";
 		jdbcTemplate.update(sql, setting.getVerification(), setting.getAuction(), setting.getDirect());
 		return setting;
 	}

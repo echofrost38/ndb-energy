@@ -56,58 +56,58 @@ public class AuthResolver extends BaseResolver
 
 		// get user ( Not found exception is threw in service)
 		User user = userService.getUserByEmail(email);
-		if (user == null) {
-			return new Credentials("Failed", "Unregistered email.");
-		}
+		if(user == null) {
+			return new Credentials("Failed", "You are not registered");
+		} 
 
 		if (!userService.checkMatchPassword(password, user.getPassword())) {
-			return new Credentials("Failed", "Email or password is invalid.");
+			return new Credentials("Failed", "Your email and password do not match!");
 		}
 		UserVerify userVerify = userVerifyService.selectById(user.getId());
-		if (userVerify == null || !userVerify.isEmailVerified()) {
-			return new Credentials("Failed", "Please verify your email.");
+		if (!userVerify.isEmailVerified()) {
+			return new Credentials("Failed", "Please verify your email");
 		}
 
 		List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
-		if (userSecurities.isEmpty()) {
-			return new Credentials("Failed", "Please set 2FA.");
+		if(userSecurities.size() == 0) {
+			return new Credentials("Failed", "Please set 2FA");
 		}
 
 		List<String> twoStep = new ArrayList<>();
 
 		for (UserSecurity userSecurity : userSecurities) {
-			if (userSecurity.isTfaEnabled()) {
+			if(userSecurity.isTfaEnabled()) {
 				twoStep.add(userSecurity.getAuthType());
 			} else {
-				return new Credentials("Failed", "Please set 2FA.");
+				return new Credentials("Failed", "Please set 2FA");
 			}
 		}
 
 		String token = userService.signin2FA(user);
 		if (token.equals("error")) {
-			return new Credentials("Failed", "2FA failed.");
+			return new Credentials("Failed", "2FA Error");
 		}
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(email, password));
 
-		totpService.setTokenAuthCache(token, authentication);
+		totpService.setTokenAuthCache(token, authentication);	
 
 		return new Credentials("Success", token, twoStep);
 	}
 
 	public Credentials confirm2FA(String email, String token, List<TwoFAEntry> code) {
-		Map<String, String> codeMap = new HashMap<>();
-		for (TwoFAEntry entry : code) {
+		Map<String, String> codeMap = new HashMap<String, String>();
+		for(TwoFAEntry entry : code) {
 			codeMap.put(entry.getKey(), entry.getValue());
 		}
 		Authentication authentication = totpService.getAuthfromToken(token);
 		if (authentication == null) {
-			return new Credentials("Failed", "Password expired.");
+			return new Credentials("Failed", "Password expired");
 		}
 
 		if (!userService.verify2FACode(email, codeMap)) {
-			return new Credentials("Failed", "Wrong 2FA code.");
+			return new Credentials("Failed", "2FA code mismatch");
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);

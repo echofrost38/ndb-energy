@@ -58,7 +58,7 @@ public class LocationLogDao extends BaseOracleDao {
                 new PreparedStatementCreator() {
                     @Override
                     public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps = connection.prepareStatement(sql,
+                        PreparedStatement ps = connection.prepareStatement(sql.toString(),
                                 new String[] { "ID" });
                         int i = 1;
                         ps.setInt(i++, m.getUserId());

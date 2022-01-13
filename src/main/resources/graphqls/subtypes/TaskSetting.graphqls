@@ -8,7 +8,6 @@ type TaskSetting {
 }
 
 input TaskSettingInput {
-    settingId: String!,
     verification: Float!,
     wallet: [WalletTaskInput]!,
     auction: Float!,

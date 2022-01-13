@@ -32,7 +32,7 @@ public class AuctionService extends BaseService {
 			auction.setStatus(Auction.COUNTDOWN);
 
 			// Save
-			auctionDao.createNewAuction(auction);
+			auction = auctionDao.createNewAuction(auction);
 			auctionAvatarDao.update(auction.getId(), auction.getAvatar());
 
 			// set new countdown!!
@@ -53,15 +53,25 @@ public class AuctionService extends BaseService {
 	}
 
 	public List<Auction> getAuctionList() {
-		return auctionDao.getAuctionList();
+		List<Auction> auctionList = auctionDao.getAuctionList();
+		for (Auction auction : auctionList) {
+			auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		}
+		return auctionList;
 	}
 
 	public Auction getAuctionById(int id) {
-		return auctionDao.getAuctionById(id);
+		Auction auction = auctionDao.getAuctionById(id);
+		if(auction == null) return null;
+		auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		return auction;
 	}
 
 	public Auction getAuctionByRound(int round) {
-		return auctionDao.getAuctionByRound(round);
+		Auction auction = auctionDao.getAuctionByRound(round);
+		if(auction == null) return null;
+		auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		return auction;
 	}
 
 	public Auction updateAuctionByAdmin(Auction auction) {
@@ -127,7 +137,11 @@ public class AuctionService extends BaseService {
 	}
 
 	public List<Auction> getAuctionByStatus(Integer status) {
-		return auctionDao.getAuctionByStatus(status);
+		List<Auction> auctionList = auctionDao.getAuctionByStatus(status);
+		for (Auction auction : auctionList) {
+			auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		}
+		return auctionList;
 	}
 
 	public String checkRounds() {

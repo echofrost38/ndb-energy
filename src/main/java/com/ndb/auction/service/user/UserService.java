@@ -303,6 +303,12 @@ public class UserService extends BaseService {
 	}
 
 	public User getUserById(int id) {
+		User user = userDao.selectById(id);
+		
+		user.setAvatar(userAvatarDao.selectById(id));
+		user.setSecurity(userSecurityDao.selectByUserId(id));
+		user.setVerify(userVerifyDao.selectById(id));
+
 		return userDao.selectById(id);
 	}
 

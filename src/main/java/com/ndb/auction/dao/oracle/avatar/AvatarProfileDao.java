@@ -42,7 +42,7 @@ public class AvatarProfileDao extends BaseOracleDao {
 				new PreparedStatementCreator() {
 					@Override
 					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-						PreparedStatement ps = connection.prepareStatement(sql.toString(),
+						PreparedStatement ps = connection.prepareStatement(sql,
 								new String[] { "ID" });
 						int i = 1;
 						ps.setString(i++, m.getFname());

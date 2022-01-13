@@ -20,15 +20,15 @@ public class TierService {
 		this.tierList = tierDao.getUserTiers();
 	}
 
-	public Tier addNewUserTier(int level, String name, long point) {
-		Tier tier = new Tier(level, name, point);
+	public Tier addNewUserTier(int level, String name, long point, String svg) {
+		Tier tier = new Tier(level, name, point, svg);
 		tierDao.addNewUserTier(tier);
 		fillTierList();
 		return tier;
 	}
 
-	public Tier updateUserTier(int level, String name, long point) {
-		Tier tier = new Tier(level, name, point);
+	public Tier updateUserTier(int level, String name, long point, String svg) {
+		Tier tier = new Tier(level, name, point, svg);
 		tierDao.updateUserTier(tier);
 		fillTierList();
 		return tier;

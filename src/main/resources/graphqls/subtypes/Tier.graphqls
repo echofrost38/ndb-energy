@@ -1,5 +1,6 @@
 type Tier {
     level: Int!,
     name: String,
-    point: Float
+    point: Float,
+    svg: String
 }

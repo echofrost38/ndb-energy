@@ -43,8 +43,8 @@ public class AvatarProfileFactsDao extends BaseOracleDao {
 	}
 
 	public AvatarFacts insert(AvatarFacts m) {
-		String sql = "INSERT INTO TBL_AVATAR_PROFILE_FACTS(SEQ_AVATAR_PROFILE_FACTS.NEXTVAL,PROFILE_ID,TOPIC,DETAIL,)"
-				+ "VALUES(?,?,?)";
+		String sql = "INSERT INTO TBL_AVATAR_PROFILE_FACTS(ID,PROFILE_ID,TOPIC,DETAIL)"
+				+ "VALUES(SEQ_AVATAR_PROFILE_FACTS.NEXTVAL,?,?,?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
@@ -54,7 +54,6 @@ public class AvatarProfileFactsDao extends BaseOracleDao {
                         PreparedStatement ps = connection.prepareStatement(sql.toString(),
                                 new String[] { "ID" });
                         int i = 1;
-                        ps.setInt(i++, m.getId());
 						ps.setInt(i++, m.getProfileId());
                         ps.setString(i++, m.getTopic());
                         ps.setString(i++, m.getDetail());

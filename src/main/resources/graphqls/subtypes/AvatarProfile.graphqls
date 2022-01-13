@@ -5,7 +5,6 @@ type AvatarProfile {
     deleted: Int,
     fname: String!,
     surname: String,
-    shortName: String,
     skillSet: [SkillSet],
     avatarSet: [AvatarSet],
     hairColor: String,

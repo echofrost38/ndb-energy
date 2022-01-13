@@ -86,7 +86,7 @@ public class AvatarService extends BaseService {
 
 	public Boolean updateAvatarProfile(
 			int id,
-			String name,
+			String fname,
 			String surname,
 			List<SkillSet> skillSet, 
 			List<AvatarSet> avatarSet, 
@@ -98,18 +98,16 @@ public class AvatarService extends BaseService {
 		if (profile == null) {
 			throw new AvatarNotFoundException("Cannot find avatar profile.", "id");
 		}
-		profile.setFname(name);
-		profile.setSurname(surname);
-		profile.setSkillSet(skillSet);
-		profile.setAvatarSet(avatarSet);
-		profile.setDetails(details);
-		profile.setHairColor(hairColor);
+		if(fname != null) profile.setFname(fname);
+		if(surname != null) profile.setSurname(surname);
+		if(details != null) profile.setDetails(details);
+		if(hairColor != null) profile.setHairColor(hairColor);
 		
 		avatarProfileDao.updateAvatarProfile(profile);
-		avatarFactDao.update(id, factSet);
-		avatarSkillDao.update(id, skillSet);
-		avatarSetDao.update(id, avatarSet);
-
+		if((skillSet != null) && (skillSet.size() != 0)) avatarSkillDao.update(id, skillSet);
+		if((factSet != null) && (factSet.size() != 0)) avatarFactDao.update(id, factSet);
+		if((avatarSet != null) && (avatarSet.size() != 0)) avatarSetDao.update(id, avatarSet);
+		
 		return true;
 	}
 
@@ -133,8 +131,8 @@ public class AvatarService extends BaseService {
 		return profile;
 	}
 
-	public AvatarProfile getAvatarProfileByName(String fname) {
-		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(fname);
+	public AvatarProfile getAvatarProfileByName(String sname) {
+		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(sname);
 		profile.setFactsSet(avatarFactDao.selectByProfileId(profile.getId()));
 		profile.setSkillSet(avatarSkillDao.selectById(profile.getId()));
 		profile.setAvatarSet(avatarSetDao.selectById(profile.getId()));

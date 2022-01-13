@@ -6,10 +6,10 @@ input SkillSetInput {
 extend type Query {
     getAvatars : [AvatarProfile]
     getAvatar (
-        id: String!
+        id: Int!
     ) : AvatarProfile
     getAvatarByName (
-        fname: String!
+        surname: String!
     ) : AvatarProfile
 }
 
@@ -17,7 +17,6 @@ extend type Mutation {
     createNewAvatar(
         fname: String!,
         surname: String!,
-        shortName: String!,
         skillSet: [SkillSetInput]!,
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],
@@ -25,10 +24,9 @@ extend type Mutation {
         details: String
     ) : AvatarProfile
     updateAvatarProfile (
-        id: String!,
-        name: String!,
+        id: Int!,
+        fname: String,
         surname: String,
-        shortName: String,
         skillSet: [SkillSetInput],
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],

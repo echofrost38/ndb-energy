@@ -33,7 +33,7 @@ public class AvatarProfileSkillDao extends BaseOracleDao {
 			public SkillSet mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		});
+		}, id);
 	}
 
 	public int insert(SkillSet m) {

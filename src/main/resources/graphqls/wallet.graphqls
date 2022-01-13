@@ -1,0 +1,45 @@
+extend type Query {
+    getInternalAddress(
+        id: String,
+        token: String,
+        network: String
+    ) : String
+    getWalletBalance(
+        token: String,
+        network: String,
+        address: String
+    ) : String
+    getAllowance(
+        token: String,
+        network: String,
+        owner: String,
+        spender: String
+    ) : String
+}
+
+extend type Mutation {
+    transferFunds(
+        token: String,
+        network: String,
+        address: String,
+        amount: Int
+    ) : Boolean
+    makeAllowance(
+        token: String,
+        network: String,
+        address: String,
+        amount: Int
+    ) : Boolean
+    transferFromFunds(
+        token: String,
+        network: String,
+        from: String,
+        to: String,
+        amount: Int
+    ) : Boolean
+}
+
+schema {
+    query: Query,
+    # mutation: Mutation
+}

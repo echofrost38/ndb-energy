@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.dao.oracle.other.OAuth2SettingDao;
-import com.ndb.auction.models.OAuth2Setting;
+import com.ndb.auction.dao.OAuth2Dao;
+import com.ndb.auction.models.OAuth2Registration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,30 +16,30 @@ import org.springframework.stereotype.Service;
 public class OAuth2RegistrationService {
 
     @Autowired
-	private OAuth2SettingDao oAuth2Dao;
+	private OAuth2Dao oAuth2Dao;
     
-    private Map<Integer, OAuth2Setting> oAuth2Registrations;
+    private Map<String, OAuth2Registration> oAuth2Registrations;
 
     @PostConstruct
     public void init() {
         try{
-            oAuth2Registrations = new HashMap<>();
+            oAuth2Registrations = new HashMap<String, OAuth2Registration>();
     
-            List<OAuth2Setting> registrations = oAuth2Dao.getAllRegistrations();
-            for(OAuth2Setting registration : registrations) {
-                oAuth2Registrations.put(registration.getId(), registration);
+            List<OAuth2Registration> registrations = oAuth2Dao.getAllRegistrations();
+            for(OAuth2Registration registration : registrations) {
+                oAuth2Registrations.put(registration.getRegistrationId(), registration);
             }
         }catch(Exception e) {
             
         }
     }
 
-    public OAuth2Setting getByRegistrationId(String id) {
+    public OAuth2Registration getByRegistrationId(String id) {
         return oAuth2Registrations.get(id);
     }
 
-    public OAuth2Setting createRegistration(OAuth2Setting registration) {
-        OAuth2Setting regist = oAuth2Dao.createRegistration(registration);
+    public OAuth2Registration createRegistration(OAuth2Registration registration) {
+        OAuth2Registration regist = oAuth2Dao.createRegistration(registration);
         init();
         return regist;
     }

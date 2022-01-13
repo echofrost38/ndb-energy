@@ -1,6 +1,6 @@
 type StripeTransaction {
-    roundId: Int!,
-    userId: Int!,
+    roundId: String!,
+    userId: String!,
     paymentIntentId: String,
     amount: Float,
     status: Int,

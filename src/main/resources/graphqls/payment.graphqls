@@ -21,17 +21,17 @@ extend type Query {
 	getCryptoTransactionByUser 
 	  : [CryptoTransaction]
 	getCryptoTransactionByAdmin(
-		userId: Int!
+		userId: String
 	) : [CryptoTransaction]
 	getCryptoTransactionByRound(
-		roundId: Int!
+		roundId: String!
 	) : [CryptoTransaction]
 	getCryptoTransaction(
-		roundId: Int!,
+		roundId: String!,
 	) : [CryptoTransaction]
 	getCryptoTransactions(
-		roundId: Int!,
-		userId: Int
+		roundId: String!,
+		userId: String
 	) : [CryptoTransaction]
 	getCoins : [Coin]
 	getCryptoPrice(
@@ -47,7 +47,7 @@ extend type Mutation {
 		paymentMethodId: String
 	) : PayResponse!
 	createCryptoPayment(
-		roundId: Int!,
+		roundId: String!,
 		amount: Float!
 	) : CryptoPayload
 	addNewCoin (

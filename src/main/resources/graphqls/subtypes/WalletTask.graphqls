@@ -1,9 +1,9 @@
 type WalletTask {
     amount: Int!,
-    point: Float!
+    points: Float!
 }
 
 input WalletTaskInput {
     amount: Int!,
-    point: Float!
+    points: Float!
 }

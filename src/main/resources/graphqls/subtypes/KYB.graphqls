@@ -1,0 +1,10 @@
+type KYB {
+    userId: String!,
+    country: String!,
+    companyName: String,
+    regNum: String,
+    status: String,
+    files: [String],
+    regTime: Float,
+    updateTime: Float
+}

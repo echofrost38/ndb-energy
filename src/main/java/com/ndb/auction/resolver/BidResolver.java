@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -18,44 +18,44 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid placeBid(
-		int roundId, 
-		Long tokenAmount, 
-		Long tokenPrice, 
-		int payment, 
+		String roundId, 
+		Double tokenAmount, 
+		Double tokenPrice, 
+		Integer payment, 
 		String cryptoType
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int userId = userDetails.getId();
-		// if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
-		// 	throw new UnauthorizedException("Please verify your identification", "tokenAmount");
-		// }
+		String userId = userDetails.getId();
+		if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
+			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		}
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid updateBid(
-		int roundId, 
-		Long tokenAmount, 
-		Long tokenPrice
+		String roundId, 
+		Double tokenAmount, 
+		Double tokenPrice
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int id = userDetails.getId();
-		// if(!sumsubService.checkThreshold(id, "bid", tokenAmount * tokenPrice)) {
-		// 	throw new UnauthorizedException("Please verify your identification", "tokenAmount");
-		// }
+		String id = userDetails.getId();
+		if(!sumsubService.checkThreshold(id, "bid", tokenAmount * tokenPrice)) {
+			throw new UnauthorizedException("Please verify your identification", "tokenAmount");
+		}
 		return bidService.updateBid(id, roundId, tokenAmount, tokenPrice);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
-		int roundId, 
-		Long tokenAmount, 
-		Long tokenPrice, 
+		String roundId, 
+		Double tokenAmount, 
+		Double tokenPrice, 
 		Integer payment, 
 		String cryptoType
 		) {
 			UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			int id = userDetails.getId();
+			String id = userDetails.getId();
 			return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice, payment, cryptoType);
 		}
 		
@@ -67,29 +67,29 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	@PreAuthorize("isAuthenticated()")
 	public List<Bid> getBidListByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int id = userDetails.getId();
+        String id = userDetails.getId();
 		return bidService.getBidListByUser(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Bid> getBidListByAdmin(int userId) {
+	public List<Bid> getBidListByAdmin(String userId) {
 		return bidService.getBidListByUser(userId);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public Bid getBidByAdmin(int userId, Integer round) {
+	public Bid getBidByAdmin(String userId, Integer round) {
 		return bidService.getBid(round, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public Bid getBid(Integer round) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int id = userDetails.getId();
+        String id = userDetails.getId();
 		return bidService.getBid(round, id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<Bid> getBidListById(int roundId) {
+	public List<Bid> getBidListById(String roundId) {
 		return bidService.getBidListByRoundId(roundId);
 	}
 
@@ -99,7 +99,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	}
 	
 	///////////////// for test 
-	public String closeBid(int roundId) {
+	public String closeBid(String roundId) {
 		bidService.closeBid(roundId);
 		return "Success";
 	}

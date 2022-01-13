@@ -14,13 +14,13 @@ public class FinancialTransaction {
     
     private String txnId; // from Conbase API
     private String code;
-    private int userId;
+    private String userId;
     private int transactionType;
     private double cryptoType;
-    private Long cryptoAmount;
+    private double cryptoAmount;
     private Boolean isConfirmed;
-    private Long createdAt;
-    private Long confirmedAt;
+    private long createdAt;
+    private long confirmedAt;
 
     public FinancialTransaction() {
 
@@ -29,7 +29,7 @@ public class FinancialTransaction {
     public FinancialTransaction(
         int type, 
         double cryptoType, 
-        Long cryptoAmount
+        double cryptoAmount
     ) {
         this.transactionType = type;
         this.cryptoType = cryptoType;
@@ -57,12 +57,12 @@ public class FinancialTransaction {
     }
 
     @DynamoDBHashKey(attributeName = "user_id")
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
     
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -86,7 +86,7 @@ public class FinancialTransaction {
     public double getCryptoAmount() {
         return cryptoAmount;
     }
-    public void setCryptoAmount(Long cryptoAmount) {
+    public void setCryptoAmount(double cryptoAmount) {
         this.cryptoAmount = cryptoAmount;
     }
 
@@ -99,18 +99,18 @@ public class FinancialTransaction {
     }
 
     @DynamoDBAttribute(attributeName = "created_at")
-    public Long getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(Long createdAt) {
+    public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
 
     @DynamoDBAttribute(attributeName = "confirmed_at")
-    public Long getConfirmedAt() {
+    public long getConfirmedAt() {
         return confirmedAt;
     }
-    public void setConfirmedAt(Long confirmedAt) {
+    public void setConfirmedAt(long confirmedAt) {
         this.confirmedAt = confirmedAt;
     }
     

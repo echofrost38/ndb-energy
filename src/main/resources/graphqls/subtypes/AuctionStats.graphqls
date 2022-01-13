@@ -1,5 +1,0 @@
-type AuctionStats {
-	qty: Float, 
-	win: Float,
-	fail: Float
-}

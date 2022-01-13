@@ -1,5 +1,11 @@
 package com.ndb.auction.resolver;
 
+import java.util.List;
+
+import com.ndb.auction.models.InternalBalance;
+import com.ndb.auction.service.UserDetailsImpl;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -32,7 +38,7 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         return ndbWalletService.getWalletBalance(token, network, address).toString();
     }
 
-    public Boolean transferFunds(String token, String network, String address, long amount) {
+    public Boolean transferFunds(String token, String network, String address, int amount) {
         return ndbWalletService.transferFunds(token, network, address, amount);
     }
 

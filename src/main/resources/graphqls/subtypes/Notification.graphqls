@@ -1,8 +1,9 @@
 type Notification {
-    userId: Int,
-    timeStamp: Float,
-    nType: Int,
-    read: Boolean,
-    title: String,
-    msg: String
+   id: String!,
+   userId: String,
+   t: String,
+   msg: String,
+   read: String,
+   type: String,
+   broadcast: String
 }

@@ -1,18 +1,29 @@
 package com.ndb.auction.models;
 
-import org.springframework.stereotype.Component;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+@DynamoDBDocument
+public class SkillSet {
 
-@Component
-@Getter
-@Setter
-@NoArgsConstructor
-public class SkillSet extends BaseModel {
+	private String skill;
+	private Integer skillRate;
+	
+	@DynamoDBAttribute(attributeName = "skill")
+	public String getSkill() {
+		return skill;
+	}
 
-	private String name;
-	private Integer rate;
+	public void setSkill(String skill) {
+		this.skill = skill;
+	}
+	
+	@DynamoDBAttribute(attributeName = "skill_rate")
+	public Integer getSkillRate() {
+		return skillRate;
+	}
 
+	public void setSkillRate(Integer skillRate) {
+		this.skillRate = skillRate;
+	}
 }

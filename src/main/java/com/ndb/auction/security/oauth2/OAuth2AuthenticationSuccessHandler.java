@@ -4,13 +4,11 @@ import com.ndb.auction.config.AppProperties;
 import com.ndb.auction.security.TokenProvider;
 import com.ndb.auction.service.CustomOAuth2UserService;
 import com.ndb.auction.service.TotpService;
-import com.ndb.auction.service.user.UserDetailsImpl;
-import com.ndb.auction.service.user.UserSecurityService;
-import com.ndb.auction.service.user.UserService;
+import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.service.UserService;
 import com.ndb.auction.exceptions.BadRequestException;
+import com.ndb.auction.models.User;
 import com.ndb.auction.models.user.AuthProvider;
-import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,12 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static com.ndb.auction.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-
 @Slf4j
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -46,9 +42,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private UserService userService;
 
     @Autowired
-    private UserSecurityService userSecurityService;
-
-    @Autowired
     private TotpService totpService;
 
     @Autowired
@@ -57,18 +50,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+	AuthenticationManager authenticationManager;
 
     @Autowired
     OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider, AppProperties appProperties,
-            HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+                                       HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
         this.appProperties = appProperties;
         this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
@@ -80,14 +72,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) {
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new BadRequestException(
-                    "Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
+            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
         }
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
@@ -95,40 +85,37 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
         String registrationId = oauthToken.getAuthorizedClientRegistrationId();
 
-        log.info("targetURI : {} registrationID : {}, UserPrincipal {},", targetUrl, registrationId,
-                authentication.getPrincipal());
+        log.info("targetURI : {} registrationID : {}, UserPrincipal {},", targetUrl, registrationId, authentication.getPrincipal());
 
         UserDetailsImpl userPrincipal = new UserDetailsImpl();
-
+        
         try {
             userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         } catch (Exception e) {
-            if (registrationId.equalsIgnoreCase(AuthProvider.apple.toString())) { // In case of Apple
+            if(registrationId.equalsIgnoreCase(AuthProvider.apple.toString())) { //In case of Apple
                 OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                 Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
                 userPrincipal = customOAuth2UserService.processUserDetails(registrationId, attributes);
             } else {
-                return UriComponentsBuilder.fromUriString(targetUrl + "/error/unknown/registrationId").build()
-                        .toUriString();
+                return UriComponentsBuilder.fromUriString(targetUrl + "/error/unknown/registrationId").build().toUriString();
             }
         }
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
-        UserSecurity userSecurity;
 
         String type = "success";
         String dataType;
         String data;
-
-        if (!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
+        
+        if(!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
             type = "error";
             dataType = "InvalidProvider";
             data = user.getProvider().toString();
-        } else if ((userSecurity = user.getSecurity()) == null || !userSecurity.isTfaEnabled()) {
+        } else if (!user.getSecurity().get("2FA")) {
             type = "error";
             dataType = "No2FA";
-            data = user.getEmail();
-        } else {
+			data = user.getEmail();
+		} else {
             dataType = userService.signin2FA(user);
             data = user.getEmail();
             if (dataType.equals("error")) {
@@ -137,13 +124,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             // Save token on cache
             totpService.setTokenAuthCache(dataType, authentication);
 
-            List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
-            
-            for (UserSecurity security : userSecurities) {
-                data += "*" + security.getAuthType();
+            Map<String, Boolean> methods = user.getTwoStep();
+
+            for (Map.Entry<String, Boolean> method : methods.entrySet()) {
+                String key = method.getKey();
+                Boolean value = method.getValue();
+
+                if (!value) continue;
+                data += "*" + key;
             }
         }
-
+        
         return UriComponentsBuilder.fromUriString(targetUrl + "/" + type + "/" + dataType + "/" + data)
                 .build().toUriString();
     }
@@ -157,17 +148,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         URI clientRedirectUri = URI.create(uri);
 
         return appProperties.getOauth2().getAuthorizedRedirectUris()
-                .stream()
-                .anyMatch(authorizedRedirectUri -> {
-                    // Only validate host and port. Let the clients use different paths if they want
-                    // to
-                    URI authorizedURI = URI.create(authorizedRedirectUri);
-                    if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                            && authorizedURI.getPort() == clientRedirectUri.getPort()) {
-                        return true;
-                    }
-                    return false;
-                });
+            .stream()
+            .anyMatch(authorizedRedirectUri -> {
+                // Only validate host and port. Let the clients use different paths if they want to
+                URI authorizedURI = URI.create(authorizedRedirectUri);
+                if(authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+                        && authorizedURI.getPort() == clientRedirectUri.getPort()) {
+                    return true;
+                }
+                return false;
+            });
     }
 
 }

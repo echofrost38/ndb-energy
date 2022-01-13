@@ -1,29 +1,50 @@
 package com.ndb.auction.models;
 
-import org.springframework.stereotype.Component;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Component
-@Getter
-@Setter
+@DynamoDBDocument
 public class AuctionStats {
-
-	private Long qty;
-	private Long win;
-	private Long fail;
-
-	public AuctionStats() {	
-		this.qty = 0L;
-		this.win = 0L;
-		this.fail = 0L;
+	private Double qty;
+	private Double win;
+	private Double fail;
+	
+	public AuctionStats() {
+		this.qty = 0.0;
+		this.win = 0.0;
+		this.fail = 0.0;
 	}
-
-	public AuctionStats(Long qty, Long win, Long fail) {
+	
+	public AuctionStats(double qty, double win, double fail) {
 		this.qty = qty;
 		this.win = win;
 		this.fail = fail;
 	}
 
+	@DynamoDBAttribute(attributeName = "qty")
+	public Double getQty() {
+		return qty;
+	}
+
+	public void setQty(Double qty) {
+		this.qty = qty;
+	}
+
+	@DynamoDBAttribute(attributeName = "win")
+	public Double getWin() {
+		return win;
+	}
+
+	public void setWin(Double win) {
+		this.win = win;
+	}
+
+	@DynamoDBAttribute(attributeName = "fail")
+	public Double getFail() {
+		return fail;
+	}
+
+	public void setFail(Double fail) {
+		this.fail = fail;
+	}
 }

@@ -32,7 +32,7 @@ public class SortRoundByNumber {
 
         while (i < low && j < high)                     //merge the left and right subarrays
         {
-            if (L[i].getRound() > R[j].getRound()) 
+            if (L[i].getNumber() > R[j].getNumber()) 
             {
                 arr[k] = L[i];
                 i++;

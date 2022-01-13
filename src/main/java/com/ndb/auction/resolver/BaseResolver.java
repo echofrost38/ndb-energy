@@ -18,12 +18,11 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TotpService;
-import com.ndb.auction.service.user.UserSecurityService;
-import com.ndb.auction.service.user.UserService;
-import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.service.UserService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
+import com.ndb.auction.service.SumsubService;
 import com.ndb.auction.service.TokenAssetService;
 
 public class BaseResolver {
@@ -59,6 +58,9 @@ public class BaseResolver {
 	CryptoService cryptoService;
 
 	@Autowired
+	SumsubService sumsubService;
+
+	@Autowired
 	NotificationService notificationService;
 
 	@Autowired
@@ -90,11 +92,5 @@ public class BaseResolver {
 
 	@Autowired
 	BalanceService balanceService;
-
-	@Autowired
-	UserVerifyService userVerifyService;
-
-	@Autowired
-	UserSecurityService userSecurityService;
 
 }

@@ -3,8 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.service.TaskSettingService;
+import com.ndb.auction.models.UserTier;
 import com.ndb.auction.service.TierService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +15,21 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class TierResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-    
     @Autowired
     private TierService tierService;
 
-    @Autowired
-    private TaskSettingService taskSettingService;
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Tier addNewUserTier(int level, String name, Long point, String svg) {
-        return tierService.addNewUserTier(level, name, point, svg);
+    public UserTier addNewUserTier(int level, String name, double points) {
+        return tierService.addNewUserTier(level, name, points);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Tier updateUserTier(int level, String name, Long point, String svg) {
-        return tierService.updateUserTier(level, name, point, svg);
+    public UserTier updateUserTier(int level, String name, double points) {
+        return tierService.updateUserTier(level, name, points);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<Tier> getUserTiers() {
+    public List<UserTier> getUserTiers() {
         return tierService.getUserTiers();
     }
 
@@ -45,16 +40,16 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting addNewSetting(TaskSetting setting) {
-        return taskSettingService.updateTaskSetting(setting);
+        return tierService.addNewSetting(setting);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting updateTaskSetting(TaskSetting setting) {
-        return taskSettingService.updateTaskSetting(setting);
+        return tierService.updateTaskSetting(setting);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public TaskSetting getTaskSetting() {
-        return taskSettingService.getTaskSetting();
+        return tierService.getTaskSetting();
     }
 }

@@ -1,5 +1,5 @@
 extend type Query {
-    getUserTiers : [Tier]
+    getUserTiers : [UserTier]
     getTaskSetting: TaskSetting
 }
 
@@ -7,15 +7,13 @@ extend type Mutation {
     addNewUserTier(
         level: Int!,
         name: String!,
-        point: Float!,
-        svg: String!
-    ) : Tier
+        points: Float!
+    ) : UserTier
     updateUserTier(
         level: Int!,
         name: String,
-        point: Float,
-        svg: String
-    ) : Tier
+        points: Float
+    ) : UserTier
     deleteUserTier(
         level: Int!
     ) : Int

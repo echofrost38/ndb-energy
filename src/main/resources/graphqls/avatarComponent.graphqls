@@ -1,7 +1,7 @@
 extend type Query {
     getAvatarComponent(
         groupId: String!,
-        compId: Int!
+        compId: String!
     ): AvatarComponent
     getAvatarComponentsByGroup (
         groupId: String!
@@ -25,7 +25,7 @@ extend type Mutation {
     ) : AvatarComponent
     updateComponent (
         groupId: String!,
-        compId: Int!,
+        compId: String!,
         tierLevel: Int,
         price: Float,
         limited: Int,

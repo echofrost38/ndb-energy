@@ -1,5 +1,4 @@
 type SkillSet {
-    id: Int,
-    name: String!,
-    rate: Int
+    skill: String!,
+    skillRate: Int
 }

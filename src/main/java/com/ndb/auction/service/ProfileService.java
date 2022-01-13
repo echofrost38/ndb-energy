@@ -4,167 +4,158 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.springframework.stereotype.Service;
+
 import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.AvatarComponent;
+import com.ndb.auction.models.AvatarProfile;
+import com.ndb.auction.models.AvatarSet;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Wallet;
-import com.ndb.auction.models.avatar.AvatarComponent;
-import com.ndb.auction.models.avatar.AvatarProfile;
-import com.ndb.auction.models.avatar.AvatarSet;
-import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserAvatar;
-
-import org.springframework.stereotype.Service;
+import com.ndb.auction.models.User;
+import com.ndb.auction.models.user.Wallet;
+import com.ndb.auction.service.interfaces.IProfileService;
 
 /**
  * 1. get market data
  * 2. get avatar ? / set avatar!!!!!
  * 3. Airdrop where to go???????????
- * 
  * @author klinux
  *
  */
 
 @Service
-public class ProfileService extends BaseService {
+public class ProfileService extends BaseService implements IProfileService {
 
 	// actually return user it self!!!!
-	public User getUserProfile(int userId) {
-		return userDao.selectById(userId);
+	@Override
+	public User getUserProfile(String userId) {
+		return userDao.getUserById(userId);
 	}
 
-	public List<Notification> getNotifications(int userId) {
+	@Override
+	public List<Notification> getNotifications(String userId) {
 		return notificationDao.getNotificationsByUser(userId);
 	}
 
-	public Integer getNotifySetting(int userId) {
-		User user = userDao.selectById(userId);
-		if (user == null) {
+	@Override
+	public Integer getNotifySetting(String userId) {
+		User user = userDao.getUserById(userId);
+		if(user == null) {
 			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
-
+	
 		return user.getNotifySetting();
 	}
 
-	public int updateNotifySetting(int userId, int setting) {
-		if (userDao.updateNotifySetting(userId, setting) < 1)
+	@Override
+	public Integer updateNotifySetting(String userId, Integer setting) {
+		User user = userDao.getUserById(userId);
+		if(user == null) {
 			throw new UserNotFoundException("We were unable to find a user id", "userId");
+		}		
+		user.setNotifySetting(setting);
+		userDao.updateUser(user);
 		return setting;
 	}
 
-	public Integer changePassword(int userId, String password) {
-
+	@Override
+	public Integer changePassword(String userId, String password) {
+		
 		return null;
 	}
 
-	public List<Bid> getBidActivity(int userId) {
+	@Override
+	public List<Bid> getBidActivity(String userId) {
 		return bidDao.getBidListByUser(userId);
 	}
 
 	/**
 	 * prefix means avatar first name!
-	 * once user select avatar with first name, user will have owned components
+	 * once user select avatar with first name, user will have owned components 
 	 */
-	public String setAvatar(int id, String prefix, String name) {
+	@Override
+	public String setAvatar(String id, String prefix, String name) {
 		// check user exists
-		UserAvatar userAvatar = userAvatarDao.selectByPrefixAndName(prefix, name);
-		if (userAvatar != null) {
+		User user = userDao.getUserByAvatar(prefix, name);
+		if(user != null) {
 			return "Already exists";
 		}
-
-		User user = userDao.selectById(id);
-		if (user == null) {
+		
+		user = userDao.getUserById(id);
+		if(user == null) {
 			throw new UserNotFoundException("We were unable to find a user with avatar", "name");
 		}
-
-		userAvatar = userAvatarDao.selectById(id);
-		if (userAvatar == null) {
-			userAvatar = new UserAvatar();
-			userAvatar.setId(id);
-		}
-
+		
 		// update purchase list and user avatar set!!
-		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(prefix);
+		AvatarProfile profile = avatarDao.getAvatarProfileByName(prefix);
 
-		if (profile == null) {
+		if(profile == null) {
 			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix");
 		}
 
-		List<AvatarSet> sets = avatarSetDao.selectById(profile.getId());
-		List<AvatarComponent> components = avatarComponentDao.getAvatarComponentsBySet(sets);
-
-		String purchasedJsonString = userAvatar.getPurchased();
-		JsonObject purchasedJson = purchasedJsonString == null ? new JsonObject()
-				: JsonParser.parseString(purchasedJsonString).getAsJsonObject();
-		for (AvatarComponent component : components) {
-			String group =String.valueOf(component.getGroupId());
-			JsonElement el = purchasedJson.get(group);
-			JsonArray array;
-			if (el == null || el.isJsonNull())
-				array = new JsonArray();
-			else
-				array = el.getAsJsonArray();
-			array.add(component.getCompId());
-			purchasedJson.add(group, array);
+		List<AvatarSet> sets = profile.getAvatarSet();
+		List<AvatarComponent> components = avatarDao.getAvatarComponentsBySet(sets);
+		Map<String, List<String>> purchasedMap = user.getAvatarPurchase();
+		for (AvatarComponent comp : components) {
+			String group = comp.getGroupId();
+			List<String> purchased = purchasedMap.get(group);
+			if(purchased == null) {
+				purchased = new ArrayList<String>();
+				purchasedMap.put(group, purchased);
+			}
+			purchased.add(comp.getCompId());
 		}
-		userAvatar.setPurchased(purchasedJson.toString());
-		userAvatar.setSelected(gson.toJson(sets));
-		userAvatar.setPrefix(prefix);
-		userAvatar.setName(name);
-		userAvatarDao.insertOrUpdate(userAvatar);
+		user.setAvatarPurchase(purchasedMap);
+		user.setAvatar(sets);
+		user.setAvatarPrefix(prefix);
+		user.setAvatarName(name);
+		userDao.updateUser(user);
 		return "Success";
 	}
 
-	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set) {
-		User user = userDao.selectById(userId);
-		if (user == null) {
+	@Override
+	public List<AvatarSet> updateAvatarSet(String userId, List<AvatarSet> set) {
+		User user = userDao.getUserById(userId);
+		if(user == null) {
 			throw new UserNotFoundException("We were unable to find a user id", "userId");
 		}
-
-		UserAvatar userAvatar = userAvatarDao.selectById(userId);
-		if (userAvatar == null) {
-			userAvatar = new UserAvatar();
-		}
-		long totalPrice = 0;
-		long price = 0;
+		double totalPrice = 0.0;
+		double price = 0.0;
 		String groupId = "";
-		int compId = 0;
-		List<AvatarComponent> purchasedComponents = new ArrayList<>();
+		String compId = "";
+		List<AvatarComponent> purchasedComponents = new ArrayList<AvatarComponent>();
 
-		Map<String, List<Integer>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
 		for (AvatarSet avatarSet : set) {
 			groupId = avatarSet.getGroupId();
 			compId = avatarSet.getCompId();
-			AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
-			if (component == null) {
+			AvatarComponent component = avatarDao.getAvatarComponent(groupId, compId);
+			if(component == null) {
 				throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 			}
 
 			// check free
 			price = component.getPrice();
-			if (price == 0) {
+			if(price == 0) {
 				continue;
 			}
 
 			// check purchased
-			List<Integer> purchaseList = purchasedMap.get(groupId);
-			if (purchaseList == null) {
-				purchaseList = new ArrayList<>();
-				purchasedMap.put(String.valueOf(groupId), purchaseList);
+			Map<String, List<String>> purchasedMap = user.getAvatarPurchase();
+			List<String> purchaseList = purchasedMap.get(groupId);
+			if(purchaseList == null) {
+				purchaseList = new ArrayList<String>();
+				purchasedMap.put(groupId, purchaseList);
 			}
-
-			if (purchaseList.contains(compId)) {
+			
+			if(purchaseList.contains(compId)) {
 				continue;
 			}
 
 			// check remained
-			if (component.getLimited() <= component.getPurchased()) {
+			if(component.getLimited() <= component.getPurchased()) {
 				return null;
 			}
 
@@ -174,25 +165,27 @@ public class ProfileService extends BaseService {
 			purchasedComponents.add(component);
 		}
 
-		// check user's NDB wallet
+		// check user's NDB wallet 
 		Wallet ndbWallet = userWalletService.getWalletById(userId, "NDB");
-		long balance = ndbWallet.getFree();
-		if (balance < totalPrice) {
+		double balance = ndbWallet.getFree();
+		if(balance < totalPrice) {
 			throw new BidException("You don't have enough balance in wallet.", "set");
 		}
 		ndbWallet.setFree(balance - totalPrice);
-		userAvatar.setPurchased(gson.toJson(purchasedMap));
-		userAvatar.setSelected(gson.toJson(set));
+		
+		
+		user.setAvatar(set);
+		userDao.updateUser(user);
 
-		for (AvatarComponent avatarComponent : purchasedComponents) {
-			avatarComponentDao.updateAvatarComponent(avatarComponent);
-		}
+		// update component purchased ?
+		avatarDao.updateAvatarComponents(purchasedComponents);
 
 		return set;
 	}
 
+	@Override
 	public String purchaseComponent(List<AvatarComponent> components) {
-
+		
 		return null;
 	}
 

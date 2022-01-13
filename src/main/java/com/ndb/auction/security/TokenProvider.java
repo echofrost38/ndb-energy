@@ -1,7 +1,7 @@
 package com.ndb.auction.security;
 
 import com.ndb.auction.config.AppProperties;
-import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.UserDetailsImpl;
 
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ndb.auction.contracts.UserWallet;
-import com.ndb.auction.models.Wallet;
+import com.ndb.auction.models.user.Wallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class UserWalletService {
         this.userWallet = loadTraderContract(password);
     }
 
-    public TransactionReceipt addNewUser(int id, String email, String name) {
+    public TransactionReceipt addNewUser(String id, String email, String name) {
         TransactionReceipt receipt = null;
         try {
             if (userWallet != null) {
@@ -53,7 +53,7 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt addFreeAmount(int id, String crypto, long _amount) {
+    public TransactionReceipt addFreeAmount(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
@@ -71,7 +71,7 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt addHoldAmount(int id, String crypto, long _amount) {
+    public TransactionReceipt addHoldAmount(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
@@ -89,7 +89,7 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt makeHold(int id, String crypto, long _amount) {
+    public TransactionReceipt makeHold(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
@@ -107,7 +107,7 @@ public class UserWalletService {
         return receipt;
     }
 
-    public TransactionReceipt releaseHold(int id, String crypto, long _amount) {
+    public TransactionReceipt releaseHold(String id, String crypto, double _amount) {
         TransactionReceipt receipt = null;
         try {
             if(userWallet != null) {
@@ -125,7 +125,7 @@ public class UserWalletService {
         return receipt;
     }
 
-    public String getUserName(int id) {
+    public String getUserName(String id) {
         String result = "";
         try {
             if(userWallet != null) {
@@ -138,26 +138,26 @@ public class UserWalletService {
         return result;
     }
 
-    public Wallet getWalletById(int id, String crypto) {
+    public Wallet getWalletById(String id, String crypto) {
         Wallet wallet = null;
         try {
             Tuple2<BigInteger, BigInteger> tuple2 = userWallet.getWalletById(id, crypto).send();
             
             BigInteger bFree = tuple2.component1();
-            int free = bFree.divide(bDecimal).intValue();
+            double free = bFree.divide(bDecimal).doubleValue();
 
             BigInteger bHold = tuple2.component2();
-            int hold = bHold.divide(bDecimal).intValue();
+            double hold = bHold.divide(bDecimal).doubleValue();
             
-            // wallet = new Wallet(crypto, free, hold);
+            wallet = new Wallet(crypto, free, hold);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return wallet;
     }
 
-    public List<Wallet> getWallets(int id) {
-        List<Wallet> wallets = new ArrayList<>();
+    public List<Wallet> getWallets(String id) {
+        List<Wallet> wallets = new ArrayList<Wallet>();
         try {
             Tuple3<List<String>, List<BigInteger>, List<BigInteger>> tuple3 = userWallet.getWallets(id).send();
             List<String> keyList = tuple3.component1();
@@ -166,13 +166,13 @@ public class UserWalletService {
             int len = keyList.size();
             for(int i = 0; i < len; i++) {
                 BigInteger bFree = freeList.get(i);
-                int free = bFree.divide(bDecimal).intValue();
+                double free = bFree.divide(bDecimal).doubleValue();
 
                 BigInteger bHold = holdList.get(i);
-                int hold = bHold.divide(bDecimal).intValue();
+                double hold = bHold.divide(bDecimal).doubleValue();
 
-                // Wallet wallet = new Wallet(keyList.get(i), free, hold);
-                // wallets.add(wallet);
+                Wallet wallet = new Wallet(keyList.get(i), free, hold);
+                wallets.add(wallet);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

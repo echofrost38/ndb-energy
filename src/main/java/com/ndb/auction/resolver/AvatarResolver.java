@@ -2,11 +2,11 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
-import com.ndb.auction.models.AvatarComponent;
-import com.ndb.auction.models.AvatarProfile;
-import com.ndb.auction.models.AvatarSet;
-import com.ndb.auction.models.Facts;
 import com.ndb.auction.models.SkillSet;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarFacts;
+import com.ndb.auction.models.avatar.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarSet;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	public AvatarComponent createNewComponent(
 		String groupId, 
 		Integer tierLevel, 
-		Double price, 
+		Long price, 
 		Integer limited,
 		String svg,
 		int width,
@@ -34,22 +34,30 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	
 	// update component
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarComponent updateComponent(String groupId, String compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
-		return avatarService.updateAvatar(groupId, compId, tierLevel, price, limited, svg, width, top, left);
+	public AvatarComponent updateComponent(String groupId, int compId, Integer tierLevel, Long price, Integer limited, String svg, int width, int top, int left) {
+		return avatarService.updateAvatarComponent(groupId, compId, tierLevel, price, limited, svg, width, top, left);
 	}
 
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile createNewAvatar(String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factsSet, String hairColor, String details) 
+	public AvatarProfile createNewAvatar(
+		String fname, 
+		String surname, 
+		List<SkillSet> skillSet, 
+		List<AvatarSet> avatarSet, 
+		List<AvatarFacts> factSet, 
+		String hairColor, 
+		String details
+	) 
 	{
-		return avatarService.createAvatarProfile(name, surname, shortName, skillSet, avatarSet, factsSet, hairColor, details);
+		return avatarService.createAvatarProfile(fname, surname, skillSet, avatarSet, factSet, hairColor, details);
 	}
 	
 	// update existing avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public AvatarProfile updateAvatarProfile(String id, String name, String surname, String shortName, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<Facts> factsSet, String hairColor, String details) 
+	public Boolean updateAvatarProfile(int id, String fname, String surname, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factSet, String hairColor, String details) 
 	{
-		return avatarService.updateAvatarProfile(id, name, surname, shortName, skillSet, avatarSet, factsSet, hairColor, details);
+		return avatarService.updateAvatarProfile(id, fname, surname, skillSet, avatarSet, factSet, hairColor, details);
 	}
 	
 	// get avatar list
@@ -59,13 +67,13 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public AvatarProfile getAvatar(String id) {
+	public AvatarProfile getAvatar(int id) {
 		return avatarService.getAvatarProfile(id);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public AvatarProfile getAvatarByName(String fname) {
-		return avatarService.getAvatarProfileByName(fname);
+	public AvatarProfile getAvatarByName(String surname) {
+		return avatarService.getAvatarProfileByName(surname);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
@@ -79,7 +87,7 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public AvatarComponent getAvatarComponent(String groupId, String compId) {
+	public AvatarComponent getAvatarComponent(String groupId, int compId) {
 		return avatarService.getAvatarComponent(groupId, compId);
 	}
 	

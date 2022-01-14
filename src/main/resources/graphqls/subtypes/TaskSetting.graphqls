@@ -1,17 +1,16 @@
 type TaskSetting {
-    settingId: String!,
+    id: Int!,
     verification: Float,
-    walletTasks: [WalletTask],
+    wallet: [WalletTask],
     auction: Float,
     direct: Float,
-    stakingTasks: [StakeTask]
+    staking: [StakeTask]
 }
 
 input TaskSettingInput {
-    settingId: String!,
     verification: Float!,
-    walletTasks: [WalletTaskInput]!,
+    wallet: [WalletTaskInput]!,
     auction: Float!,
     direct: Float!,
-    stakingTasks: [StakeTaskInput]!
+    staking: [StakeTaskInput]!
 }

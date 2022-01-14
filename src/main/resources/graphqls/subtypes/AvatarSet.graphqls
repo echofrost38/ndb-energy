@@ -1,9 +1,13 @@
 type AvatarSet {
+    id: Int!,
+    regDate: Float,
+    updateDate: Float,
+    deleted: Int,
     groupId: String,
-    compId: String
+    compId: Int
 }
 
 input AvatarSetInput {
     groupId: String,
-    compId: String
+    compId: Int
 }

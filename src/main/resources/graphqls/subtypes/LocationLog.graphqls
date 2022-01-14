@@ -1,0 +1,23 @@
+type LocationLog {
+    id: Int!,
+    regDate: Float,
+    updateDate: Float,
+    deleted: Int,
+    userId: Int,
+    ipAddress: String,
+    isVpn: Boolean,
+    isProxy: Boolean,
+    isTor: Boolean,
+    isRelay: Boolean,
+    city: String,
+    region: String,
+    country: String,
+    continent: String,
+    regionCode: String,
+    countryCode: String,
+    continentCode: String,
+    latitude: Float,
+    longitude: Float,
+    vpnapiResponse: String,
+    finalResult: String
+}

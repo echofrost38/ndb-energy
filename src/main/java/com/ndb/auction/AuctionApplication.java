@@ -21,4 +21,6 @@ public class AuctionApplication {
 		return ApolloScalars.Upload;
 	}
 
+
+
 }

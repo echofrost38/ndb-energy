@@ -1,0 +1,6 @@
+type InternalBalance {
+    userId: Int,
+    tokenId: Int,
+    free: Float,
+    hold: Float
+}

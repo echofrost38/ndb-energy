@@ -1,0 +1,8 @@
+type UserSecurity {
+    id: Int,
+    regDate: Float,
+    updateDate: Float,
+    deleted: Int,
+    authType: String,
+    tfaEnabled: Boolean, 
+}

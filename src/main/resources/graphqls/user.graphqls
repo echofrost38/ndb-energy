@@ -1,5 +1,8 @@
-extend type Query {
+type Query {
   getUser: User
+  getUserById(
+    id: Int!
+  ) : User
   getUserCount: Int
   getPaginatedUsers(key: String, limit: Int!): [User]
 }
@@ -23,6 +26,6 @@ extend type Mutation {
 }
 
 schema {
-  query: Query
+  # query: Query
   mutation: Mutation
 }

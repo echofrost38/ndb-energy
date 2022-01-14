@@ -1,11 +1,16 @@
 package com.ndb.auction.models;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class DirectSale {
+@Component
+@Getter
+@Setter
+@NoArgsConstructor
+public class DirectSale extends BaseModel {
 
     // CONSTANTS
     public static final int STRIPE = 0;
@@ -14,21 +19,21 @@ public class DirectSale {
     public static final int INTERNAL = 0;
     public static final int EXTERNAL = 1;
 
-    private String userId;
+    private int userId;
     private String txnId;
 
     // stripe and coinbase, ndb wallet
     private int payType;
-    private double ndbPrice;
-    private double ndbAmount;
+    private String ndbPrice;
+    private String ndbAmount;
     private int whereTo;
 
     private String extAddr;
 
     private boolean isConfirmed;
 
-    private long createdAt;
-    private long confirmedAt;
+    private Long createdAt;
+    private Long confirmedAt;
 
     // for stripe
     private String paymentIntentId;
@@ -36,18 +41,13 @@ public class DirectSale {
     // for coinbase
     private String code;
     private String cryptoType;
-    private double cryptoPrice;
-    private double cryptoAmount;
-
-    public DirectSale () {
-
-    }
+    private String cryptoAmount;
 
     public DirectSale(
-        String userId,
+        int userId,
         String txnId,
-        double ndbPrice,
-        double ndbAmount,
+        String ndbPrice,
+        String ndbAmount,
         int whereTo,
         String extAddr
     ) {
@@ -61,124 +61,4 @@ public class DirectSale {
         this.createdAt = System.currentTimeMillis();
     }
 
-    @DynamoDBHashKey(attributeName = "user_id")
-    public String getUserId() {
-        return userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    @DynamoDBRangeKey(attributeName = "txn_id")
-    public String getTxnId() {
-        return txnId;
-    }
-    public void setTxnId(String txnId) {
-        this.txnId = txnId;
-    }
-
-    @DynamoDBAttribute(attributeName = "pay_type")
-    public int getPayType() {
-        return payType;
-    }
-    public void setPayType(int payType) {
-        this.payType = payType;
-    }
-
-    @DynamoDBAttribute(attributeName = "ndb_price")
-    public double getNdbPrice() {
-        return ndbPrice;
-    }
-    public void setNdbPrice(double ndbPrice) {
-        this.ndbPrice = ndbPrice;
-    }
-
-    @DynamoDBAttribute(attributeName = "ndb_amount")
-    public double getNdbAmount() {
-        return ndbAmount;
-    }
-    public void setNdbAmount(double ndbAmount) {
-        this.ndbAmount = ndbAmount;
-    }
-
-    @DynamoDBAttribute(attributeName = "where_to")
-    public int getWhereTo() {
-        return whereTo;
-    }
-    public void setWhereTo(int whereTo) {
-        this.whereTo = whereTo;
-    }
-
-    @DynamoDBAttribute(attributeName = "ext_addr")
-    public String getExtAddr() {
-        return extAddr;
-    }
-
-    public void setExtAddr(String extAddr) {
-        this.extAddr = extAddr;
-    }
-
-    @DynamoDBAttribute(attributeName = "is_confirmed")
-    public boolean isConfirmed() {
-        return isConfirmed;
-    }
-    public void setConfirmed(boolean isConfirmed) {
-        this.isConfirmed = isConfirmed;
-    }
-
-    @DynamoDBAttribute(attributeName = "created_at")
-    public long getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @DynamoDBAttribute(attributeName = "confirmed_at")
-    public long getConfirmedAt() {
-        return confirmedAt;
-    }
-    public void setConfirmedAt(long confirmedAt) {
-        this.confirmedAt = confirmedAt;
-    }
-
-    @DynamoDBAttribute(attributeName = "payment_intent_id")
-    public String getPaymentIntentId() {
-        return paymentIntentId;
-    }
-    public void setPaymentIntentId(String paymentIntentId) {
-        this.paymentIntentId = paymentIntentId;
-    }
-
-    @DynamoDBAttribute(attributeName = "code")
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    @DynamoDBAttribute(attributeName = "crypto_type")
-    public String getCryptoType() {
-        return cryptoType;
-    }
-    public void setCryptoType(String cryptoType) {
-        this.cryptoType = cryptoType;
-    }
-
-    @DynamoDBAttribute(attributeName = "crypto_price")
-    public double getCryptoPrice() {
-        return cryptoPrice;
-    }
-    public void setCryptoPrice(double cryptoPrice) {
-        this.cryptoPrice = cryptoPrice;
-    }
-
-    @DynamoDBAttribute(attributeName = "crypto_amount")
-    public double getCryptoAmount() {
-        return cryptoAmount;
-    }
-    public void setCryptoAmount(double cryptoAmount) {
-        this.cryptoAmount = cryptoAmount;
-    }
 }

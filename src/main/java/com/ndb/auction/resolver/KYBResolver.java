@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.Part;
 
-import com.ndb.auction.models.KYB;
-import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.models.user.UserKyb;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,35 +18,35 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class KYBResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
 	@PreAuthorize("isAuthenticated()")
-	public KYB getMyKYBSetting() {
+	public UserKyb getMyKYBSetting() {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		return kybService.getByUserId(userDetails.getId());
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public KYB getKYBSetting(String userId) {
+	public UserKyb getKYBSetting(int userId) {
 		return kybService.getByUserId(userId);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<KYB> getKYBSettingList() {
+	public List<UserKyb> getKYBSettingList() {
 		return kybService.getAll();
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public KYB updateInfo(String country, String companyName, String regNum) {
+	public UserKyb updateInfo(String country, String companyName, String regNum) {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		String userId = userDetails.getId();
+		int userId = userDetails.getId();
 		return kybService.updateInfo(userId, country, companyName, regNum);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public KYB updateFile(List<Part> files) {
+	public UserKyb updateFile(List<Part> files) {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		String userId = userDetails.getId();
+		int userId = userDetails.getId();
 		return kybService.updateFile(userId, files);
 	}
 }

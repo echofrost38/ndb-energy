@@ -2,15 +2,16 @@ package com.ndb.auction.dao.oracle;
 
 import javax.sql.DataSource;
 
+import com.google.gson.Gson;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import lombok.NoArgsConstructor;
-
 @Repository
-@NoArgsConstructor
 public abstract class BaseOracleDao {
+
+	protected static Gson gson = new Gson();
 
 	protected JdbcTemplate jdbcTemplate;
 
@@ -20,6 +21,12 @@ public abstract class BaseOracleDao {
 	}
 
 	protected String tableName;
+
+	protected BaseOracleDao() {
+		var table = this.getClass().getAnnotation(Table.class);
+		if (table != null)
+			tableName = table.name();
+	}
 
 	protected BaseOracleDao(String tableName) {
 		this.tableName = tableName;
@@ -32,7 +39,12 @@ public abstract class BaseOracleDao {
 
 	public int deleteById(int id) {
 		String sql = "DELETE FROM " + tableName + " WHERE ID=?";
-		return jdbcTemplate.queryForObject(sql, Integer.class, id);
+		return jdbcTemplate.update(sql, id);
+	}
+
+	public int deleteAll() {
+		String sql = "DELETE FROM " + tableName;
+		return jdbcTemplate.update(sql);
 	}
 
 }

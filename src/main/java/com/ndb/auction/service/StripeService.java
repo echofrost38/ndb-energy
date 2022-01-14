@@ -4,16 +4,16 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.PayResponse;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StripeService extends BaseService {
@@ -46,7 +46,7 @@ public class StripeService extends BaseService {
 	 * @param paymentMethodId
 	 * @return
 	 */
-	public PayResponse createNewPayment(String roundId, String userId, Long amount, String paymentIntentId, String paymentMethodId) {
+	public PayResponse createNewPayment(int roundId, int userId, Long amount, String paymentIntentId, String paymentMethodId) {
 		
 		PaymentIntent intent;
 		PayResponse response = new PayResponse();
@@ -76,7 +76,7 @@ public class StripeService extends BaseService {
 //                stripeDao.updatePaymentStatus(paymentIntentId, StripeTransaction.AUTHORIZED);
 				Bid bid = bidService.getBid(roundId, userId);
 				double usdAmount = ((double)amount)/100;
-				if(bid.getPendingIncrease()) {
+				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     if(pendingPrice > usdAmount) {
                         response.setError("Insufficient funds");
@@ -86,7 +86,7 @@ public class StripeService extends BaseService {
                     bidService.updateBid(userId, roundId, bid.getTempTokenAmount(), bid.getTempTokenPrice());
                     
                 } else {
-                    double totalPrice = bid.getTotalPrice();
+                    long totalPrice = bid.getTotalPrice();
                     if(totalPrice > usdAmount) {
                         response.setError("Insufficient funds");
 						return response;
@@ -109,7 +109,7 @@ public class StripeService extends BaseService {
 	}
 
 	// update payments - called by closeBid
-	public boolean UpdateTransaction(String id, Integer status) {
+	public boolean UpdateTransaction(int id, Integer status) {
 		
 		PaymentIntent intent;
 		
@@ -136,16 +136,16 @@ public class StripeService extends BaseService {
 	}
 	
 	// get transactions
-	public List<StripeTransaction> getTransactionsByRound(String roundId) {
+	public List<StripeTransaction> getTransactionsByRound(int roundId) {
 		return stripeDao.getTransactionsByRound(roundId);
 	}
 	
-	public List<StripeTransaction> getTransactionByUser(String userId) {
+	public List<StripeTransaction> getTransactionByUser(int userId) {
 		
 		return stripeDao.getTransactionsByUser(userId);
 	}
 	
-	public List<StripeTransaction> getTransactions(String roundId, String userId) {
+	public List<StripeTransaction> getTransactions(int roundId, int userId) {
 		return stripeDao.getTransactions(roundId, userId);
 	}
 	

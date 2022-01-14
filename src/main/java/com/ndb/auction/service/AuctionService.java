@@ -2,7 +2,6 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -10,32 +9,31 @@ import lombok.RequiredArgsConstructor;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.service.interfaces.IAuctionService;
 
 @Service
 @RequiredArgsConstructor
-public class AuctionService extends BaseService implements IAuctionService {
+public class AuctionService extends BaseService {
 
-	@Override
 	public Auction createNewAuction(Auction auction) {
-		
+
 		// Started at checking
-		if(System.currentTimeMillis() > auction.getStartedAt()) {
-			throw new AuctionException("Round start time is invalid.", auction.getAuctionId());
+		if (System.currentTimeMillis() > auction.getStartedAt()) {
+			throw new AuctionException("Round start time is invalid.", String.valueOf(auction.getId()));
 		}
 
 		// check conflict auction round
-		Auction _auction = auctionDao.getAuctionByRound(auction.getNumber());
-		if(_auction != null) {
-			throw new AuctionException("Round doesn't exist.", auction.getAuctionId());
+		Auction _auction = auctionDao.getAuctionByRound(auction.getRound());
+		if (_auction != null) {
+			throw new AuctionException("Round doesn't exist.", String.valueOf(auction.getId()));
 		}
 
-		Auction prev = auctionDao.getAuctionByRound(auction.getNumber() - 1);
-		if(prev == null || prev.getStatus() == Auction.STARTED) {
+		Auction prev = auctionDao.getAuctionByRound(auction.getRound() - 1);
+		if (prev == null || prev.getStatus() == Auction.STARTED) {
 			auction.setStatus(Auction.COUNTDOWN);
 
 			// Save
-			auctionDao.createNewAuction(auction);
+			auction = auctionDao.createNewAuction(auction);
+			auctionAvatarDao.update(auction.getId(), auction.getAvatar());
 
 			// set new countdown!!
 			schedule.setNewCountdown(auction);
@@ -44,119 +42,121 @@ public class AuctionService extends BaseService implements IAuctionService {
 			// check end time and start time
 			long prevEnd = prev.getEndedAt();
 			long curStart = auction.getStartedAt();
-			if(curStart < prevEnd) 
-				throw new AuctionException("Round start time is invalid.", auction.getAuctionId());
+			if (curStart < prevEnd)
+				throw new AuctionException("Round start time is invalid.", String.valueOf(auction.getId()));
 
 			auctionDao.createNewAuction(auction);
+			auctionAvatarDao.update(auction.getId(), auction.getAvatar());
 		}
-		
+
 		return auction;
 	}
 
-	@Override
 	public List<Auction> getAuctionList() {
-		return auctionDao.getAuctionList();
+		List<Auction> auctionList = auctionDao.getAuctionList();
+		for (Auction auction : auctionList) {
+			auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		}
+		return auctionList;
 	}
 
-	@Override
-	public Auction getAuctionById(String id) {
-		return auctionDao.getAuctionById(id);
+	public Auction getAuctionById(int id) {
+		Auction auction = auctionDao.getAuctionById(id);
+		if(auction == null) return null;
+		auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		return auction;
 	}
 
 	public Auction getAuctionByRound(int round) {
-		return auctionDao.getAuctionByRound(round);
+		Auction auction = auctionDao.getAuctionByRound(round);
+		if(auction == null) return null;
+		auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		return auction;
 	}
 
-	@Override
 	public Auction updateAuctionByAdmin(Auction auction) {
-				
-		// Check Validation ( null possible ) 
-		Auction _auction = auctionDao.getAuctionById(auction.getAuctionId());
-		if(_auction == null) return null;
-		if(_auction.getStatus() != Auction.PENDING) 
-			throw new AuctionException("Round is not pending status.", auction.getAuctionId());
 
-		return auctionDao.updateAuctionByAdmin(auction);
+		// Check Validation ( null possible )
+		Auction _auction = auctionDao.getAuctionById(auction.getId());
+		if (_auction == null)
+			return null;
+		if (_auction.getStatus() != Auction.PENDING)
+			throw new AuctionException("Round is not pending status.", String.valueOf(auction.getId()));
+
+		auctionDao.updateAuctionByAdmin(auction);
+		auctionAvatarDao.update(auction.getId(), auction.getAvatar());
+		return auction;
 	}
 
-	@Override
-	public Auction startAuction(String id) {
-		
+	public Auction startAuction(int id) {
+
 		// check already opened Round
 		List<Auction> list = auctionDao.getAuctionByStatus(Auction.STARTED);
-		if(list.size() != 0) {
-			// there is already opened auction
-			return null; // or exception
+		if (list.size() != 0) {
+			throw new AuctionException("There is already opened round.", "id");
 		}
-		
+
 		// check current auction is pending
 		Auction target = auctionDao.getAuctionById(id);
-		if(target.getStatus() != Auction.COUNTDOWN) {
-			// it isn't PENDING round
-			return null; // or exception
+		if (target.getStatus() != Auction.COUNTDOWN) {
+			throw new AuctionException("It is not a pending round.", "id");
 		}
 
 		auctionDao.startAuction(target);
 
 		// get next round
 		Auction nextRound = auctionDao.getAuctionByRound(target.getStatus() + 1);
-		if(nextRound != null) {
+		if (nextRound != null) {
 			nextRound.setStatus(Auction.COUNTDOWN);
 			auctionDao.updateAuctionStats(nextRound);
 		}
-		// send notification
-		System.out.println("Auction Started, Please send me as Notification!");
 
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		notificationService.sendNotification(
-			userDetails.getId(),
-			Notification.N_AUCTION_START, 
-			"Auction Started", 
-			"Auction Started please bid!"
-		);
-		
+		// create new background tasks
+		String sRound = String.valueOf(target.getRound());
+		notificationService.broadcastNotification(
+			Notification.NEW_ROUND_STARTED, 
+			"NEW ROUND STARTED", 
+			"Auction Round " + sRound + " has been started.");
+
 		return nextRound;
 	}
 
-	@Override
-	public Auction endAuction(String id) {
+	public Auction endAuction(int id) {
 		// check Auction is Started!
 		Auction target = auctionDao.getAuctionById(id);
-		if(target.getStatus() != Auction.STARTED) {
+		if (target.getStatus() != Auction.STARTED) {
 			return null; // or exception
 		}
 		auctionDao.endAuction(target);
 
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		notificationService.sendNotification(
-			userDetails.getId(),
-			Notification.N_AUCTION_END, 
-			"Auction Finished", 
-			"Please check you bid results"
-		);
+		String msg = String.format("ROUND %d FINISHED.", target.getRound());
+		String title = "ROUND FINISHED";
+		notificationService.broadcastNotification(Notification.ROUND_FINISHED, title, msg);
 
 		return target;
 	}
 
 	public List<Auction> getAuctionByStatus(Integer status) {
-		return auctionDao.getAuctionByStatus(status);
+		List<Auction> auctionList = auctionDao.getAuctionByStatus(status);
+		for (Auction auction : auctionList) {
+			auction.setAvatar(auctionAvatarDao.selectById(auction.getId()));
+		}
+		return auctionList;
 	}
 
 	public String checkRounds() {
 		List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
-		if(auctions.size() != 0) {
-			Auction auction  = auctions.get(0);
+		if (auctions.size() != 0) {
+			Auction auction = auctions.get(0);
 			schedule.setNewCountdown(auction);
 		}
 
 		auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
-		if(auctions.size() != 0) {
+		if (auctions.size() != 0) {
 			Auction auction = auctions.get(0);
 			schedule.setStartRound(auction);
 		}
 		return "Checked";
 	}
-    
+
 }

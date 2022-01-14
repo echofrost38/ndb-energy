@@ -3,44 +3,52 @@ package com.ndb.auction.models.tier;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Component
 @Getter
 @Setter
 @NoArgsConstructor
-@DynamoDBTable(tableName = "TierTasks")
 public class TierTask {
 
-    public TierTask(String userId) {
+    public static final String AUCTION_SEPARATOR = ",";
+
+    private int userId;
+    private Boolean verification;
+    private Long wallet;
+    private List<Integer> auctions;
+    private Long direct;
+    private List<StakeHist> staking;
+
+    public TierTask(int userId) {
         this.userId = userId;
         this.verification = false;
-        this.wallet = 0.0;
-        this.auctions = new ArrayList<Integer>();
-        this.direct = 0.0;
-        this.staking = new ArrayList<StakeHist>();
+        this.auctions = new ArrayList<>();
+        this.staking = new ArrayList<>();
     }
 
-    @DynamoDBHashKey(attributeName="user_id")
-    private String userId;
-    
-    @DynamoDBAttribute(attributeName="verification")
-    private Boolean verification;
-    
-    @DynamoDBAttribute(attributeName="wallet")
-    private double wallet;
-    
-    @DynamoDBAttribute(attributeName="auctions")
-    private List<Integer> auctions;
-   
-    @DynamoDBAttribute(attributeName="direct")
-    private double direct;
-    
-    @DynamoDBAttribute(attributeName="staking")
-    private List<StakeHist> staking;
+    public String getAuctionsString() {
+        List<String> list=new ArrayList<String>();
+        for(Integer i:this.auctions)
+            list.add(i.toString());
+        return String.join(AUCTION_SEPARATOR, list);
+    }
+
+    public void setAuctionsByString(String input) {
+        String[] array = input.split(AUCTION_SEPARATOR);
+        List<Integer> list = new ArrayList<>();
+        for (String s : array) {
+            try {
+                var value = Integer.parseInt(s);
+                list.add(value);
+            } catch (Exception e) {
+            }
+        }
+        this.auctions = list;
+    }
+
 }

@@ -1,39 +1,17 @@
-extend type Subscription {
-  notifications: Notification
-}
-
 extend type Query {
-  getAllNotificationTypes: [NotificationType]
   getAllUnReadNotifications: [Notification]
-  getNotifications(stamp: Float, limit: Int!): [Notification2]
-  getUnreadNotifications: [Notification2]
-  getNotificationTypes2: [NotificationType2]
+  getNotifications(stamp: Float, limit: Int!): [Notification]
+  getUnreadNotifications: [Notification]
 }
 
 extend type Mutation {
   setNotificationRead(id: String): Notification
-  addNotificationType(name: String): String
-  deleteNotificationType(id: Int): [NotificationType]
-  updateNotificationType(id: Int!, name: String): NotificationType
-  setNotificationReadFlag(stamp: Float!): Notification2
+  setNotificationReadFlag(stamp: Float!): Notification
   setNotificationReadFlagAll: String
   changeNotifySetting(nType: Int!, status: Boolean): Int
-  addNewNotificationType2(
-    nType: Int!
-    tName: String!
-    broadcast: Boolean!
-  ): NotificationType2
-  addNewNotification(
-    userId: String!
-    nType: Int!
-    title: String!
-    msg: String!
-  ): Notification2
-  addNewBroadcast(nType: Int!, title: String!, msg: String!): String
 }
 
 schema {
   query: Query
   mutation: Mutation
-  subscription: Subscription
 }

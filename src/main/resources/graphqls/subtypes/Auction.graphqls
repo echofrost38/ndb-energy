@@ -1,6 +1,9 @@
 type Auction {
-	auctionId: String,
-	number: Int,
+	id: Int!,
+	regDate: Float,
+	updateDate: Float,
+	deleted: Int,
+	round: Int,
 	startedAt: Float,
 	endedAt: Float,
 	totalToken: Float,
@@ -8,6 +11,6 @@ type Auction {
 	avatar: [AvatarSet],
 	token: Float,
 	sold: Float,
-	stats: Stats,
+	stats: AuctionStats,
 	status: Int,
 }

@@ -26,14 +26,14 @@ public class ShuftiService extends BaseService{
     private String SECRET_KEY;
 
     // Create new application
-    public String createShuftiReference(int userId, String verifyType) {
+    public String createShuftiReference(int userId) {
         // check existing 
         ShuftiReference sRef = shuftiDao.selectById(userId);
         if(sRef != null) {
             return sRef.getReference();
         }
-        String reference = "SHUFTI-" + verifyType + "-" + String.valueOf(userId);
-        sRef = new ShuftiReference(userId, reference, verifyType);
+        String reference = "SHUFTI" + String.valueOf(userId);
+        sRef = new ShuftiReference(userId, reference);
         shuftiDao.insert(sRef);
         return reference;
     }

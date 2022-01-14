@@ -1,11 +1,13 @@
 type AvatarProfile {
-    id: String!,
-    name: String!,
+    id: Int!,
+    regDate: Float,
+    updateDate: Float,
+    deleted: Int,
+    fname: String!,
     surname: String,
-    shortName: String,
     skillSet: [SkillSet],
     avatarSet: [AvatarSet],
-    factsSet: [Facts],
     hairColor: String,
+    factsSet: [AvatarFacts],
     details: String
 }

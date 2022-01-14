@@ -94,7 +94,7 @@ public class TotpService {
 	}
 
 	 //This method is used to return the OPT number against Key->Key values is username
-	 public Boolean checkVerifyCode(String key, String code){ 
+	 public boolean checkVerifyCode(String key, String code){ 
 		try{
 			String existing = otpCache.get(key);
 			if(existing.equals(code)) {
@@ -107,7 +107,7 @@ public class TotpService {
 		}
 	 }
 	 
-	 public Boolean check2FACode(String key, String code) {
+	 public boolean check2FACode(String key, String code) {
 		 try{
 			String existing = _2FACache.get(key);
 			if(existing.equals(code)) {

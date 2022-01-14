@@ -12,7 +12,7 @@ import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.payload.PayResponse;
-import com.ndb.auction.service.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -29,89 +29,89 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionsByRound(String roundId) {
+	public List<StripeTransaction> getStripeTransactionsByRound(int roundId) {
 		return stripeService.getTransactionsByRound(roundId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public List<StripeTransaction> getStripeTransactionsByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        int id = userDetails.getId();
 		return stripeService.getTransactionByUser(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionsByAdmin(String userId) {
+	public List<StripeTransaction> getStripeTransactionsByAdmin(int userId) {
 		return stripeService.getTransactionByUser(userId);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionByAdmin(String roundId, String userId) {
+	public List<StripeTransaction> getStripeTransactionByAdmin(int roundId, int userId) {
 		return stripeService.getTransactions(roundId, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<StripeTransaction> getStripeTransaction(String roundId) {
+	public List<StripeTransaction> getStripeTransaction(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        int id = userDetails.getId();
 		return stripeService.getTransactions(roundId, id);
 	}
 
 
 	@PreAuthorize("isAuthenticated()")
 	public PayResponse stripePayment(
-		String roundId, 
+		int roundId, 
 		Long amount, 
 		String paymentIntentId,
 		String paymentMethodId
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String id = userDetails.getId();
+        int id = userDetails.getId();
 		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId, paymentMethodId);
 	}
 
 
 	@PreAuthorize("isAuthenticated()")
 	public CryptoPayload createCryptoPayment(
-		String roundId, 
-		Double amount
+		int roundId, 
+		String amount
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
 		return cryptoService.createNewPayment(roundId, userId, amount);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public CryptoTransaction getCryptoTransactionByCode(String code) {
-		return cryptoService.getTransactionById(code);
+		return cryptoService.getTransactionByCode(code);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactionByAdmin(String userId) {
+	public List<CryptoTransaction> getCryptoTransactionByAdmin(int userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public List<CryptoTransaction> getCryptoTransactionByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
 		return cryptoService.getTransactionByUser(userId);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactionByRound(String roundId) {
+	public List<CryptoTransaction> getCryptoTransactionByRound(int roundId) {
 		return cryptoService.getTransactionByRound(roundId);
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactions(String roundId, String userId) {
+	public List<CryptoTransaction> getCryptoTransactions(int roundId, int userId) {
 		return cryptoService.getTransaction(roundId, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<CryptoTransaction> getCryptoTransaction(String roundId) {
+	public List<CryptoTransaction> getCryptoTransaction(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = userDetails.getId();
+        int userId = userDetails.getId();
 		return cryptoService.getTransaction(roundId, userId);
 	}
 

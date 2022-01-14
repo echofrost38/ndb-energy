@@ -2,11 +2,11 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.avatar.AvatarSet;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.AvatarSet;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -18,15 +18,15 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	// not sure => % of total amount for all rounds, previous min price!!
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction createAuction(
-		int number, 
+		int round, 
 		String startedAt, 
-		long duration, 
-		double totalToken, 
-		double minPrice, 
+		Long duration, 
+		Long totalToken, 
+		Long minPrice, 
 		List<AvatarSet> avatar, 
-		Double token
+		Long token
 	) {
-		Auction auction = new Auction(number, startedAt, duration, totalToken, minPrice, avatar, token);
+		Auction auction = new Auction(round, startedAt, duration, totalToken, minPrice, avatar, token);
 		return auctionService.createNewAuction(auction);
 	}
 	
@@ -46,22 +46,22 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public Auction getAuctionById(String id) {
+	public Auction getAuctionById(int id) {
 		return auctionService.getAuctionById(id);
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction updateAuction(
-		String id, 
-		int number, 
-		long duration, 
-		double totalToken, 
-		double minPrice, 
+		int id, 
+		int round, 
+		Long duration, 
+		Long totalToken, 
+		Long minPrice, 
 		List<AvatarSet> avatarSet, 
-		Double token
+		Long token
 	) {
-		Auction auction = new Auction(number, null, duration, totalToken, minPrice, avatarSet, token);
-		auction.setAuctionId(id);
+		Auction auction = new Auction(round, null, duration, totalToken, minPrice, avatarSet, token);
+		auction.setId(id);
 		return auctionService.updateAuctionByAdmin(auction);
 	}
 

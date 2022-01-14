@@ -1,0 +1,15 @@
+type OAuth2Setting {
+    id: Int!,
+    clientId: String,
+    clientSecret: String,
+    clientAuthMethod: String,
+    authGrantType: String,
+    redirectUriTemplate: String,
+    scope: [String],
+    authUri: String,
+    tokenUri: String,
+    userInfoUri: String,
+    userAttributeName: String,
+    jwkSetUri: String,
+    clientName: String,
+}

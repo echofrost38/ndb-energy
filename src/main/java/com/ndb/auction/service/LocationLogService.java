@@ -1,11 +1,10 @@
 package com.ndb.auction.service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.LocationLogDao;
+import com.ndb.auction.dao.oracle.other.LocationLogDao;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.LocationLog;
 import com.ndb.auction.payload.VpnAPI;
@@ -76,7 +75,6 @@ public class LocationLogService extends BaseService {
             log.setContinentCode(response.getLocation().get("continent_code"));
             log.setLatitude(Float.parseFloat(response.getLocation().get("latitude")));
             log.setLongitude(Float.parseFloat(response.getLocation().get("longitude")));
-            log.setRegTime(new Timestamp(System.currentTimeMillis()));
             return log;
         } catch (WebClientException e) {
             return null;
@@ -87,19 +85,19 @@ public class LocationLogService extends BaseService {
         return locationLogDao.addLog(log);
     }
 
-    public int getCountByIp(String userId, String ipAddress) {
+    public int getCountByIp(int userId, String ipAddress) {
         return locationLogDao.getCountByIp(userId, ipAddress);
     }
 
-    public int getCountByCountryAndCity(String userId, String country, String city) {
+    public int getCountByCountryAndCity(int userId, String country, String city) {
         return locationLogDao.getCountByCountryAndCity(userId, country, city);
     }
 
-    public LocationLog getLogById(String userId, String logId) {
-        return locationLogDao.getLogById(userId, logId);
+    public LocationLog getLogById(int id) {
+        return locationLogDao.getLogById(id);
     }
 
-    public List<LocationLog> getLogByUser(String userId) {
+    public List<LocationLog> getLogByUser(int userId) {
         return locationLogDao.getLogByUser(userId);
     }
 

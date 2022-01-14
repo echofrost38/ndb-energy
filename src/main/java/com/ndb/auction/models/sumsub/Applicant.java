@@ -12,13 +12,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Applicant {
 	
 	private String id;
-	private String userId;
+	private int userId;
 	
 	public Applicant() {
 		
     }
 
-    public Applicant(String userId) {
+    public Applicant(int userId) {
         this.userId = userId;
     }
 	
@@ -31,10 +31,10 @@ public class Applicant {
 	}
 	
 	@DynamoDBAttribute(attributeName="user_id")
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 	

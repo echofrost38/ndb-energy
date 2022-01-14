@@ -1,9 +1,0 @@
-type Facts {
-    topic: String,
-    detail: String
-}
-
-input FactsInput {
-    topic: String,
-    detail: String
-}

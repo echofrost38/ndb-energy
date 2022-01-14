@@ -185,9 +185,7 @@ public class UserWalletService {
         UserWallet userWallet = null;
         try {
             Credentials credentials = Credentials.create(_password);
-            System.out.println(credentials.getAddress());
             userWallet = UserWallet.load(contractAddress, web3j, credentials, gasPrice, gasLimit);
-            System.out.println(userWallet.getContractAddress());
         }
         catch(Exception e) {
             

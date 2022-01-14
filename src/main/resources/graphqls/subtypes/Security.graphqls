@@ -1,4 +1,0 @@
-type Security {
-   key: String!,
-   value: Boolean
-}

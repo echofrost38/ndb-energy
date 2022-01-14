@@ -157,7 +157,7 @@ public class UserService extends BaseService {
 		return null;
 	}
 
-	public String confirmRequest2FA(String email, String method, String code) {
+	public String confirmRequest2FA(String email, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
 			throw new UserNotFoundException("Cannot find user by " + email, "email");
@@ -173,23 +173,20 @@ public class UserService extends BaseService {
 			throw new UnauthorizedException("There is no proper 2FA setting.", "code");
 		}
 
+		// Assume
+		UserSecurity userSecurity = userSecurities.get(0);
 		boolean status = false;
-		int userSecurityId = 0;
-		
-		for(UserSecurity userSecurity : userSecurities) {
-			if (userSecurity.getAuthType() == method) {
-				if (method.equals("app")) {
-					status = totpService.verifyCode(code, userSecurity.getTfaSecret());
-					userSecurityId = userSecurity.getId();
-				} else if (method.equals("phone") || method.equals("email")) {
-					status = totpService.check2FACode(email, code);
-					userSecurityId = userSecurity.getId();
-				}
+		String method;
+		if (userSecurity != null && (method = userSecurity.getAuthType()) != null) {
+			if (method.equals("app")) {
+				status = totpService.verifyCode(code, userSecurity.getTfaSecret());
+			} else if (method.equals("phone") || method.equals("email")) {
+				status = totpService.check2FACode(email, code);
 			}
 		}
 
-		if (status && userSecurityId != 0) {
-			userSecurityDao.updateTfaEnabled(userSecurityId, true);
+		if (status) {
+			userSecurityDao.updateTfaEnabled(userSecurity.getId(), true);
 			return "Success";
 		} else {
 			return "Failed";

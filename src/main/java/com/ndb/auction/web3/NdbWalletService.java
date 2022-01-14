@@ -76,9 +76,7 @@ public class NdbWalletService {
         NdbWallet ndbWallet = null;
         try {
             Credentials credentials = Credentials.create(_password);
-            System.out.println(credentials.getAddress());
             ndbWallet = NdbWallet.load(contractAddress, web3j, credentials, gasPrice, gasLimit);
-            System.out.println(ndbWallet.getContractAddress());
         }
         catch(Exception e) {
             

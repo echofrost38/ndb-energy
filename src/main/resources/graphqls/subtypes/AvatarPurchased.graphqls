@@ -1,4 +1,0 @@
-type AvatarPurchased {
-    key: String,
-    value: [String]
-}

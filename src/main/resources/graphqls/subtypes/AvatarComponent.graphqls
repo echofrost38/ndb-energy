@@ -1,6 +1,6 @@
 type AvatarComponent {
     groupId: String!,
-    compId: String!,
+    compId: Int!,
     tierLevel: Int,
     price: Float,
     limited: Int,

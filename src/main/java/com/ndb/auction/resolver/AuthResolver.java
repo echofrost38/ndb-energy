@@ -48,8 +48,8 @@ public class AuthResolver extends BaseResolver
 		return userService.request2FA(email, method, phone);
 	}
 
-	public String confirmRequest2FA(String email, String code) {
-		return userService.confirmRequest2FA(email, code);
+	public String confirmRequest2FA(String email, String method, String code) {
+		return userService.confirmRequest2FA(email, method, code);
 	}
 
 	public Credentials signin(String email, String password) {

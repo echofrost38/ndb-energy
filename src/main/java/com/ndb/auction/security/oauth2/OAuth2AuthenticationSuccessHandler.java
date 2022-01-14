@@ -114,7 +114,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         User user = userService.getUserByEmail(userPrincipal.getEmail());
-        UserSecurity userSecurity;
 
         String type = "success";
         String dataType;

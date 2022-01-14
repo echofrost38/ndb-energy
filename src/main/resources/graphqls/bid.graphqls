@@ -1,25 +1,25 @@
 extend type Mutation {
 	placeBid(
-		roundId: String!,
+		roundId: Int!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
 		payment: Int!,
 		cryptoType: String
 	) : Bid	
 	updateBid(
-		roundId: String!,
+		roundId: Int!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
 	) : Bid
 	increaseBid(
-		roundId: String!,
+		roundId: Int!,
 		tokenAmount: Float!,
 		tokenPrice: Float!,
 		payment: Int!,
 		cryptoType: String
 	) : Bid
 	closeBid(
-		roundId: String!
+		roundId: Int!
 	) : String
 }
 
@@ -29,17 +29,17 @@ extend type Query {
 	): [Bid]
 	getBidListByUser : [Bid]
 	getBidListByAdmin(
-		userId: String!
+		userId: Int!
 	): [Bid]
 	getBidByAdmin(
-		userId: String, 
-		round: Int!
+		userId: Int, 
+		roundId: Int!
 	) : Bid
 	getBid(
-		round: Int!
+		roundId: Int!
 	) : Bid
 	getBidListById(
-		roundId: String
+		roundId: Int
 	) : [Bid]
 	getBidList : [Bid]
 }

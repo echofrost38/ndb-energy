@@ -29,7 +29,7 @@ public class GraphQLExceptionHandler implements GraphQLErrorHandler {
                 exceptionError = (ExceptionWhileDataFetching) error;
                 t = exceptionError.getException();
             }
-            if (false && error.getErrorType() == ErrorType.DataFetchingException) {
+            if (true && error.getErrorType() == ErrorType.DataFetchingException) {
                 return new DatabaseAccessException("database error", t);
             }
         }

@@ -1,4 +1,4 @@
-package com.ndb.auction.models.Shufti;
+package com.ndb.auction.models.Shufti.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShuftiReference {
-    private int userId;
-    private String reference;
-    private String verificationType;
+public class VerificationData {
+    private KYB kyb;
 }

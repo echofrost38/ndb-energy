@@ -17,6 +17,7 @@ public class ShuftiDao extends BaseOracleDao {
 		ShuftiReference model = new ShuftiReference();
 		model.setUserId(rs.getInt("USER_ID"));
         model.setReference(rs.getString("REFERENCE"));
+		model.setVerificationType(rs.getString("VERIFY_TYPE"));
 		return model;
 	}
 
@@ -36,10 +37,22 @@ public class ShuftiDao extends BaseOracleDao {
 		}, userId);
     }
 
+	public ShuftiReference selectByReference(String reference) {
+		String sql = "SELECT * FROM NDB.TBL_SHUFTI_REF WHERE REFERENCE = ?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<ShuftiReference>() {
+			@Override
+			public ShuftiReference extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, reference);
+	}
+
     public int insert(ShuftiReference m) {
-        String sql = "INSERT INTO TBL_TOKEN_ASSET(USER_ID, REFERENCE)"
-				+ "VALUES(?,?)";
-		return jdbcTemplate.update(sql, m.getUserId(), m.getReference());
+        String sql = "INSERT INTO TBL_TOKEN_ASSET(USER_ID, REFERENCE, VERIFY_TYPE)"
+				+ "VALUES(?,?,?)";
+		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType());
     }
 
 }

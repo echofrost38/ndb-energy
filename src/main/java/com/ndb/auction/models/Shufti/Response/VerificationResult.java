@@ -15,6 +15,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerificationResult {
-    private Document document;
-    private Address address;
+    // kyc
+    private int kyc;
+    // background_checks
+    private int background_checks;
+    // kyb
+    private int kyb;
+    // aml_for_businesses
+    private int aml_for_businesses;
 }

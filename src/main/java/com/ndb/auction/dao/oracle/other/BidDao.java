@@ -73,7 +73,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByRound(int roundId) {
-		String sql = "SELECT * FROM TBL_BID WHERE ROUND_ID=? AND STATUS!=0 ORDER BY TOTAL_PRICE DESC";
+		String sql = "SELECT * FROM TBL_BID WHERE ROUND_ID=? AND STATUS!=0";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {

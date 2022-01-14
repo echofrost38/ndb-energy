@@ -1,6 +1,7 @@
 package com.ndb.auction.service;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -10,7 +11,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
@@ -75,11 +75,6 @@ public class BidService extends BaseService {
 
 		// check Round is opened.
 		Auction auction = auctionDao.getAuctionById(roundId);
-
-		if(auction == null) {
-			throw new AuctionException("There is not that round.", "roundId");
-		}
-
 		if (auction.getStatus() != Auction.STARTED) {
 			throw new BidException("Round is not yet started.", "roundId");
 		}
@@ -179,10 +174,9 @@ public class BidService extends BaseService {
 	public List<Bid> getBidListByRound(int round) {
 		// PaginatedScanList<> how to sort?
 		Auction auction = auctionDao.getAuctionByRound(round);
-		if(auction == null) {
-			throw new AuctionException("There is no round.", "round");
-		}
-		return bidDao.getBidListByRound(auction.getId());
+		Bid[] bidList = bidDao.getBidListByRound(auction.getId()).toArray(new Bid[0]);
+		Arrays.sort(bidList, Comparator.comparingDouble(Bid::getTokenPrice).reversed());
+		return Arrays.asList(bidList);
 	}
 
 	public List<Bid> getBidListByRoundId(int round) {

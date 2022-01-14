@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -76,15 +77,15 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public Bid getBidByAdmin(int userId, Integer roundId) {
-		return bidService.getBid(roundId, userId);
+	public Bid getBidByAdmin(int userId, Integer round) {
+		return bidService.getBid(round, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public Bid getBid(Integer roundId) {
+	public Bid getBid(Integer round) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
-		return bidService.getBid(roundId, id);
+		return bidService.getBid(round, id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

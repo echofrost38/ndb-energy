@@ -120,20 +120,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String dataType;
         String data;
 
-        boolean is2FA = false;
-        List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
-        for (UserSecurity security : userSecurities) {
-            if(security.isTfaEnabled()) {
-                is2FA = true;
-                break;
-            }
-        }
-
         if (!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
             type = "error";
             dataType = "InvalidProvider";
             data = user.getProvider().toString();
-        } else if (!is2FA) {
+        } else if ((userSecurity = user.getSecurity().get(0)) == null || !userSecurity.isTfaEnabled()) {
             type = "error";
             dataType = "No2FA";
             data = user.getEmail();
@@ -145,6 +136,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
             // Save token on cache
             totpService.setTokenAuthCache(dataType, authentication);
+
+            List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
             
             for (UserSecurity security : userSecurities) {
                 data += "*" + security.getAuthType();

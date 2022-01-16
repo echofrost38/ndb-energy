@@ -36,7 +36,7 @@ public class TierDao extends BaseOracleDao {
 	}
 
 	public List<Tier> getUserTiers() {
-		String sql = "SELECT * FROM TBL_TIER";
+		String sql = "SELECT * FROM TBL_TIER ORDER BY T_LEVEL";
 		return jdbcTemplate.query(sql, new RowMapper<Tier>() {
 			@Override
 			public Tier mapRow(ResultSet rs, int rownumber) throws SQLException {

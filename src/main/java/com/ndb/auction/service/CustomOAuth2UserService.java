@@ -157,13 +157,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
-        //existingUser.setName(oAuth2UserInfo.getName());
+        existingUser.setName(oAuth2UserInfo.getName());
         UserVerify userVerify = userVerifyDao.selectById(existingUser.getId());
         if (userVerify == null)
             userVerify = new UserVerify();
         userVerify.setEmailVerified(true);
         // existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
-        //userDao.insert(existingUser);
+        userDao.insert(existingUser);
         userVerifyDao.insertOrUpdate(userVerify);
         return existingUser;
     }

@@ -18,7 +18,7 @@ public class OAuth2RegistrationService {
     @Autowired
 	private OAuth2SettingDao oAuth2Dao;
     
-    private Map<String, OAuth2Setting> oAuth2Registrations;
+    private Map<Integer, OAuth2Setting> oAuth2Registrations;
 
     @PostConstruct
     public void init() {
@@ -27,7 +27,7 @@ public class OAuth2RegistrationService {
     
             List<OAuth2Setting> registrations = oAuth2Dao.getAllRegistrations();
             for(OAuth2Setting registration : registrations) {
-                oAuth2Registrations.put(registration.getClientName().toLowerCase(), registration);
+                oAuth2Registrations.put(registration.getId(), registration);
             }
         }catch(Exception e) {
             

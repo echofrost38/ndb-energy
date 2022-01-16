@@ -430,7 +430,7 @@ public class BidService extends BaseService {
 
 	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice, int payType,
 			String cryptoType) {
-		Bid originalBid = bidDao.getBid(roundId, userId);
+		Bid originalBid = bidDao.getBid(userId, roundId);
 		if (originalBid == null) {
 			throw new BidException("Bid is not yet placed.", "roundId");
 		}

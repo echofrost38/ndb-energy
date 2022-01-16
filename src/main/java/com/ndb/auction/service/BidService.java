@@ -216,8 +216,6 @@ public class BidService extends BaseService {
 			throw new BidException("Bid is not yet placed.", "roundId");
 		}
 
-		//
-
 		bid.setTokenAmount(tokenAmount);
 		bid.setTokenPrice(tokenPrice);
 		bid.setTotalPrice(tokenPrice * tokenAmount);

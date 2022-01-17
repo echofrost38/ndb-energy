@@ -69,20 +69,18 @@ public class AuthResolver extends BaseResolver
 		}
 
 		List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
-		if (userSecurities.isEmpty()) {
-			return new Credentials("Failed", "Please set 2FA.");
-		}
-
+		
 		List<String> twoStep = new ArrayList<>();
-
+		
 		for (UserSecurity userSecurity : userSecurities) {
 			if (userSecurity.isTfaEnabled()) {
 				twoStep.add(userSecurity.getAuthType());
-			} else {
-				return new Credentials("Failed", "Please set 2FA.");
-			}
+			} 
 		}
-
+		if (twoStep.isEmpty()) {
+			return new Credentials("Failed", "Please set 2FA.");
+		}
+		
 		String token = userService.signin2FA(user);
 		if (token.equals("error")) {
 			return new Credentials("Failed", "2FA failed.");

@@ -24,8 +24,6 @@ public class BidDao extends BaseOracleDao {
 		Bid m = new Bid();
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setRoundId(rs.getInt("ROUND_ID"));
-		m.setPrefix(rs.getString("PREFIX"));
-		m.setName(rs.getString("NAME"));
 		m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
 		m.setTotalPrice(rs.getLong("TOTAL_PRICE"));
 		m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
@@ -52,8 +50,9 @@ public class BidDao extends BaseOracleDao {
 				m.getStatus());
 		return m;
 	}
+
 	public Bid getBid(int userId, int roundId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_BID.USER_ID=? and TBL_BID.ROUND_ID=?";
+		String sql = "SELECT * FROM TBL_BID WHERE USER_ID=? AND ROUND_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<Bid>() {
 			@Override
 			public Bid extractData(ResultSet rs) throws SQLException {
@@ -74,7 +73,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByRound(int roundId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE ROUND_ID=? AND STATUS!=0 ORDER BY TOKEN_PRICE DESC";
+		String sql = "SELECT * FROM TBL_BID WHERE ROUND_ID=? AND STATUS!=0 ORDER BY TOTAL_PRICE DESC";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -84,7 +83,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByUser(int userId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE USER_ID=? AND STATUS!=0 ORDER BY ROUND_ID";
+		String sql = "SELECT * FROM TBL_BID WHERE USER_ID=? AND STATUS!=0";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -94,7 +93,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidList() {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID ORDER BY ROUND_ID";
+		String sql = "SELECT * FROM TBL_BID";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {

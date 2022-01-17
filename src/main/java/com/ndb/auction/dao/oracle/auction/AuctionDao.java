@@ -73,7 +73,7 @@ public class AuctionDao extends BaseOracleDao {
 	}
 
 	public List<Auction> getAuctionList() {
-		String sql = "SELECT * FROM TBL_AUCTION ORDER BY ROUND";
+		String sql = "SELECT * FROM TBL_AUCTION";
 		return jdbcTemplate.query(sql, new RowMapper<Auction>() {
 			@Override
 			public Auction mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -136,7 +136,7 @@ public class AuctionDao extends BaseOracleDao {
 	}
 
 	public List<Auction> getAuctionByStatus(int status) {
-		String sql = "SELECT * FROM TBL_AUCTION WHERE STATUS=? ORDER BY ROUND";
+		String sql = "SELECT * FROM TBL_AUCTION WHERE STATUS=?";
 		return jdbcTemplate.query(sql, new RowMapper<Auction>() {
 			@Override
 			public Auction mapRow(ResultSet rs, int rownumber) throws SQLException {

@@ -102,6 +102,8 @@ public class UserService extends BaseService {
 		}
 	}
 
+
+	
 	public String request2FA(String email, String method, String phone) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
@@ -128,75 +130,84 @@ public class UserService extends BaseService {
 			} else {
 				// Generate proper TOTP code
 				String code = totpService.get2FACode(email);
-
+				
 				switch (method) {
 					case "app":
-						String tfaSecret = totpService.generateSecret();
-						userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
-						String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
-						return qrUri;
+					String tfaSecret = totpService.generateSecret();
+					userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
+					String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
+					return qrUri;
 					case "phone":
-						try {
-							userDao.updatePhone(user.getId(), phone);
-							return smsService.sendSMS(phone, code);
-						} catch (IOException | TemplateException e) {
-							return "error";
-						}
+					try {
+						userDao.updatePhone(user.getId(), phone);
+						return smsService.sendSMS(phone, code);
+					} catch (IOException | TemplateException e) {
+						return "error";
+					}
 					case "email":
-						try {
-							mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-							return "sent";
-						} catch (MessagingException | IOException | TemplateException e) {
-							return "error"; // or exception
-						}
+					try {
+						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
+						return "sent";
+					} catch (MessagingException | IOException | TemplateException e) {
+						return "error"; // or exception
+					}
 					default: 
-						return String.format("There is no %s", method);
+					return String.format("There is no %s", method);
 				}
 			}
 		}
 		currentSecurity = userSecurityDao.insert(currentSecurity);
-
+		
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
-
+		
 		if (userVerify == null || !userVerify.isEmailVerified()) {
 			throw new UnauthorizedException("Your account is not verified", "email");
 		}
-
+		
 		// Generate proper TOTP code
 		String code = totpService.get2FACode(email);
-
+		
 		switch (method) {
 			case "app":
-				String tfaSecret = totpService.generateSecret();
-				userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
-				String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
-				return qrUri;
+			String tfaSecret = totpService.generateSecret();
+			userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
+			String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
+			return qrUri;
 			case "phone":
-				try {
-					userDao.updatePhone(user.getId(), phone);
-					return smsService.sendSMS(phone, code);
-				} catch (IOException | TemplateException e) {
-					return "error";
+			try {
+				userDao.updatePhone(user.getId(), phone);
+				return smsService.sendSMS(phone, code);
+			} catch (IOException | TemplateException e) {
+				return "error";
 				}
 			case "email":
-				try {
-					mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-					return "sent";
-				} catch (MessagingException | IOException | TemplateException e) {
-					return "error"; // or exception
-				}
+			try {
+				mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
+				return "sent";
+			} catch (MessagingException | IOException | TemplateException e) {
+				return "error"; // or exception
+			}
 		}
-
+		
 		return null;
 	}
-
+	
+	public String disable2FA(int userId, String method) {
+		try{
+			userSecurityDao.updateTfaDisabled(userId, method, false);
+		}catch(Exception e) {
+			return "Failed";
+		}
+		return "Success";
+	}
+	
 	public String confirmRequest2FA(String email, String method, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
 			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
-
+		
 		if (userVerify == null || !userVerify.isEmailVerified()) {
 			throw new UnauthorizedException("Your account is not verified", "email");
 		}
@@ -251,7 +262,7 @@ public class UserService extends BaseService {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						String phone = user.getPhone();
 						smsService.sendSMS(phone, code);
-					} catch (IOException | TemplateException e) {
+					} catch (Exception e) {
 						return "error";
 					}
 					break;
@@ -259,8 +270,8 @@ public class UserService extends BaseService {
 					try {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-					} catch (MessagingException | IOException | TemplateException e) {
-						return "error"; // or exception
+					} catch (Exception e) {
+						// return "error"; // or exception
 					}
 					break;
 				default:
@@ -279,6 +290,7 @@ public class UserService extends BaseService {
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
 		for (UserSecurity userSecurity : userSecurities) {
 			String method;
+			if(!userSecurity.isTfaEnabled()) continue;
 			if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
 				return false;
 			if (method.equals("app")) {

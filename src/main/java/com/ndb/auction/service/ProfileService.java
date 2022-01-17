@@ -93,7 +93,7 @@ public class ProfileService extends BaseService {
 		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(prefix);
 
 		if (profile == null) {
-			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix", 0);
+			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix");
 		}
 
 		List<AvatarSet> sets = avatarSetDao.selectById(profile.getId());
@@ -143,7 +143,7 @@ public class ProfileService extends BaseService {
 			compId = avatarSet.getCompId();
 			AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 			if (component == null) {
-				throw new AvatarNotFoundException("Cannot find avatar component.", "compId", 0);
+				throw new AvatarNotFoundException("Cannot find avatar component.", "compId");
 			}
 
 			// check free

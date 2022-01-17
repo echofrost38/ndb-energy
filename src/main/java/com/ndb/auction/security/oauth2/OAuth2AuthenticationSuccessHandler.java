@@ -128,7 +128,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
         }
 
-        if (!user.getProvider().equals(AuthProvider.valueOf(registrationId))) {
+        if (!user.getProvider().equals(registrationId)) {
             type = "error";
             dataType = "InvalidProvider";
             data = user.getProvider().toString();

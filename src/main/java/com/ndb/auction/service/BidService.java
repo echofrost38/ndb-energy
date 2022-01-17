@@ -182,12 +182,7 @@ public class BidService extends BaseService {
 		if(auction == null) {
 			throw new AuctionException("There is no round.", "round");
 		}
-
-		List<Bid> bidList = bidDao.getBidListByRound(auction.getId());
-		Bid _bidArray[] = new Bid[bidList.size()];
-		bidList.toArray(_bidArray);
-		sort.mergeSort(_bidArray, 0, _bidArray.length - 1);
-		return Arrays.asList(_bidArray);
+		return bidDao.getBidListByRound(auction.getId());
 	}
 
 	public List<Bid> getBidListByRoundId(int round) {
@@ -215,6 +210,8 @@ public class BidService extends BaseService {
 		if (bid == null) {
 			throw new BidException("Bid is not yet placed.", "roundId");
 		}
+
+		//
 
 		bid.setTokenAmount(tokenAmount);
 		bid.setTokenPrice(tokenPrice);
@@ -257,21 +254,12 @@ public class BidService extends BaseService {
 
 		int len = newList.length;
 		for (int i = 0; i < len; i++) {
-			boolean statusChanged = false;
-			Bid tempBid = newList[i];
-			
 			if (status) {
 				win += newList[i].getTokenPrice();
-				if(tempBid.getStatus() != Bid.WINNER) {
-					tempBid.setStatus(Bid.WINNER);
-					statusChanged = true;
-				}
+				newList[i].setStatus(Bid.WINNER);
 			} else {
 				fail += newList[i].getTokenPrice();
-				if(tempBid.getStatus() != Bid.FAILED) {
-					tempBid.setStatus(Bid.FAILED);
-					statusChanged = true;
-				}
+				newList[i].setStatus(Bid.FAILED);
 			}
 			availableToken -= bid.getTokenAmount();
 
@@ -280,21 +268,11 @@ public class BidService extends BaseService {
 				win -= availableToken;
 				fail += availableToken;
 			}
-
-			if(statusChanged) {
-				bidDao.updateBid(tempBid);
-	
-				// send Notification
-				notificationService.sendNotification(
-					tempBid.getUserId(),
-					Notification.BID_RANKING_UPDATED,
-					"BID RANKING UPDATED",
-					String.format("Bid ranking is updated into %d, your bid is %d.", 
-						i, tempBid.getStatus() == Bid.WINNER ? "WINNER" : "FAILED")
-				);
-			}
 			
+			bidDao.updateBid(newList[i]);
 		}
+
+		// Save new Bid status
 
 		// update & save new auction stats
 		currentRound.setStats(new AuctionStats(qty, win, fail));
@@ -304,6 +282,13 @@ public class BidService extends BaseService {
 			currentRound.setSold(win);
 		}
 		auctionDao.updateAuctionStats(currentRound);
+
+		// send Notification
+		notificationService.sendNotification(
+				userId,
+				Notification.BID_RANKING_UPDATED,
+				"BID RANKING UPDATED",
+				"Bid ranking is updated, please check your bid ranking");
 	}
 
 	// not sychnorized

@@ -251,7 +251,7 @@ public class UserService extends BaseService {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						String phone = user.getPhone();
 						smsService.sendSMS(phone, code);
-					} catch (IOException | TemplateException e) {
+					} catch (Exception e) {
 						return "error";
 					}
 					break;
@@ -259,7 +259,7 @@ public class UserService extends BaseService {
 					try {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
-					} catch (MessagingException | IOException | TemplateException e) {
+					} catch (Exception e) {
 						return "error"; // or exception
 					}
 					break;
@@ -279,6 +279,7 @@ public class UserService extends BaseService {
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
 		for (UserSecurity userSecurity : userSecurities) {
 			String method;
+			if(!userSecurity.isTfaEnabled()) continue;
 			if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
 				return false;
 			if (method.equals("app")) {

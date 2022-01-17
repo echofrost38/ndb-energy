@@ -54,6 +54,7 @@ public class UserService extends BaseService {
 			Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);
+			user.setProvider("email");
 			userDao.insert(user);
 
 			// create user wallet in contract!
@@ -91,8 +92,14 @@ public class UserService extends BaseService {
 		if (user == null) {
 			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
-		sendEmailCode(user, VERIFY_TEMPLATE);
-		return "Success";
+
+		UserVerify userVerify = userVerifyDao.selectById(user.getId());
+		if (userVerify != null && userVerify.isEmailVerified()) {
+			return "Already verified";
+		} else {
+			sendEmailCode(user, VERIFY_TEMPLATE);
+			return "Already exists, sent verify code";
+		}
 	}
 
 	public String request2FA(String email, String method, String phone) {
@@ -112,13 +119,39 @@ public class UserService extends BaseService {
 			for (UserSecurity userSecurity : userSecurities) {
 				if (userSecurity.getAuthType().equals(method)) {
 					currentSecurity = userSecurity;
+					break;
 				}
 			}
 			if (currentSecurity == null) {
 				// there is no security with that method
 				currentSecurity = new UserSecurity(user.getId(), method, false, "");
 			} else {
-				return "Already set";
+				// Generate proper TOTP code
+				String code = totpService.get2FACode(email);
+
+				switch (method) {
+					case "app":
+						String tfaSecret = totpService.generateSecret();
+						userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
+						String qrUri = totpService.getUriForImage(tfaSecret, user.getEmail());
+						return qrUri;
+					case "phone":
+						try {
+							userDao.updatePhone(user.getId(), phone);
+							return smsService.sendSMS(phone, code);
+						} catch (IOException | TemplateException e) {
+							return "error";
+						}
+					case "email":
+						try {
+							mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
+							return "sent";
+						} catch (MessagingException | IOException | TemplateException e) {
+							return "error"; // or exception
+						}
+					default: 
+						return String.format("There is no %s", method);
+				}
 			}
 		}
 		currentSecurity = userSecurityDao.insert(currentSecurity);

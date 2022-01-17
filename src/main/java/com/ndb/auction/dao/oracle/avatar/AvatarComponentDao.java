@@ -1,5 +1,7 @@
 package com.ndb.auction.dao.oracle.avatar;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,8 +12,11 @@ import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -39,8 +44,28 @@ public class AvatarComponentDao extends BaseOracleDao {
 	public AvatarComponent createAvatarComponent(AvatarComponent m) {
 		String sql = "INSERT INTO TBL_AVATAR_COMPONENT(GROUP_ID,COMP_ID,TIER_LEVEL,PRICE,LIMITED,PURCHASED,SVG,WIDTH,TOP,LEFT)"
 				+ "VALUES(?,SEQ_AVATAR_COMPONENT.NEXTVAL,?,?,?,?,?,?,?,?)";
-		jdbcTemplate.update(sql, m.getGroupId(), m.getTierLevel(), m.getPrice(), m.getLimited(),
-				m.getPurchased(), m.getSvg(), m.getWidth(), m.getTop(), m.getLeft());
+
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    @Override
+                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                        PreparedStatement ps = connection.prepareStatement(sql,
+                                new String[] { "COMP_ID" });
+                        int i = 1;
+                        ps.setString(i++, m.getGroupId());
+						ps.setInt(i++, m.getTierLevel());
+						ps.setLong(i++, m.getPrice());
+						ps.setInt(i++, m.getLimited());
+						ps.setInt(i++, m.getPurchased());
+						ps.setString(i++, m.getSvg());
+						ps.setInt(i++, m.getWidth());
+						ps.setInt(i++, m.getTop());
+						ps.setInt(i++, m.getLeft());
+                        return ps;
+                    }
+                }, keyHolder);
+        m.setCompId(keyHolder.getKey().intValue());
 		return m;
 	}
 

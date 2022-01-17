@@ -1,10 +1,8 @@
 package com.ndb.auction.service;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
@@ -71,8 +69,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (provider.equalsIgnoreCase(AuthProvider.linkedin.toString())) {
                 populateEmailAddressFromLinkedIn(oAuth2UserRequest, attributes);
             }
-            OAuth2User user = processUserDetails(provider, attributes);
-            return user;
+            return processOAuth2User(provider, attributes);
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -96,6 +93,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map map = (Map<?, ?>) ((Map<?, ?>) list.get(0)).get("handle~");
         attributes.putAll(map);
         log.info("populateEmailAddressFromLinkedIn uri : {}, attributes : {}", linkedInEmailEndpointUri, attributes);
+    }
+
+    @SuppressWarnings("deprecation")
+    private OAuth2User processOAuth2User(String provider, Map<String, Object> attributes) {
+        log.info("ProcessOAuth2User {}", attributes);
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
+        if (StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
+            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+        }
+
+        User user = userDao.selectByEmail(oAuth2UserInfo.getEmail());
+        if (user != null) {
+            user = updateExistingUser(user, oAuth2UserInfo);
+        } else {
+            user = registerNewUser(provider, oAuth2UserInfo);
+        }
+
+        return UserDetailsImpl.build(user, attributes);
     }
 
     @SuppressWarnings("deprecation")
@@ -124,9 +139,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setCountry(oAuth2UserInfo.getLocale());
-        Set<String> roles = new HashSet<String>();
-			roles.add("ROLE_USER");
-        user.setRole(roles);
         userVerify.setEmailVerified(true);
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
@@ -145,12 +157,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
+        //existingUser.setName(oAuth2UserInfo.getName());
         UserVerify userVerify = userVerifyDao.selectById(existingUser.getId());
         if (userVerify == null)
             userVerify = new UserVerify();
         userVerify.setEmailVerified(true);
         // existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
-        userDao.updateName(existingUser.getId(), oAuth2UserInfo.getName());
+        //userDao.insert(existingUser);
         userVerifyDao.insertOrUpdate(userVerify);
         return existingUser;
     }

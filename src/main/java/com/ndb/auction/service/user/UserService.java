@@ -271,7 +271,7 @@ public class UserService extends BaseService {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
 					} catch (Exception e) {
-						// return "error"; // or exception
+						return "error"; // or exception
 					}
 					break;
 				default:

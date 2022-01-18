@@ -37,6 +37,9 @@ extend type Query {
 		roundId: Int
 	) : [Bid]
 	getBidList : [Bid]
+	getBidListFrom(
+		from: Float
+	) : [Bid]
 }
 
 

@@ -2,6 +2,7 @@ package com.ndb.auction.dao.oracle.other;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -101,6 +102,16 @@ public class BidDao extends BaseOracleDao {
 				return extract(rs);
 			}
 		});
+	}
+
+	public List<Bid> getBidListFrom(Long from) {
+		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID ORDER BY ROUND_ID WHERE TBL_BID.REG_DATE > ?";
+		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
+			@Override
+			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, new Timestamp(from));
 	}
 
 }

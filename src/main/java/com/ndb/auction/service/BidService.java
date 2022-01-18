@@ -516,4 +516,8 @@ public class BidService extends BaseService {
 		return bidDao.getBidList();
 	}
 
+	public List<Bid> getBidListFrom(Long from) {
+		return bidDao.getBidListFrom(from);
+	}
+
 }

@@ -32,6 +32,10 @@ public class Bid {
     public static final int INSUFFI 	  = 4; 
 	
     private int userId;
+
+    private String prefix;
+    private String name;
+
     private int roundId;
     private Long tokenAmount;
     

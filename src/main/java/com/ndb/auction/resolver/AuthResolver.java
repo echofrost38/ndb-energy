@@ -29,24 +29,28 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthResolver extends BaseResolver
 		implements GraphQLMutationResolver, GraphQLSubscriptionResolver, GraphQLQueryResolver {
-
+		
+	private String lowerEmail(String email) {
+		return email.toLowerCase();
+	}
+	
 	public String signup(String email, String password, String country) {
-		return userService.createUser(email, password, country);
+		return userService.createUser(lowerEmail(email), password, country);
 	}
 
 	public String verifyAccount(String email, String code) {
-		if (userService.verifyAccount(email, code)) {
+		if (userService.verifyAccount(lowerEmail(email), code)) {
 			return "Success";
 		}
 		return "Failed";
 	}
 
 	public String resendVerifyCode(String email) {
-		return userService.resendVerifyCode(email);
+		return userService.resendVerifyCode(lowerEmail(email));
 	}
 
 	public String request2FA(String email, String method, String phone) {
-		return userService.request2FA(email, method, phone);
+		return userService.request2FA(lowerEmail(email), method, phone);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -57,11 +61,11 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String confirmRequest2FA(String email, String method, String code) {
-		return userService.confirmRequest2FA(email, method, code);
+		return userService.confirmRequest2FA(lowerEmail(email), method, code);
 	}
 
 	public Credentials signin(String email, String password) {
-
+		email = lowerEmail(email);
 		// get user ( Not found exception is threw in service)
 		User user = userService.getUserByEmail(email);
 		if (user == null) {
@@ -103,6 +107,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public Credentials confirm2FA(String email, String token, List<TwoFAEntry> code) {
+		email = lowerEmail(email);
 		Map<String, String> codeMap = new HashMap<>();
 		for (TwoFAEntry entry : code) {
 			codeMap.put(entry.getKey(), entry.getValue());
@@ -124,7 +129,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String forgotPassword(String email) {
-		if (userService.sendResetToken(email)) {
+		if (userService.sendResetToken(lowerEmail(email))) {
 			return "Success";
 		} else {
 			return "Failed";
@@ -132,7 +137,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String resetPassword(String email, String code, String newPassword) {
-		return userService.resetPassword(email, code, newPassword);
+		return userService.resetPassword(lowerEmail(email), code, newPassword);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -173,7 +178,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String addNewUser(int id, String email, String name) {
-		TransactionReceipt receipt = userWalletService.addNewUser(id, email, name);
+		TransactionReceipt receipt = userWalletService.addNewUser(id, lowerEmail(email), name);
 		return receipt.getLogs().get(0).getData();
 	}
 

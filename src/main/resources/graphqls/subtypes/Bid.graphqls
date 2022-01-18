@@ -1,5 +1,7 @@
 type Bid {
 	userId: Int,
+	prefix: String,
+	name: String,
 	roundId: Int,
 	tokenAmount: Float,
 	totalPrice: Float,

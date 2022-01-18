@@ -52,7 +52,7 @@ public class CryptoController extends BaseController {
         CoinbaseEvent event = new Gson().fromJson(reqQuery, CoinbaseEvent.class);
         CoinbaseEventBody body = event.getEvent();
 
-        if (body.getType().equals("charge.confirmed")) {
+        if (body.getType().equals("charge:confirmed")) {
             CoinbaseEventData data = body.getData();
 
             if (data.getPayments().size() == 0) {
@@ -104,7 +104,7 @@ public class CryptoController extends BaseController {
                         user.getId(),
                         Notification.PAYMENT_RESULT,
                         "PAYMENT CONFIRMED",
-                        "You have deposited " + cryptoAmount + cryptoType + ".");
+                        "You have successfully deposited " + cryptoAmount + cryptoType + ".");
 
                 bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             }

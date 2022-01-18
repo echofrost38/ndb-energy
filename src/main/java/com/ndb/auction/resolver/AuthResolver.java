@@ -12,7 +12,6 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.Credentials;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,13 +50,6 @@ public class AuthResolver extends BaseResolver
 
 	public String request2FA(String email, String method, String phone) {
 		return userService.request2FA(lowerEmail(email), method, phone);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public String disable2FA(String method) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int id = userDetails.getId();
-		return userService.disable2FA(id, method);
 	}
 
 	public String confirmRequest2FA(String email, String method, String code) {

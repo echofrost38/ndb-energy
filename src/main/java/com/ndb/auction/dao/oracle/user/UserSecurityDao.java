@@ -82,11 +82,6 @@ public class UserSecurityDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, tfaEnabled, id);
 	}
 
-	public int updateTfaDisabled(int userId, String method, boolean tfaEnabled) {
-		String sql = "UPDATE TBL_USER_SECURITY SET TFA_ENABLED=? WHERE USER_ID=? AND AUTH_TYPE=?";
-		return jdbcTemplate.update(sql, tfaEnabled, userId, method);
-	}
-
 	public int updateTfaSecret(int id, String tfaSecret) {
 		String sql = "UPDATE TBL_USER_SECURITY SET TFA_SECRET=? WHERE ID=?";
 		return jdbcTemplate.update(sql, tfaSecret, id);

@@ -14,7 +14,13 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class TokenAssetResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver{
     
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public int createTokenAsset(String tokenName, String tokenSymbol, String network, String address, String symbol) {
+    public int createTokenAsset(
+        String tokenName, 
+        String tokenSymbol, 
+        String network, 
+        String address, 
+        String symbol
+    ) {
         TokenAsset tokenAsset = new TokenAsset(tokenName, tokenSymbol, network, address, symbol);
         return tokenAssetService.createNewTokenAsset(tokenAsset);
     }

@@ -320,6 +320,8 @@ public class BidService extends BaseService {
 		Bid bids[] = new Bid[_bidList.size()];
 		_bidList.toArray(bids);
 
+		sort.mergeSort(bids, 0, bids.length - 1);
+
 		List<Bid> bidList = Arrays.asList(bids);
 
 		// processing all bids
@@ -334,6 +336,8 @@ public class BidService extends BaseService {
 			// check stripe
 			List<StripeTransaction> fiatTxns = stripeService.getTransactions(roundId, userId);
 			for (StripeTransaction fiatTransaction : fiatTxns) {
+
+				// Processing Stripe CAPTURE or CANCEL
 				boolean result = stripeService.UpdateTransaction(fiatTransaction.getId(), bid.getStatus());
 				if (result && (bid.getStatus() == Bid.WINNER)) {
 					totalPrice += fiatTransaction.getAmount();

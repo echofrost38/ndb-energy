@@ -76,6 +76,18 @@ public class UserDao extends BaseOracleDao {
 		}, email);
 	}
 
+	public User selectEntireByEmail(String email) {
+		String sql = "SELECT * FROM TBL_USER WHERE EMAIL=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<User>() {
+			@Override
+			public User extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, email);
+	}
+
 	public List<User> selectAll(String orderby) {
 		String sql = "SELECT * FROM TBL_USER";
 		if (orderby == null)

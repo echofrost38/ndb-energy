@@ -37,15 +37,17 @@ public class UserService extends BaseService {
 	PasswordEncoder encoder;
 
 	public String createUser(String email, String password, String country) {
-		User user = userDao.selectByEmail(email);
+		User user = userDao.selectEntireByEmail(email);
 		if (user != null) {
-			UserVerify userVerify = userVerifyDao.selectById(user.getId());
-			if (userVerify != null && userVerify.isEmailVerified()) {
-				return "Already verified";
-			} else {
-				sendEmailCode(user, VERIFY_TEMPLATE);
-				return "Already exists, sent verify code";
-			}
+			if(user.getDeleted() == 0){
+				UserVerify userVerify = userVerifyDao.selectById(user.getId());
+				if (userVerify != null && userVerify.isEmailVerified()) {
+					return "Already verified";
+				} else {
+					sendEmailCode(user, VERIFY_TEMPLATE);
+					return "Already exists, sent verify code";
+				}
+			} else {}
 		} else {
 			user = new User();
 			user.setEmail(email);
@@ -369,7 +371,8 @@ public class UserService extends BaseService {
 	}
 
 	public String deleteUser(int id) {
-		if (userDao.updateDeleted(id) > 0)
+		// if (userDao.updateDeleted(id) > 0)
+		if (userDao.deleteById(id) > 0)
 			return "Success";
 		return "Failed";
 	}

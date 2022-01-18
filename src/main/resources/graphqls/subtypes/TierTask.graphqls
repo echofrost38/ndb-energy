@@ -1,0 +1,8 @@
+type TierTask {
+    userId: Int,
+    verification: Boolean,
+    wallet: Float,
+    auctions: [Int],
+    direct: Float,
+    staking: [StakeHist]
+}

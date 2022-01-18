@@ -36,6 +36,7 @@ extend type Mutation {
 }
 
 extend type Query {
+	getUserTierTask: TierTask
 	gettingApplicantData(
 		applicantId: String!
 	) : String

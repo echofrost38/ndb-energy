@@ -39,6 +39,7 @@ public class TierTask {
     }
 
     public void setAuctionsByString(String input) {
+        if(input == null) return;
         String[] array = input.split(AUCTION_SEPARATOR);
         List<Integer> list = new ArrayList<>();
         for (String s : array) {

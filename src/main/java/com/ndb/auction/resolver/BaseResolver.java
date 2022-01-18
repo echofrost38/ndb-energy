@@ -17,6 +17,7 @@ import com.ndb.auction.service.OAuth2RegistrationService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
+import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
@@ -96,5 +97,8 @@ public class BaseResolver {
 
 	@Autowired
 	UserSecurityService userSecurityService;
+
+	@Autowired
+	TierTaskService tierTaskService;
 
 }

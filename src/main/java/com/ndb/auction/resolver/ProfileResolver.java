@@ -11,6 +11,7 @@ import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.sumsub.Applicant;
+import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +39,13 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
         return profileService.updateAvatarSet(id, components);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public TierTask getUserTierTask() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int id = userDetails.getId();
+        return tierTaskService.getTierTask(id);
     }
 
     // purchase component

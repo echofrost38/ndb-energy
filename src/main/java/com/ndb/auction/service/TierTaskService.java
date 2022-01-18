@@ -24,6 +24,9 @@ public class TierTaskService {
 
 	public TierTask getTierTask(int userId) {
 		TierTask tierTask = tierTaskDao.selectByUserId(userId);
+
+		if(tierTask == null) return null;
+
 		tierTask.setStaking(tierTaskStakeDao.selectAll(userId));
 		return tierTask;
 	}

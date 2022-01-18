@@ -77,6 +77,8 @@ public class AuthResolver extends BaseResolver
 		}
 		UserVerify userVerify = userVerifyService.selectById(user.getId());
 		if (userVerify == null || !userVerify.isEmailVerified()) {
+			// send verify code again
+			resendVerifyCode(email);
 			return new Credentials("Failed", "Please verify your email.");
 		}
 

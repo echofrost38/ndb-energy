@@ -53,7 +53,7 @@ public class UserDao extends BaseOracleDao {
 	}
 
 	public User selectById(int id) {
-		String sql = "SELECT * FROM TBL_USER WHERE ID=? and DELETED=0";
+		String sql = "SELECT * FROM TBL_USER WHERE ID=? AND DELETED=0";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<User>() {
 			@Override
 			public User extractData(ResultSet rs) throws SQLException {
@@ -65,7 +65,7 @@ public class UserDao extends BaseOracleDao {
 	}
 
 	public User selectByEmail(String email) {
-		String sql = "SELECT * FROM TBL_USER WHERE EMAIL=? and DELETED=0";
+		String sql = "SELECT * FROM TBL_USER WHERE EMAIL=? AND DELETED=0";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<User>() {
 			@Override
 			public User extractData(ResultSet rs) throws SQLException {

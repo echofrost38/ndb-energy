@@ -90,7 +90,7 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	public List<CryptoTransaction> getCryptoTransactionByAdmin(int userId) {
 		return cryptoService.getTransactionByUser(userId);
 	}
-
+	
 	@PreAuthorize("isAuthenticated()")
 	public List<CryptoTransaction> getCryptoTransactionByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

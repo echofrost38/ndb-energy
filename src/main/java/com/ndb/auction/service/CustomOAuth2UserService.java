@@ -139,7 +139,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         }
         // user.setImageUrl(oAuth2UserInfo.getImageUrl());
-        userDao.insert(user);
+        user = userDao.insert(user);
+        userVerify.setId(user.getId());
         userVerifyDao.insertOrUpdate(userVerify);
         return user;
     }

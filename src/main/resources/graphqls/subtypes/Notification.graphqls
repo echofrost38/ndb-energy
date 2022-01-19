@@ -1,4 +1,5 @@
 type Notification {
+    id: Int,
     userId: Int,
     timeStamp: Float,
     nType: Int,

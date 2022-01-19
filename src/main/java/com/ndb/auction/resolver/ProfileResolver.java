@@ -98,14 +98,12 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Admin
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public KYCSetting updateKYCSetting(String kind, double withdraw, double deposit, double bid, double direct) {
-        // return sumsubService.updateKYCSetting(kind, withdraw, deposit, bid, direct);
-        return null;
+    public int updateKYCSetting(String kind, Double bid, Double direct, Double deposit, Double withdraw) {
+        return baseVerifyService.updateKYCSetting(kind, bid, direct, deposit, withdraw);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<KYCSetting> getKYCSetting() {
-        // return sumsubService.getKYCSettings();
-        return null;
+    public List<KYCSetting> getKYCSettings() {
+        return baseVerifyService.getKYCSetting();
     }
 }

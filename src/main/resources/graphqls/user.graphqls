@@ -5,12 +5,15 @@ type Query {
   ) : User
   getUserCount: Int
   getPaginatedUsers(key: String, limit: Int!): [User]
+  getDisallowed: [GeoLocation]
 }
 
 extend type Mutation {
-  addDisallowed(countryCode: String!): GeoLocation
-  getDisallowed: [GeoLocation]
-  makeAllow(countryCode: String!): GeoLocation
+  addDisallowed(
+    country: String!,
+    countryCode: String!)
+    : GeoLocation
+  makeAllow(locationId: Int!): Int
   resetPasswordByAdmin(email: String!): String
   createNewUser(
     email: String!

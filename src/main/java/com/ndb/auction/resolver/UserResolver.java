@@ -40,8 +40,8 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public GeoLocation addDisallowed(String countryCode) {
-        return userService.addDisallowed(countryCode);
+    public GeoLocation addDisallowed(String country, String countryCode) {
+        return userService.addDisallowed(country, countryCode);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -50,8 +50,8 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public GeoLocation makeAllow(String countryCode) {
-        return userService.makeAllow(countryCode);
+    public int makeAllow(int locationId) {
+        return userService.makeAllow(locationId);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

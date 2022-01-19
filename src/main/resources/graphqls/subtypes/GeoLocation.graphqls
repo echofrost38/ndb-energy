@@ -3,6 +3,7 @@ type GeoLocation {
     regDate: Float,
     updateDate: Float,
     deleted: Int,
+    country: String
     countryCode: String,
     isAllowed: Boolean
 }

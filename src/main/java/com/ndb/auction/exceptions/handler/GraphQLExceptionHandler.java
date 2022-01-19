@@ -3,11 +3,8 @@ package com.ndb.auction.exceptions.handler;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ndb.auction.exceptions.DatabaseAccessException;
-
 import org.springframework.stereotype.Component;
 
-import graphql.ErrorType;
 import graphql.ExceptionWhileDataFetching;
 import graphql.GraphQLError;
 import graphql.kickstart.execution.error.GraphQLErrorHandler;

@@ -7,6 +7,7 @@ import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BalanceService;
+import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
@@ -100,5 +101,8 @@ public class BaseResolver {
 
 	@Autowired
 	TierTaskService tierTaskService;
+
+	@Autowired
+	BaseVerifyService baseVerifyService;
 
 }

@@ -393,16 +393,16 @@ public class UserService extends BaseService {
 	}
 
 	///////////////////////// Geo Location /////////
-	public GeoLocation addDisallowed(String countryCode) {
-		return geoLocationDao.addDisallowedCountry(countryCode);
+	public GeoLocation addDisallowed(String country, String countryCode) {
+		return geoLocationDao.addDisallowedCountry(country, countryCode);
 	}
 
 	public List<GeoLocation> getDisallowed() {
 		return geoLocationDao.getGeoLocations();
 	}
 
-	public GeoLocation makeAllow(String countryCode) {
-		return geoLocationDao.makeAllow(countryCode);
+	public int makeAllow(int locationId) {
+		return geoLocationDao.makeAllow(locationId);
 	}
 
 	public String encodePassword(String pass) {

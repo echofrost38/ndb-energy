@@ -110,4 +110,5 @@ public class FinancialResolver extends BaseResolver implements GraphQLQueryResol
 
         return "Sucess";    
     }
+
 }

@@ -32,7 +32,7 @@ extend type Mutation {
 		deposit: Float,
 		bid: Float,
 		direct: Float
-	) : KYCSetting
+	) : Int
 }
 
 extend type Query {
@@ -40,7 +40,7 @@ extend type Query {
 	gettingApplicantData(
 		applicantId: String!
 	) : String
-	getKYCSetting : [KYCSetting]
+	getKYCSettings : [KYCSetting]
 }
 
 schema {

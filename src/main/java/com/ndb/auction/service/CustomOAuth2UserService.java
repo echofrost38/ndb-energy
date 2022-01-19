@@ -149,7 +149,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         UserVerify userVerify = userVerifyDao.selectById(existingUser.getId());
         if (userVerify == null)
             userVerify = new UserVerify();
-        userVerify.setId(existingUser.getId());
         userVerify.setEmailVerified(true);
         // existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
         userDao.updateName(existingUser.getId(), oAuth2UserInfo.getName());

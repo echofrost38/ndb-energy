@@ -24,6 +24,7 @@ import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
+import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
@@ -149,4 +150,7 @@ public class BaseService {
 
     @Autowired
     public ShuftiDao shuftiDao;
+
+    @Autowired
+    public KycSettingDao kycSettingDao;
 }

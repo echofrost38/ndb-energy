@@ -17,7 +17,6 @@ public class AvatarNotFoundException extends RuntimeException implements GraphQL
 
 	private static final long serialVersionUID = -4846136662897176148L;
 	private String invalidField;
-    private int status;
 
     public AvatarNotFoundException(String message, String invalidField, int status) {
         super(message);

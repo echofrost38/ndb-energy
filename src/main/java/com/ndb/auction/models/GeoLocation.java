@@ -12,10 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class GeoLocation extends BaseModel {
 	
+	private int id;
+	private String country;
 	private String countryCode;
 	private boolean isAllowed;
 	
-	public GeoLocation(String code, boolean allowed) {
+	public GeoLocation(String country, String code, boolean allowed) {
+		this.country = country;
 		this.countryCode = code;
 		this.isAllowed = allowed;
 	}

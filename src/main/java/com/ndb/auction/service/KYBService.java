@@ -1,12 +1,9 @@
 package com.ndb.auction.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.Part;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.models.user.UserKyb;
 
@@ -15,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class KYBService extends BaseService {
-
-    private static final String BUCKET_NAME = "auctionupload";
 
     @Autowired
     private UserKybDao userKybDao;

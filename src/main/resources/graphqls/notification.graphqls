@@ -1,13 +1,16 @@
 extend type Query {
   getAllUnReadNotifications: [Notification]
-  getNotifications(stamp: Float, limit: Int!): [Notification]
-  getUnreadNotifications: [Notification]
+  getNotifications(
+    offset: Int, 
+    limit: Int
+  ): [Notification]
+  getAllUnReadNotifications: [Notification]
   getNotificationTypes: [NotificationType]
 }
 
 extend type Mutation {
   setNotificationRead(id: String): Notification
-  setNotificationReadFlag(stamp: Float!): Notification
+  setNotificationReadFlag(id: Int!): Notification
   setNotificationReadFlagAll: String
   changeNotifySetting(nType: Int!, status: Boolean): Int
 }

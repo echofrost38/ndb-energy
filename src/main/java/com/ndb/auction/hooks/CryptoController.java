@@ -87,6 +87,9 @@ public class CryptoController extends BaseController {
                     if (totalPrice > usdAmount) {
                         new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                     }
+
+                    // update user tier points
+
                 }
 
                 String cryptoType = cryptoPricing.getCurrency();

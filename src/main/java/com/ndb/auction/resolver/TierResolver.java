@@ -33,7 +33,7 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
         return tierService.updateUserTier(level, name, point, svg);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public List<Tier> getUserTiers() {
         return tierService.getUserTiers();
     }
@@ -53,7 +53,7 @@ public class TierResolver extends BaseResolver implements GraphQLQueryResolver, 
         return taskSettingService.updateTaskSetting(setting);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public TaskSetting getTaskSetting() {
         return taskSettingService.getTaskSetting();
     }

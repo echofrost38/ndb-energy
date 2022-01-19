@@ -1,5 +1,14 @@
 package com.ndb.auction.resolver;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.ndb.auction.models.Notification;
+import com.ndb.auction.payload.NotificationType;
+import com.ndb.auction.service.user.UserDetailsImpl;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -8,11 +17,6 @@ import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-
-import com.ndb.auction.models.Notification;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 @Component
 @RequiredArgsConstructor

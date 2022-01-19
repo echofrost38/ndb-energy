@@ -13,7 +13,7 @@ extend type Query {
 extend type Mutation {
 	createAuction(
 		round: Int!, 
-		startedAt: String!,  
+		startedAt: Float!,  
 		duration: Float!,
 		totalToken: Float!, 
 		minPrice: Float!,

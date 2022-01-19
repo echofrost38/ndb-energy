@@ -19,7 +19,7 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Auction createAuction(
 		int round, 
-		String startedAt, 
+		Long startedAt, 
 		Long duration, 
 		Long totalToken, 
 		Long minPrice, 

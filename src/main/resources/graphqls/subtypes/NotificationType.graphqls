@@ -1,0 +1,4 @@
+type NotificationType {
+    type: String,
+    index: Int
+}

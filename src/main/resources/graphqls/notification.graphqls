@@ -2,6 +2,7 @@ extend type Query {
   getAllUnReadNotifications: [Notification]
   getNotifications(stamp: Float, limit: Int!): [Notification]
   getUnreadNotifications: [Notification]
+  getNotificationTypes: [NotificationType]
 }
 
 extend type Mutation {

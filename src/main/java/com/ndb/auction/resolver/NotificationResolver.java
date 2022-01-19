@@ -20,6 +20,17 @@ public class NotificationResolver extends BaseResolver
         implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
 
     @PreAuthorize("isAuthenticated()")
+    public List<NotificationType> getNotificationTypes() {
+        List<NotificationType> notifyTypes = new ArrayList<NotificationType>();
+        Map<String, Integer> typeMap = notificationService.getTypeMap();
+        Set<String> keySet = typeMap.keySet();
+        for (String type : keySet) {
+            notifyTypes.add(new NotificationType(type, typeMap.get(type)));
+        }
+        return notifyTypes;
+    }
+
+    @PreAuthorize("isAuthenticated()")
     public Notification setNotificationRead(int id) {
         return notificationService.setNotificationRead(id);
     }

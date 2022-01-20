@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Wallet;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
@@ -99,21 +95,24 @@ public class ProfileService extends BaseService {
 		List<AvatarSet> sets = avatarSetDao.selectById(profile.getId());
 		List<AvatarComponent> components = avatarComponentDao.getAvatarComponentsBySet(sets);
 
-		String purchasedJsonString = userAvatar.getPurchased();
-		JsonObject purchasedJson = purchasedJsonString == null ? new JsonObject()
-				: JsonParser.parseString(purchasedJsonString).getAsJsonObject();
+
+		Map<String, List<Integer>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
+
 		for (AvatarComponent component : components) {
-			String group =String.valueOf(component.getGroupId());
-			JsonElement el = purchasedJson.get(group);
-			JsonArray array;
-			if (el == null || el.isJsonNull())
-				array = new JsonArray();
-			else
-				array = el.getAsJsonArray();
-			array.add(component.getCompId());
-			purchasedJson.add(group, array);
+			String groupId = component.getGroupId();
+			int compId = component.getCompId();
+			List<Integer> purchasedList = purchasedMap.get(groupId);
+			if(purchasedList == null) {
+				purchasedList = new ArrayList<>();
+				purchasedList.add(compId);
+				purchasedMap.put(groupId, purchasedList);
+			} else {
+				if(!purchasedList.contains(compId)) {
+					purchasedList.add(compId);
+				}
+			}
 		}
-		userAvatar.setPurchased(purchasedJson.toString());
+		
 		userAvatar.setSelected(gson.toJson(sets));
 		userAvatar.setPrefix(prefix);
 		userAvatar.setName(name);
@@ -130,26 +129,23 @@ public class ProfileService extends BaseService {
 		UserAvatar userAvatar = userAvatarDao.selectById(userId);
 		if (userAvatar == null) {
 			userAvatar = new UserAvatar();
+			userAvatar.setId(userId);
 		}
-		long totalPrice = 0;
-		long price = 0;
+		double totalPrice = 0;
+		double price = 0;
 		String groupId = "";
 		int compId = 0;
 		List<AvatarComponent> purchasedComponents = new ArrayList<>();
 
 		Map<String, List<Integer>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
+		
+		// processing for each components
 		for (AvatarSet avatarSet : set) {
 			groupId = avatarSet.getGroupId();
 			compId = avatarSet.getCompId();
 			AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 			if (component == null) {
 				throw new AvatarNotFoundException("Cannot find avatar component.", "compId", 0);
-			}
-
-			// check free
-			price = component.getPrice();
-			if (price == 0) {
-				continue;
 			}
 
 			// check purchased
@@ -164,8 +160,15 @@ public class ProfileService extends BaseService {
 			}
 
 			// check remained
-			if (component.getLimited() <= component.getPurchased()) {
-				return null;
+			if (component.getLimited() != 0 && component.getLimited() <= component.getPurchased()) {
+				throw new BidException("Avatar Components are sold out.","set");
+			}
+
+			// check free
+			price = component.getPrice();
+			if (price == 0) {
+				purchaseList.add(compId);
+				continue;
 			}
 
 			totalPrice += component.getPrice();
@@ -175,25 +178,31 @@ public class ProfileService extends BaseService {
 		}
 
 		// check user's NDB wallet
-		Wallet ndbWallet = userWalletService.getWalletById(userId, "NDB");
-		long balance = ndbWallet.getFree();
+		int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
+		InternalBalance ndbBalance = balanceDao.selectById(userId, tokenId);
+		if(ndbBalance == null) {
+			ndbBalance = new InternalBalance(userId, tokenId);
+			balanceDao.insert(ndbBalance);
+		}
+
+		double balance = ndbBalance.getFree();
 		if (balance < totalPrice) {
 			throw new BidException("You don't have enough balance in wallet.", "set");
 		}
-		ndbWallet.setFree(balance - totalPrice);
+
+		// update internal NDB balance
+		ndbBalance.setFree(balance - totalPrice);
+		balanceDao.update(ndbBalance);
+
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
+		userAvatarDao.insertOrUpdate(userAvatar);
 
 		for (AvatarComponent avatarComponent : purchasedComponents) {
 			avatarComponentDao.updateAvatarComponent(avatarComponent);
 		}
 
 		return set;
-	}
-
-	public String purchaseComponent(List<AvatarComponent> components) {
-
-		return null;
 	}
 
 }

@@ -10,7 +10,9 @@ extend type Query {
 
 extend type Mutation {
   setNotificationRead(id: String): Notification
-  setNotificationReadFlag(id: Int!): Notification
+  setNotificationReadFlag(
+    id: Int!
+  ): Notification
   setNotificationReadFlagAll: String
   changeNotifySetting(nType: Int!, status: Boolean): Int
 }

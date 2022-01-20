@@ -15,7 +15,7 @@ public class AvatarComponent {
 	private String groupId;
 	private int compId;
 	private Integer tierLevel;
-	private Long price;
+	private Double price;
 	private Integer limited;
 	private Integer purchased;
 	private String svg;
@@ -23,7 +23,7 @@ public class AvatarComponent {
 	private Integer top;
 	private Integer left;
 
-	public AvatarComponent(String groupId, Integer tierLevel, Long price, Integer limited, String svg, Integer width, Integer top, Integer left) {
+	public AvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, String svg, Integer width, Integer top, Integer left) {
 		this.groupId = groupId;
 		this.tierLevel = tierLevel;
 		this.price = price;

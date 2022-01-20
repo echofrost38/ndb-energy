@@ -5,7 +5,6 @@ import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
 import com.ndb.auction.dao.oracle.ShuftiDao;
-import com.ndb.auction.dao.oracle.TokenAssetDao;
 import com.ndb.auction.dao.oracle.auction.AuctionAvatarDao;
 import com.ndb.auction.dao.oracle.auction.AuctionDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarComponentDao;
@@ -125,6 +124,9 @@ public class BaseService {
     public NdbWalletService ndbWalletService;
 
     @Autowired
+    public TokenAssetService tokenAssetService;
+
+    @Autowired
     public DirectSaleDao directSaleDao;
 
     @Autowired
@@ -138,9 +140,6 @@ public class BaseService {
 
     @Autowired
     public TaskSettingService taskSettingService;
-
-    @Autowired
-    public TokenAssetDao tokenAssetDao;
 
     @Autowired
     public InternalBalanceDao balanceDao;

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AvatarService extends BaseService {
 
-	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Long price, Integer limited, String svg, int width, int top, int left) {
+	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
 		price = price == null ? 0 : price;
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited, svg, width, top, left);
 		AvatarComponent newComponent = avatarComponentDao.createAvatarComponent(component);
@@ -33,7 +33,7 @@ public class AvatarService extends BaseService {
 		return avatarComponentDao.getAvatarComponent(groupId, compId);
 	}
 
-	public AvatarComponent updateAvatarComponent(String groupId, int compId, Integer tierLevel, Long price, Integer limited, String svg, int width, int top, int left) {
+	public AvatarComponent updateAvatarComponent(String groupId, int compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
 		AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 		if (component == null) {
 			throw new AvatarNotFoundException("Cannot find avatar component.", "compId", 0);

@@ -24,6 +24,7 @@ import com.ndb.auction.service.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
 
@@ -58,9 +59,6 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-
-			// create user wallet in contract!
-			// userWalletService.addNewUser(user.getId(), email, "");
 
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
@@ -464,24 +462,24 @@ public class UserService extends BaseService {
 		}
 		return "Success";
 	}
-
+	
+	@Transactional
 	public String createNewUser(User user, String rPassword) {
 
 		// create new user!
-		userDao.insert(user);
+		user = userDao.insert(user);
+		user.getAvatar().setId(user.getId());
+		user.getVerify().setId(user.getId());
 		userAvatarDao.insertOrUpdate(user.getAvatar());
 		userVerifyDao.insertOrUpdate(user.getVerify());
 
 		// send email!
 		try {
-			mailService.sendVerifyEmail(user, rPassword, "NE");
+			mailService.sendVerifyEmail(user, rPassword, "new_user.ftlh");
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "Failed";
+			throw new UserNotFoundException("cannot create new user.", "email");
 		}
-
-		// ndbWalletService.createAccount(user.getId(), user.getEmail());
-
 		return "Success";
 	}
 
@@ -521,7 +519,7 @@ public class UserService extends BaseService {
 		return nType;
 	}
 
-	public int updateTier(int id, int tierLevel, long tierPoint) {
+	public int updateTier(int id, int tierLevel, Double tierPoint) {
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 

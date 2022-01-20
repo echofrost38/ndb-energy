@@ -1,0 +1,7 @@
+type Balance {
+    tokenName: String,
+    tokenSymbol: String,
+    symbol: String,
+    free: Float,
+    hold: Float
+}

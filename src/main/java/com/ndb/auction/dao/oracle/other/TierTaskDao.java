@@ -21,9 +21,9 @@ public class TierTaskDao extends BaseOracleDao {
 		TierTask m = new TierTask();
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setVerification(rs.getBoolean("VERIFICATION"));
-		m.setWallet(rs.getLong("WALLET"));
+		m.setWallet(rs.getDouble("WALLET"));
 		m.setAuctionsByString(rs.getString("AUCTIONS"));
-		m.setDirect(rs.getLong("DIRECT"));
+		m.setDirect(rs.getDouble("DIRECT"));
 		return m;
 	}
 

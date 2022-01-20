@@ -36,8 +36,7 @@ public class LocationLogService extends BaseService {
     }
 
     public boolean isProxyOrVPN(LocationLog log) {
-        return false;
-        // return log.isVpn() || log.isProxy() || log.isTor() || log.isRelay();
+        return log.isVpn() || log.isProxy() || log.isTor() || log.isRelay();
     }
 
     public boolean isAllowedCountry(String countryCode) {

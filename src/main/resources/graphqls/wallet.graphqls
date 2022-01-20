@@ -1,0 +1,7 @@
+extend type Query {
+    getBalances : [Balance]
+}
+
+schema {
+    query: Query
+}

@@ -12,6 +12,7 @@ import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.FinancialService;
+import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.KYBService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
@@ -104,5 +105,8 @@ public class BaseResolver {
 
 	@Autowired
 	BaseVerifyService baseVerifyService;
+
+	@Autowired
+	InternalBalanceService internalBalanceService;
 
 }

@@ -43,7 +43,7 @@ public class UserDao extends BaseOracleDao {
 		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
 		m.setLastLoginDate(rs.getTimestamp("LAST_LOGIN_DATE").getTime());
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
-		m.setTierPoint(rs.getLong("TIER_POINT"));
+		m.setTierPoint(rs.getDouble("TIER_POINT"));
 		m.setProvider(rs.getString("PROVIDER"));
 		m.setProviderId(rs.getString("PROVIDER_ID"));
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
@@ -191,7 +191,7 @@ public class UserDao extends BaseOracleDao {
 						ps.setTimestamp(i++, m.getBirthdayTimestamp());
 						ps.setString(i++, m.getRoleString());
 						ps.setInt(i++, m.getTierLevel());
-						ps.setLong(i++, m.getTierPoint() == null ? 0 : m.getTierPoint());
+						ps.setDouble(i++, m.getTierPoint() == null ? 0 : m.getTierPoint());
 						ps.setString(i++, m.getProvider());
 						ps.setString(i++, m.getProviderId());
 						ps.setInt(i++, m.getNotifySetting());
@@ -223,7 +223,7 @@ public class UserDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, role, id);
 	}
 
-	public int updateTier(int id, int tierLevel, long tierPoint) {
+	public int updateTier(int id, int tierLevel, Double tierPoint) {
 		String sql = "UPDATE TBL_USER SET TIER_LEVEL=?,TIER_POINT=? WHERE ID=?";
 		return jdbcTemplate.update(sql, tierLevel, tierPoint, id);
 	}

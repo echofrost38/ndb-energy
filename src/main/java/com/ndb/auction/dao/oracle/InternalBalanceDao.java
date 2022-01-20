@@ -38,11 +38,11 @@ public class InternalBalanceDao extends BaseOracleDao {
 			public InternalBalance mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		});
+		}, userId);
     }
 
 	public InternalBalance selectById(int userId, int tokenId) {
-		String sql = "SELECT * TBL_INTERNAL_BALANCE WHERE USER_ID = ? AND TOKEN_ID = ?";
+		String sql = "SELECT * FROM TBL_INTERNAL_BALANCE WHERE USER_ID = ? AND TOKEN_ID = ?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<InternalBalance>() {
 			@Override
 			public InternalBalance extractData(ResultSet rs) throws SQLException {
@@ -54,8 +54,8 @@ public class InternalBalanceDao extends BaseOracleDao {
 	}
 
     public int insert(InternalBalance m) {
-        String sql = "INSERT INTO TBL_INTERNAL_BALANCE(ID,USER_ID,TOKEN_ID,FREE,HOLD)"
-				+ "VALUES(SEQ_INTERNAL_BALANCE.NEXTVAL,?,?,?,?)";
+        String sql = "INSERT INTO TBL_INTERNAL_BALANCE(USER_ID,TOKEN_ID,FREE,HOLD)"
+				+ "VALUES(?,?,?,?)";
 		return jdbcTemplate.update(sql, m.getUserId(), m.getTokenId(), m.getFree(), m.getHold());
     }
 

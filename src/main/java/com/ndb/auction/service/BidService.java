@@ -162,9 +162,9 @@ public class BidService extends BaseService {
 		}
 		User user = userDao.selectById(userId);
 		tierTask.getAuctions().add(roundNumber);
-		long point = user.getTierPoint();
+		double point = user.getTierPoint();
 		point += taskSetting.getAuction();
-		long _point = point;
+		double _point = point;
 		int level = user.getTierLevel();
 		for (Tier tier : tiers) {
 			if (tier.getPoint() >= point && tier.getPoint() > _point) {

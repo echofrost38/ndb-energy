@@ -30,7 +30,7 @@ public class User extends BaseModel {
 	private Long lastLoginDate;
 	private Set<String> role;
 	private int tierLevel;
-	private Long tierPoint;
+	private Double tierPoint;
 	private String provider;
 	private String providerId;
 	private int notifySetting;

@@ -171,7 +171,7 @@ public class FinancialController extends BaseController {
                 directSaleService.updateDirectSale(tx);
 
                 // update Tier Setting!!!!
-                // addDirectSalepoint(tx.getUserId(), payAmount);
+                addDirectSalepoint(tx.getUserId(), payAmount);
 
                 // Real moving of NDB
                 if (tx.getWhereTo() == DirectSale.INTERNAL) {
@@ -189,19 +189,19 @@ public class FinancialController extends BaseController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void addDirectSalepoint(int userId, long amount) {
+    private void addDirectSalepoint(int userId, double amount) {
         TierTask tierTask = tierTaskService.getTierTask(userId);
         TaskSetting taskSetting = taskSettingService.getTaskSetting();
         List<Tier> tiers = tierService.getUserTiers();
 
-        long prevDirect = tierTask.getDirect();
+        double prevDirect = tierTask.getDirect();
         tierTask.setDirect(prevDirect + amount);
 
         User user = userService.getUserById(userId);
 
-        long point = user.getTierPoint();
+        double point = user.getTierPoint();
         point += (taskSetting.getDirect() * amount);
-        long _point = point;
+        double _point = point;
         int level = user.getTierLevel();
         for (Tier tier : tiers) {
             if (tier.getPoint() >= point && tier.getPoint() > _point) {

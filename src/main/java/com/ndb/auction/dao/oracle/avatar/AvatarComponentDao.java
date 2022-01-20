@@ -31,7 +31,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 		m.setGroupId(rs.getString("GROUP_ID"));
 		m.setCompId(rs.getInt("COMP_ID"));
 		m.setTierLevel(rs.getInt("TIER_LEVEL"));
-		m.setPrice(rs.getLong("PRICE"));
+		m.setPrice(rs.getDouble("PRICE"));
 		m.setLimited(rs.getInt("LIMITED"));
 		m.setPurchased(rs.getInt("PURCHASED"));
 		m.setSvg(rs.getString("SVG"));
@@ -55,7 +55,7 @@ public class AvatarComponentDao extends BaseOracleDao {
                         int i = 1;
                         ps.setString(i++, m.getGroupId());
 						ps.setInt(i++, m.getTierLevel());
-						ps.setLong(i++, m.getPrice());
+						ps.setDouble(i++, m.getPrice());
 						ps.setInt(i++, m.getLimited());
 						ps.setInt(i++, m.getPurchased());
 						ps.setString(i++, m.getSvg());

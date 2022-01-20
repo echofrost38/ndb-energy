@@ -62,7 +62,7 @@ public class TokenAssetDao extends BaseOracleDao {
 	}
 
     public int updateDeleted(int id) {
-		String sql = "UPDATE NDB.TBL_TOKEN_ASSET SET DELETED=1 WHERE ID=?";
+		String sql = "DELETE FROM TBL_TOKEN_ASSET WHERE ID=?";
 		return jdbcTemplate.update(sql, id);
 	}
 

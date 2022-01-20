@@ -53,7 +53,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     public int makeAllow(int locationId) {
         return userService.makeAllow(locationId);
     }
-
+// user management by admin
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String resetPasswordByAdmin(String email) {
         return userService.resetPasswordByAdmin(email);

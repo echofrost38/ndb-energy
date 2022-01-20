@@ -1,5 +1,6 @@
 package com.ndb.auction.hooks;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,11 +9,14 @@ import com.google.gson.Gson;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.CryptoTransaction;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;
 import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
+import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 
 import org.springframework.http.HttpStatus;
@@ -73,6 +77,9 @@ public class CryptoController extends BaseController {
                 double usdAmount = Double.valueOf(usdPricing.getAmount());
                 Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
 
+                // wallet update confirmed amount make hold
+                User user = userService.getUserById(txn.getUserId());
+
                 if (bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     if (pendingPrice > usdAmount) {
@@ -89,15 +96,30 @@ public class CryptoController extends BaseController {
                     }
 
                     // update user tier points
+                    List<Tier> tierList = tierService.getUserTiers();
+                    TaskSetting taskSetting = taskSettingService.getTaskSetting();
+                    TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+                    List<Integer> auctionList = tierTask.getAuctions();
+                    if(!auctionList.contains(bid.getRoundId())) {
+                        auctionList.add(bid.getRoundId());
+                        // get point
+                        double newPoint = user.getTierPoint() + taskSetting.getAuction();
+                        int tierLevel = 0;
 
+                        // check change in level
+                        for (Tier tier : tierList) {
+                            if(tier.getPoint() <= newPoint) {
+                                tierLevel = tier.getLevel();
+                            }
+                        }
+                        userService.updateTier(user.getId(), tierLevel, newPoint);
+                        taskSettingService.updateTaskSetting(taskSetting);
+                    } 
                 }
 
                 String cryptoType = cryptoPricing.getCurrency();
                 String cryptoAmount = cryptoPricing.getAmount();
                 cryptoService.updateTransaction(code, CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);
-
-                // wallet update confirmed amount make hold
-                User user = userService.getUserById(txn.getUserId());
                 
                 // Change crypto Hold amount!!!!!!!!!!!!!!!
                 // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);

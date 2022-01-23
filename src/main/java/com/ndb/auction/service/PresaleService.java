@@ -14,6 +14,16 @@ public class PresaleService extends BaseService {
         if(prev != null) {
             throw new PreSaleException(String.format("Presale round %d already exists.", presale.getRound()), String.valueOf(presale.getRound()));
         }
+        // check date
+        Long currentTime = System.currentTimeMillis();
+        if(currentTime > presale.getStartedAt()) {
+            throw new PreSaleException("Presale start time invalid", "started at");
+        }
+
+        if(presale.getStartedAt() > presale.getEndedAt()) {
+            throw new PreSaleException("Presale end time invalid", "ended at");
+        }
+
         int result = presaleDao.insert(presale);
         int count = presale.getConditions().size();
         if(count != presaleConditionDao.insertConditionList(presale.getConditions())){

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ndb.auction.exceptions.UserNotFoundException;
+
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarProfile;
@@ -70,7 +72,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            return "Already Exists.";
+            throw new UserNotFoundException("already_exists", "email");
         }
 
         String rPassword = userService.getRandomPassword(10);

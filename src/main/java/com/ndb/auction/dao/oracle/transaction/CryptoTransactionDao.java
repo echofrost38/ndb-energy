@@ -1,4 +1,4 @@
-package com.ndb.auction.dao.oracle.other;
+package com.ndb.auction.dao.oracle.transaction;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
-import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.transaction.CryptoTransaction;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,24 +21,25 @@ public class CryptoTransactionDao extends BaseOracleDao {
 
 	private static CryptoTransaction extract(ResultSet rs) throws SQLException {
 		CryptoTransaction m = new CryptoTransaction();
-		m.setTxnId(rs.getString("TXN_ID"));
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setRoundId(rs.getInt("ROUND_ID"));
-		m.setAmount(rs.getString("AMOUNT"));
+		m.setTransactionType(rs.getInt("TRANSACTION_TYPE"));
+		m.setPresaleId(rs.getInt("PRESALE_ID"));
+		m.setAmount(rs.getDouble("AMOUNT"));
+		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
+		m.setTxnId(rs.getString("TXN_ID"));
+		m.setCode(rs.getString("CODE"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));
 		m.setCryptoAmount(rs.getString("CRYPTO_AMOUNT"));
 		m.setStatus(rs.getInt("STATUS"));
-		m.setCode(rs.getString("CODE"));
-		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		return m;
 	}
 
 	public int insert(CryptoTransaction m) {
-		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
+		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,TRANSACTION_TYPE,PRESALE_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
 				+ " VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getAmount(),
-				m.getCryptoType(), m.getCryptoAmount(), m.getStatus());
+		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getTransactionType(), m.getPresaleId(), m.getAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
 	}
 
 	public List<CryptoTransaction> selectAll(String orderby) {
@@ -77,7 +78,7 @@ public class CryptoTransactionDao extends BaseOracleDao {
 	}
 
 	public List<CryptoTransaction> selectByRoundId(int roundId) {
-		String sql = "SELECT * FROM TBL_CRYPTO_TRANSACTION WHERE ROUND_ID=? ORDER BY AMOUNT DESC";
+		String sql = "SELECT * FROM TBL_CRYPTO_TRANSACTION WHERE ROUND_ID=? ORDER BY NDB_PRICE DESC";
 		return jdbcTemplate.query(sql, new RowMapper<CryptoTransaction>() {
 			@Override
 			public CryptoTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -87,7 +88,7 @@ public class CryptoTransactionDao extends BaseOracleDao {
 	}
 
 	public List<CryptoTransaction> getTransaction(int userId, int roundId) {
-		String sql = "SELECT * FROM TBL_CRYPTO_TRANSACTION WHERE ROUND_ID=? AND USER_ID=? ORDER BY ID DESC";
+		String sql = "SELECT * FROM TBL_CRYPTO_TRANSACTION WHERE ROUND_ID=? AND USER_ID=? ORDER BY UPDATED_AT";
 		return jdbcTemplate.query(sql, new RowMapper<CryptoTransaction>() {
 			@Override
 			public CryptoTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {

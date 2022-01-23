@@ -1,4 +1,4 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.transaction;
 
 import org.springframework.stereotype.Component;
 
@@ -10,35 +10,30 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CryptoTransaction {
+public class CryptoTransaction extends BaseTransaction {
+    
     public static final int INITIATED = 0;
     public static final int CONFIRMED = 1;
     public static final int CANCELED = 2;
 
     private String txnId;
-    private int roundId;
-    private int userId;
     private String code;
 
-    private String amount; // usd
     private String cryptoAmount;
     private String cryptoType;
 
     private int status;
 
-    private Long createdAt;
     private Long updatedAt;
 
-    public CryptoTransaction(String txnId, int roundId, int userId, String code, String amount, String cryptoAmount,
-            String cryptoType) {
-        this.code = code;
-        this.txnId = txnId;
-        this.roundId = roundId;
+    public CryptoTransaction(int userId, int roundId, String txnId, String code, Double amount, int transactionType) {
         this.userId = userId;
+        this.roundId = roundId;
+        this.txnId = txnId;
+        this.code = code;
         this.amount = amount;
-        this.cryptoAmount = cryptoAmount;
-        this.cryptoType = cryptoType;
-        this.status = INITIATED;
+        this.transactionType = transactionType;
+        this.status = 0;
     }
 
 }

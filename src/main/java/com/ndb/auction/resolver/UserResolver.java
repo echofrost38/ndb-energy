@@ -1,8 +1,14 @@
 package com.ndb.auction.resolver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ndb.auction.models.GeoLocation;
+import com.ndb.auction.models.avatar.AvatarComponent;
+import com.ndb.auction.models.avatar.AvatarProfile;
+import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.UserVerify;
@@ -69,14 +75,35 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user = new User();
-        user.setEmail(email);
-        user.setPassword(encoded);
-        user.setCountry(country);
+        user = new User(email, encoded, country);
 
         UserAvatar userAvatar = new UserAvatar();
         userAvatar.setPrefix(avatarName);
         userAvatar.setName(shortName);
+
+        // processing purchased map
+        AvatarProfile profile = avatarService.getAvatarProfileByName(avatarName);
+        List<AvatarSet> sets = avatarService.getAvatarSetById(profile.getId());
+        List<AvatarComponent> components = avatarService.getAvatarComponentsBySet(sets);
+
+        Map<String, List<Integer>> purchasedMap = new HashMap<>();
+        for (AvatarComponent component : components) {
+            String groupId = component.getGroupId();
+            int compId = component.getCompId();
+            List<Integer> purchasedList = purchasedMap.get(groupId);
+			if(purchasedList == null) {
+				purchasedList = new ArrayList<>();
+				purchasedList.add(compId);
+				purchasedMap.put(groupId, purchasedList);
+			} else {
+				if(!purchasedList.contains(compId)) {
+					purchasedList.add(compId);
+				}
+			}
+        }
+        userAvatar.setPurchased(gson.toJson(purchasedMap));
+        userAvatar.setSelected(gson.toJson(sets));
+
         user.setAvatar(userAvatar);
 
         UserVerify userVerify = new UserVerify();
@@ -84,8 +111,13 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         user.setVerify(userVerify);
 
         // check role
-        if (role.equals("ROLE_ADMIN"))
+        if(role.equals("ROLE_USER")) {
             user.addRole(role);
+        } else if (role.equals("ROLE_ADMIN")) {
+            user.addRole(role);
+            user.addRole("ROLE_USER");
+        }
+            
 
         return userService.createNewUser(user, rPassword);
     }

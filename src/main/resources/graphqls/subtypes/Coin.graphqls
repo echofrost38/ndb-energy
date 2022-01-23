@@ -1,4 +1,0 @@
-type Coin {
-    name: String,
-    symbol: String
-}

@@ -477,8 +477,8 @@ public class UserService extends BaseService {
 		try {
 			mailService.sendVerifyEmail(user, rPassword, "new_user.ftlh");
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new UserNotFoundException("cannot create new user.", "email");
+			// e.printStackTrace();
+			// throw new UserNotFoundException("cannot create new user.", "email");
 		}
 		return "Success";
 	}

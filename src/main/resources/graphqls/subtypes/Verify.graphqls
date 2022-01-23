@@ -1,4 +1,0 @@
-type Verify {
-   key: String,
-   value: Boolean
-}

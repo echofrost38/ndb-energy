@@ -13,11 +13,12 @@ import com.ndb.auction.dao.oracle.avatar.AvatarProfileFactsDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSetDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSkillDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
-import com.ndb.auction.dao.oracle.other.CryptoTransactionDao;
-import com.ndb.auction.dao.oracle.other.DirectSaleDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
-import com.ndb.auction.dao.oracle.other.StripeTransactionDao;
+import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
+import com.ndb.auction.dao.oracle.presale.PreSaleDao;
+import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
+import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -127,9 +128,6 @@ public class BaseService {
     public TokenAssetService tokenAssetService;
 
     @Autowired
-    public DirectSaleDao directSaleDao;
-
-    @Autowired
     public GeoLocationDao geoLocationDao;
 
     @Autowired
@@ -152,4 +150,10 @@ public class BaseService {
 
     @Autowired
     public KycSettingDao kycSettingDao;
+
+    @Autowired
+    public PreSaleDao presaleDao;
+
+    @Autowired
+    public PreSaleConditionDao presaleConditionDao;
 }

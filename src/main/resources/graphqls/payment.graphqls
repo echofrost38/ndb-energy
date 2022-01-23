@@ -33,10 +33,6 @@ extend type Query {
 		roundId: Int!,
 		userId: Int
 	) : [CryptoTransaction]
-	getCoins : [Coin]
-	getCryptoPrice(
-		symbol: String
-	) : Float
 }
 
 extend type Mutation {
@@ -50,14 +46,6 @@ extend type Mutation {
 		roundId: Int!,
 		amount: Float!
 	) : CryptoPayload
-	addNewCoin (
-		name: String,
-		symbol: String
-	) : Coin
-	deleteCoin (
-		name: String,
-		symbol: String
-	) : Coin
 }
 
 schema {

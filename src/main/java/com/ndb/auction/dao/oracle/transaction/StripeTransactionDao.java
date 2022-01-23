@@ -1,4 +1,4 @@
-package com.ndb.auction.dao.oracle.other;
+package com.ndb.auction.dao.oracle.transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -12,10 +12,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.oracle.other.FinancialDao;
+import com.ndb.auction.dao.oracle.transaction.FinancialDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
-import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
@@ -30,9 +29,6 @@ import com.ndb.auction.web3.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseController {
-
-    @Autowired
-    DirectSaleService directSaleService;
 
     @Autowired
     CryptoService cryptoService;

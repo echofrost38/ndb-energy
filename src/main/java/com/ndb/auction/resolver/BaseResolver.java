@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 
+import com.google.gson.Gson;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
@@ -10,12 +11,12 @@ import com.ndb.auction.service.BalanceService;
 import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
-import com.ndb.auction.service.DirectSaleService;
 import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.KYBService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
+import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
@@ -30,6 +31,8 @@ import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.TokenAssetService;
 
 public class BaseResolver {
+
+	protected static Gson gson = new Gson();
 
 	@Autowired
 	AuctionService auctionService;
@@ -74,9 +77,6 @@ public class BaseResolver {
 	FinancialService financialService;
 
 	@Autowired
-	public DirectSaleService directSaleService;
-
-	@Autowired
 	UserWalletService userWalletService;
 
 	@Autowired
@@ -108,5 +108,8 @@ public class BaseResolver {
 
 	@Autowired
 	InternalBalanceService internalBalanceService;
+
+	@Autowired
+	PresaleService presaleService;
 
 }

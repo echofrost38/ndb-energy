@@ -5,8 +5,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.Coin;
-import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.coinbase.CoinbaseBody;
 import com.ndb.auction.models.coinbase.CoinbasePostBody;
 import com.ndb.auction.models.coinbase.CoinbaseRes;
@@ -24,8 +23,6 @@ import reactor.core.publisher.Mono;
 public class CryptoService extends BaseService {
 
     // get crypto price from binance API
-    // coin name, symbol, pair
-    private List<Coin> coinList;
     private WebClient binanceAPI;
     private WebClient coinbaseAPI;
 
@@ -41,31 +38,6 @@ public class CryptoService extends BaseService {
     public synchronized void buildCoinCache() {
         // clearCoinCache();
         // this.coinList = cryptoTransactionDao.getCoins();
-    }
-
-    public List<Coin> getCoinList() {
-        if (this.coinList == null) {
-            buildCoinCache();
-        }
-        return this.coinList;
-    }
-
-    private void clearCoinCache() {
-        if (this.coinList == null)
-            return;
-        this.coinList.clear();
-    }
-
-    public Coin addNewCoin(String name, String symbol) {
-        // Coin coin = new Coin(name, symbol);
-        // return cryptoTransactionDao.addNewCoin(coin);
-        return null;
-    }
-
-    public Coin deleteCoin(String name, String symbol) {
-        // Coin coin = new Coin(name, symbol);
-        // return cryptoTransactionDao.deleteCoin(coin);
-        return null;
     }
 
     public int getCryptoPriceBySymbol(String symbol) {
@@ -109,7 +81,7 @@ public class CryptoService extends BaseService {
         CoinbaseBody resBody = res.getData();
         String txnId = resBody.getId();
         String code = resBody.getCode();
-        CryptoTransaction tx = new CryptoTransaction(txnId, roundId, userId, code, amount, "0", null);
+        CryptoTransaction tx = new CryptoTransaction(userId, roundId, txnId, code, Double.valueOf(amount), 1);
         cryptoTransactionDao.insert(tx);
 
         CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());

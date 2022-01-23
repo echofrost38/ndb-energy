@@ -53,6 +53,7 @@ public class BidDao extends BaseOracleDao {
 				m.getStatus());
 		return m;
 	}
+	
 	public Bid getBid(int userId, int roundId) {
 		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_BID.USER_ID=? and TBL_BID.ROUND_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<Bid>() {

@@ -147,4 +147,8 @@ public class AvatarService extends BaseService {
 		return avatarComponentDao.getAvatarComponentsByGid(groupId);
 	}
 
+	public List<AvatarSet> getAvatarSetById(int profileId) {
+		return avatarSetDao.selectById(profileId);
+	}
+
 }

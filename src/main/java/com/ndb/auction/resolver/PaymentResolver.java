@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
-import com.ndb.auction.models.Coin;
-import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.payload.PayResponse;
@@ -116,26 +115,8 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<Coin> getCoins() {
-		return cryptoService.getCoinList();
-	}
-
-	@PreAuthorize("isAuthenticated()")
 	public double getCryptoPrice(String symbol) {
 		return cryptoService.getCryptoPriceBySymbol(symbol);
 	}
-
-	// admin 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public Coin addNewCoin(String name, String symbol) {
-		return cryptoService.addNewCoin(name, symbol);
-	}
-
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public Coin deleteCoin(String name, String symbol) {
-		return cryptoService.deleteCoin(name, symbol);
-	}
-
-
 
 }

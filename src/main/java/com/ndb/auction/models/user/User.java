@@ -1,6 +1,7 @@
 package com.ndb.auction.models.user;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +44,7 @@ public class User extends BaseModel {
 		this.email = email;
 		this.password = encodedPass;
 		this.country = country;
+		this.role = new HashSet<>();
 	}
 
 	public User setRoleString(String value) {

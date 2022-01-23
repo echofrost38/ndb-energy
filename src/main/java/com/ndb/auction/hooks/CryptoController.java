@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.coinbase.CoinbaseEvent;

@@ -39,9 +39,21 @@ public class ShuftiService extends BaseService{
     }
 
     // kyc verification
-    public void kycRequest() {
+    public void kycRequest(
+        String country, 
+        String name, 
+        String dob, 
+        String document, // base64
+        String addressDoc, // based64
+        String address, // user's address
+        String consent, // base64 image
+        String consentText
+    ) {
         
     }
+
+    // Background checks 
+
 
     // private routines
     private String generateToken() {

@@ -16,7 +16,7 @@ import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
-import com.ndb.auction.models.CryptoTransaction;
+import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
@@ -354,7 +354,7 @@ public class BidService extends BaseService {
 					continue;
 				}
 				if (bid.getStatus() == Bid.WINNER) {
-					String sAmount = cryptoTransaction.getAmount();
+					String sAmount = cryptoTransaction.getAmount().toString();
 					totalPrice += Long.valueOf(sAmount);
 				} else {
 					// hold -> release

@@ -1,0 +1,65 @@
+type Face {
+    proof: String
+}
+
+input FaceInput {
+    proof: String
+}
+
+type Name {
+    first_name: String,
+    last_name: String
+}
+
+input NameInput {
+    first_name: String,
+    last_name: String
+}
+
+type Document {
+    proof: String,
+    additional_proof: String,
+    supported_types: [String],
+    name: Name,
+    dob: String
+}
+
+input DocumentInput {
+    proof: String,
+    name: NameInput,
+    dob: String
+}
+
+type Address {
+    proof: String,
+    supported_types: [String],
+    name: String,
+    full_address: String
+}
+
+input AddressInput {
+    proof: String,
+    full_address: String
+}
+
+type ShuftiRequest {
+    reference: String,
+    country: String,
+    email: String,
+    callback_url: String,
+    verification_mode: String,
+    face: Face,
+    document: Document,
+    address: Address
+}
+
+input ShuftiRequestInput {
+    reference: String,
+    country: String,
+    email: String,
+    callback_url: String,
+    verification_mode: String,
+    face: FaceInput,
+    document: DocumentInput,
+    address: AddressInput
+}

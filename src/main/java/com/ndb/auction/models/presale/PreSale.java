@@ -16,6 +16,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PreSale extends BaseModel {
     
+    public static int PENDING = 0;
+    public static int STARTED = 1;
+    public static int ENDED = 2;
+
     private int round;
     
     private Long startedAt;

@@ -10,6 +10,7 @@ import javax.servlet.http.Part;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
+import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -47,13 +48,14 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         int id = userDetails.getId();
         return tierTaskService.getTierTask(id);
     }
-
-    // purchase component
-    public String purchaseNewComponents(List<AvatarComponent> components) {
-    	
-        return "";
-    }
     
+    // Identity Verification
+    @PreAuthorize("isAuthenticated()")
+    public int verifyKYC(ShuftiRequest shuftiRequest) {
+        System.out.printf(shuftiRequest.getEmail());
+        return 0;
+    }
+
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
     public String createApplicant(String country, String docType, String levelName) {

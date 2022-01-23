@@ -3,11 +3,16 @@ package com.ndb.auction.service;
 import java.io.IOException;
 import java.util.Base64;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -25,6 +30,8 @@ public class ShuftiService extends BaseService{
     @Value("${shufti.secret.key}")
     private String SECRET_KEY;
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     // Create new application
     public String createShuftiReference(int userId, String verifyType) {
         // check existing 
@@ -39,21 +46,10 @@ public class ShuftiService extends BaseService{
     }
 
     // kyc verification
-    public void kycRequest(
-        String country, 
-        String name, 
-        String dob, 
-        String document, // base64
-        String addressDoc, // based64
-        String address, // user's address
-        String consent, // base64 image
-        String consentText
-    ) {
-        
+    @SuppressWarnings("deprecation")
+    public void kycRequest(ShuftiRequest request) throws JsonProcessingException, IOException {
+        sendPost(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), objectMapper.writeValueAsString(request)));
     }
-
-    // Background checks 
-
 
     // private routines
     private String generateToken() {

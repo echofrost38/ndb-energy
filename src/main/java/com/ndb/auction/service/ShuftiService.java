@@ -67,6 +67,11 @@ public class ShuftiService extends BaseService{
         addrSupportedTypes.add("utility_bill");
         request.getAddress().setSupported_types(addrSupportedTypes);
 
+        List<String> consentTypes = new ArrayList<>();
+        consentTypes.add("printed");
+        request.getConsent().setSupported_types(consentTypes);
+        request.getConsent().setText("I & NDB");    
+
         Response response = sendPost(RequestBody.create(
             MediaType.parse(
                 "application/json; charset=utf-8"), 

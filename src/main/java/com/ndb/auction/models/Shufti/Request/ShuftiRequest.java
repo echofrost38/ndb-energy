@@ -17,4 +17,6 @@ public class ShuftiRequest {
     private Face face;
     private Document document;
     private Address address;
+    private BackgroundChecks background_checks;
+    private Consent consent;
 }

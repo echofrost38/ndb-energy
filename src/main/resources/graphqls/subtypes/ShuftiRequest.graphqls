@@ -42,6 +42,32 @@ input AddressInput {
     full_address: String
 }
 
+type Names {
+    first_name: String,
+    middle_name: String,
+    last_name: String
+}
+
+input NamesInput {
+    first_name: String,
+    middle_name: String,
+    last_name: String
+}
+
+type backgroundChecks {
+    name: Names,
+    dob: String
+}
+
+input BackgroundChecksInput {
+    name: NamesInput,
+    dob: String
+}
+
+input ConsentInput {
+    proof: String
+}
+
 type ShuftiRequest {
     reference: String,
     country: String,
@@ -57,5 +83,7 @@ input ShuftiRequestInput {
     email: String,
     face: FaceInput,
     document: DocumentInput,
-    address: AddressInput
+    address: AddressInput,
+    consent: ConsentInput,
+    background_checks: BackgroundChecksInput
 }

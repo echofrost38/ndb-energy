@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 @Service
 public class ShuftiService extends BaseService{
@@ -48,7 +49,14 @@ public class ShuftiService extends BaseService{
     // kyc verification
     @SuppressWarnings("deprecation")
     public void kycRequest(ShuftiRequest request) throws JsonProcessingException, IOException {
-        sendPost(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), objectMapper.writeValueAsString(request)));
+        Response response = sendPost(RequestBody.create(
+            MediaType.parse(
+                "application/json; charset=utf-8"), 
+                objectMapper.writeValueAsString(request))
+        );
+        ResponseBody responseBody = response.body();
+        String responseString = responseBody.string();
+        System.out.println(responseString);
     }
 
     // private routines

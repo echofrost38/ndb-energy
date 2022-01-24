@@ -46,19 +46,15 @@ type ShuftiRequest {
     reference: String,
     country: String,
     email: String,
-    callback_url: String,
-    verification_mode: String,
     face: Face,
     document: Document,
     address: Address
 }
 
 input ShuftiRequestInput {
-    reference: String,
+    reference: String, # will be created in java
     country: String,
     email: String,
-    callback_url: String,
-    verification_mode: String,
     face: FaceInput,
     document: DocumentInput,
     address: AddressInput

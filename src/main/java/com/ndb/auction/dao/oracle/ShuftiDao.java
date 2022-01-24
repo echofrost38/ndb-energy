@@ -8,11 +8,13 @@ import com.ndb.auction.models.Shufti.ShuftiReference;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
+import lombok.NoArgsConstructor;
+
 @Repository
+@NoArgsConstructor
+@Table(name="TBL_SHUFTI_REF")
 public class ShuftiDao extends BaseOracleDao {
     
-    private static final String TABLE_NAME = "NDB.TBL_SHUFTI_REF";
-
     private static ShuftiReference extract(ResultSet rs) throws SQLException {
 		ShuftiReference model = new ShuftiReference();
 		model.setUserId(rs.getInt("USER_ID"));
@@ -21,12 +23,8 @@ public class ShuftiDao extends BaseOracleDao {
 		return model;
 	}
 
-    public ShuftiDao() {
-		super(TABLE_NAME);
-	}
-
     public ShuftiReference selectById(int userId) {
-        String sql = "SELECT * FROM NDB.TBL_SHUFTI_REF WHERE USER_ID=?";
+        String sql = "SELECT * FROM TBL_SHUFTI_REF WHERE USER_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<ShuftiReference>() {
 			@Override
 			public ShuftiReference extractData(ResultSet rs) throws SQLException {
@@ -38,7 +36,7 @@ public class ShuftiDao extends BaseOracleDao {
     }
 
 	public ShuftiReference selectByReference(String reference) {
-		String sql = "SELECT * FROM NDB.TBL_SHUFTI_REF WHERE REFERENCE = ?";
+		String sql = "SELECT * FROM TBL_SHUFTI_REF WHERE REFERENCE = ?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<ShuftiReference>() {
 			@Override
 			public ShuftiReference extractData(ResultSet rs) throws SQLException {
@@ -50,7 +48,7 @@ public class ShuftiDao extends BaseOracleDao {
 	}
 
     public int insert(ShuftiReference m) {
-        String sql = "INSERT INTO TBL_TOKEN_ASSET(USER_ID, REFERENCE, VERIFY_TYPE)"
+        String sql = "INSERT INTO TBL_SHUFTI_REF(USER_ID, REFERENCE, VERIFY_TYPE)"
 				+ "VALUES(?,?,?)";
 		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType());
     }

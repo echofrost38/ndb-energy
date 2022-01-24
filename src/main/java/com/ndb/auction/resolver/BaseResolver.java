@@ -18,6 +18,7 @@ import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
 import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.ProfileService;
+import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TierTaskService;
@@ -111,5 +112,8 @@ public class BaseResolver {
 
 	@Autowired
 	PresaleService presaleService;
+
+	@Autowired
+	ShuftiService shuftiService;
 
 }

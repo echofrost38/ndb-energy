@@ -52,8 +52,17 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
     public int verifyKYC(ShuftiRequest shuftiRequest) {
-        System.out.printf(shuftiRequest.getEmail());
-        return 0;
+        // create reference record
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        String ref = shuftiService.createShuftiReference(userId, "KYC");
+        try {
+            shuftiService.kycRequest(shuftiRequest);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+        return 1;
     }
 
     // Identity Verification

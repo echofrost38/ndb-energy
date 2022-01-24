@@ -14,7 +14,6 @@ public class ShuftiRequest {
     private String country;
     private String email;
     private String callback_url;
-    private String verification_mode;
     private Face face;
     private Document document;
     private Address address;

@@ -1,6 +1,7 @@
 package com.ndb.auction.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,6 +99,10 @@ public class ProfileService extends BaseService {
 
 		Map<String, List<Integer>> purchasedMap = gson.fromJson(userAvatar.getPurchased(), Map.class);
 
+		if(purchasedMap == null) {
+			purchasedMap = new HashMap<>();
+		}
+
 		for (AvatarComponent component : components) {
 			String groupId = component.getGroupId();
 			int compId = component.getCompId();
@@ -114,6 +119,7 @@ public class ProfileService extends BaseService {
 		}
 		
 		userAvatar.setSelected(gson.toJson(sets));
+		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setPrefix(prefix);
 		userAvatar.setName(name);
 		userAvatarDao.insertOrUpdate(userAvatar);

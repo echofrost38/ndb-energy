@@ -33,6 +33,10 @@ type Mutation {
   addHoldAmount(id: String!, crypto: String!, amount: Int!): String
 }
 
+type Query {
+  getAllOAuth2Settings: [OAuth2Setting]
+}
+
 type Subscription {
   fluxTest(param: String!): String
 }

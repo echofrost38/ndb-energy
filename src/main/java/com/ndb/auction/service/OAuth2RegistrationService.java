@@ -48,4 +48,8 @@ public class OAuth2RegistrationService {
         return oAuth2Dao.updateOAuth2Client(clientName, clientId, clientSecret);
     }
 
+    public List<OAuth2Setting> getAllOAuth2Settings() {
+        return oAuth2Dao.getAllRegistrations();
+    }
+
 }

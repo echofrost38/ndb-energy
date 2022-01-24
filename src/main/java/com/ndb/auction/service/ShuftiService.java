@@ -1,12 +1,16 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
+import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -48,15 +52,32 @@ public class ShuftiService extends BaseService{
 
     // kyc verification
     @SuppressWarnings("deprecation")
-    public void kycRequest(ShuftiRequest request) throws JsonProcessingException, IOException {
+    public int kycRequest(ShuftiRequest request) throws JsonProcessingException, IOException {
+        
+        // add supported types
+        List<String> docSupportedTypes = new ArrayList<>();
+        docSupportedTypes.add("id_card");
+        docSupportedTypes.add("driving_license");
+        docSupportedTypes.add("passport");
+        request.getDocument().setSupported_types(docSupportedTypes);
+
+        List<String> addrSupportedTypes = new ArrayList<>();
+        addrSupportedTypes.add("id_card");
+        addrSupportedTypes.add("bank_statement");
+        addrSupportedTypes.add("utility_bill");
+        request.getAddress().setSupported_types(addrSupportedTypes);
+
         Response response = sendPost(RequestBody.create(
             MediaType.parse(
                 "application/json; charset=utf-8"), 
                 objectMapper.writeValueAsString(request))
         );
         ResponseBody responseBody = response.body();
-        String responseString = responseBody.string();
-        System.out.println(responseString);
+        ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody.string(), ShuftiResponse.class);
+        if(shuftiResponse.getEvent().equals("verification.accepted")) {
+            return 1;
+        } 
+        return 0;
     }
 
     // private routines
@@ -75,7 +96,13 @@ public class ShuftiService extends BaseService{
             .post(requestBody)
             .build();
         
-        Response response = new OkHttpClient().newCall(request).execute();
+        OkHttpClient client = new OkHttpClient.Builder()
+            .readTimeout(0, TimeUnit.DAYS)
+            .writeTimeout(0, TimeUnit.DAYS)
+            .callTimeout(0, TimeUnit.DAYS)
+            .build();
+
+        Response response = client.newCall(request).execute();
         if (response.code() != 200 && response.code() != 201) {
             // https://developers.sumsub.com/api-reference/#errors
             // If an unsuccessful answer is received, please log the value of the "correlationId" parameter.

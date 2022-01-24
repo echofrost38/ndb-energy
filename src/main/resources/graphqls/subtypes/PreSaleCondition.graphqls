@@ -1,0 +1,10 @@
+type PreSaleCondition {
+    presaleId: Int,
+    task: String,
+    url: String
+}
+
+input PreSaleConditionInput {
+    task: String,
+    url: String
+}

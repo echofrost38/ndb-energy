@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.Part;
 
+import com.google.zxing.Result;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
@@ -21,9 +22,11 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import graphql.kickstart.tools.GraphQLSubscriptionResolver;
+import reactor.core.publisher.Mono;
 
 @Component
-public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
+public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver, GraphQLSubscriptionResolver {
     
     // select avatar profile
     // prefix means avatar name!!!
@@ -51,18 +54,19 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public int verifyKYC(ShuftiRequest shuftiRequest) {
+    public Mono<Integer> verifyKYC(ShuftiRequest shuftiRequest) {
         // create reference record
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         String ref = shuftiService.createShuftiReference(userId, "KYC");
+        Integer result = 0;
         try {
-            shuftiService.kycRequest(shuftiRequest);
+            result = shuftiService.kycRequest(shuftiRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            return 0;
+            return Mono.just(0);
         }
-        return 1;
+        return Mono.just(result);
     }
 
     // Identity Verification

@@ -104,13 +104,4 @@ public class OAuth2SettingDao extends BaseOracleDao {
 		return m;
 	}
 
-    public String updateOAuth2Client(String clientName, String clientId, String clientSecret) {
-		try {
-			String sql = "UPDATE TBL_OAUTH2_SETTING SET CLIENT_ID=?, CLIENT_SECRET=?, WHERE CLIENT_NAME=?";
-			jdbcTemplate.update(sql, clientId, clientSecret,clientName);
-		} catch(Exception e) {
-			return "Failed";
-		}
-		return "Success";
-    }
 }

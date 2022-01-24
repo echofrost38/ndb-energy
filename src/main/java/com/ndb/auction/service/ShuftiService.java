@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +14,6 @@ import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
 import com.ndb.auction.payload.ShuftiStatusRequest;
 import com.ndb.auction.payload.ShuftiStatusResponse;
-import com.ndb.auction.exceptions.UserNotFoundException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,10 +46,19 @@ public class ShuftiService extends BaseService{
         if(sRef != null) {
             return sRef.getReference();
         }
-        String reference = "SHUFTI-" + verifyType + "-" + String.valueOf(userId);
+        String reference = UUID.randomUUID().toString();
         sRef = new ShuftiReference(userId, reference, verifyType);
         shuftiDao.insert(sRef);
         return reference;
+    }
+
+    public String updateShuftiReference(int userId, String reference) {
+        shuftiDao.update(userId, reference);
+        return reference;
+    }
+
+    public ShuftiReference getShuftiReference(int userId) {
+        return shuftiDao.selectById(userId);
     }
 
     // kyc verification
@@ -79,8 +88,8 @@ public class ShuftiService extends BaseService{
                 "application/json; charset=utf-8"), 
                 objectMapper.writeValueAsString(request)), BASE_URL
         );
-        ResponseBody responseBody = response.body();
-        ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody.string(), ShuftiResponse.class);
+        String responseBody = response.body().string();
+        ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody, ShuftiResponse.class);
         if(shuftiResponse.getEvent().equals("verification.accepted")) {
             return 1;
         } 
@@ -88,13 +97,7 @@ public class ShuftiService extends BaseService{
     }
     
     @SuppressWarnings("deprecation")
-    public int kycStatusRequest(int userId) throws JsonProcessingException, IOException {
-        ShuftiReference shuftiReference = shuftiDao.selectById(userId);
-        if(shuftiReference == null) {
-            throw new UserNotFoundException("not_found_reference","user");
-        }
-        
-        String reference = shuftiReference.getReference();
+    public int kycStatusRequest(String reference) throws JsonProcessingException, IOException {
         ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
         Response response = sendPost(RequestBody.create(
             MediaType.parse("application/json; charset=utf-8"), 

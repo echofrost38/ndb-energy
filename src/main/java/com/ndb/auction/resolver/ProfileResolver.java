@@ -1,33 +1,27 @@
 package com.ndb.auction.resolver;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import javax.servlet.http.Part;
+import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.zxing.Result;
 import com.ndb.auction.models.KYCSetting;
-import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
-import com.ndb.auction.models.sumsub.Applicant;
+import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import com.ndb.auction.exceptions.UserNotFoundException;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import graphql.kickstart.tools.GraphQLSubscriptionResolver;
-import reactor.core.publisher.Mono;
 
 @Component
-public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver, GraphQLSubscriptionResolver {
+public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     // select avatar profile
     // prefix means avatar name!!!
@@ -55,27 +49,45 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public Mono<Integer> verifyKYC(ShuftiRequest shuftiRequest) {
+    public int verifyKYC(ShuftiRequest shuftiRequest) throws JsonProcessingException, IOException {
         // create reference record
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        String ref = shuftiService.createShuftiReference(userId, "KYC");
+        ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
+        int status = 1;
+        if(referenceObj != null) {
+            status = shuftiService.kycStatusRequest(referenceObj.getReference());
+            if(status == 1) {
+                return 1;
+            }
+        }
+        String ref = "";
+        if(status == 1) {
+            ref = shuftiService.createShuftiReference(userId, "KYC");
+        } else {
+            ref = shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
+        }
         shuftiRequest.setReference(ref);
-        Integer result = 0;
         try {
-            result = shuftiService.kycRequest(shuftiRequest);
+            shuftiService.kycRequest(shuftiRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            return Mono.just(0);
+            return 0;
         }
-        return Mono.just(result);
+        return 1;
     }
 
     @PreAuthorize("isAuthenticated()")
     public Integer kycStatusRequest() throws JsonProcessingException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return shuftiService.kycStatusRequest(userId);
+
+        ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
+        if(referenceObj == null) {
+            throw new UserNotFoundException("not_found_reference", "user");
+        }
+
+        return shuftiService.kycStatusRequest(referenceObj.getReference());
     }
     
     // Admin

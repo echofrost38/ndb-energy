@@ -53,4 +53,9 @@ public class ShuftiDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType());
     }
 
+	public int update(int userId, String reference) {
+        String sql = "UPDATE TBL_SHUFTI_REF SET REFERENCE = ? WHERE USER_ID = ?";
+		return jdbcTemplate.update(sql, reference, userId);
+    }
+
 }

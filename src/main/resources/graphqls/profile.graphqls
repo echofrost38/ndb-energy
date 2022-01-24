@@ -28,10 +28,10 @@ extend type Mutation {
 	requestCheck : String
 	updateKYCSetting(
 		kind: String!,
-		withdraw: Float,
-		deposit: Float,
 		bid: Float,
-		direct: Float
+		direct: Float,
+		deposit: Float,
+		withdraw: Float
 	) : Int
 }
 

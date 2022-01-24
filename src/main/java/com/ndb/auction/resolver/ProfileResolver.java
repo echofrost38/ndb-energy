@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.Part;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.zxing.Result;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
@@ -59,6 +60,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         String ref = shuftiService.createShuftiReference(userId, "KYC");
+        shuftiRequest.setReference(ref);
         Integer result = 0;
         try {
             result = shuftiService.kycRequest(shuftiRequest);
@@ -69,46 +71,11 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         return Mono.just(result);
     }
 
-    // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public String createApplicant(String country, String docType, String levelName) {
-    	
-    	return "Success";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public String upgradeApplicant(String levelName) {
+    public Integer kycStatusRequest() throws JsonProcessingException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-   
-        return "Success";
-    }
-    
-    @PreAuthorize("isAuthenticated()")
-    public String upload(String docType, String country, Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
-    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-    	return "";
-    }
-    
-    @PreAuthorize("isAuthenticated()")
-    public String uploadSelfie(String country, Part selfie) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
-    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-    	return "imageId";
-    }
-    
-    @PreAuthorize("isAuthenticated()")
-    public String requestCheck()  throws InvalidKeyException, NoSuchAlgorithmException, IOException {
-    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-    	return "result";
-    }
-    
-    @PreAuthorize("isAuthenticated()")
-    public String gettingApplicantData(String applicantId) {
-    	String levelName = "";
-    	return levelName;
+        return shuftiService.kycStatusRequest(userId);
     }
     
     // Admin

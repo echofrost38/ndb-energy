@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
-
+import com.ndb.auction.payload.ShuftiStatusRequest;
+import com.ndb.auction.payload.ShuftiStatusResponse;
+import com.ndb.auction.exceptions.UserNotFoundException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -75,13 +77,33 @@ public class ShuftiService extends BaseService{
         Response response = sendPost(RequestBody.create(
             MediaType.parse(
                 "application/json; charset=utf-8"), 
-                objectMapper.writeValueAsString(request))
+                objectMapper.writeValueAsString(request)), BASE_URL
         );
         ResponseBody responseBody = response.body();
         ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody.string(), ShuftiResponse.class);
         if(shuftiResponse.getEvent().equals("verification.accepted")) {
             return 1;
         } 
+        return 0;
+    }
+    
+    @SuppressWarnings("deprecation")
+    public int kycStatusRequest(int userId) throws JsonProcessingException, IOException {
+        ShuftiReference shuftiReference = shuftiDao.selectById(userId);
+        if(shuftiReference == null) {
+            throw new UserNotFoundException("not_found_reference","user");
+        }
+        
+        String reference = shuftiReference.getReference();
+        ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
+        Response response = sendPost(RequestBody.create(
+            MediaType.parse("application/json; charset=utf-8"), 
+            objectMapper.writeValueAsString(request)), BASE_URL + "status");
+        ResponseBody responseBody = response.body();
+        ShuftiStatusResponse shuftiResponse = objectMapper.readValue(responseBody.string(), ShuftiStatusResponse.class);
+        if(shuftiResponse.getEvent().equals("verification.accepted")) {
+            return 1;
+        }
         return 0;
     }
 
@@ -91,10 +113,10 @@ public class ShuftiService extends BaseService{
         return Base64.getEncoder().encodeToString(combination.getBytes());
     }
 
-    private Response sendPost(RequestBody requestBody) throws IOException {
+    private Response sendPost(RequestBody requestBody, String url) throws IOException {
         String token = generateToken();
         Request request = new Request.Builder()
-            .url(BASE_URL)
+            .url(url)
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
             .header("Authorization", "Basic " + token)

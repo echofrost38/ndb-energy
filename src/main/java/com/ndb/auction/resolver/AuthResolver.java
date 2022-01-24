@@ -143,6 +143,11 @@ public class AuthResolver extends BaseResolver
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public String updateOAuth2Client(String clientName, String clientId, String clientSecret) {
+		return oAuth2RegistrationService.updateOAuth2Client(clientName, clientId, clientSecret);
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public OAuth2Setting addOAuth2Registration(
 			int registrationId,
 			String clientId,

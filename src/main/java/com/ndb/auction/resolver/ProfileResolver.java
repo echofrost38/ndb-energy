@@ -68,13 +68,15 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
             ref = shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
         }
         shuftiRequest.setReference(ref);
+
+        int result = 0;
         try {
-            shuftiService.kycRequest(shuftiRequest);
+            result = shuftiService.kycRequest(userId, shuftiRequest);
         } catch (IOException e) {
             e.printStackTrace();
             return 0;
         }
-        return 1;
+        return result;
     }
 
     @PreAuthorize("isAuthenticated()")

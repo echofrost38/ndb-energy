@@ -56,7 +56,6 @@ public class PaymentResolver extends BaseResolver implements GraphQLMutationReso
 		return stripeService.getTransactions(roundId, id);
 	}
 
-
 	@PreAuthorize("isAuthenticated()")
 	public PayResponse stripePayment(
 		int roundId, 

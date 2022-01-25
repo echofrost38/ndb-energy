@@ -21,23 +21,23 @@ public class CryptoTransactionDao extends BaseOracleDao {
 
 	private static CryptoTransaction extract(ResultSet rs) throws SQLException {
 		CryptoTransaction m = new CryptoTransaction();
-		m.setUserId(rs.getInt("USER_ID"));
-		m.setRoundId(rs.getInt("ROUND_ID"));
-		m.setTransactionType(rs.getInt("TRANSACTION_TYPE"));
-		m.setPresaleId(rs.getInt("PRESALE_ID"));
-		m.setAmount(rs.getDouble("AMOUNT"));
-		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setTxnId(rs.getString("TXN_ID"));
 		m.setCode(rs.getString("CODE"));
+		m.setUserId(rs.getInt("USER_ID"));
+		m.setRoundId(rs.getInt("ROUND_ID"));
+		m.setAmount(rs.getDouble("AMOUNT"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));
 		m.setCryptoAmount(rs.getString("CRYPTO_AMOUNT"));
+		m.setTransactionType(rs.getInt("TXN_TYPE"));
+		m.setPresaleId(rs.getInt("PRESALE_ID"));
 		m.setStatus(rs.getInt("STATUS"));
+		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		return m;
 	}
 
 	public int insert(CryptoTransaction m) {
-		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,TRANSACTION_TYPE,PRESALE_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
+		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,TXN_TYPE,PRESALE_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
 				+ " VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getTransactionType(), m.getPresaleId(), m.getAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
 	}

@@ -33,7 +33,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
 
     public int insert(PreSaleOrder m) {
         String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,ROUND_ID,USER_ID,NDB_AMOUNT,NDB_PRICE,STARTED_AT,ENDED_AT)"
-            + "VALUES(SEQ_AUCTION.NEXTVAL,?,?,?,?,SYSDATE,SYSDATE)";
+            + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,SYSDATE,SYSDATE)";
         return jdbcTemplate.update(sql, m.getRoundId(), m.getUserId(), m.getNdbAmount(), m.getNdbPrice());
     }
 

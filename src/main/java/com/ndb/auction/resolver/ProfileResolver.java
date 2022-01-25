@@ -86,7 +86,6 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj == null) {
             throw new UserNotFoundException("not_found_reference", "user");
         }
-
         return shuftiService.kycStatusRequest(referenceObj.getReference());
     }
     

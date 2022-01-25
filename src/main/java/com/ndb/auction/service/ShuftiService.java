@@ -9,15 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.models.tier.TierTask;
-import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.ShuftiStatusRequest;
 import com.ndb.auction.payload.ShuftiStatusResponse;
 
@@ -69,7 +63,7 @@ public class ShuftiService extends BaseService{
 
     // kyc verification
     @SuppressWarnings("deprecation")
-    public int kycRequest(int userId, ShuftiRequest request) throws JsonProcessingException, IOException {
+    public int kycRequest(ShuftiRequest request) throws JsonProcessingException, IOException {
         
         // add supported types
         List<String> docSupportedTypes = new ArrayList<>();
@@ -97,35 +91,6 @@ public class ShuftiService extends BaseService{
         String responseBody = response.body().string();
         ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody, ShuftiResponse.class);
         if(shuftiResponse.getEvent().equals("verification.accepted")) {
-            // update user tier!
-            List<Tier> tierList = tierService.getUserTiers();
-            TaskSetting taskSetting = taskSettingService.getTaskSetting();
-            TierTask tierTask = tierTaskService.getTierTask(userId);
-            tierTask.setVerification(true);
-
-            User user = userDao.selectById(userId);
-            double tierPoint = user.getTierPoint();
-            tierPoint += taskSetting.getVerification();
-            int tierLevel = 0;
-            for (Tier tier : tierList) {
-                if(tier.getPoint() <= tierPoint) {
-                    tierLevel = tier.getLevel();
-                }
-            }
-            userDao.updateTier(userId, tierLevel, tierPoint);
-            tierTaskService.updateTierTask(tierTask);
-
-            UserVerify userVerify = userVerifyDao.selectById(userId);
-            userVerify.setKycVerified(true);
-
-            // send notification
-            notificationService.sendNotification(
-                user.getId(),
-                Notification.KYC_VERIFIED,
-                "PAYMENT CONFIRMED",
-                "You have successfully deposited " + ".");
-
-
             return 1;
         } 
         return 0;

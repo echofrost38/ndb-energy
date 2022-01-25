@@ -113,7 +113,7 @@ public class CryptoController extends BaseController {
                             }
                         }
                         userService.updateTier(user.getId(), tierLevel, newPoint);
-                        tierTaskService.updateTierTask(tierTask);
+                        taskSettingService.updateTaskSetting(taskSetting);
                     } 
                 }
 

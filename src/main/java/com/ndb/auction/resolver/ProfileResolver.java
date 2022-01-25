@@ -1,27 +1,32 @@
 package com.ndb.auction.resolver;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import javax.servlet.http.Part;
+
+import com.google.zxing.Result;
 import com.ndb.auction.models.KYCSetting;
+import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
-import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.sumsub.Applicant;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import com.ndb.auction.exceptions.UserNotFoundException;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import graphql.kickstart.tools.GraphQLSubscriptionResolver;
+import reactor.core.publisher.Mono;
 
 @Component
-public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
+public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver, GraphQLSubscriptionResolver {
     
     // select avatar profile
     // prefix means avatar name!!!
@@ -49,45 +54,61 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public int verifyKYC(ShuftiRequest shuftiRequest) throws JsonProcessingException, IOException {
+    public Mono<Integer> verifyKYC(ShuftiRequest shuftiRequest) {
         // create reference record
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
-        int status = 1;
-        if(referenceObj != null) {
-            status = shuftiService.kycStatusRequest(referenceObj.getReference());
-            if(status == 1) {
-                return 1;
-            }
-        }
-        String ref = "";
-        if(status == 1) {
-            ref = shuftiService.createShuftiReference(userId, "KYC");
-        } else {
-            ref = shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
-        }
-        shuftiRequest.setReference(ref);
+        String ref = shuftiService.createShuftiReference(userId, "KYC");
+        Integer result = 0;
         try {
-            shuftiService.kycRequest(shuftiRequest);
+            result = shuftiService.kycRequest(shuftiRequest);
         } catch (IOException e) {
             e.printStackTrace();
-            return 0;
+            return Mono.just(0);
         }
-        return 1;
+        return Mono.just(result);
+    }
+
+    // Identity Verification
+    @PreAuthorize("isAuthenticated()")
+    public String createApplicant(String country, String docType, String levelName) {
+    	
+    	return "Success";
     }
 
     @PreAuthorize("isAuthenticated()")
-    public Integer kycStatusRequest() throws JsonProcessingException, IOException {
+    public String upgradeApplicant(String levelName) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-
-        ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
-        if(referenceObj == null) {
-            throw new UserNotFoundException("not_found_reference", "user");
-        }
-
-        return shuftiService.kycStatusRequest(referenceObj.getReference());
+   
+        return "Success";
+    }
+    
+    @PreAuthorize("isAuthenticated()")
+    public String upload(String docType, String country, Part file) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+    	return "";
+    }
+    
+    @PreAuthorize("isAuthenticated()")
+    public String uploadSelfie(String country, Part selfie) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+    	return "imageId";
+    }
+    
+    @PreAuthorize("isAuthenticated()")
+    public String requestCheck()  throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    	UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+    	return "result";
+    }
+    
+    @PreAuthorize("isAuthenticated()")
+    public String gettingApplicantData(String applicantId) {
+    	String levelName = "";
+    	return levelName;
     }
     
     // Admin

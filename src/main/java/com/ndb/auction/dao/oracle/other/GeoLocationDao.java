@@ -61,11 +61,6 @@ public class GeoLocationDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, id);
 	}
 
-	public int makeDisallow(int id) {
-		String sql = "UPDATE TBL_GEO_LOCATION SET IS_ALLOWED=0 WHERE ID=?";
-		return jdbcTemplate.update(sql, id);
-	}
-
 	// get location
 	public GeoLocation getGeoLocation(int id) {
 		String sql = "SELECT * FROM TBL_GEO_LOCATION WHERE ID=?";

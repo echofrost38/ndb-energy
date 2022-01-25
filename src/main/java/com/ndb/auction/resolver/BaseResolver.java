@@ -23,6 +23,7 @@ import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.TotpService;
+import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;

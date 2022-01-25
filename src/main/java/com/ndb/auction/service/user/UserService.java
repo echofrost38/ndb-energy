@@ -392,12 +392,6 @@ public class UserService extends BaseService {
 
 	///////////////////////// Geo Location /////////
 	public GeoLocation addDisallowed(String country, String countryCode) {
-		GeoLocation geoLocation = geoLocationDao.getGeoLocation(countryCode);
-		if(geoLocation != null) {
-			geoLocationDao.makeDisallow(geoLocation.getId());
-			geoLocation.setAllowed(false);
-			return geoLocation;
-		}
 		return geoLocationDao.addDisallowedCountry(country, countryCode);
 	}
 

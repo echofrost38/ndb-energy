@@ -8,25 +8,49 @@ extend type Mutation {
 	updateAvatarSet(
 		components: [AvatarSetInput]
 	) : [AvatarSet]
+	createApplicant(
+		country: String!,
+		docType: String!,
+		levelName: String!
+	) : String
+	upgradeApplicant(
+		levelName: String!
+	) : String
+	upload(
+		docType: String!,
+		country: String!,
+		file: Upload!
+	) : String	
+	uploadSelfie(
+		country: String!,
+		selfie: Upload!
+	) : String
+	requestCheck : String
 	updateKYCSetting(
 		kind: String!,
-		bid: Float,
-		direct: Float,
+		withdraw: Float,
 		deposit: Float,
-		withdraw: Float
-	) : Int
-	verifyKYC(
-		shuftiRequest: ShuftiRequestInput
+		bid: Float,
+		direct: Float
 	) : Int
 }
 
 extend type Query {
 	getUserTierTask: TierTask
+	gettingApplicantData(
+		applicantId: String!
+	) : String
 	getKYCSettings : [KYCSetting]
-	kycStatusRequest : Int
+}
+
+extend type Subscription {
+	verifyKYC(
+		shuftiRequest: ShuftiRequestInput
+	) : Int
 }
 
 schema {
 	mutation: Mutation,
 	query: Query,
+	subscription: Subscription
 }

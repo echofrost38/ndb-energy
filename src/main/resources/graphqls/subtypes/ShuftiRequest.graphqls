@@ -78,6 +78,7 @@ type ShuftiRequest {
 }
 
 input ShuftiRequestInput {
+    reference: String, # will be created in java
     country: String,
     email: String,
     face: FaceInput,

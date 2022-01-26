@@ -1,1 +1,0 @@
-sudo yum -y install certbot-nginx

@@ -1,6 +1,8 @@
 package com.ndb.auction.resolver;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +51,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public int verifyKYC(ShuftiRequest shuftiRequest) throws JsonProcessingException, IOException {
+    public int verifyKYC(ShuftiRequest shuftiRequest) throws JsonProcessingException, IOException, InvalidKeyException, NoSuchAlgorithmException {
         // create reference record
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
@@ -80,7 +82,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
 
     @PreAuthorize("isAuthenticated()")
-    public Integer kycStatusRequest() throws JsonProcessingException, IOException {
+    public Integer kycStatusRequest() throws JsonProcessingException, IOException, InvalidKeyException, NoSuchAlgorithmException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 

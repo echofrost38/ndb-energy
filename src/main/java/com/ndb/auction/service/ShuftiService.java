@@ -1,27 +1,30 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.TaskSetting;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.models.tier.TierTask;
-import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.ShuftiStatusRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -36,7 +39,12 @@ public class ShuftiService extends BaseService{
     @Value("${shufti.secret.key}")
     private String SECRET_KEY;
 
+    @Value("${shufti.callback_url")
+    private String CALLBACK_URL;
+
     private WebClient shuftiAPI;
+
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public ShuftiService(WebClient.Builder webClientBuilder) {
         this.shuftiAPI = webClientBuilder
@@ -87,64 +95,29 @@ public class ShuftiService extends BaseService{
         request.getConsent().setSupported_types(consentTypes);
         request.getConsent().setText("I & NDB");    
 
-        sendShuftiRequest(request)
-            .subscribe(response -> handleRequestResponse(response));
+        request.setCallback_url(CALLBACK_URL);  
 
+        sendShuftiRequest(request)
+            .subscribe(response -> System.out.println(response));
         return 1;
     }
 
-    public int kycStatusRequestAsync(String reference) {
+    public int kycStatusRequestAsync(String reference) throws InvalidKeyException, JsonProcessingException, NoSuchAlgorithmException, IOException {
         ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
-        ShuftiResponse response = sendShuftiStatusRequest(request).block();
+
+        @SuppressWarnings("deprecation")
+		Response _response = sendPost("status", 
+            RequestBody.create(
+                MediaType.parse("application/json; charset=utf-8"),
+                objectMapper.writeValueAsString(request))
+        );
+
+        String _responseString = _response.body().string();
+        ShuftiResponse response = new Gson().fromJson(_responseString, ShuftiResponse.class);
         if(response.getEvent().equals("verification.accepted")) {
             return 1;
         }
         return 0;
-    }
-
-    private void handleRequestResponse(ShuftiResponse response) {
-        String reference = response.getReference();
-        ShuftiReference ref = shuftiDao.selectByReference(reference);
-
-        if(ref == null) return;
-        int userId = ref.getUserId();
-        
-        if(response.getEvent().equals("verification.accepted")) {
-            // update user tier!
-            List<Tier> tierList = tierService.getUserTiers();
-            TaskSetting taskSetting = taskSettingService.getTaskSetting();
-            TierTask tierTask = tierTaskService.getTierTask(userId);
-            tierTask.setVerification(true);
-
-            User user = userDao.selectById(userId);
-            double tierPoint = user.getTierPoint();
-            tierPoint += taskSetting.getVerification();
-            int tierLevel = 0;
-            for (Tier tier : tierList) {
-                if(tier.getPoint() <= tierPoint) {
-                    tierLevel = tier.getLevel();
-                }
-            }
-            userDao.updateTier(userId, tierLevel, tierPoint);
-            tierTaskService.updateTierTask(tierTask);
-
-            UserVerify userVerify = userVerifyDao.selectById(userId);
-            userVerify.setKycVerified(true);
-
-            // send notification
-            notificationService.sendNotification(
-                userId,
-                Notification.KYC_VERIFIED,
-                "KYC VERIFIED",
-                "Your identity has been successfully verified.");
-        } else {
-            // send notification
-            notificationService.sendNotification(
-                userId,
-                Notification.KYC_VERIFIED,
-                "KYC VERIFICATION FAILED",
-                "Verification failed.");
-        }
     }
 
     // private routines
@@ -154,28 +127,35 @@ public class ShuftiService extends BaseService{
     }
 
     //// WebClient
-    private Mono<ShuftiResponse> sendShuftiRequest(ShuftiRequest request) {
+    private Mono<String> sendShuftiRequest(ShuftiRequest request) {
         String token = generateToken();
         return shuftiAPI.post()
             .uri(uriBuilder -> uriBuilder.path("").build())
-            .header("Accept", "application/json")
-            .header("Content-Type", "application/json")
+            .header("Content-Type", "application/json; charset=utf-8")
             .header("Authorization", "Basic " + token)
             .body(Mono.just(request), ShuftiRequest.class)
             .retrieve()
-            .bodyToMono(ShuftiResponse.class);
+            .bodyToMono(String.class);
     }
 
-    private Mono<ShuftiResponse> sendShuftiStatusRequest(ShuftiStatusRequest request) {
+    private Response sendPost(String url, RequestBody requestBody) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         String token = generateToken();
-        return shuftiAPI.post()
-            .uri(uriBuilder -> uriBuilder.path("status").build())
-            .header("Accept", "application/json")
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Basic " + token)
-            .body(Mono.just(request), ShuftiStatusRequest.class)
-            .retrieve()
-            .bodyToMono(ShuftiResponse.class);
+        Request request = new Request.Builder()
+                .url(BASE_URL + url)
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Basic " + token)
+                .post(requestBody)
+                .build();
+
+        Response response = new OkHttpClient().newCall(request).execute();
+
+        if (response.code() != 200 && response.code() != 201) {
+            // https://developers.sumsub.com/api-reference/#errors
+            // If an unsuccessful answer is received, please log the value of the "correlationId" parameter.
+            // Then perhaps you should throw the exception. (depends on the logic of your code)
+        }
+        return response;
     }
 
 

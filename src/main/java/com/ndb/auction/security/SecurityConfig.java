@@ -104,7 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/subscriptions/**").permitAll()
 				.antMatchers("/coinbase/**").permitAll()
 				.antMatchers("/auth/**", "/oauth2/**").permitAll()
-				.antMatchers("/sumsub/**").permitAll()
+				.antMatchers("/shufti/**").permitAll()
 				.antMatchers("/stripe/**").permitAll()
 				.antMatchers("/paypal/**").permitAll()
 				.antMatchers("/crypto/**").permitAll()

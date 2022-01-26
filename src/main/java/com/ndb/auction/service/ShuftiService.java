@@ -39,7 +39,7 @@ public class ShuftiService extends BaseService{
     @Value("${shufti.secret.key}")
     private String SECRET_KEY;
 
-    @Value("${shufti.callback_url")
+    @Value("${shufti.callback_url}")
     private String CALLBACK_URL;
 
     private WebClient shuftiAPI;

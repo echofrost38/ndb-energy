@@ -12,7 +12,7 @@ artifacts:
   type: zip
   files:
     - auction.jar
-    - .ebextensions/**/*
-    - .platform/**/*
+    #  - .ebextensions/**/*
+    #  - .platform/**/*
     - Procfile
-  discard-paths: yes
+#   discard-paths: yes

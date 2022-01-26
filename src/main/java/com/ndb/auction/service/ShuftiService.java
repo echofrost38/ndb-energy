@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Shufti.ShuftiReference;
@@ -19,17 +17,12 @@ import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.ShuftiStatusRequest;
-import com.ndb.auction.payload.ShuftiStatusResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ShuftiService extends BaseService{
@@ -43,7 +36,13 @@ public class ShuftiService extends BaseService{
     @Value("${shufti.secret.key}")
     private String SECRET_KEY;
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private WebClient shuftiAPI;
+
+    public ShuftiService(WebClient.Builder webClientBuilder) {
+        this.shuftiAPI = webClientBuilder
+            .baseUrl(BASE_URL)
+            .build();
+    }
 
     // Create new application
     public String createShuftiReference(int userId, String verifyType) {
@@ -68,7 +67,6 @@ public class ShuftiService extends BaseService{
     }
 
     // kyc verification
-    @SuppressWarnings("deprecation")
     public int kycRequest(int userId, ShuftiRequest request) throws JsonProcessingException, IOException {
         
         // add supported types
@@ -89,14 +87,29 @@ public class ShuftiService extends BaseService{
         request.getConsent().setSupported_types(consentTypes);
         request.getConsent().setText("I & NDB");    
 
-        Response response = sendPost(RequestBody.create(
-            MediaType.parse(
-                "application/json; charset=utf-8"), 
-                objectMapper.writeValueAsString(request)), BASE_URL
-        );
-        String responseBody = response.body().string();
-        ShuftiResponse shuftiResponse = objectMapper.readValue(responseBody, ShuftiResponse.class);
-        if(shuftiResponse.getEvent().equals("verification.accepted")) {
+        sendShuftiRequest(request)
+            .subscribe(response -> handleRequestResponse(response));
+
+        return 1;
+    }
+
+    public int kycStatusRequestAsync(String reference) {
+        ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
+        ShuftiResponse response = sendShuftiStatusRequest(request).block();
+        if(response.getEvent().equals("verification.accepted")) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private void handleRequestResponse(ShuftiResponse response) {
+        String reference = response.getReference();
+        ShuftiReference ref = shuftiDao.selectByReference(reference);
+
+        if(ref == null) return;
+        int userId = ref.getUserId();
+        
+        if(response.getEvent().equals("verification.accepted")) {
             // update user tier!
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -120,29 +133,18 @@ public class ShuftiService extends BaseService{
 
             // send notification
             notificationService.sendNotification(
-                user.getId(),
+                userId,
                 Notification.KYC_VERIFIED,
-                "PAYMENT CONFIRMED",
-                "You have successfully deposited " + ".");
-
-
-            return 1;
-        } 
-        return 0;
-    }
-    
-    @SuppressWarnings("deprecation")
-    public int kycStatusRequest(String reference) throws JsonProcessingException, IOException {
-        ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
-        Response response = sendPost(RequestBody.create(
-            MediaType.parse("application/json; charset=utf-8"), 
-            objectMapper.writeValueAsString(request)), BASE_URL + "status");
-        ResponseBody responseBody = response.body();
-        ShuftiStatusResponse shuftiResponse = objectMapper.readValue(responseBody.string(), ShuftiStatusResponse.class);
-        if(shuftiResponse.getEvent().equals("verification.accepted")) {
-            return 1;
+                "KYC VERIFIED",
+                "Your identity has been successfully verified.");
+        } else {
+            // send notification
+            notificationService.sendNotification(
+                userId,
+                Notification.KYC_VERIFIED,
+                "KYC VERIFICATION FAILED",
+                "Verification failed.");
         }
-        return 0;
     }
 
     // private routines
@@ -151,29 +153,30 @@ public class ShuftiService extends BaseService{
         return Base64.getEncoder().encodeToString(combination.getBytes());
     }
 
-    private Response sendPost(RequestBody requestBody, String url) throws IOException {
+    //// WebClient
+    private Mono<ShuftiResponse> sendShuftiRequest(ShuftiRequest request) {
         String token = generateToken();
-        Request request = new Request.Builder()
-            .url(url)
+        return shuftiAPI.post()
+            .uri(uriBuilder -> uriBuilder.path("").build())
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
             .header("Authorization", "Basic " + token)
-            .post(requestBody)
-            .build();
-        
-        OkHttpClient client = new OkHttpClient.Builder()
-            .readTimeout(0, TimeUnit.DAYS)
-            .writeTimeout(0, TimeUnit.DAYS)
-            .callTimeout(0, TimeUnit.DAYS)
-            .build();
-
-        Response response = client.newCall(request).execute();
-        if (response.code() != 200 && response.code() != 201) {
-            // https://developers.sumsub.com/api-reference/#errors
-            // If an unsuccessful answer is received, please log the value of the "correlationId" parameter.
-            // Then perhaps you should throw the exception. (depends on the logic of your code)
-        }
-        return response;
+            .body(Mono.just(request), ShuftiRequest.class)
+            .retrieve()
+            .bodyToMono(ShuftiResponse.class);
     }
+
+    private Mono<ShuftiResponse> sendShuftiStatusRequest(ShuftiStatusRequest request) {
+        String token = generateToken();
+        return shuftiAPI.post()
+            .uri(uriBuilder -> uriBuilder.path("status").build())
+            .header("Accept", "application/json")
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Basic " + token)
+            .body(Mono.just(request), ShuftiStatusRequest.class)
+            .retrieve()
+            .bodyToMono(ShuftiResponse.class);
+    }
+
 
 }

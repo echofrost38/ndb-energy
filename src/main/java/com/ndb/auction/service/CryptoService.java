@@ -35,11 +35,6 @@ public class CryptoService extends BaseService {
                 .build();
     }
 
-    public synchronized void buildCoinCache() {
-        // clearCoinCache();
-        // this.coinList = cryptoTransactionDao.getCoins();
-    }
-
     public int getCryptoPriceBySymbol(String symbol) {
         String symbolPair = symbol + "USDT";
         CoinPrice objs = binanceAPI.get()

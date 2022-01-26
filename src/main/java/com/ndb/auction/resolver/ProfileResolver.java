@@ -56,7 +56,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
         int status = 1;
         if(referenceObj != null) {
-            status = shuftiService.kycStatusRequest(referenceObj.getReference());
+            status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
                 return 1;
             }
@@ -68,13 +68,15 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
             ref = shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
         }
         shuftiRequest.setReference(ref);
+
+        int result = 0;
         try {
-            shuftiService.kycRequest(userId, shuftiRequest);
+            result = shuftiService.kycRequest(userId, shuftiRequest);
         } catch (IOException e) {
             e.printStackTrace();
             return 0;
         }
-        return 1;
+        return result;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -86,7 +88,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj == null) {
             throw new UserNotFoundException("not_found_reference", "user");
         }
-        return shuftiService.kycStatusRequest(referenceObj.getReference());
+        return shuftiService.kycStatusRequestAsync(referenceObj.getReference());
     }
     
     // Admin

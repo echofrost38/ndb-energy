@@ -16,4 +16,3 @@ artifacts:
     #  - .platform/**/*
     - Procfile
 #   discard-paths: yes
-

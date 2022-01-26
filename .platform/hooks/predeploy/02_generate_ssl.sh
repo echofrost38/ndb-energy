@@ -1,1 +1,0 @@
-sudo certbot certonly --nginx -d api.live.ndb.money --non-interactive --email viktor@ndb.technology  --agree-tos

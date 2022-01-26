@@ -1,18 +1,18 @@
 version: 0.2
 phases:
-   install:
-      runtime-versions:
-         java: corretto11
-   build:
-      commands:
-         - echo Build started on `date`
-         - mvn package
-         - mv target/auction.jar auction.jar
+  install:
+    runtime-versions:
+      java: corretto11
+  build:
+    commands:
+      - echo Build started on `date`
+      - mvn package
+      - mv target/auction.jar auction.jar
 artifacts:
-   type: zip
-   files:
-      - auction.jar
-      - .ebextensions/**/*
-      - .platform/**/*
-      - Procfile
-   # discard-paths: yes
+  type: zip
+  files:
+    - auction.jar
+    - .ebextensions/**/*
+    - .platform/**/*
+    - Procfile
+  discard-paths: yes

@@ -21,7 +21,6 @@ type Document {
     additional_proof: String,
     supported_types: [String],
     name: Name,
-    dob: String
 }
 
 input DocumentInput {
@@ -55,12 +54,10 @@ input NamesInput {
 
 type backgroundChecks {
     name: Names,
-    dob: String
 }
 
 input BackgroundChecksInput {
     name: NamesInput,
-    dob: String
 }
 
 input ConsentInput {

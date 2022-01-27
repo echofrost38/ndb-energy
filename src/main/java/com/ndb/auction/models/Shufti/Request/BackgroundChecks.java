@@ -10,6 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BackgroundChecks {
-    private String dob;
     private Names name;
 }

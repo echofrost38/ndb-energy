@@ -16,5 +16,4 @@ public class Document {
     private String additional_proof;
     private List<String> supported_types;
     private Name name;
-    private String dob;
 }

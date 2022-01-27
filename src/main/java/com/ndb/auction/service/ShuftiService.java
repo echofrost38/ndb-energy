@@ -78,19 +78,15 @@ public class ShuftiService extends BaseService{
         
         // add supported types
         List<String> docSupportedTypes = new ArrayList<>();
-        docSupportedTypes.add("id_card");
-        docSupportedTypes.add("driving_license");
         docSupportedTypes.add("passport");
         request.getDocument().setSupported_types(docSupportedTypes);
 
         List<String> addrSupportedTypes = new ArrayList<>();
         addrSupportedTypes.add("id_card");
-        addrSupportedTypes.add("bank_statement");
-        addrSupportedTypes.add("utility_bill");
         request.getAddress().setSupported_types(addrSupportedTypes);
 
         List<String> consentTypes = new ArrayList<>();
-        consentTypes.add("printed");
+        consentTypes.add("handwritten");
         request.getConsent().setSupported_types(consentTypes);
         request.getConsent().setText("I & NDB");    
 

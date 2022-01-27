@@ -27,14 +27,6 @@ public class ScheduledTasks {
 	private Auction readyRound;
 	private Long readyCounter;
 
-	public AuctionService getAuctionService() {
-		return auctionService;
-	}
-
-	public void setAuctionService(AuctionService auctionService) {
-		this.auctionService = auctionService;
-	}
-
 	public Auction getStartedRound() {
 		return startedRound;
 	}

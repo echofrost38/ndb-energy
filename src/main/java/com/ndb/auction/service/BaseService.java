@@ -36,12 +36,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
 
-    @Value("${sumsub.secret.key}")
-    public String SUMSUB_SECRET_KEY; // Example: Hej2ch71kG2kTd1iIUDZFNsO5C1lh5Gq
-
-    @Value("${sumsub.app.token}")
-    public String SUMSUB_APP_TOKEN; // Example: sbx:uY0CgwELmgUAEyl4hNWxLngb.0WSeQeiYny4WEqmAALEAiK2qTC96fBad
-
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";

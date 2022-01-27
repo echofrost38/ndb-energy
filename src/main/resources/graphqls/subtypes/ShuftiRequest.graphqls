@@ -27,7 +27,6 @@ type Document {
 input DocumentInput {
     proof: String,
     name: NameInput,
-    dob: String
 }
 
 type Address {

@@ -107,7 +107,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
     }
 
     public int updateStatus(int orderId) {
-        String sql = "UPDATE TBL_PRESALE_ORDER SET STATUS = 1 WHERE ID=?";
+        String sql = "UPDATE TBL_PRESALE_ORDER SET STATUS = 1, UPDATED_AT=SYSDATE WHERE ID=?";
         return jdbcTemplate.update(sql, orderId);
     }
 

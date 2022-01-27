@@ -161,6 +161,15 @@ public class CryptoController extends BaseController {
                 return false;
             }
 
+            // processing order
+            Long ndb = presaleOrder.getNdbAmount();
+            if(presaleOrder.getDestination() == PreSaleOrder.INTERNAL) {
+                balanceService.addFreeBalance(user.getId(), "NDB", Double.valueOf(ndb));
+            } else if (presaleOrder.getDestination() == PreSaleOrder.EXTERNAL) {
+                // transfer ndb
+
+            }
+
             // update user tier points
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -192,7 +201,6 @@ public class CryptoController extends BaseController {
                 "PAYMENT CONFIRMED",
                 "You have successfully deposited " + cryptoAmount + cryptoType + ".");
 
-        
         return true;
     }
 

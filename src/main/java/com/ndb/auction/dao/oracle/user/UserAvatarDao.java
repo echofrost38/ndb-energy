@@ -56,7 +56,7 @@ public class UserAvatarDao extends BaseOracleDao {
 
 	public int insert(UserAvatar m) {
 		String sql = "INSERT INTO TBL_USER_AVATAR(ID,PURCHASED,HAIR_COLOR,PREFIX,NAME,REG_DATE,UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(), m.getHairColor(), m.getPrefix(), m.getName());
 	}
 
@@ -64,7 +64,7 @@ public class UserAvatarDao extends BaseOracleDao {
 		String sql = "MERGE INTO TBL_USER_AVATAR USING DUAL ON (ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET PURCHASED=?, HAIR_COLOR=?, SELECTED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE "
 				+ "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, HAIR_COLOR, SELECTED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(),m.getHairColor(), m.getSelected(), m.getPrefix(), m.getName(), m.getId(),
 				m.getPurchased(),m.getHairColor(), m.getSelected(), m.getPrefix(), m.getName());
 	}

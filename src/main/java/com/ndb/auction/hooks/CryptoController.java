@@ -18,7 +18,9 @@ import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.Balance;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -159,15 +161,61 @@ public class CryptoController extends BaseController {
     }
 
     private boolean handleDepositPayment(CoinbasePayments payment, DepositTransaction txn) {
+        
+        int userId = txn.getUserId();
 
         // 1) update transaction 
         depositTxnDao.updateStatus(txn.getCode());
 
         // 2) update user's internal balance
-        
+        CoinbasePricing cryptoPricing = payment.getValue().get("crypto");
+
+        String cryptoType = cryptoPricing.getCurrency();
+        double cryptoAmount = Double.valueOf(cryptoPricing.getAmount());
+
+        balanceService.addFreeBalance(userId, cryptoType, cryptoAmount);
 
         // 3) check user's tier information and level if possible
+        List<Balance> balances = balanceService.getInternalBalances(userId);
 
+        double totalBalance = 0.0;
+        for (Balance balance : balances) {
+            // get price and total balance
+            double _price = cryptoService.getCryptoPriceBySymbol(balance.getTokenSymbol());
+            double _balance = _price * (balance.getFree() + balance.getHold());
+            totalBalance += _balance;
+        }
+
+        // update user tier points
+        User user = userService.getUserById(userId);
+        List<Tier> tierList = tierService.getUserTiers();
+        TaskSetting taskSetting = taskSettingService.getTaskSetting();
+        TierTask tierTask = tierTaskService.getTierTask(userId);
+
+        if(tierTask.getWallet() < totalBalance) {
+
+            tierTask.setWallet(totalBalance);
+            // get point
+            double gainedPoint = 0.0;
+            for (WalletTask task : taskSetting.getWallet()) {
+                if(task.getAmount() < totalBalance) {
+                    gainedPoint = task.getPoint();
+                    break;
+                }
+            }
+
+            double newPoint = user.getTierPoint() + gainedPoint;
+            int tierLevel = 0;
+            // check change in level
+            for (Tier tier : tierList) {
+                if(tier.getPoint() <= newPoint) {
+                    tierLevel = tier.getLevel();
+                }
+            }
+            userService.updateTier(user.getId(), tierLevel, newPoint);
+            tierTaskService.updateTierTask(tierTask);
+        }
+        
         return true;
     }
 

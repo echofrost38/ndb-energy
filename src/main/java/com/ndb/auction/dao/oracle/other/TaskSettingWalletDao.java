@@ -26,7 +26,7 @@ public class TaskSettingWalletDao extends BaseOracleDao {
 	}
 
     public List<WalletTask> selectAll() {
-		String sql = "SELECT * FROM TBL_TASK_SETTING_WALLET";
+		String sql = "SELECT * FROM TBL_TASK_SETTING_WALLET ORDER BY AMOUNT DESC";
 		return jdbcTemplate.query(sql, new RowMapper<WalletTask>() {
 			@Override
 			public WalletTask mapRow(ResultSet rs, int rownumber) throws SQLException {

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
@@ -68,6 +69,9 @@ public class BaseController {
     
     @Autowired
     DepositTransactionDao depositTxnDao;
+
+    @Autowired
+    InternalBalanceService balanceService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

@@ -44,7 +44,7 @@ public class Bid {
 
     private Long tempTokenAmount;
     private Long tempTokenPrice;
-    private Long delta;
+    private double delta;
     private boolean pendingIncrease;
 
     private Map<String, BidHolding> holdingList;

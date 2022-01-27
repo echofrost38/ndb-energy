@@ -70,7 +70,7 @@ public class BidService extends BaseService {
 		}
 
 		// create new pending bid
-		long totalPrice = tokenAmount * tokenPrice;
+		double totalPrice = Double.valueOf(tokenAmount * tokenPrice);
 		bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
 
 		// check Round is opened.
@@ -101,7 +101,7 @@ public class BidService extends BaseService {
 		// check pay type : WALLET!!!!!
 		if (payType == Bid.WALLET) {
 			// check user's wallet!
-			long cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
+			double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
 			// User user = userDao.selectById(userId);
 			// Map<String, Wallet> wallets = user.getWallet();
@@ -129,13 +129,6 @@ public class BidService extends BaseService {
 			if (free < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			TransactionReceipt receipt = userWalletService.makeHold(userId, cryptoType, cryptoAmount);
-			List<Log> logs = receipt.getLogs();
-			if (logs.isEmpty())
-				throw new BidException("We cannot make the hold in your wallet.", "tokenAmount");
-			Log log = logs.get(0);
-			String data = log.getData();
-			System.out.println(data);
 
 			Map<String, BidHolding> holdingList = bid.getHoldingList();
 			BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
@@ -381,15 +374,10 @@ public class BidService extends BaseService {
 					totalPrice += holding.getUsd();
 				} else {
 					// hold -> release
-					long cryptoAmount = holding.getCrypto();
+					double cryptoAmount = holding.getCrypto();
 					Wallet wallet = userWalletService.getWalletById(userId, _cryptoType);
 
 					long hold = wallet.getHolding();
-					if (hold > cryptoAmount) {
-						userWalletService.releaseHold(userId, _cryptoType, cryptoAmount);
-					} else {
-						continue;
-					}
 				}
 			}
 
@@ -470,14 +458,14 @@ public class BidService extends BaseService {
 
 		long _total = _tokenAmount * _tokenPrice;
 		long newTotal = tokenAmount * tokenPrice;
-		long delta = newTotal - _total;
+		double delta = newTotal - _total;
 
 		// check pay type : WALLET!!!!!
 		if (payType == Bid.WALLET) {
 			// check user's wallet!
 
 			// get crypto price!!
-			long cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
+			double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
 			Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
 
@@ -491,7 +479,7 @@ public class BidService extends BaseService {
 			BidHolding hold = null;
 			if (holdingList.containsKey(cryptoType)) {
 				hold = holdingList.get(cryptoType);
-				long currentAmount = hold.getCrypto();
+				double currentAmount = hold.getCrypto();
 				hold.setCrypto(currentAmount + cryptoAmount);
 			} else {
 				hold = new BidHolding(cryptoAmount, delta);

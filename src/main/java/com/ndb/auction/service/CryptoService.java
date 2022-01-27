@@ -33,7 +33,7 @@ public class CryptoService extends BaseService {
                 .build();
     }
 
-    public int getCryptoPriceBySymbol(String symbol) {
+    public double getCryptoPriceBySymbol(String symbol) {
         String symbolPair = symbol + "USDT";
         CoinPrice objs = binanceAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/ticker/price")
@@ -42,7 +42,7 @@ public class CryptoService extends BaseService {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .retrieve()
                 .bodyToMono(CoinPrice.class).block();
-        return Integer.parseInt(objs.getPrice());
+        return Double.valueOf(objs.getPrice());
     }
 
     public CryptoPayload createNewPayment(int roundId, int userId, String amount) {

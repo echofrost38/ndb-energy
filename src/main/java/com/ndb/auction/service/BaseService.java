@@ -18,6 +18,7 @@ import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
+import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
@@ -31,6 +32,7 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
 
@@ -51,6 +53,8 @@ public class BaseService {
     public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
 
     protected static Gson gson = new Gson();
+    
+    protected WebClient coinbaseAPI;
 
     @Autowired
     TaskRunner taskRunner;
@@ -156,4 +160,7 @@ public class BaseService {
 
     @Autowired
     public PreSaleConditionDao presaleConditionDao;
+
+    @Autowired
+    public DepositTransactionDao depositTxnDao;
 }

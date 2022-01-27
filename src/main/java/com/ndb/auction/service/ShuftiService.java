@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
@@ -113,7 +112,7 @@ public class ShuftiService extends BaseService{
         );
 
         String _responseString = _response.body().string();
-        ShuftiResponse response = new Gson().fromJson(_responseString, ShuftiResponse.class);
+        ShuftiResponse response = gson.fromJson(_responseString, ShuftiResponse.class);
         if(response.getEvent().equals("verification.accepted")) {
             return 1;
         }

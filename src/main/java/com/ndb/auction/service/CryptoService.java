@@ -2,7 +2,6 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.transaction.CryptoTransaction;
@@ -24,8 +23,7 @@ public class CryptoService extends BaseService {
 
     // get crypto price from binance API
     private WebClient binanceAPI;
-    private WebClient coinbaseAPI;
-
+    
     public CryptoService(WebClient.Builder webClientBuilder) {
         this.binanceAPI = webClientBuilder
                 .baseUrl("https://api.binance.com/api/v3")
@@ -71,7 +69,7 @@ public class CryptoService extends BaseService {
                 .retrieve()
                 .bodyToMono(String.class).block();
 
-        CoinbaseRes res = new Gson().fromJson(response, CoinbaseRes.class);
+        CoinbaseRes res = gson.fromJson(response, CoinbaseRes.class);
 
         CoinbaseBody resBody = res.getData();
         String txnId = resBody.getId();

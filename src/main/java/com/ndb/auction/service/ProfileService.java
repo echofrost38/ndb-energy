@@ -203,6 +203,7 @@ public class ProfileService extends BaseService {
 
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
+		userAvatar.setHairColor(hairColor);
 		
 		userAvatarDao.insertOrUpdate(userAvatar);
 

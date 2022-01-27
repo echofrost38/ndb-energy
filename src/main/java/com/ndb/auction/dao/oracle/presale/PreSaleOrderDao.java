@@ -1,15 +1,21 @@
 package com.ndb.auction.dao.oracle.presale;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.presale.PreSaleOrder;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -22,8 +28,10 @@ public class PreSaleOrderDao extends BaseOracleDao {
     private static PreSaleOrder extract(ResultSet rs) throws SQLException {
 		PreSaleOrder m = new PreSaleOrder();
 		m.setId(rs.getInt("ID"));
-		m.setRoundId(rs.getInt("PRESALE_ID"));
+		m.setPresaleId(rs.getInt("PRESALE_ID"));
         m.setUserId(rs.getInt("USER_ID"));
+        m.setDestination(rs.getInt("DESTINATION"));
+        m.setExtAddr(rs.getString("EXT_ADDR"));
         m.setNdbAmount(rs.getLong("NDB_AMOUNT"));
         m.setNdbPrice(rs.getLong("NDB_PRICE"));
         m.setCreatedAt(rs.getTimestamp("STARTED_AT").getTime());
@@ -31,10 +39,29 @@ public class PreSaleOrderDao extends BaseOracleDao {
         return m;
 	}
 
-    public int insert(PreSaleOrder m) {
-        String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,ROUND_ID,USER_ID,NDB_AMOUNT,NDB_PRICE,STARTED_AT,ENDED_AT)"
+    public PreSaleOrder insert(PreSaleOrder m) {
+        String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,PRESALE_ID,USER_ID,DESTINATION, EXT_ADDR, NDB_AMOUNT,NDB_PRICE,STARTED_AT,ENDED_AT)"
             + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql, m.getRoundId(), m.getUserId(), m.getNdbAmount(), m.getNdbPrice());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    @Override
+                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                        PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+                        int i = 1;
+                        ps.setInt(i++, m.getPresaleId());
+                        ps.setInt(i++, m.getUserId());
+                        ps.setInt(i++, m.getDestination());
+                        ps.setString(i++, m.getExtAddr());
+                        ps.setLong(i++, m.getNdbAmount());
+                        ps.setLong(i++, m.getNdbPrice());
+                        ps.setTimestamp(i++, new Timestamp(m.getCreatedAt()));
+                        ps.setTimestamp(i++, new Timestamp(m.getUpdateDate()));
+                        return ps;
+                    }
+                }, keyHolder);
+        m.setId(keyHolder.getKey().intValue());
+        return m;
     }
 
     public List<PreSaleOrder> selectByPresaleId(int presaleId) {
@@ -77,6 +104,11 @@ public class PreSaleOrderDao extends BaseOracleDao {
 				return extract(rs);
 			}
 		}, orderId);
+    }
+
+    public int updateStatus(int orderId) {
+        String sql = "UPDATE TBL_PRESALE_ORDER SET STATUS = 1 WHERE ID=?";
+        return jdbcTemplate.update(sql, orderId);
     }
 
 }

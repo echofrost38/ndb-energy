@@ -122,11 +122,12 @@ public class ProfileService extends BaseService {
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setPrefix(prefix);
 		userAvatar.setName(name);
+		userAvatar.setHairColor(profile.getHairColor());
 		userAvatarDao.insertOrUpdate(userAvatar);
 		return "Success";
 	}
 
-	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set) {
+	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set, String hairColor) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
 			throw new UserNotFoundException("We were unable to find a user id", "userId");
@@ -202,6 +203,7 @@ public class ProfileService extends BaseService {
 
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
+		
 		userAvatarDao.insertOrUpdate(userAvatar);
 
 		for (AvatarComponent avatarComponent : purchasedComponents) {

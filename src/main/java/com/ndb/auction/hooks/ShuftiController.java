@@ -97,7 +97,7 @@ public class ShuftiController extends BaseController {
                 Notification.KYC_VERIFIED,
                 "KYC VERIFIED",
                 "Your identity has been successfully verified.");
-            System.out.println("Verification failed");
+            System.out.println("Verification success.");
             System.out.println(response.getEvent());
         } else {
             // send notification
@@ -105,7 +105,7 @@ public class ShuftiController extends BaseController {
                 userId,
                 Notification.KYC_VERIFIED,
                 "KYC VERIFICATION FAILED",
-                "Verification failed.");
+                "KYC Verification failed.");
             System.out.println("Verification failed");
             System.out.println(response.getEvent());
         }

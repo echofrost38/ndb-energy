@@ -6,7 +6,8 @@ extend type Mutation {
 		name: String!
 	) : String
 	updateAvatarSet(
-		components: [AvatarSetInput]
+		components: [AvatarSetInput],
+		hairColor: String
 	) : [AvatarSet]
 	updateKYCSetting(
 		kind: String!,

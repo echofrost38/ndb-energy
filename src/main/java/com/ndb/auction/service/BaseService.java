@@ -17,6 +17,7 @@ import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
+import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
@@ -163,4 +164,7 @@ public class BaseService {
 
     @Autowired
     public DepositTransactionDao depositTxnDao;
+
+    @Autowired
+    public PreSaleOrderDao presaleOrderDao;
 }

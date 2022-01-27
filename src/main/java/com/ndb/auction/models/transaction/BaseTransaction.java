@@ -16,10 +16,10 @@ public class BaseTransaction {
     public static final int PRESALE = 2;
 
     protected int userId;
-    protected int roundId;
+    protected Integer roundId;
 
     protected int transactionType;
-    protected int presaleId;
+    protected Integer presaleOrderId;
     
     protected Double amount; // usd value
     protected Long createdAt;

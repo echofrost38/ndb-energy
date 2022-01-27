@@ -51,5 +51,17 @@ public class PresaleService extends BaseService {
         }
         return result;
     }
+
+    public int startPresale(int presaleId) {
+        return presaleDao.updateStatus(presaleId, PreSale.STARTED);
+    }
+
+    public int closePresale(int presaleId) {
+        return presaleDao.updateStatus(presaleId, PreSale.ENDED);
+    }
+
+    public PreSale getPresaleById(int presaleId) {
+        return presaleDao.selectById(presaleId);
+    }
     
 }

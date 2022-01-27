@@ -16,6 +16,7 @@ import com.ndb.auction.models.coinbase.CoinbaseEventBody;
 import com.ndb.auction.models.coinbase.CoinbaseEventData;
 import com.ndb.auction.models.coinbase.CoinbasePayments;
 import com.ndb.auction.models.coinbase.CoinbasePricing;
+import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
@@ -99,64 +100,99 @@ public class CryptoController extends BaseController {
         CoinbasePricing cryptoPricing = paymentValues.get("crypto");
         CoinbasePricing usdPricing = paymentValues.get("local");
 
+        String cryptoType = cryptoPricing.getCurrency();
+        String cryptoAmount = cryptoPricing.getAmount();
+
         double usdAmount = Double.valueOf(usdPricing.getAmount());
-        Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
-
-        // wallet update confirmed amount make hold
         User user = userService.getUserById(txn.getUserId());
+        
+        if(txn.getRoundId() != null) {
+            Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
 
-        if (bid.isPendingIncrease()) {
-            double pendingPrice = bid.getDelta();
-            if (pendingPrice > usdAmount) {
-                return false;
+            if (bid.isPendingIncrease()) {
+                double pendingPrice = bid.getDelta();
+                if (pendingPrice > usdAmount) {
+                    
+                    return false;
+                }
+
+                bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(),
+                        bid.getTempTokenPrice());
+
+            } else {
+                long totalPrice = bid.getTotalPrice();
+                if (totalPrice > usdAmount) {
+
+                    return false;
+                }
+
+                // update user tier points
+                List<Tier> tierList = tierService.getUserTiers();
+                TaskSetting taskSetting = taskSettingService.getTaskSetting();
+                TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+                List<Integer> auctionList = tierTask.getAuctions();
+                if(!auctionList.contains(bid.getRoundId())) {
+                    auctionList.add(bid.getRoundId());
+                    // get point
+                    double newPoint = user.getTierPoint() + taskSetting.getAuction();
+                    int tierLevel = 0;
+
+                    // check change in level
+                    for (Tier tier : tierList) {
+                        if(tier.getPoint() <= newPoint) {
+                            tierLevel = tier.getLevel();
+                        }
+                    }
+                    userService.updateTier(user.getId(), tierLevel, newPoint);
+                    tierTaskService.updateTierTask(tierTask);
+                } 
             }
+            
+        // Change crypto Hold amount!!!!!!!!!!!!!!!
+        // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
+            
+            bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
+        } else if (txn.getPresaleOrderId() != null) {
+            PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getPresaleOrderId());
+            Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
+            
+            if(totalPrice > usdAmount) {
 
-            bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(),
-                    bid.getTempTokenPrice());
-
-        } else {
-            long totalPrice = bid.getTotalPrice();
-            if (totalPrice > usdAmount) {
                 return false;
             }
 
             // update user tier points
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
-            TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
-            List<Integer> auctionList = tierTask.getAuctions();
-            if(!auctionList.contains(bid.getRoundId())) {
-                auctionList.add(bid.getRoundId());
-                // get point
-                double newPoint = user.getTierPoint() + taskSetting.getAuction();
-                int tierLevel = 0;
+            TierTask tierTask = tierTaskService.getTierTask(user.getId());
+            double presalePoint = tierTask.getDirect();
+            presalePoint += taskSetting.getDirect() * usdAmount;
+            tierTask.setDirect(presalePoint);
 
-                // check change in level
-                for (Tier tier : tierList) {
-                    if(tier.getPoint() <= newPoint) {
-                        tierLevel = tier.getLevel();
-                    }
+            double newPoint = user.getTierPoint() + taskSetting.getDirect() * usdAmount;
+            int tierLevel = 0;
+
+            // check change in level
+            for (Tier tier : tierList) {
+                if(tier.getPoint() <= newPoint) {
+                    tierLevel = tier.getLevel();
                 }
-                userService.updateTier(user.getId(), tierLevel, newPoint);
-                tierTaskService.updateTierTask(tierTask);
-            } 
-        }
+            }
+            userService.updateTier(user.getId(), tierLevel, newPoint);
+            tierTaskService.updateTierTask(tierTask);
 
-        String cryptoType = cryptoPricing.getCurrency();
-        String cryptoAmount = cryptoPricing.getAmount();
+            presaleOrderService.updateStatus(presaleOrder.getId());
+        }
         cryptoService.updateTransaction(txn.getCode(), CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);
-        
-        // Change crypto Hold amount!!!!!!!!!!!!!!!
-        // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
 
         // send notification to user for payment result!!
         notificationService.sendNotification(
-                user.getId(),
+                txn.getUserId(),
                 Notification.PAYMENT_RESULT,
                 "PAYMENT CONFIRMED",
                 "You have successfully deposited " + cryptoAmount + cryptoType + ".");
 
-        bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
+        
         return true;
     }
 

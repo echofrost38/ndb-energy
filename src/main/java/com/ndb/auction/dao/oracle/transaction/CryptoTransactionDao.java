@@ -29,7 +29,7 @@ public class CryptoTransactionDao extends BaseOracleDao {
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));
 		m.setCryptoAmount(rs.getString("CRYPTO_AMOUNT"));
 		m.setTransactionType(rs.getInt("TXN_TYPE"));
-		m.setPresaleId(rs.getInt("PRESALE_ID"));
+		m.setPresaleOrderId(rs.getInt("PRESALE_ORDER_ID"));
 		m.setStatus(rs.getInt("STATUS"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
@@ -37,9 +37,9 @@ public class CryptoTransactionDao extends BaseOracleDao {
 	}
 
 	public int insert(CryptoTransaction m) {
-		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,TXN_TYPE,PRESALE_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
+		String sql = "INSERT INTO TBL_CRYPTO_TRANSACTION(TXN_ID,CODE,USER_ID,ROUND_ID,TXN_TYPE,PRESALE_ORDER_ID,AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,STATUS,CREATED_AT,UPDATED_AT)"
 				+ " VALUES(?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getTransactionType(), m.getPresaleId(), m.getAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
+		return jdbcTemplate.update(sql, m.getTxnId(), m.getCode(), m.getUserId(), m.getRoundId(), m.getTransactionType(), m.getPresaleOrderId(), m.getAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getStatus(), m.getCreatedAt(), m.getUpdatedAt());
 	}
 
 	public List<CryptoTransaction> selectAll(String orderby) {

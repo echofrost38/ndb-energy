@@ -22,6 +22,7 @@ public class UserAvatarDao extends BaseOracleDao {
 		m.setId(rs.getInt("ID"));
 		m.setPurchased(rs.getString("PURCHASED"));
 		m.setSelected(rs.getString("SELECTED"));
+		m.setHairColor(rs.getString("HAIR_COLOR"));	
 		m.setPrefix(rs.getString("PREFIX"));
 		m.setName(rs.getString("NAME"));
 		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
@@ -54,18 +55,18 @@ public class UserAvatarDao extends BaseOracleDao {
 	}
 
 	public int insert(UserAvatar m) {
-		String sql = "INSERT INTO TBL_USER_AVATAR(ID,PURCHASED,PREFIX,NAME,REG_DATE,UPDATE_DATE)"
+		String sql = "INSERT INTO TBL_USER_AVATAR(ID,PURCHASED,HAIR_COLOR,PREFIX,NAME,REG_DATE,UPDATE_DATE)"
 				+ "VALUES(?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(), m.getPrefix(), m.getName());
+		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(), m.getHairColor(), m.getPrefix(), m.getName());
 	}
 
 	public int insertOrUpdate(UserAvatar m) {
 		String sql = "MERGE INTO TBL_USER_AVATAR USING DUAL ON (ID=?)"
-				+ "WHEN MATCHED THEN UPDATE SET PURCHASED=?, SELECTED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE "
-				+ "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, SELECTED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
+				+ "WHEN MATCHED THEN UPDATE SET PURCHASED=?, HAIR_COLOR=?, SELECTED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE "
+				+ "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, HAIR_COLOR, SELECTED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
 				+ "VALUES(?,?,?,?,?,SYSDATE,SYSDATE)";
-		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(),m.getSelected(), m.getPrefix(), m.getName(), m.getId(),
-				m.getPurchased(), m.getSelected(), m.getPrefix(), m.getName());
+		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(),m.getHairColor(), m.getSelected(), m.getPrefix(), m.getName(), m.getId(),
+				m.getPurchased(),m.getHairColor(), m.getSelected(), m.getPrefix(), m.getName());
 	}
 
 }

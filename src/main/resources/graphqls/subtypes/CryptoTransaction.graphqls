@@ -1,9 +1,11 @@
 type CryptoTransaction {
-    txnId: String!,
     roundId: Int!,
     userId: Int!,
-    code: String!,
+    transactionType: Int!,
+    presaleOrderId: Int!,
     amount: String!,
+    txnId: String!,
+    code: String!,
     cryptoAmount: String,
     cryptoType: String,
     status: Int,

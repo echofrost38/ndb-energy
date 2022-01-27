@@ -1,4 +1,4 @@
-package com.ndb.auction.resolver;
+package com.ndb.auction.resolver.payment;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +11,7 @@ import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.payload.PayResponse;
+import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -18,7 +19,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 
-public class PaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
+public class BidPaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
 	// for stripe payment
 	@PreAuthorize("isAuthenticated()")

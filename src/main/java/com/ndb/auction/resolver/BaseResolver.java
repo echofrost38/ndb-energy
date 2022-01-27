@@ -16,6 +16,7 @@ import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.KYBService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
+import com.ndb.auction.service.PresaleOrderService;
 import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
@@ -56,6 +57,7 @@ public class BaseResolver {
 	TotpService totpService;
 
 	@Autowired
+    protected
 	StripeService stripeService;
 
 	@Autowired
@@ -65,6 +67,7 @@ public class BaseResolver {
 	ProfileService profileService;
 
 	@Autowired
+    protected
 	CryptoService cryptoService;
 
 	@Autowired
@@ -113,12 +116,15 @@ public class BaseResolver {
 	InternalBalanceService internalBalanceService;
 
 	@Autowired
-	PresaleService presaleService;
+	protected PresaleService presaleService;
 
 	@Autowired
 	ShuftiService shuftiService;
 
 	@Autowired
 	DepositService depositService;
+
+	@Autowired
+	protected PresaleOrderService presaleOrderService;
 
 }

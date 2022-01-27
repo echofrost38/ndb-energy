@@ -26,9 +26,10 @@ public class CryptoTransaction extends BaseTransaction {
 
     private Long updatedAt;
 
-    public CryptoTransaction(int userId, int roundId, String txnId, String code, Double amount, int transactionType) {
+    public CryptoTransaction(int userId, Integer roundId, Integer presalOrderId, String txnId, String code, Double amount, int transactionType) {
         this.userId = userId;
         this.roundId = roundId;
+        this.presaleOrderId = presaleOrderId;
         this.txnId = txnId;
         this.code = code;
         this.amount = amount;

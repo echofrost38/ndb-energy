@@ -17,6 +17,7 @@ import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.NotificationService;
+import com.ndb.auction.service.PresaleOrderService;
 import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.TierTaskService;
@@ -72,6 +73,9 @@ public class BaseController {
 
     @Autowired
     InternalBalanceService balanceService;
+
+    @Autowired
+    PresaleOrderService presaleOrderService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

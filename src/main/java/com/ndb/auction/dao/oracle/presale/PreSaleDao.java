@@ -87,4 +87,9 @@ public class PreSaleDao extends BaseOracleDao {
         return jdbcTemplate.update(sql, amount, id);
     }   
 
+	public int updateStatus(int presaleId, int status) {
+		String sql = "UPDATE TBL_PRESALE SET STATUS=? WHERE ID = ?";
+		return jdbcTemplate.update(sql, status, presaleId);
+	}
+
 }

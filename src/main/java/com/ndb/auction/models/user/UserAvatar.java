@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserAvatar extends BaseModel {
-
+	private String hairColor;
 	private String purchased;
 	private String selected;
 	private String prefix;

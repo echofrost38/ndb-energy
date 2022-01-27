@@ -12,7 +12,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.oracle.transaction.FinancialDao;
+import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.NotificationService;
@@ -55,9 +55,6 @@ public class BaseController {
     NotificationService notificationService;
 
     @Autowired
-    FinancialDao financialDao;
-
-    @Autowired
     UserWalletService userWalletService;
 
     @Autowired
@@ -68,6 +65,9 @@ public class BaseController {
 
     @Autowired
     TaskSettingService taskSettingService;
+    
+    @Autowired
+    DepositTransactionDao depositTxnDao;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

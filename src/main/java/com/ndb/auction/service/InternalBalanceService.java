@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InternalBalanceService extends BaseService {
+    
     // getting balances
     public List<Balance> getInternalBalances(int userId) {
         List<InternalBalance> iBalances = balanceDao.selectByUserId(userId, null);
@@ -22,4 +23,9 @@ public class InternalBalanceService extends BaseService {
         }
         return balanceList;
     } 
+
+    // public int addFreeBalance(int userId, String cryptoType, Double amount) {
+
+    // }
+
 }

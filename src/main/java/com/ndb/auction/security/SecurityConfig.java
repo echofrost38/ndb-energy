@@ -100,7 +100,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/graphql/**").permitAll()
 				.antMatchers("/graphiql/**").permitAll()
 				.antMatchers("/vendor/**").permitAll()
-				// .antMatchers("/playground/**").permitAll()
+				.antMatchers("/playground/**").permitAll()
 				.antMatchers("/subscriptions/**").permitAll()
 				.antMatchers("/coinbase/**").permitAll()
 				.antMatchers("/auth/**", "/oauth2/**").permitAll()

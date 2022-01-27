@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.payload.Balance;
+import com.ndb.auction.payload.CryptoPayload;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,11 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     }
     
     // get deposit address 
-    
+    @PreAuthorize("isAuthenticated()")
+    public CryptoPayload getDepositAddress() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return depositService.createNewCharge(userId);
+    }
 
 }

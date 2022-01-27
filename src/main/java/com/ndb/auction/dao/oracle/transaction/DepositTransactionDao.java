@@ -8,6 +8,7 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.transaction.DepositTransaction;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -52,5 +53,17 @@ public class DepositTransactionDao extends BaseOracleDao {
 			}
 		}, userId);
     }
+
+	public DepositTransaction selectByCode(String code) {
+		String sql = "SELECT * FROM TBL_DEPOSIT_TXN WHERE CODE=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<DepositTransaction>() {
+			@Override
+			public DepositTransaction extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, code);
+	}
 
 }

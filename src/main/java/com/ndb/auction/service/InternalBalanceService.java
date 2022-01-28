@@ -34,4 +34,9 @@ public class InternalBalanceService extends BaseService {
         return balanceDao.addFreeBalance(userId, tokenId, amount);
     }
 
+    public int addHoldBalance(int userId, String cryptoType, Double amount) {
+        int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+        return balanceDao.addHoldBalance(userId, tokenId, amount);
+    }
+
 }

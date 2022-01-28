@@ -72,4 +72,12 @@ public class InternalBalanceDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, userId, tokenId, amount, userId, tokenId, amount, 0);
 	}
 
+	public int addHoldBalance(int userId, int tokenId, double amount) {
+		String sql = "MERGE INTO TBL_INTERNAL_BALANCE USING DUAL ON (USER_ID=? AND TOKEN_ID=?)"
+				+ "WHEN MATCHED THEN UPDATE SET FREE=FREE+? "
+				+ "WHEN NOT MATCHED THEN INSERT(USER_ID,TOKEN_ID,FREE,HOLD)"
+				+ "VALUES(?,?,?,?)";
+		return jdbcTemplate.update(sql, userId, tokenId, amount, userId, tokenId, amount, 0);
+	}
+
 }

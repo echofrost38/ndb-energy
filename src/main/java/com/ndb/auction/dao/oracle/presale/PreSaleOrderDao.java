@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -41,7 +40,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
 
     public PreSaleOrder insert(PreSaleOrder m) {
         String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,PRESALE_ID,USER_ID,DESTINATION, EXT_ADDR, NDB_AMOUNT,NDB_PRICE,STARTED_AT,ENDED_AT)"
-            + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,SYSDATE,SYSDATE)";
+            + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,?,?,SYSDATE,SYSDATE)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -55,8 +54,6 @@ public class PreSaleOrderDao extends BaseOracleDao {
                         ps.setString(i++, m.getExtAddr());
                         ps.setLong(i++, m.getNdbAmount());
                         ps.setLong(i++, m.getNdbPrice());
-                        ps.setTimestamp(i++, new Timestamp(m.getCreatedAt()));
-                        ps.setTimestamp(i++, new Timestamp(m.getUpdateDate()));
                         return ps;
                     }
                 }, keyHolder);

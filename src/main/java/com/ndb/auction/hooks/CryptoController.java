@@ -148,11 +148,12 @@ public class CryptoController extends BaseController {
                 } 
             }
             
-        // Change crypto Hold amount!!!!!!!!!!!!!!!
-        // userWalletService.addHoldAmount(txn.getUserId(), cryptoType, cryptoAmount);
-            
+            // Change crypto Hold amount!!!!!!!!!!!!!!!
+            balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(cryptoAmount));
             bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
+        
         } else if (txn.getPresaleOrderId() != null) {
+            
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getPresaleOrderId());
             Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
             

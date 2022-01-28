@@ -12,6 +12,8 @@ extend type Mutation {
     placePreSaleOrder(
         presaleId: Int,
         destination: Int,
+        ndbAmount: Float,
+        ndbPrice: Float,
         extAddr: String
     ) : PreSaleOrder
     # payment for presale

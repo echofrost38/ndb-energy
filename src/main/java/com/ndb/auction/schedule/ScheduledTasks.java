@@ -134,8 +134,6 @@ public class ScheduledTasks {
 		this.startedPresaleCounter /= 1000;
 	}
 
-
-
 	@Scheduled(fixedRate = 1000)
 	public void AuctionCounter() {
 

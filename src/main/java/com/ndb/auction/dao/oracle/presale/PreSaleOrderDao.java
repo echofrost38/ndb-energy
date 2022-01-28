@@ -33,14 +33,15 @@ public class PreSaleOrderDao extends BaseOracleDao {
         m.setExtAddr(rs.getString("EXT_ADDR"));
         m.setNdbAmount(rs.getLong("NDB_AMOUNT"));
         m.setNdbPrice(rs.getLong("NDB_PRICE"));
+        m.setStatus(rs.getInt("STATUS"));
         m.setCreatedAt(rs.getTimestamp("STARTED_AT").getTime());
         m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
         return m;
 	}
 
     public PreSaleOrder insert(PreSaleOrder m) {
-        String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,PRESALE_ID,USER_ID,DESTINATION, EXT_ADDR, NDB_AMOUNT,NDB_PRICE,STARTED_AT,ENDED_AT)"
-            + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,?,?,SYSDATE,SYSDATE)";
+        String sql = "INSERT INTO TBL_PRESALE_ORDER(ID,PRESALE_ID,USER_ID,DESTINATION, EXT_ADDR, NDB_AMOUNT,NDB_PRICE,STATUS,STARTED_AT,UPDATED_AT)"
+            + "VALUES(SEQ_PRESALE_ORDER.NEXTVAL,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -54,6 +55,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
                         ps.setString(i++, m.getExtAddr());
                         ps.setLong(i++, m.getNdbAmount());
                         ps.setLong(i++, m.getNdbPrice());
+                        ps.setInt(i++, m.getStatus());
                         return ps;
                     }
                 }, keyHolder);

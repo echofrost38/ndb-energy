@@ -2,6 +2,7 @@ package com.ndb.auction.dao.oracle.presale;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -35,7 +36,7 @@ public class PreSaleDao extends BaseOracleDao {
     public int insert(PreSale m) {
         String sql = "INSERT INTO TBL_PRESALE(ID,ROUND,STARTED_AT,ENDED_AT,TOKEN_AMOUNT,TOKEN_PRICE,SOLD,STATUS)"
             + "VALUES(SEQ_PRESALE.NEXTVAL,?,?,?,?,?,?,?)";
-        return jdbcTemplate.update(sql, m.getRound(), m.getStartedAt(), m.getEndedAt(), m.getTokenAmount(), m.getTokenPrice(), 0L, 1);
+        return jdbcTemplate.update(sql, m.getRound(), new Timestamp(m.getStartedAt()), new Timestamp(m.getEndedAt()), m.getTokenAmount(), m.getTokenPrice(), 0L, 1);
     }
 
     public PreSale selectById(int id) {

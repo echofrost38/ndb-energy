@@ -1,4 +1,4 @@
-package com.ndb.auction.service;
+package com.ndb.auction.service.utils;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;

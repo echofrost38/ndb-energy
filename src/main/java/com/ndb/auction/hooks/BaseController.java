@@ -27,6 +27,7 @@ import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,9 @@ public class BaseController {
 
     @Autowired
     TokenAssetService tokenAssetService;
+
+    @Autowired
+    protected NDBCoinService ndbCoinService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

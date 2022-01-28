@@ -16,6 +16,8 @@ import com.ndb.auction.security.oauth2.user.OAuth2UserInfo;
 import com.ndb.auction.security.oauth2.user.OAuth2UserInfoFactory;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserService;
+import com.ndb.auction.service.utils.MailService;
+import com.ndb.auction.service.utils.TotpService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

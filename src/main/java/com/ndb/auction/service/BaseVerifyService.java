@@ -13,7 +13,11 @@ public class BaseVerifyService extends BaseService{
         return kycSettingDao.updateKYCSetting(kind, bid, direct, deposit, withdraw);
     }
 
-    public List<KYCSetting> getKYCSetting() {
+    public List<KYCSetting> getKYCSettings() {
         return kycSettingDao.getKYCSettings();
+    }
+
+    public KYCSetting getKYCSetting(String kind) {
+        return kycSettingDao.getKYCSetting(kind);
     }
 }

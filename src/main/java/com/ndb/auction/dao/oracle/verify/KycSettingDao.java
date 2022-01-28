@@ -8,6 +8,7 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.KYCSetting;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -41,6 +42,18 @@ public class KycSettingDao extends BaseOracleDao{
 				return extract(rs);
 			}
 		});
+    }
+
+    public KYCSetting getKYCSetting(String kind) {
+        String sql = "SELECT * FROM TBL_KYC_SETTING WHERE KIND=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<KYCSetting>() {
+			@Override
+			public KYCSetting extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, kind);
     }
 
 }

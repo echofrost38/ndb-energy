@@ -157,7 +157,7 @@ public class CryptoController extends BaseController {
             Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
             
             if(totalPrice > usdAmount) {
-
+                
                 return false;
             }
 
@@ -167,7 +167,7 @@ public class CryptoController extends BaseController {
                 balanceService.addFreeBalance(user.getId(), "NDB", Double.valueOf(ndb));
             } else if (presaleOrder.getDestination() == PreSaleOrder.EXTERNAL) {
                 // transfer ndb
-
+                ndbCoinService.transferNDB(presaleOrder.getExtAddr(), Double.valueOf(ndb));
             }
 
             // update user tier points
@@ -259,7 +259,7 @@ public class CryptoController extends BaseController {
             userService.updateTier(user.getId(), tierLevel, newPoint);
             tierTaskService.updateTierTask(tierTask);
         }
-        
+
         return true;
     }
 

@@ -101,6 +101,6 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<KYCSetting> getKYCSettings() {
-        return baseVerifyService.getKYCSetting();
+        return baseVerifyService.getKYCSettings();
     }
 }

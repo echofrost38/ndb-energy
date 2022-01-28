@@ -1,4 +1,4 @@
-package com.ndb.auction.service;
+package com.ndb.auction.service.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;

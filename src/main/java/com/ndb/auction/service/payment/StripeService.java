@@ -1,4 +1,4 @@
-package com.ndb.auction.service;
+package com.ndb.auction.service.payment;
 
 import java.util.List;
 
@@ -7,6 +7,8 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.PayResponse;
+import com.ndb.auction.service.BaseService;
+import com.ndb.auction.service.BidService;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;

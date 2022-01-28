@@ -1,5 +1,15 @@
 extend type Query {
     getBalances : [Balance]
+
+}
+
+extend type Mutation {
+    getDepositAddress : CryptoPayload
+    withdrawCrypto(
+        to: String,
+        amount: Float,
+        tokenSymbol: String
+    ) : Boolean
 }
 
 schema {

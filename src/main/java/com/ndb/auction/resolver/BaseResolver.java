@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
-import com.ndb.auction.service.BalanceService;
 import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
@@ -21,15 +20,16 @@ import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
-import com.ndb.auction.service.StripeService;
 import com.ndb.auction.service.TierTaskService;
-import com.ndb.auction.service.TotpService;
 import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
+import com.ndb.auction.service.payment.StripeService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.IPChecking;
+import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
 import com.ndb.auction.service.TokenAssetService;
@@ -98,9 +98,6 @@ public class BaseResolver {
 	TokenAssetService tokenAssetService;
 
 	@Autowired
-	BalanceService balanceService;
-
-	@Autowired
 	UserVerifyService userVerifyService;
 
 	@Autowired
@@ -126,5 +123,8 @@ public class BaseResolver {
 
 	@Autowired
 	protected PresaleOrderService presaleOrderService;
+
+	@Autowired
+	protected NDBCoinService ndbCoinService;
 
 }

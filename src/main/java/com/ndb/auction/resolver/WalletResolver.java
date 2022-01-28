@@ -2,6 +2,9 @@ package com.ndb.auction.resolver;
 
 import java.util.List;
 
+import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.models.InternalBalance;
+import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.payload.Balance;
 import com.ndb.auction.payload.CryptoPayload;
 
@@ -35,6 +38,33 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return depositService.createNewCharge(userId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public boolean withdrawCrypto(String to, double amount, String tokenSymbol) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+
+        // 1) check balance 
+        InternalBalance balance = internalBalanceService.getBalance(userId, tokenSymbol);
+        if(balance.getFree() < amount) {
+            throw new BalanceException("no_enough_fund", "amount");
+        }
+
+        // 2) check KYC level
+        KYCSetting kyc = baseVerifyService.getKYCSetting("KYC");
+        
+        if(kyc == null) {
+            throw new BalanceException("no_kyc", "kind");
+        }
+
+        if(kyc.getWithdraw() <= amount) {
+            if(!shuftiService.kycStatusCkeck(userId)) {
+                throw new BalanceException("no_kyc_verified", "kind");
+            }
+        }
+
+        return ndbCoinService.transferNDB(to, amount);
     }
 
 }

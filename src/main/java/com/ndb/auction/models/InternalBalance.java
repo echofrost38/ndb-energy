@@ -11,8 +11,8 @@ public class InternalBalance {
     
     private int userId;
     private int tokenId;
-    private double free;
-    private double hold; 
+    private Double free;
+    private Double hold; 
 
     public InternalBalance(int userId, int tokenId) {
         this.userId = userId;

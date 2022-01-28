@@ -27,6 +27,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
+import com.ndb.auction.service.payment.StripeService;
 import com.ndb.auction.utils.Sort;
 
 import org.springframework.beans.factory.annotation.Autowired;

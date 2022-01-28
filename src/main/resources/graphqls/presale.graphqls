@@ -1,4 +1,5 @@
 extend type Mutation {
+    # create new Presale
     createNewPresale(
         round: Int!,
         startedAt: Float!,
@@ -7,6 +8,16 @@ extend type Mutation {
         tokenPrice: Float!,
         conditions: [PreSaleConditionInput!]!
     ) : Int
+    # create new order
+    placePreSaleOrder(
+        presaleId: Int,
+        destination: Int,
+        extAddr: String
+    ) : PreSaleOrder
+    # payment for presale
+    createChargeForPresale(
+        orderId: Int
+    ) : CryptoPayload
 }
 
 extend type Query {

@@ -1,3 +1,8 @@
+type CoinbasePricing {
+	amount: String!
+	currency: String!
+}
+
 type CryptoPayload {
 	addresses: [AddressList],
 	pricing: [PricingList]	

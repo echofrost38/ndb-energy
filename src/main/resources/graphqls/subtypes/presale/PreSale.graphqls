@@ -1,0 +1,11 @@
+type PreSale {
+    id: Int,
+    round: Int,
+    startedAt: Float,
+    endedAt: Float,
+    tokenAmount: Float,
+    tokenPrice: Float,
+    sold: Float,
+    status: Int,
+    conditions: [PreSaleCondition]
+}

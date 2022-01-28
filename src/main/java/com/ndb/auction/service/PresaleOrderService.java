@@ -1,5 +1,6 @@
 package com.ndb.auction.service;
 
+import com.ndb.auction.exceptions.PreSaleException;
 import com.ndb.auction.models.coinbase.CoinbaseBody;
 import com.ndb.auction.models.coinbase.CoinbasePostBody;
 import com.ndb.auction.models.coinbase.CoinbaseRes;
@@ -24,10 +25,17 @@ public class PresaleOrderService extends BaseService {
     }
     
     // create new presale order
-    public CryptoPayload createNewPresaleOrder(PreSaleOrder order) {
+    public PreSaleOrder placePresaleOrder(PreSaleOrder order) {
+        return presaleOrderDao.insert(order);
+    }
+    
+    public CryptoPayload payOrderWithCrypto(int orderId) {
 
         // insert dataabase
-        order = presaleOrderDao.insert(order);
+        PreSaleOrder order = presaleOrderDao.selectById(orderId);
+        if(order == null || order.getStatus() == 1) {
+            throw new PreSaleException("no_presale_order", "orderId");
+        }
 
         Long _amount = order.getNdbAmount() * order.getNdbPrice();
         String amount = _amount.toString();
@@ -60,6 +68,8 @@ public class PresaleOrderService extends BaseService {
         CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());
         return payload;
     }
+
+
 
     public PreSaleOrder getPresaleById(int orderId) {
         return presaleOrderDao.selectById(orderId);

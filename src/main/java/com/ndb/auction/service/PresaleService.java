@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.ndb.auction.exceptions.PreSaleException;
 import com.ndb.auction.models.presale.PreSale;
+import com.ndb.auction.models.presale.PreSaleCondition;
 import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,11 @@ public class PresaleService extends BaseService {
         List<PreSale> presales = presaleDao.selectByStatus(PreSale.STARTED);
         if(presales.size() != 0) {
             throw new PreSaleException("opened_presale", "conflict");
+        }
+
+        presales = presaleDao.selectByStatus(PreSale.COUNTDOWN);
+        if(presales.size() != 0) {
+            throw new PreSaleException("countdown_presale", "conflict");
         }
 
         // check date
@@ -49,19 +56,45 @@ public class PresaleService extends BaseService {
         if(count != presaleConditionDao.insertConditionList(presale.getConditions())){
             return 0;
         }
+
+        schedule.setPresaleCountdown(presale);
         return result;
     }
 
     public int startPresale(int presaleId) {
+        notificationService.broadcastNotification(
+            Notification.NEW_ROUND_STARTED, 
+            "NEW ROUND STARTED", 
+            "PreSale Round has been started.");
         return presaleDao.updateStatus(presaleId, PreSale.STARTED);
     }
 
     public int closePresale(int presaleId) {
+        notificationService.broadcastNotification(
+            Notification.ROUND_FINISHED, 
+            "ROUND CLOSED", 
+            "PreSale Round has been closed.");
         return presaleDao.updateStatus(presaleId, PreSale.ENDED);
     }
 
     public PreSale getPresaleById(int presaleId) {
         return presaleDao.selectById(presaleId);
+    }
+
+    public List<PreSale> getPresaleByStatus(int status) {
+        return presaleDao.selectByStatus(status);
+    }
+
+    public List<PreSale> getPresales() {
+        return presaleDao.selectAll();
+    }
+
+    public int addSoldAmount(int presaleId, Long sold) {
+        return presaleDao.udpateSold(presaleId, sold);
+    }
+
+    public List<PreSaleCondition> getConditionsById(int presaleId) {
+        return presaleConditionDao.selectById(presaleId);
     }
     
 }

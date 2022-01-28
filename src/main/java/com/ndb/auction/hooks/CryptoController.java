@@ -189,8 +189,8 @@ public class CryptoController extends BaseController {
             }
             userService.updateTier(user.getId(), tierLevel, newPoint);
             tierTaskService.updateTierTask(tierTask);
-
             presaleOrderService.updateStatus(presaleOrder.getId());
+            presaleService.addSoldAmount(presaleOrder.getPresaleId(), ndb);
         }
         cryptoService.updateTransaction(txn.getCode(), CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);
 

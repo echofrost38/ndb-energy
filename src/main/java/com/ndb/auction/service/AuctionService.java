@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.presale.PreSale;
 
 @Service
 @RequiredArgsConstructor
@@ -24,31 +25,30 @@ public class AuctionService extends BaseService {
 		// check conflict auction round
 		Auction _auction = auctionDao.getAuctionByRound(auction.getRound());
 		if (_auction != null) {
-			throw new AuctionException("Round doesn't exist.", String.valueOf(auction.getId()));
+			throw new AuctionException("Round already exist.", String.valueOf(auction.getId()));
 		}
 
-		Auction prev = auctionDao.getAuctionByRound(auction.getRound() - 1);
-		if (prev == null || prev.getStatus() == Auction.STARTED) {
-			auction.setStatus(Auction.COUNTDOWN);
+		// started round
+		List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
+		if(auctions.size() != 0) {
+			throw new AuctionException("countdown_auction", String.valueOf(auction.getId()));
+		}		
+		auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
+		if(auctions.size() != 0) {
+			throw new AuctionException("started_auction", String.valueOf(auction.getId()));
+		}		
 
-			// Save
-			auction = auctionDao.createNewAuction(auction);
-			auctionAvatarDao.update(auction.getId(), auction.getAvatar());
-
-			// set new countdown!!
-			schedule.setNewCountdown(auction);
-
-		} else {
-			// check end time and start time
-			long prevEnd = prev.getEndedAt();
-			long curStart = auction.getStartedAt();
-			if (curStart < prevEnd)
-				throw new AuctionException("Round start time is invalid.", String.valueOf(auction.getId()));
-
-			auctionDao.createNewAuction(auction);
-			auctionAvatarDao.update(auction.getId(), auction.getAvatar());
+		// check presale
+		List<PreSale> presales = presaleDao.selectByStatus(PreSale.COUNTDOWN);
+		if(presales.size() != 0) {
+			throw new AuctionException("countdown_presale", String.valueOf(auction.getId()));
 		}
-
+		presales = presaleDao.selectByStatus(PreSale.STARTED);
+		if(presales.size() != 0) {
+			throw new AuctionException("started_presale", String.valueOf(auction.getId()));
+		}
+		auctionDao.createNewAuction(auction);
+		schedule.setNewCountdown(auction);
 		return auction;
 	}
 

@@ -1,0 +1,12 @@
+type PreSaleOrder {
+    id: Int,
+    userId: Int,
+    presaleId: Int,
+    destination: Int,
+    extAddr: String,
+    ndbAmount: Float,
+    ndbPrice: Float,
+    status: Int,
+    createdAt: Float,
+    updatedAt: Float
+}

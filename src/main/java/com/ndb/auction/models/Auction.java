@@ -47,7 +47,7 @@ public class Auction extends BaseModel {
 		this.endedAt = endedAtMill;
 
 		// initial pending status
-    	this.status = PENDING; 
+    	this.status = COUNTDOWN; 
     	AuctionStats auctionStats = new AuctionStats();
     	this.stats = auctionStats;
         this.avatar = avatar;

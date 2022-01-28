@@ -17,8 +17,9 @@ import lombok.Setter;
 public class PreSale extends BaseModel {
     
     public static int PENDING = 0;
-    public static int STARTED = 1;
-    public static int ENDED = 2;
+    public static int COUNTDOWN = 1;
+    public static int STARTED = 2;
+    public static int ENDED = 3;
 
     private int round;
     

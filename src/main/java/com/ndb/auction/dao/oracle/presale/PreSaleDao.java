@@ -35,7 +35,7 @@ public class PreSaleDao extends BaseOracleDao {
     public int insert(PreSale m) {
         String sql = "INSERT INTO TBL_PRESALE(ID,ROUND,STARTED_AT,ENDED_AT,TOKEN_AMOUNT,TOKEN_PRICE,SOLD,STATUS)"
             + "VALUES(SEQ_PRESALE.NEXTVAL,?,?,?,?,?,?,?)";
-        return jdbcTemplate.update(sql, m.getRound(), m.getStartedAt(), m.getEndedAt(), m.getTokenAmount(), m.getTokenPrice(), 0L, 0);
+        return jdbcTemplate.update(sql, m.getRound(), m.getStartedAt(), m.getEndedAt(), m.getTokenAmount(), m.getTokenPrice(), 0L, 1);
     }
 
     public PreSale selectById(int id) {

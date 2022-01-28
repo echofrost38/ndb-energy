@@ -9,6 +9,13 @@ extend type Mutation {
     ) : Int
 }
 
+extend type Query {
+    getPreSales: [PreSale]
+    getPreSaleByStatus(
+        status: Int
+    ) : [PreSale]
+}
+
 schema {
     mutation: Mutation,
     query: Query

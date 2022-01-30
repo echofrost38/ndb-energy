@@ -168,7 +168,7 @@ public class CryptoController extends BaseController {
                 balanceService.addFreeBalance(user.getId(), "NDB", Double.valueOf(ndb));
             } else if (presaleOrder.getDestination() == PreSaleOrder.EXTERNAL) {
                 // transfer ndb
-                ndbCoinService.transferNDB(presaleOrder.getExtAddr(), Double.valueOf(ndb));
+                ndbCoinService.transferNDB(txn.getUserId(), presaleOrder.getExtAddr(), Double.valueOf(ndb));
             }
 
             // update user tier points
@@ -260,6 +260,13 @@ public class CryptoController extends BaseController {
             userService.updateTier(user.getId(), tierLevel, newPoint);
             tierTaskService.updateTierTask(tierTask);
         }
+
+        notificationService.sendNotification(
+            userId,
+            Notification.DEPOSIT_SUCCESS, 
+            "Deposit Successful", 
+            String.format("You have successfully deposited %f %s", cryptoAmount, cryptoType));
+
 
         return true;
     }

@@ -80,4 +80,9 @@ public class InternalBalanceDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, userId, tokenId, amount, userId, tokenId, amount, 0);
 	}
 
+	public int deductFreeBalance(int userId, int tokenId, double amount) {
+		String sql = "UPDATE TBL_INTERNAL_BALANCE SET FREE = FREE - ? WHERE USER_ID = ? AND TOKEN_ID = ?";
+		return jdbcTemplate.update(sql, amount, userId, tokenId);
+	}
+
 }

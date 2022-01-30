@@ -18,6 +18,8 @@ public class Notification extends BaseModel {
     public static final int BID_CLOSED = 3;
     public static final int PAYMENT_RESULT = 4;
     public static final int KYC_VERIFIED = 5;
+    public static final int DEPOSIT_SUCCESS = 6;
+    public static final int WITHDRAW_SUCCESS = 7;
 
     private int userId;
     private Long timeStamp;

@@ -21,6 +21,7 @@ import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
+import com.ndb.auction.dao.oracle.transaction.WithdrawTransactionDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -170,4 +171,7 @@ public class BaseService {
 
     @Autowired
     public PreSaleOrderDao presaleOrderDao;
+
+    @Autowired
+    protected WithdrawTransactionDao withdrawTxnDao;
 }

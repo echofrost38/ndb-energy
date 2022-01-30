@@ -64,7 +64,15 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
             }
         }
 
-        return ndbCoinService.transferNDB(to, amount);
+        // withdraw of NDB
+        if(ndbCoinService.transferNDB(userId, to, amount)) {
+            // deduct from wallet
+            internalBalanceService.deductFree(userId, tokenSymbol, amount);
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
 }

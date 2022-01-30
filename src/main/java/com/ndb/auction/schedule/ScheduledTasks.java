@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.presale.PreSale;
@@ -12,6 +16,8 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.StatService;
+import com.ndb.auction.service.payment.WithdrawService;
+import com.ndb.auction.web3.NDBCoinService;
 
 @Component
 public class ScheduledTasks {
@@ -28,6 +34,12 @@ public class ScheduledTasks {
 	@Autowired
 	PresaleService presaleService;
 
+	@Autowired
+	WithdrawService withdrawService;
+
+	@Autowired
+	NDBCoinService ndbCoinService;
+
 	private Auction startedRound;
 	private Long startedCounter;
 
@@ -40,6 +52,9 @@ public class ScheduledTasks {
 	private PreSale readyPresale;
 	private Long readyPresaleCounter;
 
+	// check transaction
+	private Map<String, BigInteger> pendingTransactions;
+
 	public ScheduledTasks() {
 		this.readyCounter = 0L;
 		this.startedCounter = 0L;
@@ -50,6 +65,8 @@ public class ScheduledTasks {
 		this.startedPresaleCounter = 0l;
 		this.readyPresale = null;
 		this.readyPresaleCounter = 0l;
+
+		pendingTransactions = new HashMap<>();
 	}
 
 	public void checkAllRounds() {
@@ -198,6 +215,27 @@ public class ScheduledTasks {
 			}
 		}
 		
+	}
+
+	// add pending list
+	public void addPendingTxn(String hash, BigInteger blockNum) {
+		if(pendingTransactions.containsKey(hash)) 
+			return;
+		pendingTransactions.put(hash, blockNum);
+	}
+
+	@Scheduled(fixedRate = 1000 * 120)
+	public void checkConfirmation() {
+		Set<String> hashSet = this.pendingTransactions.keySet();
+		for (String hash : hashSet) {
+			BigInteger target = this.pendingTransactions.get(hash);
+			if(ndbCoinService.checkConfirmation(target)) {
+				// set success
+				System.out.println("SUCCESS: " + hash);
+				withdrawService.updateStatus(hash);
+				pendingTransactions.remove(hash);
+			}
+		}
 	}
 
 }

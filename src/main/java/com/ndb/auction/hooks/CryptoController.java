@@ -267,7 +267,6 @@ public class CryptoController extends BaseController {
             "Deposit Successful", 
             String.format("You have successfully deposited %f %s", cryptoAmount, cryptoType));
 
-
         return true;
     }
 

@@ -2,32 +2,24 @@ package com.ndb.auction.config;
 
 import java.util.Date;
 
-import com.ndb.auction.background.TaskRunner;
-import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.CryptoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @Configuration
+@EnableAsync
 public class AppConfig {
 
     public static boolean appStartUp;
 
-    @Autowired
-    TaskRunner taskRunner;
-
-    @Autowired
-    ScheduledTasks scheduledTask;
-
     @EventListener(ApplicationReadyEvent.class)
     public void startup() {
         appStartUp = true;
-        scheduledTask.checkAllRounds();
-        taskRunner.run();
     }
 
     @Autowired

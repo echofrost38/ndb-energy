@@ -47,7 +47,7 @@ public class UserSecurityDao extends BaseOracleDao {
 
 	public UserSecurity insert(UserSecurity m) {
 		String sql = "INSERT INTO TBL_USER_SECURITY(ID,AUTH_TYPE,TFA_ENABLED,TFA_SECRET,REG_DATE,UPDATE_DATE, USER_ID)"
-				+ "VALUES(SEC_USER_SECURITY.NEXTVAL,?,?,?,SYSDATE,SYSDATE,?)";
+				+ "VALUES(SEQ_USER_SECURITY.NEXTVAL,?,?,?,SYSDATE,SYSDATE,?)";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(

@@ -17,6 +17,8 @@ import com.ndb.auction.service.user.UserDetailsImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -51,7 +53,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     
     // Identity Verification
     @PreAuthorize("isAuthenticated()")
-    public int verifyKYC(ShuftiRequest shuftiRequest) throws JsonProcessingException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+    public String createNewReference() throws JsonProcessingException, IOException, InvalidKeyException, NoSuchAlgorithmException {
         // create reference record
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
@@ -60,7 +62,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj != null) {
             status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
-                return 1;
+                throw new UnauthorizedException("already_verified", "userId");
             }
         }
         String ref = "";
@@ -69,16 +71,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         } else {
             ref = shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
         }
-        shuftiRequest.setReference(ref);
-
-        int result = 0;
-        try {
-            result = shuftiService.kycRequest(userId, shuftiRequest);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
-        }
-        return result;
+        return ref;
     }
 
     @PreAuthorize("isAuthenticated()")

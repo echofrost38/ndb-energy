@@ -5,12 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ndb.auction.background.BroadcastNotification;
-import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
@@ -21,6 +20,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationService {
+
+    @Autowired
+    BroadcastNotification broadcastNotification;
 
     private Map<String, Integer> typeMap;
 
@@ -47,9 +49,6 @@ public class NotificationService {
 
     @Autowired
     public MailService mailService;
-
-    @Autowired
-    private TaskRunner taskRunner;
 
     public Map<String, Integer> getTypeMap() {
         return this.typeMap;
@@ -92,8 +91,7 @@ public class NotificationService {
 
     public void broadcastNotification(int type, String title, String msg) {
         Notification m = new Notification( 0, type, title, msg);
-        BroadcastNotification broadcast = new BroadcastNotification(m);
-        taskRunner.addNewTask(broadcast);
+        broadcastNotification.addNotification(m);
     }
 
     public Notification addNewNotification(int userId, int type, String title, String msg) {
@@ -103,12 +101,9 @@ public class NotificationService {
 
     public String addNewBroadcast(int type, String title, String msg) {
         List<User> userlist = userDao.selectAll(null);
-        List<Notification> notifications = new ArrayList<>();
         for (User user : userlist) {
             Notification m = new Notification(user.getId(), type, title, msg);
-            notifications.add(m);
         }
-        notificationDao.pushNewNotifications(notifications);
         return "Success";
     }
 

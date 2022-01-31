@@ -16,9 +16,7 @@ extend type Mutation {
 		deposit: Float,
 		withdraw: Float
 	) : Int
-	verifyKYC(
-		shuftiRequest: ShuftiRequestInput
-	) : Int
+	createNewReference : String
 }
 
 extend type Query {

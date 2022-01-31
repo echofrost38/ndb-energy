@@ -1,7 +1,6 @@
 package com.ndb.auction.service;
 
 import com.google.gson.Gson;
-import com.ndb.auction.background.TaskRunner;
 import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
 import com.ndb.auction.dao.oracle.ShuftiDao;
@@ -28,6 +27,7 @@ import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
+import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
@@ -60,9 +60,6 @@ public class BaseService {
     protected static Gson gson = new Gson();
     
     protected WebClient coinbaseAPI;
-
-    @Autowired
-    TaskRunner taskRunner;
 
     @Autowired
     ScheduledTasks schedule;
@@ -147,6 +144,9 @@ public class BaseService {
 
     @Autowired
     public TaskSettingService taskSettingService;
+
+    @Autowired
+    public BroadcastNotification broadcastNotification;
 
     @Autowired
     public InternalBalanceDao balanceDao;

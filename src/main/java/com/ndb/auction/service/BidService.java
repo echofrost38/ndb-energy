@@ -16,6 +16,7 @@ import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
+import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
@@ -102,32 +103,14 @@ public class BidService extends BaseService {
 			// check user's wallet!
 			double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
-			// User user = userDao.selectById(userId);
-			// Map<String, Wallet> wallets = user.getWallet();
-			// Wallet wallet = wallets.get(cryptoType);
-			// if(wallet == null) {
-			// wallet = new Wallet();
-			// wallets.put(cryptoType, wallet);
-			// }
-			//
-			//
-			// double holding = wallet.getHolding();
-			// long free = wallet.getFree();
-			// if(free < cryptoAmount) {
-			// throw new BidException("You don't have enough balance in wallet.",
-			// "tokenAmount");
-			// }
-			//
-			// wallet.setFree(free - cryptoAmount);
-			// wallet.setHolding(holding + cryptoAmount);
-			//
-			// userDao.updateUser(user);
-
-			Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
-			long free = wallet.getFree();
-			if (free < cryptoAmount) {
+			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+			InternalBalance balance = balanceDao.selectById(userId, tokenId);
+			
+			if (balance.getFree() < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
+
+			balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
 
 			Map<String, BidHolding> holdingList = bid.getHoldingList();
 			BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
@@ -336,10 +319,6 @@ public class BidService extends BaseService {
 				}
 			}
 
-			// check crypto
-			User user = userDao.selectById(userId);
-			// Map<String, Wallet> tempWallet = user.getWallet();
-
 			List<CryptoTransaction> cryptoTxns = cryptoService.getTransaction(roundId, userId);
 			for (CryptoTransaction cryptoTransaction : cryptoTxns) {
 				if (cryptoTransaction.getStatus() != CryptoTransaction.CONFIRMED) {
@@ -348,19 +327,24 @@ public class BidService extends BaseService {
 				if (bid.getStatus() == Bid.WINNER) {
 					String sAmount = cryptoTransaction.getAmount().toString();
 					totalPrice += Long.valueOf(sAmount);
+
+					// release held token
+					String cryptoType = cryptoTransaction.getCryptoType();
+					double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
+					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
+
 				} else {
 					// hold -> release
 					String cryptoType = cryptoTransaction.getCryptoType();
-					String cryptoAmount = cryptoTransaction.getCryptoAmount();
+					Double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
 
-					Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
-
-					long hold = wallet.getHolding();
-					// if (hold > cryptoAmount) {
-					// 	userWalletService.releaseHold(userId, cryptoType, cryptoAmount);
-					// } else {
-					// 	continue;
-					// }
+					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+					InternalBalance balance = balanceDao.selectById(userId, tokenId);
+					if(balance.getHold() < cryptoAmount) {
+						continue;
+					}
+					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);
 				}
 			}
 
@@ -371,18 +355,26 @@ public class BidService extends BaseService {
 				BidHolding holding = walletPayments.get(_cryptoType);
 				if (bid.getStatus() == Bid.WINNER) {
 					totalPrice += holding.getUsd();
-				} else {
-					// hold -> release
+					
 					double cryptoAmount = holding.getCrypto();
-					Wallet wallet = userWalletService.getWalletById(userId, _cryptoType);
+					int tokenId = tokenAssetService.getTokenIdBySymbol(_cryptoType);
+					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
 
-					long hold = wallet.getHolding();
+				} else {
+
+					double cryptoAmount = holding.getCrypto();
+					int tokenId = tokenAssetService.getTokenIdBySymbol(_cryptoType);
+					InternalBalance balance = balanceDao.selectById(userId, tokenId);
+					if(balance.getHold() < cryptoAmount) {
+						continue;
+					}
+					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);
 				}
 			}
 
 			// checking Round AVATAR
 			boolean roundAvatarWinner = true;
-			UserAvatar userAvatar = userAvatarDao.selectById(user.getId());
+			UserAvatar userAvatar = userAvatarDao.selectById(userId);
 			String purchasedJsonString;
 			if (userAvatar != null && (purchasedJsonString = userAvatar.getPurchased()) != null
 					&& !purchasedJsonString.isEmpty()) {
@@ -413,24 +405,24 @@ public class BidService extends BaseService {
 				}
 
 				if (totalToken < token) {
-					// userWalletService.addFreeAmount(userId, "NDB", totalToken);
+					// add ndb
+					int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+					balanceDao.addFreeBalance(userId, ndbId, totalToken);
 					totalToken = 0;
 				} else {
-					// userWalletService.addFreeAmount(userId, "NDB", totalToken);
+					int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+					balanceDao.addFreeBalance(userId, ndbId, token);
 					totalToken -= token;
 				}
 
 			}
 
-			// userDao.updateUser(user); //TODO: why update?
 			notificationService.sendNotification(
 				bid.getUserId(), 
 				Notification.BID_CLOSED, 
 				"BID CLOSED", 
 				String.format("Your Bid closed. You %s", bid.getStatus() == Bid.WINNER ? "won!" : "failed")
 			);
-
-			
 		}
 	}
 
@@ -465,14 +457,13 @@ public class BidService extends BaseService {
 
 			// get crypto price!!
 			double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
+			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+			InternalBalance balance = balanceDao.selectById(userId, tokenId);
 
-			Wallet wallet = userWalletService.getWalletById(userId, cryptoType);
-
-			long free = wallet.getFree();
-			if (free < cryptoAmount) {
+			if (balance.getFree() < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
 			}
-			userWalletService.makeHold(userId, cryptoType, free);
+			balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
 
 			Map<String, BidHolding> holdingList = originalBid.getHoldingList();
 			BidHolding hold = null;

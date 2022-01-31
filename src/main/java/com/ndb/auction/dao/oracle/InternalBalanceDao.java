@@ -80,8 +80,23 @@ public class InternalBalanceDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, userId, tokenId, amount, userId, tokenId, amount, 0);
 	}
 
+	public int makeHoldBalance(int userId, int tokenId, double amount) {
+		String sql = "UPDATE TBL_INTERNAL_BALANCE SET FREE = FREE - ?, HOLD = HOLD + ? WHERE USER_ID = ? AND TOKEN_ID = ?";
+		return jdbcTemplate.update(sql, amount, amount, userId, tokenId);
+	}
+
+	public int releaseHoldBalance(int userId, int tokenId, double amount) {
+		String sql = "UPDATE TBL_INTERNAL_BALANCE SET FREE = FREE + ?, HOLD = HOLD - ? WHERE USER_ID = ? AND TOKEN_ID = ?";
+		return jdbcTemplate.update(sql, amount, amount, userId, tokenId);
+	}
+
 	public int deductFreeBalance(int userId, int tokenId, double amount) {
 		String sql = "UPDATE TBL_INTERNAL_BALANCE SET FREE = FREE - ? WHERE USER_ID = ? AND TOKEN_ID = ?";
+		return jdbcTemplate.update(sql, amount, userId, tokenId);
+	}
+
+	public int deductHoldBalance(int userId, int tokenId, double amount) {
+		String sql = "UPDATE TBL_INTERNAL_BALANCE SET HOLD = HOLD - ? WHERE USER_ID = ? AND TOKEN_ID = ?";
 		return jdbcTemplate.update(sql, amount, userId, tokenId);
 	}
 

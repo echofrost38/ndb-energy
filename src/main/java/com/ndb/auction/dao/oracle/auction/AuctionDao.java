@@ -12,6 +12,7 @@ import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -40,6 +41,18 @@ public class AuctionDao extends BaseOracleDao {
 		m.setToken(rs.getLong("TOKEN"));
 		m.setStatus(rs.getInt("STATUS"));
 		return m;
+	}
+
+	public int getNewRound() {
+		String sql = "SELECT MAX(ROUND) LAST_ROUND FROM TBL_AUCTION";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Integer>() {
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				if(!rs.next())
+					return null;
+				return rs.getInt("LAST_ROUND") + 1;					
+			}
+		});
 	}
 
 	public Auction createNewAuction(Auction m) {

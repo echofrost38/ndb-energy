@@ -159,4 +159,8 @@ public class AuctionService extends BaseService {
 		return "Checked";
 	}
 
+	public int getNewRound() {
+		return auctionDao.getNewRound();
+	}
+
 }

@@ -8,6 +8,7 @@ extend type Query {
 	getAuctionByNumber(
 		round: Int!
 	) : Auction
+	getNewRound : Int
 }
 
 extend type Mutation {

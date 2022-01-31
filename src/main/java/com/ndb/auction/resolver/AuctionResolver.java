@@ -69,5 +69,10 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	public String checkRounds() {
 		return auctionService.checkRounds();
 	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public int getNewRound() {
+		return auctionService.getNewRound();
+	}
 	
 }

@@ -32,6 +32,8 @@ public class NotificationService {
         typeMap.put("BID CLOSED", 3);
         typeMap.put("PAYMENT RESULT", 4);
         typeMap.put("KYC VERIFIED", 5);
+        typeMap.put("DEPOSIT SUCCESS", 6);
+        typeMap.put("WITHDRAW SUCCESS", 7);
     }
 
     @Autowired

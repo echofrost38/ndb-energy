@@ -165,13 +165,7 @@ public class ScheduledTasks {
 				startedCounter = (readyRound.getEndedAt() - readyRound.getStartedAt()) / 1000;
 
 				int id = readyRound.getId();
-				Auction nextRound = auctionService.startAuction(id);
-				if (nextRound != null) {
-					readyRound = nextRound;
-					readyCounter = (nextRound.getStartedAt() - System.currentTimeMillis()) / 1000;
-				} else {
-					readyRound = null;
-				}
+				auctionService.startAuction(id);
 			}
 		}
 

@@ -88,7 +88,7 @@ public class AuctionService extends BaseService {
 		return auction;
 	}
 
-	public Auction startAuction(int id) {
+	public void startAuction(int id) {
 
 		// check already opened Round
 		List<Auction> list = auctionDao.getAuctionByStatus(Auction.STARTED);
@@ -104,21 +104,11 @@ public class AuctionService extends BaseService {
 
 		auctionDao.startAuction(target);
 
-		// get next round
-		Auction nextRound = auctionDao.getAuctionByRound(target.getStatus() + 1);
-		if (nextRound != null) {
-			nextRound.setStatus(Auction.COUNTDOWN);
-			auctionDao.updateAuctionStats(nextRound);
-		}
-
-		// create new background tasks
-		String sRound = String.valueOf(target.getRound());
 		notificationService.broadcastNotification(
 			Notification.NEW_ROUND_STARTED, 
 			"NEW ROUND STARTED", 
-			"Auction Round " + sRound + " has been started.");
+			"Auction Round " + target.getRound() + " has been started.");
 
-		return nextRound;
 	}
 
 	public Auction endAuction(int id) {

@@ -10,7 +10,9 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BroadcastNotification implements BackgroundTask {
     
     @Autowired

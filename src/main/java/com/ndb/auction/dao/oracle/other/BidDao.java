@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonSyntaxException;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Bid;

@@ -32,6 +32,7 @@ import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 public class BaseController {
 
@@ -93,6 +94,21 @@ public class BaseController {
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String HMAC_SHA_1 = "HmacSHA1";
+
+    @Value("${coinspayment.merchant.id}")
+    public String MERCHANT_ID;
+
+    @Value("${coinspayment.public.key}")
+    public String COINSPAYMENT_PUB_KEY;
+
+    @Value("${coinspayment.private.key}")
+    public String COINSPAYMENT_PRIV_KEY;
+
+    @Value("${coinspayment.ipn.secret}")
+    public String COINSPAYMENT_IPN_SECRET;
+
+    @Value("${coinspayment.ipn.url}")
+    public String COINSPAYMENT_IPN_URL;
 
     public String getBody(HttpServletRequest request) throws IOException {
 
@@ -164,6 +180,54 @@ public class BaseController {
             throw new RuntimeException("Problemas calculando HMAC", ex);
         }
         return result;
+    }
+
+    public double getDouble(HttpServletRequest request, String param) {
+        try {
+            Object value = request.getParameter(param);
+            if(value == null) {
+                return 0;
+            }
+            return Double.parseDouble(value.toString());
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
+
+    public int getInt(HttpServletRequest request, String param) {
+        try {
+            Object value = request.getParameter(param);
+            if(value == null) {
+                return 0;
+            }
+            return Integer.parseInt(value.toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+    
+    public long getLong(HttpServletRequest request, String param) {
+        try {
+            Object value = request.getParameter(param);
+            if(value == null) {
+                return 0;
+            }
+            return Long.parseLong(value.toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+    
+    public String getString(HttpServletRequest request, String param, Boolean trim) {
+    	try {
+    		String result = request.getParameter(param);
+    		if(trim) {
+    			result = result.trim();
+    		}
+    		return result;
+    	} catch (Exception e) {
+    		return null;
+    	}
     }
 
 }

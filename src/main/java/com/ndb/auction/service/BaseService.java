@@ -1,5 +1,12 @@
 package com.ndb.auction.service;
 
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import com.google.gson.Gson;
 import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
@@ -17,6 +24,7 @@ import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
+import com.ndb.auction.dao.oracle.transaction.CoinsPaymentDao;
 import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
@@ -41,19 +49,30 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
 
+    private static final String HMAC_SHA_512 = "HmacSHA512";
+
+    public static final String COINS_API_URL = "https://www.coinpayments.net/api.php";
+
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
 
-    @Value("${coinbase.apiKey}")
-    public String coinbaseApiKey;
+    @Value("${coinspayment.public.key}")
+    public String COINSPAYMENT_PUB_KEY;
 
-    public final String SUMSUB_TEST_BASE_URL = "https://api.sumsub.com";
+    @Value("${coinspayment.private.key}")
+    public String COINSPAYMENT_PRIV_KEY;
+
+    @Value("${coinspayment.ipn.secret}")
+    public String COINSPAYMENT_IPN_SECRET;
+
+    @Value("${coinspayment.ipn.url}")
+    public String COINSPAYMENT_IPN_URL;
 
     protected static Gson gson = new Gson();
     
-    protected WebClient coinbaseAPI;
+    protected WebClient coinPaymentAPI;
 
     @Autowired
     ScheduledTasks schedule;
@@ -168,4 +187,26 @@ public class BaseService {
 
     @Autowired
     protected WithdrawTransactionDao withdrawTxnDao;
+
+    @Autowired
+    protected CoinsPaymentDao coinpaymentsDao;
+
+    public String buildHmacSignature(String value, String secret) {
+        String result;
+        try {
+            Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_512);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_512);
+            hmacSHA512.init(secretKeySpec);
+
+            byte[] digest = hmacSHA512.doFinal(value.getBytes());
+            BigInteger hash = new BigInteger(1, digest);
+            result = hash.toString(16);
+            if ((result.length() % 2) != 0) {
+                result = "0" + result;
+            }
+        } catch (IllegalStateException | InvalidKeyException | NoSuchAlgorithmException ex) {
+            throw new RuntimeException("Problemas calculando HMAC", ex);
+        }
+        return result;
+    }
 }

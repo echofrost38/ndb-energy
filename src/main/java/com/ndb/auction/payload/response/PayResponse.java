@@ -1,4 +1,4 @@
-package com.ndb.auction.payload;
+package com.ndb.auction.payload.response;
 
 public class PayResponse {
 	

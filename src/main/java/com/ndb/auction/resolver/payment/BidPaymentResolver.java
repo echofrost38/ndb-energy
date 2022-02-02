@@ -10,7 +10,7 @@ import java.util.List;
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.CryptoPayload;
-import com.ndb.auction.payload.PayResponse;
+import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 

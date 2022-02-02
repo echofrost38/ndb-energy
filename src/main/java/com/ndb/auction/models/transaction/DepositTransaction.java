@@ -9,15 +9,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DepositTransaction {
     
-    public DepositTransaction(int userId, String txnId, String code) {
+    public DepositTransaction(int userId, String cryptoType) {
         this.userId = userId;
-        this.txnId = txnId;
-        this.code = code;
+        this.cryptoType = cryptoType;
+        this.status = 0;
+        this.amount = 0.0;
+        this.cryptoAmount = 0.0;
     }
+
+    private int id;
     private int userId;
-    private String txnId;
-    private String code;
-    private Double amount;
+    private Double amount; // USD?
     private Double cryptoAmount;
     private String cryptoType;
 

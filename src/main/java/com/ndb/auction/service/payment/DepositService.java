@@ -1,66 +1,68 @@
 package com.ndb.auction.service.payment;
 
-import java.util.List;
+import java.io.IOException;
 
-import com.ndb.auction.models.coinbase.CoinbaseBody;
-import com.ndb.auction.models.coinbase.CoinbasePostBody;
-import com.ndb.auction.models.coinbase.CoinbaseRes;
 import com.ndb.auction.models.transaction.DepositTransaction;
-import com.ndb.auction.payload.CryptoPayload;
+import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
+import com.ndb.auction.payload.response.AddressResponse;
 import com.ndb.auction.service.BaseService;
 
-import org.apache.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class DepositService extends BaseService {
 
+    protected CloseableHttpClient client;
+
     public DepositService(WebClient.Builder webClientBuilder) {
-        this.coinbaseAPI = webClientBuilder
-                .baseUrl("https://api.commerce.coinbase.com")
+        client = HttpClients.createDefault();
+        this.coinPaymentAPI = webClientBuilder
+                .baseUrl(COINS_API_URL)
                 .build();
     }
 
-    // make new deposit charge
-    public CryptoPayload createNewCharge(int userId) {
-        CoinbasePostBody postBody = new CoinbasePostBody(
-            "DEPOSIT",
-            "Deposit for " + userId,
-            "no_price",
-            ""
-        );
+    public String getDepositAddress(int userId, String currency) throws ClientProtocolException, IOException {
 
-        // API call for create new charge
-        String response = coinbaseAPI.post()
-                .uri(uriBuilder -> uriBuilder.path("/charges").build())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-CC-Api-Key", coinbaseApiKey)
-                .header("X-CC-Version", "2018-03-22")
-                .body(Mono.just(postBody), CoinbasePostBody.class)
-                .retrieve()
-                .bodyToMono(String.class).block();
+        HttpPost post = new HttpPost(COINS_API_URL);
+        post.addHeader("Connection", "close");
+        post.addHeader("Accept", "*/*");
+        post.addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        post.addHeader("Cookie2", "$Version=1");
+        post.addHeader("Accept-Language", "en-US");
 
-        CoinbaseRes res = gson.fromJson(response, CoinbaseRes.class);
+        // create new deposit transaction 
+        DepositTransaction txn = new DepositTransaction(userId, currency);
+        txn = depositTxnDao.insert(txn);
 
-        CoinbaseBody resBody = res.getData();
-        String txnId = resBody.getId();
-        String code = resBody.getCode();
+        // get address 
+        String ipnUrl = COINSPAYMENT_IPN_URL + txn.getId();
+        CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(currency, ipnUrl);
+        String payload = request.toString();
+        payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";
+        String hmac = buildHmacSignature(payload, COINSPAYMENT_PRIV_KEY);
 
-        DepositTransaction tx = new DepositTransaction(userId, txnId, code);
-        if(depositTxnDao.insert(tx) == 1) {
-            CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), null);
-            return payload;
-        }
+        post.addHeader("HMAC", hmac);
+        post.setEntity(new StringEntity(payload));
+        CloseableHttpResponse response = client.execute(post);
 
-        return null;
-    }
+        String content = EntityUtils.toString(response.getEntity());
 
-    public List<DepositTransaction> getDepositTxnByUserId(int userId) {
-        return depositTxnDao.selectByUser(userId);
-    }
+        System.out.println(content);
+
+        AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
+        if(!addressResponse.getError().equals("ok")) return "error";
+
+        return addressResponse.getResult().getAddress();
+    }    
+
+    
 
 }

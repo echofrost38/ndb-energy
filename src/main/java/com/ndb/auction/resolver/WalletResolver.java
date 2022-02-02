@@ -1,5 +1,6 @@
 package com.ndb.auction.resolver;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.ndb.auction.exceptions.BalanceException;
@@ -8,6 +9,7 @@ import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.payload.Balance;
 import com.ndb.auction.payload.CryptoPayload;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -34,10 +36,10 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     
     // get deposit address 
     @PreAuthorize("isAuthenticated()")
-    public CryptoPayload getDepositAddress() {
+    public String getDepositAddress(String currency) throws ClientProtocolException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return depositService.createNewCharge(userId);
+        return depositService.getDepositAddress(userId, currency);
     }
 
     @PreAuthorize("isAuthenticated()")

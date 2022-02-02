@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.StripeTransaction;
-import com.ndb.auction.payload.PayResponse;
+import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
 import com.stripe.Stripe;

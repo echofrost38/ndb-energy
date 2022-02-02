@@ -5,9 +5,6 @@ import java.util.List;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.transaction.CryptoTransaction;
-import com.ndb.auction.models.coinbase.CoinbaseBody;
-import com.ndb.auction.models.coinbase.CoinbasePostBody;
-import com.ndb.auction.models.coinbase.CoinbaseRes;
 import com.ndb.auction.payload.CoinPrice;
 import com.ndb.auction.payload.CryptoPayload;
 
@@ -15,8 +12,6 @@ import org.apache.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class CryptoService extends BaseService {
@@ -28,8 +23,8 @@ public class CryptoService extends BaseService {
         this.binanceAPI = webClientBuilder
                 .baseUrl("https://api.binance.com/api/v3")
                 .build();
-        this.coinbaseAPI = webClientBuilder
-                .baseUrl("https://api.commerce.coinbase.com")
+        this.coinPaymentAPI = webClientBuilder
+                .baseUrl(COINS_API_URL)
                 .build();
     }
 
@@ -53,33 +48,8 @@ public class CryptoService extends BaseService {
             throw new AuctionException("Round doesn't exist.", "roundId");
         }
 
-        CoinbasePostBody data = new CoinbasePostBody(
-                "Bid payment",
-                "Bid payment for " + userId,
-                "fixed_price",
-                amount);
-
-        // API call for create new charge
-        String response = coinbaseAPI.post()
-                .uri(uriBuilder -> uriBuilder.path("/charges").build())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header("X-CC-Api-Key", coinbaseApiKey)
-                .header("X-CC-Version", "2018-03-22")
-                .body(Mono.just(data), CoinbasePostBody.class)
-                .retrieve()
-                .bodyToMono(String.class).block();
-
-        CoinbaseRes res = gson.fromJson(response, CoinbaseRes.class);
-
-        CoinbaseBody resBody = res.getData();
-        String txnId = resBody.getId();
-        String code = resBody.getCode();
-        CryptoTransaction tx = new CryptoTransaction(userId, roundId, null, txnId, code, Double.valueOf(amount), CryptoTransaction.AUCTION);
-        cryptoTransactionDao.insert(tx);
-
-        CryptoPayload payload = new CryptoPayload(resBody.getAddresses(), resBody.getPricing());
-
-        return payload;
+        
+        return null;
     }
 
     public CryptoTransaction getTransactionByCode(String code) {

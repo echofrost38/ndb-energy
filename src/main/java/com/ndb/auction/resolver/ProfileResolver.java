@@ -9,7 +9,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarSet;
-import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.service.user.UserDetailsImpl;

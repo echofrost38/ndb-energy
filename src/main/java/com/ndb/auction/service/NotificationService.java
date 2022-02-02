@@ -1,6 +1,5 @@
 package com.ndb.auction.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,14 +96,6 @@ public class NotificationService {
     public Notification addNewNotification(int userId, int type, String title, String msg) {
         Notification notification = new Notification(userId, type, title, msg);
         return notificationDao.addNewNotification(notification);
-    }
-
-    public String addNewBroadcast(int type, String title, String msg) {
-        List<User> userlist = userDao.selectAll(null);
-        for (User user : userlist) {
-            Notification m = new Notification(user.getId(), type, title, msg);
-        }
-        return "Success";
     }
 
     public List<Notification> getPaginatedNotifications(int userId, Integer offset, Integer limit) {

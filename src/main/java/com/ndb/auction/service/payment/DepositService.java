@@ -43,7 +43,7 @@ public class DepositService extends BaseService {
         txn = depositTxnDao.insert(txn);
 
         // get address 
-        String ipnUrl = COINSPAYMENT_IPN_URL + txn.getId();
+        String ipnUrl = COINSPAYMENT_IPN_URL + "/deposit/" + txn.getId();
         CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(currency, ipnUrl);
         String payload = request.toString();
         payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";

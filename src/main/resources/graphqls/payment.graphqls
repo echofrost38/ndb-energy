@@ -15,8 +15,8 @@ extend type Query {
 		roundId: String!,
 		userId: String
 	) : [StripeTransaction]
-	getCryptoTransactionByCode(
-		code: String!
+	getCryptoTransactionById(
+		id: Int!
 	) : CryptoTransaction
 	getCryptoTransactionByUser 
 	  : [CryptoTransaction]
@@ -44,8 +44,9 @@ extend type Mutation {
 	) : PayResponse!
 	createCryptoPayment(
 		roundId: Int!,
-		amount: Float!
-	) : CryptoPayload
+		amount: Float!,
+		currency: String!
+	) : String
 	createChargeForPresale(
 		orderId: Int
 	) : CryptoPayload

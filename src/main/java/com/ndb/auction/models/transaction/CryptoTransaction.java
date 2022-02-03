@@ -10,30 +10,48 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CryptoTransaction extends BaseTransaction {
+public class CryptoTransaction {
     
     public static final int INITIATED = 0;
     public static final int CONFIRMED = 1;
     public static final int CANCELED = 2;
 
-    private String txnId;
-    private String code;
+    private int id;
 
-    private String cryptoAmount;
+    private Double cryptoAmount;
     private String cryptoType;
 
     private int status;
 
     private Long updatedAt;
 
-    public CryptoTransaction(int userId, Integer roundId, Integer presalOrderId, String txnId, String code, Double amount, int transactionType) {
+    public static final int AUCTION = 1;
+    public static final int PRESALE = 2;
+
+    private int userId;
+    private Integer roundId;
+
+    private int transactionType;
+    private Integer presaleOrderId;
+    
+    private Double amount; // usd value
+    private Long createdAt;
+
+    public CryptoTransaction(
+        int userId, 
+        Integer roundId, 
+        Integer presaleId, 
+        Double amount, // usd
+        String cryptoType,
+        int transactionType
+    ) {
         this.userId = userId;
         this.roundId = roundId;
-        this.presaleOrderId = presaleOrderId;
-        this.txnId = txnId;
-        this.code = code;
+        this.presaleOrderId = presaleId;
         this.amount = amount;
+        this.cryptoType = cryptoType;
         this.transactionType = transactionType;
+        this.cryptoAmount = 0.0;
         this.status = 0;
     }
 

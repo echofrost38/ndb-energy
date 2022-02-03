@@ -1,15 +1,16 @@
 package com.ndb.auction.resolver.payment;
 
+import org.apache.http.ParseException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.StripeTransaction;
-import com.ndb.auction.payload.CryptoPayload;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -71,18 +72,15 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 
 
 	@PreAuthorize("isAuthenticated()")
-	public CryptoPayload createCryptoPayment(
-		int roundId, 
-		String amount
-	) {
+	public String createCryptoPayment(int roundId, Double amount, String currency) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return cryptoService.createNewPayment(roundId, userId, amount);
+		return cryptoService.createNewPayment(roundId, userId, amount, currency);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public CryptoTransaction getCryptoTransactionByCode(String code) {
-		return cryptoService.getTransactionByCode(code);
+	public CryptoTransaction getCryptoTransactionById(int id) {
+		return cryptoService.getTransactionById(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

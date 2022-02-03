@@ -64,4 +64,9 @@ public class UserVerifyDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, value, id);
 	}
 
+	public int updateKYCVerified(int id, boolean value) {
+		String sql = "UPDATE TBL_USER_VERIFY SET KYC_VERIFIED=? WHERE ID=?";
+		return jdbcTemplate.update(sql, value, id);
+	}
+
 }

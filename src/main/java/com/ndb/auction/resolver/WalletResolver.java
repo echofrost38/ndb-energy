@@ -7,7 +7,6 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.payload.Balance;
-import com.ndb.auction.payload.CryptoPayload;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;

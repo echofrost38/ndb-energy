@@ -37,8 +37,6 @@ public class PresaleOrderService extends BaseService {
         return null;
     }
 
-
-
     public PreSaleOrder getPresaleById(int orderId) {
         return presaleOrderDao.selectById(orderId);
     }

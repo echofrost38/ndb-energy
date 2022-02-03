@@ -15,7 +15,6 @@ import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserVerify;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,8 +87,8 @@ public class ShuftiController extends BaseController {
             userDao.updateTier(userId, tierLevel, tierPoint);
             tierTaskService.updateTierTask(tierTask);
 
-            UserVerify userVerify = userVerifyDao.selectById(userId);
-            userVerify.setKycVerified(true);
+            userVerifyDao.updateKYCVerified(userId, true);
+            
 
             // send notification
             notificationService.sendNotification(
@@ -99,7 +98,9 @@ public class ShuftiController extends BaseController {
                 "Your identity has been successfully verified.");
             System.out.println("Verification success.");
             System.out.println(response.getEvent());
-        } else {
+        } else if (response.getEvent().equals("request.pending")){
+
+        } else if (response.getEvent().equals("verification.declined")) {
             // send notification
             notificationService.sendNotification(
                 userId,

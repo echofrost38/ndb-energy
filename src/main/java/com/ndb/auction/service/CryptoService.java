@@ -75,28 +75,28 @@ public class CryptoService extends BaseService {
         post.addHeader("Accept-Language", "en-US");
 
         // create new crypto transaction for BID!
-        CryptoTransaction txn = new CryptoTransaction(userId, roundId, 0, amount, currency, 0);
+        CryptoTransaction txn = new CryptoTransaction(userId, roundId, 0, amount, currency, CryptoTransaction.AUCTION);
         txn = cryptoTransactionDao.insert(txn);
-
+        
         // get address
         String ipnUrl = COINSPAYMENT_IPN_URL + "/bid/" + txn.getId();
         CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(currency, ipnUrl);
-
+        
         String payload = request.toString();
         payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";
         String hmac = buildHmacSignature(payload, COINSPAYMENT_PRIV_KEY);
-
+        
         post.addHeader("HMAC", hmac);
         post.setEntity(new StringEntity(payload));
         CloseableHttpResponse response = client.execute(post);
-
+        
         String content = EntityUtils.toString(response.getEntity());
-
+        
         System.out.println(content);
-
+        
         AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
         if(!addressResponse.getError().equals("ok")) return "error";
-
+        
         return addressResponse.getResult().getAddress();
     }
 

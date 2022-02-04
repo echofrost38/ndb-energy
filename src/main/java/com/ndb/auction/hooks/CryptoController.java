@@ -39,7 +39,7 @@ public class CryptoController extends BaseController {
 
     @PostMapping("/ipn/bid/{id}")
     @ResponseBody
-    public Object CoinbaseWebhooks(@PathVariable("id") int id, HttpServletRequest request) {
+    public Object coinPaymentsBidIpn(@PathVariable("id") int id, HttpServletRequest request) {
 
         // ipn mode check
 		String ipnMode = request.getParameter("ipn_mode");
@@ -93,65 +93,139 @@ public class CryptoController extends BaseController {
 		int status = getInt(request, "status");
 		log.info("IPN status : {}", status);
 
-        CryptoTransaction txn = cryptoService.getTransactionById(id);
-        User user = userService.getUserById(txn.getUserId());
-
-        if(txn.getRoundId() != null) {
-            Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
-
-            if (bid.isPendingIncrease()) {
-                double pendingPrice = bid.getDelta();
-                if (pendingPrice > fiatAmount) {
-                    
-                    return false;
-                }
-
-                bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(),
-                        bid.getTempTokenPrice());
-
-            } else {
-                long totalPrice = bid.getTotalPrice();
-                if (totalPrice > fiatAmount) {
-
-                    return false;
-                }
-
-                // update user tier points
-                List<Tier> tierList = tierService.getUserTiers();
-                TaskSetting taskSetting = taskSettingService.getTaskSetting();
-                TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
-                List<Integer> auctionList = tierTask.getAuctions();
-                if(!auctionList.contains(bid.getRoundId())) {
-                    auctionList.add(bid.getRoundId());
-                    // get point
-                    double newPoint = user.getTierPoint() + taskSetting.getAuction();
-                    int tierLevel = 0;
-
-                    // check change in level
-                    for (Tier tier : tierList) {
-                        if(tier.getPoint() <= newPoint) {
-                            tierLevel = tier.getLevel();
-                        }
+        if (status >= 100 || status == 2) {
+            CryptoTransaction txn = cryptoService.getTransactionById(id);
+            User user = userService.getUserById(txn.getUserId());
+    
+            if(txn.getTransactionType() == CryptoTransaction.AUCTION) {
+                Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
+    
+                if (bid.isPendingIncrease()) {
+                    double pendingPrice = bid.getDelta();
+                    if (pendingPrice > fiatAmount) {
+                        
+                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                     }
-                    userService.updateTier(user.getId(), tierLevel, newPoint);
-                    tierTaskService.updateTierTask(tierTask);
-                } 
-            }
+    
+                    bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(),
+                            bid.getTempTokenPrice());
+    
+                } else {
+                    long totalPrice = bid.getTotalPrice();
+                    if (totalPrice > fiatAmount) {
+    
+                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+                    }
+    
+                    // update user tier points
+                    List<Tier> tierList = tierService.getUserTiers();
+                    TaskSetting taskSetting = taskSettingService.getTaskSetting();
+                    TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+                    List<Integer> auctionList = tierTask.getAuctions();
+                    if(!auctionList.contains(bid.getRoundId())) {
+                        auctionList.add(bid.getRoundId());
+                        // get point
+                        double newPoint = user.getTierPoint() + taskSetting.getAuction();
+                        int tierLevel = 0;
+    
+                        // check change in level
+                        for (Tier tier : tierList) {
+                            if(tier.getPoint() <= newPoint) {
+                                tierLevel = tier.getLevel();
+                            }
+                        }
+                        userService.updateTier(user.getId(), tierLevel, newPoint);
+                        tierTaskService.updateTierTask(tierTask);
+                    } 
+                }
+                
+                // Change crypto Hold amount!!!!!!!!!!!!!!!
+                balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(amount));
+                bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
             
-            // Change crypto Hold amount!!!!!!!!!!!!!!!
-            balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(amount));
-            bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
+            } 
+            cryptoService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
+    
+            // send notification to user for payment result!!
+            notificationService.sendNotification(
+                    txn.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    "You have successfully deposited " + amount + cryptoType + " for Auction Round.");
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/ipn/deposit/{id}")
+    @ResponseBody
+    public ResponseEntity<?> coinPaymentsPresaleIpn(@PathVariable("id") int id, HttpServletRequest request) {
         
-        } else if (txn.getPresaleOrderId() != null) {
-            
+        // ipn mode check
+        String ipnMode = request.getParameter("ipn_mode");
+        if(!ipnMode.equals("hmac")) {
+            log.error("IPN Mode is not HMAC");
+            throw new IPNExceptions("IPN Mode is not HMAC");
+        }
+
+        String hmac = request.getHeader("hmac");
+        if(hmac == null) {
+            log.error("IPN Hmac is null");
+            throw new IPNExceptions("IPN Hmac is null");
+        }
+
+        String merchant = request.getParameter("merchant");
+        if(merchant == null || !merchant.equals(MERCHANT_ID)) {
+            log.error("No or incorrect Merchant ID passed");
+            throw new IPNExceptions("No or incorrect Merchant ID passed");
+        }
+
+        // String reqQuery = "";
+        // Enumeration<String> enumeration = request.getParameterNames();
+        // while(enumeration.hasMoreElements()){
+        //     String parameterName = (String) enumeration.nextElement();
+        //     reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
+        // }
+
+        // reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
+        // reqQuery = reqQuery.replaceAll("@", "%40");
+        // reqQuery = reqQuery.replace(' ', '+');
+        // log.info("IPN reqQuery : {}", reqQuery);
+
+        String reqQuery = "";
+        try {
+            reqQuery = getBody(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
+        if(!_hmac.equals(hmac)) {
+            throw new IPNExceptions("not match");
+        }
+
+        // get currency and amount
+        String currency = getString(request, "currency", true);
+        String cryptoType = currency.split(".")[0];
+        Double amount = getDouble(request, "amount");
+        Double fiatAmount = getDouble(request, "fiat_amount");
+
+        int status = getInt(request, "status");
+        log.info("IPN status : {}", status);
+
+        if (status >= 100 || status == 2) {
+
+            CryptoTransaction txn = cryptoService.getTransactionById(id);
+            User user = userService.getUserById(txn.getUserId());
+
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getPresaleOrderId());
             Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
             
             if(totalPrice > fiatAmount) {
                 
-                return false;
+                new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-
+    
             // processing order
             Long ndb = presaleOrder.getNdbAmount();
             if(presaleOrder.getDestination() == PreSaleOrder.INTERNAL) {
@@ -160,7 +234,7 @@ public class CryptoController extends BaseController {
                 // transfer ndb
                 ndbCoinService.transferNDB(txn.getUserId(), presaleOrder.getExtAddr(), Double.valueOf(ndb));
             }
-
+    
             // update user tier points
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -168,10 +242,10 @@ public class CryptoController extends BaseController {
             double presalePoint = tierTask.getDirect();
             presalePoint += taskSetting.getDirect() * fiatAmount;
             tierTask.setDirect(presalePoint);
-
+    
             double newPoint = user.getTierPoint() + taskSetting.getDirect() * fiatAmount;
             int tierLevel = 0;
-
+    
             // check change in level
             for (Tier tier : tierList) {
                 if(tier.getPoint() <= newPoint) {
@@ -182,21 +256,24 @@ public class CryptoController extends BaseController {
             tierTaskService.updateTierTask(tierTask);
             presaleOrderService.updateStatus(presaleOrder.getId());
             presaleService.addSoldAmount(presaleOrder.getPresaleId(), ndb);
+
+            cryptoService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
+    
+            // send notification to user for payment result!!
+            notificationService.sendNotification(
+                    txn.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    "You have successfully deposited " + amount + cryptoType + " for Presale Round.");
         }
-        cryptoService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
 
-        // send notification to user for payment result!!
-        notificationService.sendNotification(
-                txn.getUserId(),
-                Notification.PAYMENT_RESULT,
-                "PAYMENT CONFIRMED",
-                "You have successfully deposited " + amount + cryptoType + ".");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return null;
     }
 
     @PostMapping("/ipn/deposit/{id}")
-    public ResponseEntity<?> coinPaymentsIpn(@PathVariable("id") int id, HttpServletRequest request) {
+    @ResponseBody
+    public ResponseEntity<?> coinPaymentsDepositIpn(@PathVariable("id") int id, HttpServletRequest request) {
         // ipn mode check
 		String ipnMode = request.getParameter("ipn_mode");
 		if(!ipnMode.equals("hmac")) {

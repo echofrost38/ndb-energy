@@ -16,6 +16,9 @@ public class CryptoTransaction {
     public static final int CONFIRMED = 1;
     public static final int CANCELED = 2;
 
+    public static final int AUCTION = 1;
+    public static final int PRESALE = 2;
+    
     private int id;
 
     private Double cryptoAmount;
@@ -24,9 +27,6 @@ public class CryptoTransaction {
     private int status;
 
     private Long updatedAt;
-
-    public static final int AUCTION = 1;
-    public static final int PRESALE = 2;
 
     private int userId;
     private Integer roundId;

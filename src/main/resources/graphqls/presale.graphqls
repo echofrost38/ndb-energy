@@ -18,8 +18,10 @@ extend type Mutation {
     ) : PreSaleOrder
     # payment for presale
     createChargeForPresale(
-        orderId: Int
-    ) : CryptoPayload
+        orderId: Int,
+        amount: Float,
+        currency: String
+    ) : String
 }
 
 extend type Query {

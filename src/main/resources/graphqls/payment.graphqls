@@ -47,9 +47,6 @@ extend type Mutation {
 		amount: Float!,
 		currency: String!
 	) : String
-	createChargeForPresale(
-		orderId: Int
-	) : CryptoPayload
 }
 
 schema {

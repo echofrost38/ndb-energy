@@ -157,7 +157,7 @@ public class CryptoController extends BaseController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/ipn/deposit/{id}")
+    @PostMapping("/ipn/presale/{id}")
     @ResponseBody
     public ResponseEntity<?> coinPaymentsPresaleIpn(@PathVariable("id") int id, HttpServletRequest request) {
         

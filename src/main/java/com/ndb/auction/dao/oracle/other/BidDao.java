@@ -34,7 +34,6 @@ public class BidDao extends BaseOracleDao {
 		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
 		m.setPendingIncrease(rs.getBoolean("PENDING_INCREASE"));
-		// @SuppressWarnings("unchecked")
 		m.setHoldingList(gson.fromJson(rs.getString("HOLDING"), Map.class));
 		m.setPayType(rs.getInt("PAY_TYPE"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));

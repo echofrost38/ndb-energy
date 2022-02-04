@@ -25,6 +25,8 @@ public class TierTask {
     private List<StakeHist> staking;
 
     public TierTask(int userId) {
+        this.wallet = 0.0;
+        this.direct = 0.0;
         this.userId = userId;
         this.verification = false;
         this.auctions = new ArrayList<>();
@@ -39,9 +41,12 @@ public class TierTask {
     }
 
     public void setAuctionsByString(String input) {
-        if(input == null) return;
-        String[] array = input.split(AUCTION_SEPARATOR);
         List<Integer> list = new ArrayList<>();
+        if(input == null) {
+            this.auctions = list;
+            return;
+        }
+        String[] array = input.split(AUCTION_SEPARATOR);
         for (String s : array) {
             try {
                 var value = Integer.parseInt(s);

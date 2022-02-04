@@ -89,7 +89,6 @@ public class ShuftiController extends BaseController {
 
             userVerifyDao.updateKYCVerified(userId, true);
             
-
             // send notification
             notificationService.sendNotification(
                 userId,

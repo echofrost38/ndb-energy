@@ -10,7 +10,11 @@ import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
 public class PreSaleException extends RuntimeException implements GraphQLError {
-    private String invalidField;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7127260020859746953L;
+	private String invalidField;
 
     public PreSaleException(String message, String invalidField) {
         super(message);

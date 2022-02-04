@@ -23,12 +23,10 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import graphql.kickstart.tools.GraphQLSubscriptionResolver;
-import reactor.core.publisher.Mono;
 
 @Component
 public class AuthResolver extends BaseResolver
-		implements GraphQLMutationResolver, GraphQLSubscriptionResolver, GraphQLQueryResolver {
+		implements GraphQLMutationResolver, GraphQLQueryResolver {
 		
 	private String lowerEmail(String email) {
 		return email.toLowerCase();
@@ -182,11 +180,6 @@ public class AuthResolver extends BaseResolver
 				jwkSetUri,
 				clientName);
 		return oAuth2RegistrationService.createRegistration(registration);
-	}
-
-	/// testing purpose
-	public Mono<String> fluxTest(String param) {
-		return Mono.just("flux test: " + param);
 	}
 
 	public String addNewUser(int id, String email, String name) {

@@ -11,7 +11,11 @@ import graphql.language.SourceLocation;
 
 public class BalanceException extends RuntimeException implements GraphQLError{
 
-    private String invalidField;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1960415876170696264L;
+	private String invalidField;
 
     public BalanceException(String message, String invalidField) {
         super(message);

@@ -9,7 +9,12 @@ import graphql.language.SourceLocation;
 
 public class DatabaseAccessException extends RuntimeException implements GraphQLError {
 
-    public DatabaseAccessException(String message, Throwable e) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4915025020331453965L;
+
+	public DatabaseAccessException(String message, Throwable e) {
         super(message, e);
     }
 

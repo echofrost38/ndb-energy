@@ -15,13 +15,12 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import graphql.kickstart.tools.GraphQLSubscriptionResolver;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class NotificationResolver extends BaseResolver
-        implements GraphQLSubscriptionResolver, GraphQLMutationResolver, GraphQLQueryResolver {
+        implements GraphQLMutationResolver, GraphQLQueryResolver {
 
     @PreAuthorize("isAuthenticated()")
     public List<NotificationType> getNotificationTypes() {

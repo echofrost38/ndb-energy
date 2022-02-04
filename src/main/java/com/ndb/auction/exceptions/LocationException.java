@@ -10,7 +10,12 @@ import graphql.language.SourceLocation;
 
 public class LocationException extends RuntimeException implements GraphQLError {
 
-    public LocationException(String message) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3215658805455521038L;
+
+	public LocationException(String message) {
         super(message);
     }
 

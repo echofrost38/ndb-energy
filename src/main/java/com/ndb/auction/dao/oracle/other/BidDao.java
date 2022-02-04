@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonSyntaxException;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Bid;
@@ -35,6 +34,7 @@ public class BidDao extends BaseOracleDao {
 		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
 		m.setPendingIncrease(rs.getBoolean("PENDING_INCREASE"));
+		// @SuppressWarnings("unchecked")
 		m.setHoldingList(gson.fromJson(rs.getString("HOLDING"), Map.class));
 		m.setPayType(rs.getInt("PAY_TYPE"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));

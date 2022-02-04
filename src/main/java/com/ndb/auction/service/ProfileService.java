@@ -68,6 +68,7 @@ public class ProfileService extends BaseService {
 	 * prefix means avatar first name!
 	 * once user select avatar with first name, user will have owned components
 	 */
+	@SuppressWarnings("unchecked")
 	public String setAvatar(int id, String prefix, String name) {
 		// check user exists
 		UserAvatar userAvatar = userAvatarDao.selectByPrefixAndName(prefix, name);
@@ -127,6 +128,7 @@ public class ProfileService extends BaseService {
 		return "Success";
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set, String hairColor) {
 		User user = userDao.selectById(userId);
 		if (user == null) {

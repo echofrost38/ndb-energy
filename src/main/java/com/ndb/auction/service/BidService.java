@@ -21,7 +21,6 @@ import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.Wallet;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.Tier;

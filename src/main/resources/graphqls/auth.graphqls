@@ -37,10 +37,6 @@ type Query {
   getAllOAuth2Settings: [OAuth2Setting]
 }
 
-type Subscription {
-  fluxTest(param: String!): String
-}
-
 schema {
   mutation: Mutation
   # query: Query

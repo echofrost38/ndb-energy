@@ -28,7 +28,7 @@ public class ShuftiRequest {
         this.consent = new Consent(consent);
         this.face = new Face(face);
         this.background_checks = new BackgroundChecks(names);
-        this.callback_url = "https://9ce6-80-237-47-16.ngrok.io/shufti";
+        // this.callback_url = "https://9ce6-80-237-47-16.ngrok.io/shufti";
     }
 
     private String reference;

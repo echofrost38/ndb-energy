@@ -333,6 +333,8 @@ public class ShuftiService extends BaseService{
 
         // build ShuftiRequest
         ShuftiRequest request = new ShuftiRequest(reference, country, doc64, addr64, fullAddr, con64, sel64, names);
+        request.setCallback_url(CALLBACK_URL);
+        
         sendShuftiRequest(request).subscribe();
 
         return "sent request";

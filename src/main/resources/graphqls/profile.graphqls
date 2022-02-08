@@ -33,10 +33,10 @@ extend type Mutation {
 	) : Boolean
 	uploadConsent(
 		consent: Upload
-	) : String
+	) : Boolean
 	uploadSelfie(
 		selfie: Upload
-	) : String
+	) : Boolean
 	sendVerifyRequest(
 		country: String,
 		fullAddr: String,

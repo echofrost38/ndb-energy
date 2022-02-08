@@ -10,7 +10,31 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShuftiReference {
+    
+    public ShuftiReference(int userId, String reference) {
+        this.userId = userId;
+        this.reference = reference;
+        this.verificationType = "KYC";
+
+        this.docStatus = false;
+        this.addrStatus = false;
+        this.conStatus = false;
+        this.selfieStatus = false;
+    }
+    
     private int userId;
     private String reference;
     private String verificationType;
+
+    // document
+    private Boolean docStatus; // success or failed
+
+    // address
+    private Boolean addrStatus;
+
+    // consent
+    private Boolean conStatus;
+
+    // selfie
+    private Boolean selfieStatus;
 }

@@ -1,0 +1,13 @@
+type ShuftiRefPayload {
+    userId: Int,
+    reference: String,
+    verificationType: String,
+    docStatus: Boolean,
+    addrStatus: Boolean,
+    conStatus: Boolean,
+    selfieStatus: Boolean,
+    document: String,
+    addr: String,
+    consent: String,
+    selfie: String
+}

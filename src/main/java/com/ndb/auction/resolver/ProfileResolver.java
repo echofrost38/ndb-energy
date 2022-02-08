@@ -6,13 +6,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.Part;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.payload.response.ShuftiRefPayload;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
+import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,7 +30,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-    
+
     // select avatar profile
     // prefix means avatar name!!!
     @PreAuthorize("isAuthenticated()")
@@ -74,6 +79,13 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
 
     @PreAuthorize("isAuthenticated()")
+    public ShuftiRefPayload getShuftReference() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.getShuftiRefPayload(userId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     public Integer kycStatusRequest() throws JsonProcessingException, IOException, InvalidKeyException, NoSuchAlgorithmException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
@@ -83,6 +95,54 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
             throw new UserNotFoundException("not_found_reference", "user");
         }
         return shuftiService.kycStatusRequestAsync(referenceObj.getReference());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Boolean uploadDocument(Part document) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.uploadDocument(userId, document);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Boolean uploadAddress(Part address) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.uploadAddress(userId, address);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Boolean uploadConsent(Part consent) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.uploadConsent(userId, consent);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Boolean uploadSelfie(Part selfie) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.uploadSelfie(userId, selfie);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public String sendVerifyRequest(String country, String fullAddr, Names names) throws ClientProtocolException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
+        int status = 1;
+        if(referenceObj != null) {
+            status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
+            if(status == 1) {
+                throw new UnauthorizedException("already_verified", "userId");
+            }
+        }
+        if(status == 1) {
+            shuftiService.createShuftiReference(userId, "KYC");
+        } else {
+            shuftiService.updateShuftiReference(userId, UUID.randomUUID().toString());
+        }
+        return shuftiService.sendVerifyRequest(userId, country, fullAddr, names);
     }
     
     // Admin

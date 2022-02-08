@@ -1,5 +1,11 @@
 scalar Upload
 
+input NamesInput {
+	first_name: String,
+	middle_name: String,
+	last_name: String
+}
+
 extend type Mutation {
 	setAvatar(
 		prefix: String!,
@@ -17,12 +23,32 @@ extend type Mutation {
 		withdraw: Float
 	) : Int
 	createNewReference : String
+	
+	# upload verification data
+	uploadDocument(
+		document: Upload
+	) : Boolean
+	uploadAddress(
+		address: Upload
+	) : Boolean
+	uploadConsent(
+		consent: Upload
+	) : String
+	uploadSelfie(
+		selfie: Upload
+	) : String
+	sendVerifyRequest(
+		country: String,
+		fullAddr: String,
+		names: NamesInput
+	) : String
 }
 
 extend type Query {
 	getUserTierTask: TierTask
 	getKYCSettings : [KYCSetting]
 	kycStatusRequest : Int
+	getShuftReference : ShuftiRefPayload
 }
 
 schema {

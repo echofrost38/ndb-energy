@@ -15,12 +15,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerificationResult {
-    // kyc
-    private int kyc;
-    // background_checks
+    private DocumentResult document;
+    private AddressResult address;
+    private ConsentResult consent;
     private int background_checks;
-    // kyb
-    private int kyb;
-    // aml_for_businesses
-    private int aml_for_businesses;
+    private int face;
 }

@@ -83,6 +83,14 @@ public class UserService extends BaseService {
 			userVerify.setId(user.getId());
 			userVerify.setEmailVerified(true);
 			userVerifyDao.insert(userVerify);
+
+			// add internal balance 
+			int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+			balanceDao.addFreeBalance(user.getId(), ndbId, 0);
+
+			int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
+			balanceDao.addFreeBalance(user.getId(), voltId, 0);
+
 		}
 		return true;
 	}

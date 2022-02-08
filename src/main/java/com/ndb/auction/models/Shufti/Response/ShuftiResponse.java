@@ -17,5 +17,7 @@ import lombok.Setter;
 public class ShuftiResponse {
     private String reference;
     private String event;
-    // private VerificationResult verification_result;
+    private String declined_reason;
+    private ShuftiError error;
+    private VerificationResult verification_result;
 }

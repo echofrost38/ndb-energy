@@ -12,6 +12,7 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
+import com.ndb.auction.models.Shufti.Response.VerificationResult;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
@@ -61,6 +62,8 @@ public class ShuftiController extends BaseController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        System.out.println(reqQuery);
+
         ShuftiResponse response = new Gson().fromJson(reqQuery, ShuftiResponse.class);
         String reference = response.getReference();
         ShuftiReference ref = shuftiDao.selectByReference(reference);
@@ -69,6 +72,9 @@ public class ShuftiController extends BaseController {
         int userId = ref.getUserId();
         
         if(response.getEvent().equals("verification.accepted")) {
+            
+            shuftiDao.passed(userId);
+            
             // update user tier!
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -99,13 +105,45 @@ public class ShuftiController extends BaseController {
             System.out.println(response.getEvent());
         } else if (response.getEvent().equals("request.pending")){
 
+        } else if (response.getEvent().equals("request.invalid")) {
+            // invalid
+            
         } else if (response.getEvent().equals("verification.declined")) {
+            // check declined reason
+            VerificationResult result = response.getVerification_result();
+            
+            // check one by one
+            if(result.getDocument().getDocument() != 1) {
+                shuftiDao.updateDocStatus(userId, false);
+            } else {
+                shuftiDao.updateDocStatus(userId, true);
+            }
+
+            if(result.getAddress().getAddress_document() != 1) {
+                shuftiDao.updateAddrStatus(userId, false);
+            } else {
+                shuftiDao.updateAddrStatus(userId, true);
+            }
+
+            if(result.getConsent().getConsent() != 1) {
+                shuftiDao.updateConStatus(userId, false);
+            } else {
+                shuftiDao.updateConStatus(userId, true);
+            }
+
+            if(result.getFace() != 1) {
+                shuftiDao.updateSelfieStatus(userId, false);
+            } else {
+                shuftiDao.updateSelfieStatus(userId, true);
+            }
+            
             // send notification
             notificationService.sendNotification(
                 userId,
                 Notification.KYC_VERIFIED,
                 "KYC VERIFICATION FAILED",
-                "KYC Verification failed.");
+                String.format("KYC Verification failed.\n%s. \nPlease try again.", 
+                    response.getDeclined_reason()));
             System.out.println("Verification failed");
             System.out.println(response.getEvent());
         }

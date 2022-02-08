@@ -1,6 +1,8 @@
 package com.ndb.auction.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -8,13 +10,28 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.Part;
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
 import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
 import com.ndb.auction.payload.ShuftiStatusRequest;
+import com.ndb.auction.payload.response.ShuftiRefPayload;
 
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,7 +62,15 @@ public class ShuftiService extends BaseService{
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ShuftiService(WebClient.Builder webClientBuilder) {
+    protected CloseableHttpClient client;
+    
+    private final AmazonS3 s3;
+
+    private static final String bucketName = "ndb-sale-dev";
+
+    public ShuftiService(WebClient.Builder webClientBuilder, AmazonS3 s3) {
+        client = HttpClients.createDefault();
+        this.s3 = s3;
         this.shuftiAPI = webClientBuilder
             .baseUrl(BASE_URL)
             .build();
@@ -59,13 +84,13 @@ public class ShuftiService extends BaseService{
             return sRef.getReference();
         }
         String reference = UUID.randomUUID().toString();
-        sRef = new ShuftiReference(userId, reference, verifyType);
+        sRef = new ShuftiReference(userId, reference);
         shuftiDao.insert(sRef);
         return reference;
     }
 
     public String updateShuftiReference(int userId, String reference) {
-        shuftiDao.update(userId, reference);
+        shuftiDao.updateReference(userId, reference);
         return reference;
     }
 
@@ -109,7 +134,7 @@ public class ShuftiService extends BaseService{
 
         String _responseString = _response.body().string();
         ShuftiResponse response = gson.fromJson(_responseString, ShuftiResponse.class);
-        if(response.getEvent().equals("verification.accepted")) {
+        if(response.getEvent() != null && response.getEvent().equals("verification.accepted")) {
             return 1;
         }
         return 0;
@@ -181,5 +206,164 @@ public class ShuftiService extends BaseService{
         return response;
     }
 
+    private String sendPost(ShuftiRequest request) throws ClientProtocolException, IOException {
+        String token = generateToken();
+        HttpPost post = new HttpPost(BASE_URL);
+        String body = gson.toJson(request, ShuftiRequest.class);
+        StringEntity entity = new StringEntity(body);
+        post.setEntity(entity);
+        post.addHeader("Accept", "application/json");
+        post.addHeader("Content-type", "application/json"); 
+        post.addHeader("Authorization","Basic " + token);
 
+        CloseableHttpResponse response = client.execute(post);
+        
+        return EntityUtils.toString(response.getEntity());
+    }
+
+    // ====================== upload into s3 ===============
+    public Boolean uploadDocument(int userId, Part document) {
+        // get reference obj
+        ShuftiReference refObj = shuftiDao.selectById(userId);
+        if(refObj == null) {
+            // no reference, create new one.
+            createShuftiReference(userId, "KYC");
+        }
+        String docUrl = String.format("%d-passport", userId);
+
+        try {
+            InputStream input = document.getInputStream();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(document.getSize());
+            s3.putObject(bucketName, docUrl, input, metadata); 
+            // shuftiDao.updateDocUrl(userId, docUrl);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }  
+
+    public Boolean uploadAddress(int userId, Part addr) {
+        // get reference obj
+        ShuftiReference refObj = shuftiDao.selectById(userId);
+        if(refObj == null) {
+            throw new UserNotFoundException("no_reference", "userId");
+        }
+        String addrUrl = String.format("%d-address", userId);
+
+        try {
+            InputStream input = addr.getInputStream();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(addr.getSize());
+            s3.putObject(bucketName, addrUrl, input, metadata); 
+            // shuftiDao.updateAddrUrl(userId, addrUrl);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public Boolean uploadConsent(int userId, Part consent) {
+        // get reference obj
+        ShuftiReference refObj = shuftiDao.selectById(userId);
+        if(refObj == null) {
+            throw new UserNotFoundException("no_reference", "userId");
+        }
+        String conUrl = String.format("%d-consent", userId);
+
+        try {
+            InputStream input = consent.getInputStream();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(consent.getSize());
+            s3.putObject(bucketName, conUrl, input, metadata); 
+            // shuftiDao.updateConUrl(userId, conUrl);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public Boolean uploadSelfie(int userId, Part selfie) {
+        // get reference obj
+        ShuftiReference refObj = shuftiDao.selectById(userId);
+        if(refObj == null) {
+            throw new UserNotFoundException("no_reference", "userId");
+        }
+        String selfieUrl = String.format("%d-selfie", userId);
+
+        try {
+            InputStream input = selfie.getInputStream();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(selfie.getSize());
+            s3.putObject(bucketName, selfieUrl, input, metadata); 
+            // shuftiDao.updateAddrUrl(userId, selfieUrl);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public ShuftiRefPayload getShuftiRefPayload(int userId) {
+        ShuftiReference ref = shuftiDao.selectById(userId);
+        ShuftiRefPayload refPayload = new ShuftiRefPayload(ref);
+
+        // download files
+        refPayload.setDocument(downloadImage(userId, "passport"));
+        refPayload.setAddr(downloadImage(userId, "address"));
+        refPayload.setConsent(downloadImage(userId, "consent"));
+        refPayload.setSelfie(downloadImage(userId, "selfie"));
+
+        return refPayload;
+    }
+
+    public String sendVerifyRequest(int userId, String country, String fullAddr, Names names) throws ClientProtocolException, IOException {
+        ShuftiReference refObj = shuftiDao.selectById(userId);
+        
+        // check refObj
+        if(refObj == null) {
+            throw new UserNotFoundException("no_reference", "userId");
+        }
+
+        String reference = refObj.getReference();
+        
+        String doc64 = downloadImage(userId, "passport");
+        String addr64 = downloadImage(userId, "address");
+        String con64 = downloadImage(userId, "consent");
+        String sel64 = downloadImage(userId, "selfie");
+
+        // build ShuftiRequest
+        ShuftiRequest request = new ShuftiRequest(reference, country, doc64, addr64, fullAddr, con64, sel64, names);
+        sendShuftiRequest(request).subscribe();
+
+        return "sent request";
+    }
+
+    private String downloadImage(int userId, String type) {
+        try {
+            String url = String.format("%d-%s", userId, type);
+            S3Object docS3 = s3.getObject(bucketName, url);
+            InputStream stream = docS3.getObjectContent();
+            
+            // get byte array from image stream
+            int bufLength = 2048;
+            byte[] buffer = new byte[2048];
+            byte[] data;
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int readLength;
+            while ((readLength = stream.read(buffer, 0, bufLength)) != -1) {
+                out.write(buffer, 0, readLength);
+            }
+
+            data = out.toByteArray();
+            String imageString = Base64.getEncoder().withoutPadding().encodeToString(data);
+            
+            out.close();
+            stream.close();
+
+            return imageString;
+        } catch (Exception e) {
+            return "";
+        } 
+    }
 }

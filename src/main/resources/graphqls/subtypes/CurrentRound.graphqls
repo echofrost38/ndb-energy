@@ -1,0 +1,5 @@
+type CurrentRound {
+    status: String,
+    auction: Auction,
+    presale: PreSale
+}

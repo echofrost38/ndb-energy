@@ -44,6 +44,8 @@ public class DepositService extends BaseService {
 
         // get address 
         String ipnUrl = COINSPAYMENT_IPN_URL + "/deposit/" + txn.getId();
+        System.out.println(String.format("Transactio ID: %d", txn.getId()));
+        
         CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(currency, ipnUrl);
         String payload = request.toString();
         payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";

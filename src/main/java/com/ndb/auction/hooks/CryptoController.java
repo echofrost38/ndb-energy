@@ -1,5 +1,6 @@
 package com.ndb.auction.hooks;
 
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -293,33 +294,32 @@ public class CryptoController extends BaseController {
 			throw new IPNExceptions("No or incorrect Merchant ID passed");
 		}
 		
-		// String reqQuery = "";
-		// Enumeration<String> enumeration = request.getParameterNames();
-        // while(enumeration.hasMoreElements()){
-        //     String parameterName = (String) enumeration.nextElement();
-        //     reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
-        // }
-		
-		// reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
-		// reqQuery = reqQuery.replaceAll("@", "%40");
-		// reqQuery = reqQuery.replace(' ', '+');
-		// log.info("IPN reqQuery : {}", reqQuery);
-
-        String reqQuery = "";
-        try {
-            reqQuery = getBody(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+		String reqQuery = "";
+		Enumeration<String> enumeration = request.getParameterNames();
+        while(enumeration.hasMoreElements()){
+            String parameterName = (String) enumeration.nextElement();
+            reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
         }
+		
+		reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
+		reqQuery = reqQuery.replaceAll("@", "%40");
+		reqQuery = reqQuery.replace(' ', '+');
+		log.info("IPN reqQuery : {}", reqQuery);
 		
 		String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
 		if(!_hmac.equals(hmac)) {
-			throw new IPNExceptions("not match");
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
         
 		// get currency and amount
         String currency = getString(request, "currency", true);
-        String cryptoType = currency.split(".")[0];
+        String cryptoType = "";
+        if(currency.contains(".")) {
+            cryptoType = currency.split(".")[0];
+        } else {
+            cryptoType = currency;
+        }
+
         Double amount = getDouble(request, "amount");
         Double fiatAmount = getDouble(request, "fiat_amount");
 		
@@ -328,10 +328,16 @@ public class CryptoController extends BaseController {
 		if (status >= 100 || status == 2) {
             
             DepositTransaction txn = depositTxnDao.selectById(id);
-            int userId = txn.getUserId();
-            
-            balanceService.addFreeBalance(userId, cryptoType, amount);
+            if(txn == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+            }
 
+            if(txn.getStatus() == 1) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+            }
+
+            int userId = txn.getUserId();
+            balanceService.addFreeBalance(userId, cryptoType, amount);
             List<Balance> balances = balanceService.getInternalBalances(userId);
 
             double totalBalance = 0.0;
@@ -354,10 +360,13 @@ public class CryptoController extends BaseController {
                 // get point
                 double gainedPoint = 0.0;
                 for (WalletTask task : taskSetting.getWallet()) {
-                    if(task.getAmount() < totalBalance) {
-                        gainedPoint = task.getPoint();
+                    if(tierTask.getWallet() > task.getAmount()) {
+                        continue;
+                    }                    
+                    if(totalBalance < task.getAmount()) {
                         break;
                     }
+                    gainedPoint += task.getPoint();
                 }
     
                 double newPoint = user.getTierPoint() + gainedPoint;

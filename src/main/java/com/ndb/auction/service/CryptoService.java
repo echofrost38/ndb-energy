@@ -42,15 +42,26 @@ public class CryptoService extends BaseService {
     }
 
     public double getCryptoPriceBySymbol(String symbol) {
-        String symbolPair = symbol + "USDT";
-        CoinPrice objs = binanceAPI.get()
-                .uri(uriBuilder -> uriBuilder.path("/ticker/price")
-                        .queryParam("symbol", symbolPair.toUpperCase())
-                        .build())
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .bodyToMono(CoinPrice.class).block();
-        return Double.valueOf(objs.getPrice());
+        try {
+            String symbolPair = symbol + "USDT";
+            CoinPrice objs = binanceAPI.get()
+                    .uri(uriBuilder -> uriBuilder.path("/ticker/price")
+                            .queryParam("symbol", symbolPair.toUpperCase())
+                            .build())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .retrieve()
+                    .onStatus(org.springframework.http.HttpStatus::is4xxClientError, response -> {
+                        return null;
+                    })
+                    .bodyToMono(CoinPrice.class)
+                    .onErrorMap(throwable -> {
+                        return null;
+                    })
+                    .block();
+            return Double.valueOf(objs.getPrice());
+        } catch (Exception e) {
+        }
+        return 0.0;
     }
 
     public String createNewPayment(int roundId, int userId, Double amount, String currency) throws ParseException, IOException {

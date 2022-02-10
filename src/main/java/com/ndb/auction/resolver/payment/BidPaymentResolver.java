@@ -67,7 +67,7 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
-		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId, paymentMethodId);
+		return stripeService.createStripeForAuction(roundId, id, amount, paymentIntentId, paymentMethodId);
 	}
 
 	@PreAuthorize("isAuthenticated()")

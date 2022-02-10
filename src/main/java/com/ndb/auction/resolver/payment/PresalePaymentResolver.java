@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment;
 
 import java.io.IOException;
 
+import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 
 import org.apache.http.ParseException;
@@ -20,6 +21,9 @@ public class PresalePaymentResolver extends BaseResolver implements GraphQLQuery
         return presaleOrderService.payOrderWithCrypto(orderId, amount, currency);
     }
 
-    
+    // @PreAuthorize("isAuthenticated()")
+    // public PayResponse payStripeForPreSale(int orderId, Long amount, String paymentIntentId, String paymentMethodId) {
+
+    // }
 
 }

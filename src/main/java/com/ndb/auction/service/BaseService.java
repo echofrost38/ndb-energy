@@ -40,6 +40,7 @@ import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
+import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
@@ -190,6 +191,9 @@ public class BaseService {
 
     @Autowired
     protected CoinsPaymentDao coinpaymentsDao;
+
+    @Autowired
+    protected NDBCoinService ndbCoinService;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

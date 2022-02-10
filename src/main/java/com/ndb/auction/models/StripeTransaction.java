@@ -17,6 +17,9 @@ public class StripeTransaction extends BaseModel {
 	public static final Integer CAPTURED = 2;
 	public static final Integer CANCELED = 3;
 
+	public static final int AUCTION  = 1;
+	public static final int PRESALE  = 2;
+
 	private int roundId;
 	private int userId;
 	private String paymentIntentId;
@@ -25,13 +28,17 @@ public class StripeTransaction extends BaseModel {
 	private Long createdAt;
 	private Long updatedAt;
 
-	public StripeTransaction(int roundId, int userId, Long amount, String paymentIntentId) {
+	// 1 - Auction, 2 - Presale
+	private int transactionType;
+
+	public StripeTransaction(int roundId, int userId, Long amount, int txnType, String paymentIntentId) {
 		this.roundId = roundId;
 		this.userId = userId;
 		this.amount = amount;
 		this.paymentIntentId = paymentIntentId;
 		this.createdAt = System.currentTimeMillis();
 		this.status = AUTHORIZED;
+		this.transactionType = txnType;
 	}
 
 }

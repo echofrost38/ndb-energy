@@ -61,24 +61,17 @@ public class CryptoController extends BaseController {
 			throw new IPNExceptions("No or incorrect Merchant ID passed");
 		}
 		
-		// String reqQuery = "";
-		// Enumeration<String> enumeration = request.getParameterNames();
-        // while(enumeration.hasMoreElements()){
-        //     String parameterName = (String) enumeration.nextElement();
-        //     reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
-        // }
-		
-		// reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
-		// reqQuery = reqQuery.replaceAll("@", "%40");
-		// reqQuery = reqQuery.replace(' ', '+');
-		// log.info("IPN reqQuery : {}", reqQuery);
-
-        String reqQuery = "";
-        try {
-            reqQuery = getBody(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+		String reqQuery = "";
+		Enumeration<String> enumeration = request.getParameterNames();
+        while(enumeration.hasMoreElements()){
+            String parameterName = (String) enumeration.nextElement();
+            reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
         }
+		
+		reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
+		reqQuery = reqQuery.replaceAll("@", "%40");
+		reqQuery = reqQuery.replace(' ', '+');
+		log.info("IPN reqQuery : {}", reqQuery);
 		
 		String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
 		if(!_hmac.equals(hmac)) {
@@ -181,24 +174,17 @@ public class CryptoController extends BaseController {
             throw new IPNExceptions("No or incorrect Merchant ID passed");
         }
 
-        // String reqQuery = "";
-        // Enumeration<String> enumeration = request.getParameterNames();
-        // while(enumeration.hasMoreElements()){
-        //     String parameterName = (String) enumeration.nextElement();
-        //     reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
-        // }
-
-        // reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
-        // reqQuery = reqQuery.replaceAll("@", "%40");
-        // reqQuery = reqQuery.replace(' ', '+');
-        // log.info("IPN reqQuery : {}", reqQuery);
-
         String reqQuery = "";
-        try {
-            reqQuery = getBody(request);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Enumeration<String> enumeration = request.getParameterNames();
+        while(enumeration.hasMoreElements()){
+            String parameterName = (String) enumeration.nextElement();
+            reqQuery += parameterName + "=" + request.getParameter(parameterName) + "&";
         }
+
+        reqQuery = (String) reqQuery.subSequence(0, reqQuery.length() - 1);
+        reqQuery = reqQuery.replaceAll("@", "%40");
+        reqQuery = reqQuery.replace(' ', '+');
+        log.info("IPN reqQuery : {}", reqQuery);
 
         String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
         if(!_hmac.equals(hmac)) {
@@ -265,7 +251,8 @@ public class CryptoController extends BaseController {
                     txn.getUserId(),
                     Notification.PAYMENT_RESULT,
                     "PAYMENT CONFIRMED",
-                    "You have successfully deposited " + amount + cryptoType + " for Presale Round.");
+                    "You have successfully deposited " + amount + cryptoType + " for Presale Round.\n" 
+                    + "You've got " + ndb + "NDB.");
         }
 
 

@@ -1,4 +1,4 @@
-package com.ndb.auction.models;
+package com.ndb.auction.models.balance;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,14 +7,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @Setter
 @NoArgsConstructor
-public class InternalBalance {
+public class CryptoBalance extends BaseBalance {
     
-    private int userId;
     private int tokenId;
-    private Double free;
-    private Double hold; 
-
-    public InternalBalance(int userId, int tokenId) {
+    public CryptoBalance(int userId, int tokenId) {
         this.userId = userId;
         this.tokenId = tokenId;
         this.free = 0.0;

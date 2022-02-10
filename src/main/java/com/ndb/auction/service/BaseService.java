@@ -8,7 +8,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
-import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
 import com.ndb.auction.dao.oracle.ShuftiDao;
 import com.ndb.auction.dao.oracle.auction.AuctionAvatarDao;
@@ -18,6 +17,7 @@ import com.ndb.auction.dao.oracle.avatar.AvatarProfileDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileFactsDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSetDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSkillDao;
+import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
@@ -163,7 +163,7 @@ public class BaseService {
     public BroadcastNotification broadcastNotification;
 
     @Autowired
-    public InternalBalanceDao balanceDao;
+    public CryptoBalanceDao balanceDao;
 
     @Autowired
     public InternalWalletDao walletDao;

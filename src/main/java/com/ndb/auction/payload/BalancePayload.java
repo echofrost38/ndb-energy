@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Balance {
+public class BalancePayload {
     
     private String tokenName;
     private String tokenSymbol;

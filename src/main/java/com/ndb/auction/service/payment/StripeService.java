@@ -147,7 +147,7 @@ public class StripeService extends BaseService {
 					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
 					.build();
 				intent = PaymentIntent.create(createParams);
-
+				
 			} else if (paymentIntentId != null) {
 				intent = PaymentIntent.retrieve(paymentIntentId);
 				intent = intent.confirm();

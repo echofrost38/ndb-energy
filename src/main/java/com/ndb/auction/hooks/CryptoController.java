@@ -16,7 +16,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.payload.Balance;
+import com.ndb.auction.payload.BalancePayload;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -325,10 +325,10 @@ public class CryptoController extends BaseController {
 
             int userId = txn.getUserId();
             balanceService.addFreeBalance(userId, cryptoType, amount);
-            List<Balance> balances = balanceService.getInternalBalances(userId);
+            List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
             double totalBalance = 0.0;
-            for (Balance balance : balances) {
+            for (BalancePayload balance : balances) {
                 // get price and total balance
                 double _price = cryptoService.getCryptoPriceBySymbol(balance.getTokenSymbol());
                 double _balance = _price * (balance.getFree() + balance.getHold());

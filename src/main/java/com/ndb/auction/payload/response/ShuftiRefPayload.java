@@ -19,7 +19,8 @@ public class ShuftiRefPayload extends ShuftiReference{
             ref.getDocStatus(), 
             ref.getAddrStatus(), 
             ref.getConStatus(), 
-            ref.getSelfieStatus()
+            ref.getSelfieStatus(),
+            ref.getPending()
         );
     }
     // base64 for doc, addr, consent and selfie

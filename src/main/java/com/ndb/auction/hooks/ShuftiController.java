@@ -71,6 +71,8 @@ public class ShuftiController extends BaseController {
         if(ref == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);;
         int userId = ref.getUserId();
         
+        shuftiDao.updatePendingStatus(userId, false);
+
         if(response.getEvent().equals("verification.accepted")) {
             
             shuftiDao.passed(userId);
@@ -107,7 +109,14 @@ public class ShuftiController extends BaseController {
 
         } else if (response.getEvent().equals("request.invalid")) {
             // invalid
-            
+            notificationService.sendNotification(
+                userId,
+                Notification.KYC_VERIFIED,
+                "KYC VERIFICATION FAILED",
+                String.format(
+                    "KYC Verification failed.\n%s \nPlease try again.", 
+                    response.getError().getMessage())
+            );
         } else if (response.getEvent().equals("verification.declined")) {
             // check declined reason
             VerificationResult result = response.getVerification_result();

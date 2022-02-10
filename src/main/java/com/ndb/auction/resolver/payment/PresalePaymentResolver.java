@@ -20,4 +20,6 @@ public class PresalePaymentResolver extends BaseResolver implements GraphQLQuery
         return presaleOrderService.payOrderWithCrypto(orderId, amount, currency);
     }
 
+    
+
 }

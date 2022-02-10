@@ -9,5 +9,6 @@ type ShuftiRefPayload {
     document: String,
     addr: String,
     consent: String,
-    selfie: String
+    selfie: String,
+    pending: Boolean
 }

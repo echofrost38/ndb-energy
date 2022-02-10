@@ -337,6 +337,8 @@ public class ShuftiService extends BaseService{
         
         sendShuftiRequest(request).subscribe();
 
+        shuftiDao.updatePendingStatus(userId, true);
+
         return "sent request";
     }
 

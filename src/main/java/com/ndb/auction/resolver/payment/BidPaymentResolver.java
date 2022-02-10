@@ -70,7 +70,6 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId, paymentMethodId);
 	}
 
-
 	@PreAuthorize("isAuthenticated()")
 	public String createCryptoPayment(int roundId, Double amount, String currency) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

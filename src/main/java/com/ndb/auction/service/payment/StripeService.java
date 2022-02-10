@@ -34,7 +34,6 @@ public class StripeService extends BaseService {
     	Stripe.apiKey = stripeSecretKey;
     }
 	
-	
 	public String getPublicKey( ) {
 		return stripePublicKey;
 	}
@@ -64,8 +63,6 @@ public class StripeService extends BaseService {
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
                         .setConfirm(true)
                         .build();
-                
-                
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams);
                 

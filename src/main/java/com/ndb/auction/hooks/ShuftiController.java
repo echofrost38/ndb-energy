@@ -106,7 +106,13 @@ public class ShuftiController extends BaseController {
             System.out.println("Verification success.");
             System.out.println(response.getEvent());
         } else if (response.getEvent().equals("request.pending")){
-
+            // invalid
+            notificationService.sendNotification(
+                userId,
+                Notification.KYC_VERIFIED,
+                "KYC VERIFICATION PENDING",
+                "KYC Verification is pending."
+            );
         } else if (response.getEvent().equals("request.invalid")) {
             // invalid
             notificationService.sendNotification(
@@ -156,8 +162,6 @@ public class ShuftiController extends BaseController {
             System.out.println("Verification failed");
             System.out.println(response.getEvent());
         }
-
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 }

@@ -9,6 +9,7 @@ import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
+import com.ndb.auction.models.balance.FiatBalance;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
@@ -16,6 +17,7 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
+import com.ndb.auction.service.CryptoService;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -165,6 +167,38 @@ public class StripeService extends BaseService {
 		return response;
 	}
 
+	public PayResponse payStripeForDeposit(		
+		int userId, 
+		Long amount, 
+		String paymentIntentId,
+		String paymentMethodId
+	) {
+		PaymentIntent intent = null;
+		PayResponse response = new PayResponse();
+		try {
+			if(paymentMethodId != null) {
+				PaymentIntentCreateParams createParams = PaymentIntentCreateParams.builder()
+					.setAmount(amount)
+					.setCurrency("USD")	
+					.setConfirm(true)
+					.setPaymentMethod(paymentIntentId)
+					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+					.build();
+				intent = PaymentIntent.create(createParams);
+			} else if (paymentIntentId != null) {
+				intent = PaymentIntent.retrieve(paymentIntentId);
+				intent = intent.confirm();
+			}
+
+
+
+		} catch (Exception e) {
+		
+		}
+
+		return null;
+	}
+
 	// update payments - called by closeBid
 	public boolean UpdateTransaction(int id, Integer status) {
 		
@@ -198,7 +232,6 @@ public class StripeService extends BaseService {
 	}
 	
 	public List<StripeTransaction> getTransactionByUser(int userId) {
-		
 		return stripeDao.getTransactionsByUser(userId);
 	}
 	
@@ -286,4 +319,16 @@ public class StripeService extends BaseService {
 			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
 	}
 	
+	private void handleDepositSuccess(int userId, Long amount) {
+		User user = userDao.selectById(userId);
+		int fiatId = 0;
+
+		fiatBalanceDao.addFreeBalance(userId, fiatId, Double.valueOf(amount) / 100);
+		List<FiatBalance> fiatBalances = fiatBalanceDao.selectByUserId(userId, null);
+
+		double totalBalance = 0.0;
+
+
+	}
+
 }

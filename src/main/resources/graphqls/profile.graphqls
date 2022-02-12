@@ -48,7 +48,8 @@ extend type Query {
 	getUserTierTask: TierTask
 	getKYCSettings : [KYCSetting]
 	kycStatusRequest : Int
-	getShuftReference : ShuftiRefPayload
+	getShuftiRefPayload : ShuftiRefPayload
+	getShuftiReference: ShuftiReference
 }
 
 schema {

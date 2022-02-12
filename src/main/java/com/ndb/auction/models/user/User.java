@@ -45,6 +45,7 @@ public class User extends BaseModel {
 		this.password = encodedPass;
 		this.country = country;
 		this.role = new HashSet<>();
+		this.notifySetting = 0xFFFF;
 	}
 
 	public User setRoleString(String value) {

@@ -44,7 +44,7 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
 
     @PreAuthorize("isAuthenticated()")
     public PayResponse depositWithStripe() {
-
+        
         return null;
     }
 

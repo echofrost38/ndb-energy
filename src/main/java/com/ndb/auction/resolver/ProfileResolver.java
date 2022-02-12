@@ -79,7 +79,7 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
 
     @PreAuthorize("isAuthenticated()")
-    public ShuftiRefPayload getShuftReference() {
+    public ShuftiRefPayload getShuftiRefPayload() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return shuftiService.getShuftiRefPayload(userId);
@@ -155,4 +155,20 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     public List<KYCSetting> getKYCSettings() {
         return baseVerifyService.getKYCSettings();
     }
+
+    // frontend version
+    @PreAuthorize("isAuthenticated()")
+    public int insertOrUpdateReference(String reference) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.insertOrUpdateReference(userId, reference);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public ShuftiReference getShuftiReference() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return shuftiService.getShuftiReference(userId);
+    }
+
 }

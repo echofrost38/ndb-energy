@@ -54,7 +54,7 @@ public class ShuftiDao extends BaseOracleDao {
 
     public int insert(ShuftiReference m) {
         String sql = "INSERT INTO TBL_SHUFTI_REF(USER_ID, REFERENCE, VERIFY_TYPE, DOC_STATUS, ADDR_STATUS, CON_STATUS, PENDING)"
-				+ "VALUES(?,?,?)";
+				+ "VALUES(?,?,?,?,?,?,?)";
 		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType(), m.getDocStatus(), m.getAddrStatus(), m.getConStatus(), m.getPending());
     }
 

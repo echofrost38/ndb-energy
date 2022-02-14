@@ -42,6 +42,10 @@ extend type Mutation {
 		fullAddr: String,
 		names: NamesInput
 	) : String
+
+	insertOrUpdateReference (
+		reference: String
+	) : Int
 }
 
 extend type Query {

@@ -9,7 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FiatAsset {
     private int id;
-    private int fiatId;
-    private String fiatSymbol;
-    private String symbol;
+    private String name; // EUR
+    private String symbol; 
 }

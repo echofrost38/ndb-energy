@@ -43,9 +43,10 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse depositWithStripe() {
-        
-        return null;
+    public PayResponse depositWithStripe(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
     }
 
     @PreAuthorize("isAuthenticated()")

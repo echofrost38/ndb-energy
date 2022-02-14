@@ -23,9 +23,29 @@ public class FiatAssetService {
 
     public int getFiatIdByName(String name) {
         if(assetMap == null) {
-
+            fillList();
         }
         return assetMap.get(name);
+    }
+
+    public FiatAsset getFiatAssetById(int id) {
+        if(assetMap == null) {
+            fillList();
+        }
+        return assetIdMap.get(id);
+    }
+
+    public int createNewFiatAsset(FiatAsset fiatAsset) {
+        int result = fiatAssetDao.insert(fiatAsset);
+        fillList();
+        return result;
+    }
+
+    public List<FiatAsset> getAllFiatAssets(String orderBy) {
+        if(assetList == null) {
+            fillList();
+        }
+        return assetList;
     }
 
     private synchronized void fillList() {

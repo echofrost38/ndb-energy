@@ -13,11 +13,11 @@ import com.ndb.auction.models.balance.FiatBalance;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
-import com.ndb.auction.service.CryptoService;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -170,6 +170,7 @@ public class StripeService extends BaseService {
 	public PayResponse payStripeForDeposit(		
 		int userId, 
 		Long amount, 
+		String currencyName,
 		String paymentIntentId,
 		String paymentMethodId
 	) {
@@ -179,7 +180,7 @@ public class StripeService extends BaseService {
 			if(paymentMethodId != null) {
 				PaymentIntentCreateParams createParams = PaymentIntentCreateParams.builder()
 					.setAmount(amount)
-					.setCurrency("USD")	
+					.setCurrency(currencyName)	
 					.setConfirm(true)
 					.setPaymentMethod(paymentIntentId)
 					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
@@ -190,13 +191,14 @@ public class StripeService extends BaseService {
 				intent = intent.confirm();
 			}
 
-
-
+			if(intent != null && intent.getStatus().equals("succeeded")) {
+				handleDepositSuccess(userId, intent.getAmount(), intent.getCurrency());
+			}
+			response = generateResponse(intent, response);
 		} catch (Exception e) {
-		
+			response.setError(e.getMessage());
 		}
-
-		return null;
+		return response;
 	}
 
 	// update payments - called by closeBid
@@ -319,14 +321,59 @@ public class StripeService extends BaseService {
 			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
 	}
 	
-	private void handleDepositSuccess(int userId, Long amount) {
+	private void handleDepositSuccess(int userId, Long amount, String currency) {
 		User user = userDao.selectById(userId);
-		int fiatId = 0;
+		int fiatId = fiatAssetService.getFiatIdByName(currency);
 
 		fiatBalanceDao.addFreeBalance(userId, fiatId, Double.valueOf(amount) / 100);
 		List<FiatBalance> fiatBalances = fiatBalanceDao.selectByUserId(userId, null);
 
 		double totalBalance = 0.0;
+		for (FiatBalance balance : fiatBalances) {
+			String _currency = fiatAssetService.getFiatAssetById(balance.getFiatId()).getName();
+			double _totalBalance = balance.getFree() + balance.getHold();
+			double _usdBalance = apiUtils.currencyConvert(_currency, "usd", _totalBalance);
+			totalBalance += _usdBalance;
+		}
+
+		// update user tier points
+		List<Tier> tierList = tierService.getUserTiers();
+		TaskSetting taskSetting = taskSettingService.getTaskSetting();
+		TierTask tierTask = tierTaskService.getTierTask(userId);
+
+		if(tierTask.getWallet() < totalBalance) {
+
+			tierTask.setWallet(totalBalance);
+			// get point
+			double gainedPoint = 0.0;
+			for (WalletTask task : taskSetting.getWallet()) {
+				if(tierTask.getWallet() > task.getAmount()) {
+					continue;
+				}                    
+				if(totalBalance < task.getAmount()) {
+					break;
+				}
+				gainedPoint += task.getPoint();
+			}
+
+			double newPoint = user.getTierPoint() + gainedPoint;
+			int tierLevel = 0;
+			// check change in level
+			for (Tier tier : tierList) {
+				if(tier.getPoint() <= newPoint) {
+					tierLevel = tier.getLevel();
+				}
+			}
+			userDao.updateTier(user.getId(), tierLevel, newPoint);
+			tierTaskService.updateTierTask(tierTask);
+		}
+
+		notificationService.sendNotification(
+			userId,
+			Notification.DEPOSIT_SUCCESS, 
+			"Deposit Successful", 
+			String.format("You have successfully deposited %f %s", Double.valueOf(amount) / 100, currency)
+		);
 
 
 	}

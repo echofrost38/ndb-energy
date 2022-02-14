@@ -207,6 +207,12 @@ public class BaseService {
     @Autowired
     protected ThirdAPIUtils thirdAPI;
 
+    @Autowired
+	protected FiatAssetService fiatAssetService;
+
+    @Autowired
+    protected ThirdAPIUtils apiUtils;
+
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {

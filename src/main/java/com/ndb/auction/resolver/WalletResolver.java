@@ -13,6 +13,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.plaid.client.model.LinkTokenCreateResponse;
+
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -47,6 +49,13 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public LinkTokenCreateResponse depositWithPlaid() throws IOException {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return plaidService.createLinkToken(userId);
     }
 
     @PreAuthorize("isAuthenticated()")

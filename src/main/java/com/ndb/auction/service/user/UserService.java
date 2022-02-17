@@ -50,10 +50,7 @@ public class UserService extends BaseService {
 				}
 			} else {}
 		} else {
-			user = new User();
-			user.setEmail(email);
-			user.setPassword(encoder.encode(password));
-			user.setCountry(country);
+			user = new User(email, encoder.encode(password), country);
 			Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);

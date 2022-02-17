@@ -77,6 +77,11 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		return cryptoService.createNewPayment(roundId, userId, amount, currency);
 	}
 
+	// @PreAuthorize("isAuthenticated()")
+	public String getExchangeRate() throws ParseException, IOException {
+		return cryptoService.getExchangeRate();
+	}
+
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public CryptoTransaction getCryptoTransactionById(int id) {
 		return cryptoService.getTransactionById(id);

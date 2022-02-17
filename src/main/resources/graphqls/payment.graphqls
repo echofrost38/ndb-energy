@@ -38,7 +38,7 @@ extend type Query {
 
 extend type Mutation {
 	stripePayment (
-		roundId: String,
+		roundId: Int,
 		amount: Float,
 		paymentIntentId: String,
 		paymentMethodId: String

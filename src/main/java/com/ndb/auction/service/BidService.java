@@ -208,7 +208,7 @@ public class BidService extends BaseService {
 		addAuctionpoint(userId, currentRound.getRound());
 
 		// sorting must be updated!!!!
-		Bid bid = bidDao.getBid(roundId, userId);
+		Bid bid = bidDao.getBid(userId, roundId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		Bid _bidArray[] = new Bid[bidList.size()];
 		bidList.toArray(_bidArray);
@@ -263,7 +263,7 @@ public class BidService extends BaseService {
 					tempBid.getUserId(),
 					Notification.BID_RANKING_UPDATED,
 					"BID RANKING UPDATED",
-					String.format("Bid ranking is updated into %d, your bid is %d.", 
+					String.format("Bid ranking is updated into %d, your bid is %s.", 
 						i, tempBid.getStatus() == Bid.WINNER ? "WINNER" : "FAILED")
 				);
 			}

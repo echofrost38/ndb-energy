@@ -126,7 +126,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setCountry(oAuth2UserInfo.getLocale());
-        user.setNotifySetting(0xFFFF);
         Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
         user.setRole(roles);

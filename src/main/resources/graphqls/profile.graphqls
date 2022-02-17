@@ -42,18 +42,13 @@ extend type Mutation {
 		fullAddr: String,
 		names: NamesInput
 	) : String
-
-	insertOrUpdateReference (
-		reference: String
-	) : Int
 }
 
 extend type Query {
 	getUserTierTask: TierTask
 	getKYCSettings : [KYCSetting]
 	kycStatusRequest : Int
-	getShuftiRefPayload : ShuftiRefPayload
-	getShuftiReference: ShuftiReference
+	getShuftReference : ShuftiRefPayload
 }
 
 schema {

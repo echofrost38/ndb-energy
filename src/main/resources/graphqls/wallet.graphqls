@@ -1,5 +1,5 @@
 extend type Query {
-    getBalances : [BalancePayload]
+    getBalances : [Balance]
 
 }
 
@@ -12,12 +12,6 @@ extend type Mutation {
         amount: Float,
         tokenSymbol: String
     ) : Boolean
-    depositWithStripe(
-        amount: Float,
-        currencyName: String,
-        paymentIntentId: String,
-        paymentMethodId: String
-    ) : PayResponse
 }
 
 schema {

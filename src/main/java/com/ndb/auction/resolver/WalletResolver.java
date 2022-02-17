@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.KYCSetting;
-import com.ndb.auction.models.balance.CryptoBalance;
-import com.ndb.auction.payload.BalancePayload;
-import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.payload.Balance;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.ndb.auction.service.user.UserDetailsImpl;
-import com.plaid.client.model.LinkTokenCreateResponse;
-
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -25,7 +22,7 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     
     // get wallet balances 
     @PreAuthorize("isAuthenticated()")
-    public List<BalancePayload> getBalances() {
+    public List<Balance> getBalances() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
         return internalBalanceService.getInternalBalances(id);
@@ -45,26 +42,12 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse depositWithStripe(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public LinkTokenCreateResponse depositWithPlaid() throws IOException {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return plaidService.createLinkToken(userId);
-    }
-
-    @PreAuthorize("isAuthenticated()")
     public boolean withdrawCrypto(String to, double amount, String tokenSymbol) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
         // 1) check balance 
-        CryptoBalance balance = internalBalanceService.getBalance(userId, tokenSymbol);
+        InternalBalance balance = internalBalanceService.getBalance(userId, tokenSymbol);
         if(balance.getFree() < amount) {
             throw new BalanceException("no_enough_fund", "amount");
         }

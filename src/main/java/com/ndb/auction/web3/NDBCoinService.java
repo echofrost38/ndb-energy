@@ -3,14 +3,11 @@ package com.ndb.auction.web3;
 import java.io.IOException;
 import java.math.BigInteger;
 
-import javax.annotation.PostConstruct;
-
 import com.ndb.auction.models.transaction.WithdrawTransaction;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.WithdrawService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.contracts.eip20.generated.ERC20.TransferEventResponse;
@@ -23,47 +20,35 @@ import org.web3j.protocol.http.HttpService;
 @Service
 public class NDBCoinService {
     
-    @Value("${ndb.private.key}")
-    private String ndbKey;
-
-    @Value("${bsc.json.rpc}")
-    private String bscNetwork;
-
-    @Value("${ndb.token.addr}")
-    private String ndbTokenContract;
-
     @Autowired
     private WithdrawService withdrawService;
 
     @Autowired
     private ScheduledTasks schedule;
 
-    private Credentials ndbCredential;
+    private final Web3j bscTestNet = Web3j.build(new HttpService("https://data-seed-prebsc-1-s1.binance.org:8545/"));
 
-    private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
-
+    private final String ndbContract = "0x2A90DBBcf6f19fdAE1E07Cec39ee0c591c6110Af";
+    
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
     private final BigInteger decimals = new BigInteger("100000000");
 
-    @PostConstruct
-    public void init() {
-        Credentials ndbCredential = Credentials.create(ndbKey); 
+    public NDBCoinService() {
+        String privateKey = "56eab44f1e2a9de8a79f8bd42003d270bd7f58d4242b954a94c1bf5d8f8fdc55";
+        Credentials credentials = Credentials.create(privateKey); 
 
         @SuppressWarnings("deprecation")
-        ERC20 ndbToken = ERC20.load(ndbTokenContract, BEP20NET, ndbCredential, gasPrice, gasLimit);
-        
+        ERC20 ndbToken = ERC20.load(ndbContract, bscTestNet, credentials, gasPrice, gasLimit);
+        String address = ndbToken.getContractAddress();
+        System.out.println(address);
+
         ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
             .subscribe(event -> {
                 handleEvent(event);
             }, error -> {
                 System.out.println("Error: " + error);
             });
-    }
-
-    public NDBCoinService() {
-
-        
     }
 
     private void handleEvent(TransferEventResponse event) throws IOException {
@@ -84,7 +69,7 @@ public class NDBCoinService {
     public boolean checkConfirmation(BigInteger targetNumber) {
         // check confirm or not
         try {
-            BigInteger latestNumber = BEP20NET.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
+            BigInteger latestNumber = bscTestNet.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
             if(latestNumber.subtract(targetNumber).longValue() > 12L) {
                 return true;
             }
@@ -98,9 +83,11 @@ public class NDBCoinService {
 
     public boolean transferNDB(int userId, String address, Double amount) {
         try {
+            String privateKey = "56eab44f1e2a9de8a79f8bd42003d270bd7f58d4242b954a94c1bf5d8f8fdc55";
+            Credentials credentials = Credentials.create(privateKey);    
 
             @SuppressWarnings("deprecation")
-            ERC20 ndbToken = ERC20.load(ndbTokenContract, BEP20NET, ndbCredential, gasPrice, gasLimit);
+            ERC20 ndbToken = ERC20.load(ndbContract, bscTestNet, credentials, gasPrice, gasLimit);
             Long lamount = (long) (amount * 10000);
             BigInteger _amount = BigInteger.valueOf(lamount);
             _amount = _amount.multiply(decimals);

@@ -16,13 +16,13 @@ import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
+import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
-import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
@@ -103,7 +103,7 @@ public class BidService extends BaseService {
 			double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
 			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-			CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+			InternalBalance balance = balanceDao.selectById(userId, tokenId);
 			
 			if (balance.getFree() < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
@@ -208,7 +208,7 @@ public class BidService extends BaseService {
 		addAuctionpoint(userId, currentRound.getRound());
 
 		// sorting must be updated!!!!
-		Bid bid = bidDao.getBid(userId, roundId);
+		Bid bid = bidDao.getBid(roundId, userId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		Bid _bidArray[] = new Bid[bidList.size()];
 		bidList.toArray(_bidArray);
@@ -263,7 +263,7 @@ public class BidService extends BaseService {
 					tempBid.getUserId(),
 					Notification.BID_RANKING_UPDATED,
 					"BID RANKING UPDATED",
-					String.format("Bid ranking is updated into %d, your bid is %s.", 
+					String.format("Bid ranking is updated into %d, your bid is %d.", 
 						i, tempBid.getStatus() == Bid.WINNER ? "WINNER" : "FAILED")
 				);
 			}
@@ -339,7 +339,7 @@ public class BidService extends BaseService {
 					Double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
 
 					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-					CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+					InternalBalance balance = balanceDao.selectById(userId, tokenId);
 					if(balance.getHold() < cryptoAmount) {
 						continue;
 					}
@@ -363,7 +363,7 @@ public class BidService extends BaseService {
 
 					double cryptoAmount = holding.getCrypto();
 					int tokenId = tokenAssetService.getTokenIdBySymbol(_cryptoType);
-					CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+					InternalBalance balance = balanceDao.selectById(userId, tokenId);
 					if(balance.getHold() < cryptoAmount) {
 						continue;
 					}
@@ -457,7 +457,7 @@ public class BidService extends BaseService {
 			// get crypto price!!
 			double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
 			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-			CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+			InternalBalance balance = balanceDao.selectById(userId, tokenId);
 
 			if (balance.getFree() < cryptoAmount) {
 				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");

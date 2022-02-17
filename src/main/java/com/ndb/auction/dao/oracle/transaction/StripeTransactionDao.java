@@ -34,13 +34,12 @@ public class StripeTransactionDao extends BaseOracleDao {
 		m.setStatus(rs.getInt("STATUS"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_DATE").getTime());
 		m.setUpdatedAt(rs.getTimestamp("UPDATED_DATE").getTime());
-		m.setTransactionType(rs.getInt("TXN_TYPE"));
 		return m;
 	}
 
 	public StripeTransaction createNewPayment(StripeTransaction m) {
-		String sql = "INSERT INTO TBL_STRIPE_TX(ID, ROUND_ID, USER_ID, PAYMENT_INTENT_ID, AMOUNT, STATUS, CREATED_DATE, UPDATED_DATE, TXN_TYPE)"
-				+ "VALUES(SEQ_STRIPE_TX.NEXTVAL,?,?,?,?,?,SYSDATE,SYSDATE, ?)";
+		String sql = "INSERT INTO TBL_STRIPE_TX(ID, ROUND_ID, USER_ID, PAYMENT_INTENT_ID, AMOUNT, STATUS, CREATED_DATE, UPDATED_DATE)"
+				+ "VALUES(SEQ_STRIPE_TX.NEXTVAL,?,?,?,?,?,SYSDATE,SYSDATE)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 				new PreparedStatementCreator() {
@@ -54,7 +53,6 @@ public class StripeTransactionDao extends BaseOracleDao {
 						ps.setString(i++, m.getPaymentIntentId());
 						ps.setLong(i++, m.getAmount());
 						ps.setInt(i++, m.getStatus());
-						ps.setInt(i++, m.getTransactionType());
 						return ps;
 					}
 				}, keyHolder);

@@ -337,8 +337,6 @@ public class ShuftiService extends BaseService{
         
         sendShuftiRequest(request).subscribe();
 
-        shuftiDao.updatePendingStatus(userId, true);
-
         return "sent request";
     }
 
@@ -370,16 +368,4 @@ public class ShuftiService extends BaseService{
             return "";
         } 
     }
-
-    // frontend version
-    public int insertOrUpdateReference(int userId, String reference) {
-        // check exists
-        ShuftiReference ref = shuftiDao.selectById(userId);
-        if(ref != null) {
-            return shuftiDao.updateReference(userId, reference);
-        }
-        ref = new ShuftiReference(userId, reference);
-        return shuftiDao.insert(ref);
-    }
-
 }

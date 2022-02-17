@@ -3,12 +3,12 @@ package com.ndb.auction.service;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
+import com.ndb.auction.dao.oracle.InternalBalanceDao;
 import com.ndb.auction.dao.oracle.InternalWalletDao;
 import com.ndb.auction.dao.oracle.ShuftiDao;
 import com.ndb.auction.dao.oracle.auction.AuctionAvatarDao;
@@ -18,8 +18,6 @@ import com.ndb.auction.dao.oracle.avatar.AvatarProfileDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileFactsDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSetDao;
 import com.ndb.auction.dao.oracle.avatar.AvatarProfileSkillDao;
-import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
-import com.ndb.auction.dao.oracle.balance.FiatBalanceDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
@@ -37,16 +35,11 @@ import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
-import com.ndb.auction.models.TokenAsset;
-import com.ndb.auction.models.balance.CryptoBalance;
-import com.ndb.auction.models.balance.FiatBalance;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
-import com.ndb.auction.utils.ThirdAPIUtils;
-import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
@@ -169,7 +162,7 @@ public class BaseService {
     public BroadcastNotification broadcastNotification;
 
     @Autowired
-    public CryptoBalanceDao balanceDao;
+    public InternalBalanceDao balanceDao;
 
     @Autowired
     public InternalWalletDao walletDao;
@@ -198,21 +191,6 @@ public class BaseService {
     @Autowired
     protected CoinsPaymentDao coinpaymentsDao;
 
-    @Autowired
-    protected FiatBalanceDao fiatBalanceDao;
-
-    @Autowired
-    protected NDBCoinService ndbCoinService;
-
-    @Autowired
-    protected ThirdAPIUtils thirdAPI;
-
-    @Autowired
-	protected FiatAssetService fiatAssetService;
-
-    @Autowired
-    protected ThirdAPIUtils apiUtils;
-
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {
@@ -230,27 +208,5 @@ public class BaseService {
             throw new RuntimeException("Problemas calculando HMAC", ex);
         }
         return result;
-    }
-
-    public Double getTotalBalance(int userId) {
-
-        double totalBalance = 0.0;
-        
-        // calculate crypto balance
-        List<CryptoBalance> cryptoBalances = balanceDao.selectByUserId(userId, null);
-        for (CryptoBalance cryptoBalance : cryptoBalances) {
-            TokenAsset asset = tokenAssetService.getTokenAssetById(cryptoBalance.getTokenId());
-            double _price = thirdAPI.getCryptoPriceBySymbol(asset.getTokenSymbol());
-            double _balance = _price * (cryptoBalance.getFree() + cryptoBalance.getHold());
-            totalBalance += _balance;
-        }
-
-        List<FiatBalance> fiatBalances = fiatBalanceDao.selectByUserId(userId, null);
-        for (FiatBalance fiatBalance : fiatBalances) {
-            
-
-        }
-
-        return 0.0;
     }
 }

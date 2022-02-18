@@ -67,15 +67,19 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
-		return stripeService.createNewPayment(roundId, id, amount, paymentIntentId, paymentMethodId);
+		return stripeService.createStripeForAuction(roundId, id, amount, paymentIntentId, paymentMethodId);
 	}
-
 
 	@PreAuthorize("isAuthenticated()")
 	public String createCryptoPayment(int roundId, Double amount, String currency) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 		return cryptoService.createNewPayment(roundId, userId, amount, currency);
+	}
+
+	// @PreAuthorize("isAuthenticated()")
+	public String getExchangeRate() throws ParseException, IOException {
+		return cryptoService.getExchangeRate();
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

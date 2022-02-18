@@ -1,0 +1,5 @@
+type ShuftiReference {
+    userId: Int,
+    reference: String,
+    pending: Boolean
+}

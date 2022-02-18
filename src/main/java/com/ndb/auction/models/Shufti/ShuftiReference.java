@@ -20,6 +20,8 @@ public class ShuftiReference {
         this.addrStatus = false;
         this.conStatus = false;
         this.selfieStatus = false;
+
+        this.pending = false;
     }
     
     private int userId;
@@ -37,4 +39,6 @@ public class ShuftiReference {
 
     // selfie
     private Boolean selfieStatus;
+
+    private Boolean pending;
 }

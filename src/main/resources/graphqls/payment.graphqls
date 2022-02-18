@@ -33,11 +33,12 @@ extend type Query {
 		roundId: Int!,
 		userId: Int
 	) : [CryptoTransaction]
+	getExchangeRate : String
 }
 
 extend type Mutation {
 	stripePayment (
-		roundId: String,
+		roundId: Int,
 		amount: Float,
 		paymentIntentId: String,
 		paymentMethodId: String

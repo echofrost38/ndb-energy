@@ -3,9 +3,9 @@ package com.ndb.auction.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.TokenAsset;
-import com.ndb.auction.payload.Balance;
+import com.ndb.auction.models.balance.CryptoBalance;
+import com.ndb.auction.payload.BalancePayload;
 
 import org.springframework.stereotype.Service;
 
@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 public class InternalBalanceService extends BaseService {
     
     // getting balances
-    public List<Balance> getInternalBalances(int userId) {
-        List<InternalBalance> iBalances = balanceDao.selectByUserId(userId, null);
-        List<Balance> balanceList = new ArrayList<>();
-        for (InternalBalance balance : iBalances) {
+    public List<BalancePayload> getInternalBalances(int userId) {
+        List<CryptoBalance> iBalances = balanceDao.selectByUserId(userId, null);
+        List<BalancePayload> balanceList = new ArrayList<>();
+        for (CryptoBalance balance : iBalances) {
             TokenAsset asset = tokenAssetService.getTokenAssetById(balance.getTokenId());
-            Balance b = new Balance(asset.getTokenName(), asset.getTokenSymbol(), asset.getSymbol(), balance.getFree(), balance.getHold());
+            BalancePayload b = new BalancePayload(asset.getTokenName(), asset.getTokenSymbol(), asset.getSymbol(), balance.getFree(), balance.getHold());
             balanceList.add(b);
         }
         return balanceList;
     } 
 
-    public InternalBalance getBalance(int userId, String symbol) {
+    public CryptoBalance getBalance(int userId, String symbol) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(symbol);
         return balanceDao.selectById(userId, tokenId);
     }

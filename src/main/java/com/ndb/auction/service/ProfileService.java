@@ -9,11 +9,11 @@ import com.ndb.auction.exceptions.AvatarNotFoundException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.InternalBalance;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
+import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 
@@ -188,9 +188,9 @@ public class ProfileService extends BaseService {
 
 		// check user's NDB wallet
 		int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-		InternalBalance ndbBalance = balanceDao.selectById(userId, tokenId);
+		CryptoBalance ndbBalance = balanceDao.selectById(userId, tokenId);
 		if(ndbBalance == null) {
-			ndbBalance = new InternalBalance(userId, tokenId);
+			ndbBalance = new CryptoBalance(userId, tokenId);
 			balanceDao.insert(ndbBalance);
 		}
 

@@ -1,4 +1,4 @@
-type Balance {
+type BalancePayload {
     tokenName: String,
     tokenSymbol: String,
     symbol: String,

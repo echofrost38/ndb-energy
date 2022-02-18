@@ -24,6 +24,7 @@ public class ShuftiDao extends BaseOracleDao {
 		model.setAddrStatus(rs.getBoolean("ADDR_STATUS"));
 		model.setConStatus(rs.getBoolean("CON_STATUS"));
 		model.setSelfieStatus(rs.getBoolean("SEL_STATUS"));
+		model.setPending(rs.getBoolean("PENDING"));
 		return model;
 	}
 
@@ -52,9 +53,9 @@ public class ShuftiDao extends BaseOracleDao {
 	}
 
     public int insert(ShuftiReference m) {
-        String sql = "INSERT INTO TBL_SHUFTI_REF(USER_ID, REFERENCE, VERIFY_TYPE, DOC_STATUS, ADDR_STATUS, CON_STATUS)"
-				+ "VALUES(?,?,?,?,?,?)";
-		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType(), m.getDocStatus(), m.getAddrStatus(), m.getConStatus());
+        String sql = "INSERT INTO TBL_SHUFTI_REF(USER_ID, REFERENCE, VERIFY_TYPE, DOC_STATUS, ADDR_STATUS, CON_STATUS, PENDING)"
+				+ "VALUES(?,?,?,?,?,?,?)";
+		return jdbcTemplate.update(sql, m.getUserId(), m.getReference(), m.getVerificationType(), m.getDocStatus(), m.getAddrStatus(), m.getConStatus(), m.getPending());
     }
 
 	public int updateReference (int userId, String reference) {
@@ -84,6 +85,11 @@ public class ShuftiDao extends BaseOracleDao {
 
 	public int updateSelfieStatus(int userId, Boolean status) {
 		String sql = "UPDATE TBL_SHUFTI_REF SET CON_STATUS = ? WHERE USER_ID = ?";
+		return jdbcTemplate.update(sql, status, userId);
+	}
+
+	public int updatePendingStatus(int userId, Boolean status) {
+		String sql = "UPDATE TBL_SHUFTI_REF SET PENDING = ? WHERE USER_ID = ?";
 		return jdbcTemplate.update(sql, status, userId);
 	}
 

@@ -1,5 +1,5 @@
 extend type Query {
-    getBalances : [Balance]
+    getBalances : [BalancePayload]
 
 }
 
@@ -12,6 +12,16 @@ extend type Mutation {
         amount: Float,
         tokenSymbol: String
     ) : Boolean
+    depositWithStripe(
+        amount: Float,
+        currencyName: String,
+        paymentIntentId: String,
+        paymentMethodId: String
+    ) : PayResponse
+    depositWithPlaid : String
+    plaidExchangeToken(
+        publicToken: String
+    ): String
 }
 
 schema {

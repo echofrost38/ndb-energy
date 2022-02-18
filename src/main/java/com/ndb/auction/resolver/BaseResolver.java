@@ -10,6 +10,7 @@ import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.FiatAssetService;
 import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.KYBService;
@@ -23,6 +24,7 @@ import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
+import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.StripeService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
@@ -127,4 +129,9 @@ public class BaseResolver {
 	@Autowired
 	protected NDBCoinService ndbCoinService;
 
+	@Autowired
+	protected FiatAssetService fiatAssetService;
+
+	@Autowired
+	protected PlaidService plaidService;
 }

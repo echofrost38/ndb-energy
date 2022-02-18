@@ -63,7 +63,7 @@ public class BidService extends BaseService {
 			int payType,
 			String cryptoType) {
 		// Check existing
-		Bid bid = bidDao.getBid(roundId, userId);
+		Bid bid = bidDao.getBid(userId, roundId);
 		if (bid != null) {
 			throw new BidException("Already place a bid to this round.", "roundId");
 		}

@@ -52,23 +52,23 @@ public class PlaidService extends BaseService {
         apiKeys.put("secret", SECRET);
         ApiClient apiClient = new ApiClient(apiKeys);
 
-        apiClient.setPlaidAdapter(ApiClient.Sandbox);
+        apiClient.setPlaidAdapter(ApiClient.Development);
         plaidClient = apiClient.createService(PlaidApi.class);
     }
 
     // Create a recipient
     private String createRecipient() throws IOException {
         PaymentInitiationAddress address = new PaymentInitiationAddress()
-            .street(Arrays.asList("Street Name 999"))
-            .city("City")
-            .postalCode("99999")
+            .street(Arrays.asList("56 Shoreditch High Street"))
+            .city("London")
+            .postalCode("E1 6JJ")
             .country("GB");
         RecipientBACSNullable basc = new RecipientBACSNullable ()
-            .account("260934")
-            .sortCode("560029");
+            .account("22063784")
+            .sortCode("23-14-70");
 
         PaymentInitiationRecipientCreateRequest request = new PaymentInitiationRecipientCreateRequest()
-            .name("John Doe")
+            .name("Voltamond")
             .bacs(basc)
             .address(address);
         Response<PaymentInitiationRecipientCreateResponse> response = plaidClient

@@ -62,7 +62,7 @@ public class TokenAssetDao extends BaseOracleDao {
 	}
 
 	public int updateSymbol(int id, String symbol) {
-		String sql = "UPDATE TBL_TOKEN_ASSET SYMBOL = ? WHERE ID = ?";
+		String sql = "UPDATE TBL_TOKEN_ASSET SET SYMBOL = ? WHERE ID = ?";
 		return jdbcTemplate.update(sql, symbol, id);
 	}
 

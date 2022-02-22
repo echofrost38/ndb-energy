@@ -143,8 +143,8 @@ public class AuctionDao extends BaseOracleDao {
 	}
 
 	public Auction updateAuctionStats(Auction m) {
-		String sql = "UPDATE TBL_AUCTION SET STATUS=? WHERE ID=?";
-		jdbcTemplate.update(sql, m.getStatus(), m.getId());
+		String sql = "UPDATE TBL_AUCTION SET QTY = ?, WIN = ?, FAIL = ?, SOLD = ? WHERE ID=?";
+		jdbcTemplate.update(sql, m.getStats().getQty(),m.getStats().getWin(),m.getStats().getFail(), m.getSold(), m.getId());
 		return m;
 	}
 

@@ -2,6 +2,8 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,11 @@ import com.ndb.auction.models.presale.PreSale;
 @Service
 @RequiredArgsConstructor
 public class AuctionService extends BaseService {
+
+	@PostConstruct
+	public void init() {
+		schedule.checkAllRounds();
+	}
 
 	public Auction createNewAuction(Auction auction) {
 

@@ -20,7 +20,4 @@ public class AuctionApplication {
 	GraphQLScalarType uploadScalarType() {
 		return ApolloScalars.Upload;
 	}
-
-
-
 }

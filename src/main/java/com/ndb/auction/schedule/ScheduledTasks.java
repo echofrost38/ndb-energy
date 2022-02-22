@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.service.AuctionService;
@@ -81,6 +83,15 @@ public class ScheduledTasks {
 				setNewCountdown(auction);
 				System.out.println(String.format("Auction Round %d is in countdown.", auction.getRound()));
 				return;
+			} else if (auction.getStartedAt() < currentTime && auction.getEndedAt() > currentTime) {
+				// start round
+				setStartRound(auction);
+				auctionService.startAuction(auction.getId());
+				System.out.println(String.format("Auction Round %d has been started.", auction.getRound()));
+				return;
+			} else {
+				auctionService.endAuction(auction.getId());
+				return;
 			}
 		}
 		
@@ -92,6 +103,9 @@ public class ScheduledTasks {
 				setStartRound(auction);
 				System.out.println(String.format("Auction Round %d has been started.", auction.getRound()));
 				return;
+			} else {
+				auctionService.endAuction(auction.getId());
+				return;
 			}
 		}
 
@@ -102,6 +116,14 @@ public class ScheduledTasks {
 				setPresaleCountdown(presale);
 				System.out.println(String.format("PreSale Round %d is in countdown.", presale.getId()));
 				return;
+			} else if (presale.getStartedAt() < currentTime && presale.getEndedAt() > currentTime) {
+				setPresaleStart(presale);
+				presaleService.startPresale(presale.getId());
+				System.out.println(String.format("PreSale Round %d has been started.", presale.getId()));
+				return;
+			} else {
+				presaleService.closePresale(presale.getId());
+				return;
 			}
 		}
 
@@ -111,6 +133,9 @@ public class ScheduledTasks {
 			if(presale.getStartedAt() < currentTime && presale.getEndedAt() > currentTime) {
 				setPresaleStart(presale);
 				System.out.println(String.format("PreSale Round %d has been started.", presale.getId()));
+				return;
+			} else {
+				presaleService.closePresale(presale.getId());
 				return;
 			}
 		}

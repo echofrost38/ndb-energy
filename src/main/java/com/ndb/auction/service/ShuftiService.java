@@ -26,12 +26,8 @@ import com.ndb.auction.payload.ShuftiStatusRequest;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -206,20 +202,20 @@ public class ShuftiService extends BaseService{
         return response;
     }
 
-    private String sendPost(ShuftiRequest request) throws ClientProtocolException, IOException {
-        String token = generateToken();
-        HttpPost post = new HttpPost(BASE_URL);
-        String body = gson.toJson(request, ShuftiRequest.class);
-        StringEntity entity = new StringEntity(body);
-        post.setEntity(entity);
-        post.addHeader("Accept", "application/json");
-        post.addHeader("Content-type", "application/json"); 
-        post.addHeader("Authorization","Basic " + token);
+    // private String sendPost(ShuftiRequest request) throws ClientProtocolException, IOException {
+    //     String token = generateToken();
+    //     HttpPost post = new HttpPost(BASE_URL);
+    //     String body = gson.toJson(request, ShuftiRequest.class);
+    //     StringEntity entity = new StringEntity(body);
+    //     post.setEntity(entity);
+    //     post.addHeader("Accept", "application/json");
+    //     post.addHeader("Content-type", "application/json"); 
+    //     post.addHeader("Authorization","Basic " + token);
 
-        CloseableHttpResponse response = client.execute(post);
+    //     CloseableHttpResponse response = client.execute(post);
         
-        return EntityUtils.toString(response.getEntity());
-    }
+    //     return EntityUtils.toString(response.getEntity());
+    // }
 
     // ====================== upload into s3 ===============
     public Boolean uploadDocument(int userId, Part document) {

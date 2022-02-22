@@ -225,7 +225,7 @@ public class BidService extends BaseService {
 		boolean status = true;
 
 		// qty, win, fail : total price ( USD )
-		long qty = 0, win = 0, fail = 0;
+		long win = 0, fail = 0;
 		final long total = currentRound.getTotalToken();
 		long availableToken = total;
 
@@ -271,7 +271,7 @@ public class BidService extends BaseService {
 		}
 
 		// update & save new auction stats
-		currentRound.setStats(new AuctionStats(qty, win, fail));
+		currentRound.setStats(new AuctionStats(win + fail, win, fail));
 		if (win > total) {
 			currentRound.setSold(total);
 		} else {

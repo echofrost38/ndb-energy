@@ -119,8 +119,6 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
             user.addRole(role);
             user.addRole("ROLE_USER");
         }
-            
-
         return userService.createNewUser(user, rPassword);
     }
 

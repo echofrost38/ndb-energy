@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Transaction {
-    private int id;
-    private int userId;
-    private Double amount;
-    private Long createdAt;
-    private Boolean status;
+    protected int id;
+    protected int userId;
+    protected Double amount;
+    protected Long createdAt;
+    protected Boolean status;
 }

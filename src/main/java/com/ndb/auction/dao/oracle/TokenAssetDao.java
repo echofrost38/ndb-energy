@@ -61,6 +61,11 @@ public class TokenAssetDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, m.getTokenName(), m.getTokenSymbol(), m.getNetwork(), m.getAddress(), m.getSymbol());
 	}
 
+	public int updateSymbol(int id, String symbol) {
+		String sql = "UPDATE TBL_TOKEN_ASSET SYMBOL = ? WHERE ID = ?";
+		return jdbcTemplate.update(sql, symbol, id);
+	}
+
     public int updateDeleted(int id) {
 		String sql = "DELETE FROM TBL_TOKEN_ASSET WHERE ID=?";
 		return jdbcTemplate.update(sql, id);

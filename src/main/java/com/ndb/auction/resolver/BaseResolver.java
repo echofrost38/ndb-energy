@@ -22,6 +22,7 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
+import com.ndb.auction.service.payment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
@@ -134,4 +135,7 @@ public class BaseResolver {
 
 	@Autowired
 	protected PlaidService plaidService;
+
+	@Autowired
+	protected CoinpaymentAuctionService coinpaymentAuctionService;
 }

@@ -9,6 +9,7 @@ import com.ndb.auction.exceptions.IPNExceptions;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.transaction.DepositTransaction;
+import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
@@ -88,56 +89,54 @@ public class CryptoController extends BaseController {
 		log.info("IPN status : {}", status);
 
         if (status >= 100 || status == 2) {
-            CryptoTransaction txn = cryptoService.getTransactionById(id);
+            CoinpaymentAuctionTransaction txn = (CoinpaymentAuctionTransaction) coinpaymentAuctionService.selectById(id);
             User user = userService.getUserById(txn.getUserId());
     
-            if(txn.getTransactionType() == CryptoTransaction.AUCTION) {
-                Bid bid = bidService.getBid(txn.getRoundId(), txn.getUserId());
+            Bid bid = bidService.getBid(txn.getAuctionId(), txn.getUserId());
     
-                if (bid.isPendingIncrease()) {
-                    double pendingPrice = bid.getDelta();
-                    if (pendingPrice > fiatAmount) {
-                        
-                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-                    }
-    
-                    bidService.updateBid(txn.getUserId(), txn.getRoundId(), bid.getTempTokenAmount(),
-                            bid.getTempTokenPrice());
-    
-                } else {
-                    long totalPrice = bid.getTotalPrice();
-                    if (totalPrice > fiatAmount) {
-    
-                        new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-                    }
-    
-                    // update user tier points
-                    List<Tier> tierList = tierService.getUserTiers();
-                    TaskSetting taskSetting = taskSettingService.getTaskSetting();
-                    TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
-                    List<Integer> auctionList = tierTask.getAuctions();
-                    if(!auctionList.contains(bid.getRoundId())) {
-                        auctionList.add(bid.getRoundId());
-                        // get point
-                        double newPoint = user.getTierPoint() + taskSetting.getAuction();
-                        int tierLevel = 0;
-    
-                        // check change in level
-                        for (Tier tier : tierList) {
-                            if(tier.getPoint() <= newPoint) {
-                                tierLevel = tier.getLevel();
-                            }
-                        }
-                        userService.updateTier(user.getId(), tierLevel, newPoint);
-                        tierTaskService.updateTierTask(tierTask);
-                    } 
+            if (bid.isPendingIncrease()) {
+                double pendingPrice = bid.getDelta();
+                if (pendingPrice > fiatAmount) {
+                    
+                    new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                 }
-                
-                // Change crypto Hold amount!!!!!!!!!!!!!!!
-                balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(amount));
-                bidService.updateBidRanking(txn.getUserId(), txn.getRoundId());
+
+                bidService.updateBid(txn.getUserId(), txn.getAuctionId(), bid.getTempTokenAmount(),
+                        bid.getTempTokenPrice());
+
+            } else {
+                long totalPrice = bid.getTotalPrice();
+                if (totalPrice > fiatAmount) {
+
+                    new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+                }
+
+                // update user tier points
+                List<Tier> tierList = tierService.getUserTiers();
+                TaskSetting taskSetting = taskSettingService.getTaskSetting();
+                TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+                List<Integer> auctionList = tierTask.getAuctions();
+                if(!auctionList.contains(bid.getRoundId())) {
+                    auctionList.add(bid.getRoundId());
+                    // get point
+                    double newPoint = user.getTierPoint() + taskSetting.getAuction();
+                    int tierLevel = 0;
+
+                    // check change in level
+                    for (Tier tier : tierList) {
+                        if(tier.getPoint() <= newPoint) {
+                            tierLevel = tier.getLevel();
+                        }
+                    }
+                    userService.updateTier(user.getId(), tierLevel, newPoint);
+                    tierTaskService.updateTierTask(tierTask);
+                } 
+            }
             
-            } 
+            // Change crypto Hold amount!!!!!!!!!!!!!!!
+            balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(amount));
+            bidService.updateBidRanking(txn.getUserId(), txn.getAuctionId());
+
             cryptoService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
     
             // send notification to user for payment result!!

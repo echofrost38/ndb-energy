@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CryptoTransaction extends Transaction {
-    private String cryptoType;
-    private String network;
-    private Double cryptoAmount;
-    private Long confirmedAt;
+    protected String cryptoType;
+    protected String network;
+    protected Double cryptoAmount;
+    protected Long confirmedAt;
 }

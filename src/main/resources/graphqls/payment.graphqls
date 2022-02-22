@@ -46,7 +46,9 @@ extend type Mutation {
 	createCryptoPayment(
 		roundId: Int!,
 		amount: Float!,
-		currency: String!
+		cryptoType: String,
+		network: String,
+		coin: String!
 	) : String
 }
 

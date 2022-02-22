@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CryptoDepositTransaction extends CryptoTransaction {
-    private String depositAddress;
+    protected String depositAddress;
 }

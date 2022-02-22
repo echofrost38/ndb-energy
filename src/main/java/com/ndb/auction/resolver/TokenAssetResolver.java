@@ -31,6 +31,11 @@ public class TokenAssetResolver extends BaseResolver implements GraphQLMutationR
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public int updateSymbol(int id, String symbol) {
+        return tokenAssetService.updateTokenSymbol(id, symbol);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public int deleteTokenAsset(int id) {
         return tokenAssetService.deleteTokenAsset(id);
     }

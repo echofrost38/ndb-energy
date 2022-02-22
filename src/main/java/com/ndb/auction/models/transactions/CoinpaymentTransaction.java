@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CoinpaymentTransaction extends CryptoDepositTransaction {
-    private String coin;
+    protected String coin;
 }

@@ -57,6 +57,14 @@ public class TokenAssetService {
         return result;
     }
 
+    public int updateTokenSymbol(int id, String symbol) {
+        int result = tokenAssetDao.updateSymbol(id, symbol);
+        if(result == 1) {
+            this.fillList();
+        }
+        return result;
+    }
+
     public List<TokenAsset> getAllTokenAssets(String orderBy) {
         if(this.assetList == null) {
             fillList();

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ndb.auction.models.transaction.CryptoTransaction;
+import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
@@ -71,10 +72,11 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public String createCryptoPayment(int roundId, Double amount, String currency) throws ParseException, IOException {
+	public String createCryptoPayment(int roundId, Double amount, String cryptoType, String network, String coin) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return cryptoService.createNewPayment(roundId, userId, amount, currency);
+		CoinpaymentAuctionTransaction _m = new CoinpaymentAuctionTransaction(roundId, userId, amount, cryptoType, network, coin);
+		return coinpaymentAuctionService.createNewTransaction(_m);
 	}
 
 	// @PreAuthorize("isAuthenticated()")

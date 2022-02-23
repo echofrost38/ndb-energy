@@ -62,13 +62,20 @@ public class BidService extends BaseService {
 			long tokenPrice) {
 		// Check existing
 		Bid bid = bidDao.getBid(userId, roundId);
-		if (bid != null) {
+		if (bid != null && bid.getStatus() != Bid.NOT_CONFIRMED) {
 			throw new BidException("Already place a bid to this round.", "roundId");
 		}
 
 		// create new pending bid
 		// double totalPrice = Double.valueOf(tokenAmount * tokenPrice);
-		bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
+		if(bid == null) {
+			bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
+		} else {
+			bid.setUserId(userId);
+			bid.setRoundId(roundId);
+			bid.setTokenAmount(tokenAmount);
+			bid.setTokenPrice(tokenPrice);
+		}
 
 		// check Round is opened.
 		Auction auction = auctionDao.getAuctionById(roundId);

@@ -44,13 +44,17 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public Bid placeBid(Bid m) {
-		String sql = "INSERT INTO TBL_BID(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_PRICE, TOKEN_PRICE, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
+		String sql = "MERGE INTO TBL_BID USING DUAL ON (USER_ID=? AND ROUND_ID=?)"
+				+ "WHEN MATCHED THEN UPDATE SET TOKEN_AMOUNT=?, TOTAL_PRICE=?, TOKEN_PRICE=?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, DELTA=?, PENDING_INCREASE=?, "
+				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?"
+				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_PRICE, TOKEN_PRICE, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
 				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS)"
 				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
-		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalPrice(),
-				m.getTokenPrice(), m.getTempTokenAmount(), m.getTempTokenPrice(), m.getDelta(), m.isPendingIncrease(),
-				gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(),
-				m.getStatus());
+		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalPrice(), m.getTokenPrice(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
+			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
+			m.getTotalPrice(), m.getTokenPrice(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
+			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus()
+		);
 		return m;
 	}
 	

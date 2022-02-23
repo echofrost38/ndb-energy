@@ -31,7 +31,7 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setAmount(rs.getLong("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
-        m.setConfirmedAt(rs.getTimestamp("CONFIRMED_AT").getTime());
+        m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
         m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
@@ -45,7 +45,7 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
     @Override
     public Transaction insert(Transaction _m) {
         StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
-        String sql = "INSERT INTO TBL_STRIPE_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,CONFIRMED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,AUCTION_ID,BID_ID)"
+        String sql = "INSERT INTO TBL_STRIPE_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,AUCTION_ID,BID_ID)"
         + " VALUES(SEQ_STRIPE_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
@@ -136,17 +136,17 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
 
     @Override
     public int update(int id, int status) {
-        String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, CONFIRMED_AT=SYSDATE WHERE ID=?";
+        String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, UPDATED_AT=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, status, id);
     }
 
     public int update(int userId, int auctionId, String intentId) {
-        String sql = "UPDATE TBL_STRIPE_AUCTION SET INTENT_ID=?, STATUS = ?, CONFIRMED_AT=SYSDATE WHERE USER_ID=? AND AUCTION_ID = ?";
+        String sql = "UPDATE TBL_STRIPE_AUCTION SET INTENT_ID=?, STATUS = ?, UPDATED_AT=SYSDATE WHERE USER_ID=? AND AUCTION_ID = ?";
 		return jdbcTemplate.update(sql, intentId, true, userId, auctionId);
     }
 
     public int updatePaymentStatus(String paymentIntentId, int status) {
-        String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, CONFIRMED_AT=SYSDATE WHERE INTENT_ID=?";
+        String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, UPDATED_AT=SYSDATE WHERE INTENT_ID=?";
 		return jdbcTemplate.update(sql, status, paymentIntentId);
     }
     

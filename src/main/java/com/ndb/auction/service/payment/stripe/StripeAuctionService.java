@@ -67,8 +67,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                         response.setError("Insufficient funds");
 						return response;
                     }
-					bidService.updateBidRanking(bid);
                 }
+                bidService.updateBidRanking(bid);
             }
 			response = generateResponse(intent, response);
                         

@@ -43,13 +43,13 @@ extend type Mutation {
 		paymentIntentId: String,
 		paymentMethodId: String
 	) : PayResponse!
-	createCryptoPayment(
+	createCryptoPaymentForAuction(
 		roundId: Int!,
 		amount: Float!,
 		cryptoType: String,
 		network: String,
 		coin: String!
-	) : String
+	) : CoinpaymentAuctionTransaction
 }
 
 schema {

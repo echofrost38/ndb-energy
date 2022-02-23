@@ -102,6 +102,8 @@ public class CryptoController extends BaseController {
                 bidService.increaseAmount(
                     bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice()
                 );
+                bid.setTokenAmount(bid.getTempTokenAmount());
+                bid.setTokenPrice(bid.getTempTokenPrice());
             } else {
                 long totalPrice = bid.getTotalPrice();
                 if (totalPrice > fiatAmount) {

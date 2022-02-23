@@ -10,6 +10,6 @@ import com.ndb.auction.models.transactions.Transaction;
 import org.apache.http.client.ClientProtocolException;
 
 public interface ICryptoDepositService {
-    public String createNewTransaction(Transaction m) throws UnsupportedEncodingException, ClientProtocolException, IOException;
+    public Transaction createNewTransaction(Transaction m) throws UnsupportedEncodingException, ClientProtocolException, IOException;
     public List<CryptoDepositTransaction> selectByDepositAddress(String depositAddress);
 }

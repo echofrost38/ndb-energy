@@ -39,7 +39,7 @@ public class CoinpaymentAuctionService extends CoinpaymentBaseService implements
     }
 
     @Override
-    public String createNewTransaction(Transaction _m) throws ClientProtocolException, IOException {
+    public Transaction createNewTransaction(Transaction _m) throws ClientProtocolException, IOException {
         CoinpaymentAuctionTransaction m = (CoinpaymentAuctionTransaction)_m;
         
         // round existing
@@ -78,11 +78,11 @@ public class CoinpaymentAuctionService extends CoinpaymentBaseService implements
         String content = EntityUtils.toString(response.getEntity());
         
         AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
-        if(!addressResponse.getError().equals("ok")) return "error";
+        if(!addressResponse.getError().equals("ok")) return null;
         String address = addressResponse.getResult().getAddress();
         coinpaymentAuctionDao.insertDepositAddress(m.getId(), address);
-
-        return address;
+        m.setDepositAddress(address);
+        return m;
     }
 
     @Override

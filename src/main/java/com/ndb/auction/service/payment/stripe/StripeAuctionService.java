@@ -60,7 +60,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     }
                     
                     bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
-                    
+                    bid.setTokenAmount(bid.getTempTokenAmount());
+                    bid.setTokenPrice(bid.getTempTokenPrice());
                 } else {
                     long totalPrice = bid.getTotalPrice();
                     if(totalPrice > usdAmount) {

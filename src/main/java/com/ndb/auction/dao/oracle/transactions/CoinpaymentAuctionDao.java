@@ -30,7 +30,7 @@ public class CoinpaymentAuctionDao extends BaseOracleDao implements ITransaction
 		CoinpaymentAuctionTransaction m = new CoinpaymentAuctionTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getDouble("AMOUNT"));
+		m.setAmount(rs.getLong("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));

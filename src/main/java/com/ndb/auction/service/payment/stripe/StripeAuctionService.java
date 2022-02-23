@@ -36,6 +36,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                         .build();
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams);
+                stripeAuctionDao.insert(m);
             } else {
                 // Confirm the paymentIntent to collect the money
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
@@ -43,9 +44,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
             }
 
             if(intent.getStatus().equals("requires_capture")) {
-                m.setPaymentIntentId(intent.getId());
-                m = (StripeAuctionTransaction) stripeAuctionDao.insert(m);
-                
+                stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
 				Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if(bid == null) {
                     throw new BidException("no_bid", "auctionId");
@@ -113,6 +112,10 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
     @Override
     public int update(int id, int status) {
         return stripeAuctionDao.update(id, status);
+    }
+
+    public int update(int userId, int auctionId, String intentId) {
+        return stripeAuctionDao.update(userId, auctionId, intentId);
     }
 
 	// update payments - called by closeBid

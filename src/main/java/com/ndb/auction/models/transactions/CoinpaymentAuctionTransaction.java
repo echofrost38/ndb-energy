@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CoinpaymentAuctionTransaction extends CoinpaymentTransaction {
     
-    public CoinpaymentAuctionTransaction(int auctionId, int userId, Double amount, String cryptoType, String network, String coin) {
+    public CoinpaymentAuctionTransaction(int auctionId, int userId, Long amount, String cryptoType, String network, String coin) {
         this.auctionId = auctionId;
         this.userId = userId;
         this.amount = amount;

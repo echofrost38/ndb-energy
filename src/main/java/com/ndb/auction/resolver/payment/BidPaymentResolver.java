@@ -73,7 +73,7 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public CoinpaymentAuctionTransaction createCryptoPaymentForAuction(int roundId, Double amount, String cryptoType, String network, String coin) throws ParseException, IOException {
+	public CoinpaymentAuctionTransaction createCryptoPaymentForAuction(int roundId, Long amount, String cryptoType, String network, String coin) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 		CoinpaymentAuctionTransaction _m = new CoinpaymentAuctionTransaction(roundId, userId, amount, cryptoType, network, coin);

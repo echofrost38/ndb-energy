@@ -29,12 +29,12 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
 		StripeAuctionTransaction m = new StripeAuctionTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getDouble("AMOUNT"));
+		m.setAmount(rs.getLong("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
         m.setPaymentMethodId(rs.getString("METHOD_ID"));
         m.setPaymentIntentId(rs.getString("INTENT_ID"));
 		m.setAuctionId(rs.getInt("AUCTION_ID"));
@@ -138,6 +138,11 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
     public int update(int id, int status) {
         String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, UPDATE_AT=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, status, id);
+    }
+
+    public int update(int userId, int auctionId, String intentId) {
+        String sql = "UPDATE TBL_STRIPE_AUCTION SET INTENT_ID=?, STATUS = ?, UPDATE_AT=SYSDATE WHERE USER_ID=? AND AUCTION_ID = ?";
+		return jdbcTemplate.update(sql, intentId, true, userId, auctionId);
     }
 
     public int updatePaymentStatus(String paymentIntentId, int status) {

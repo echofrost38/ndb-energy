@@ -27,7 +27,8 @@ public class PresalePaymentResolver extends BaseResolver implements GraphQLQuery
     public PayResponse payStripeForPreSale(int orderId, Long amount, String paymentIntentId, String paymentMethodId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return stripeService.payStripeForPresale(orderId, userId, amount, paymentIntentId, paymentMethodId);
+        // return stripeService.payStripeForPresale(orderId, userId, amount, paymentIntentId, paymentMethodId);
+        return null;
     }
 
 }

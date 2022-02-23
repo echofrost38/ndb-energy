@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class FiatTransaction extends Transaction {
-    private String fiatType;
-    private Double fiatAmount;
+    protected String fiatType;
+    protected Double fiatAmount;
 }

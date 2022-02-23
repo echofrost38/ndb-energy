@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.StripeTransaction;
+import com.ndb.auction.models.transactions.StripeAuctionTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -27,36 +27,36 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	@PreAuthorize("isAuthenticated()")
 	@CrossOrigin
 	public String getStripePubKey() {
-		return stripeService.getPublicKey();
+		return stripeBaseService.getPublicKey();
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionsByRound(int roundId) {
-		return stripeService.getTransactionsByRound(roundId);
+	public List<StripeAuctionTransaction> getStripeTransactionsByRound(int roundId) {
+		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByRound(roundId, null);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<StripeTransaction> getStripeTransactionsByUser() {
+	public List<StripeAuctionTransaction> getStripeTransactionsByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
-		return stripeService.getTransactionByUser(id);
+		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(id, null);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionsByAdmin(int userId) {
-		return stripeService.getTransactionByUser(userId);
+	public List<StripeAuctionTransaction> getStripeTransactionsByAdmin(int userId) {
+		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(userId, null);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeTransaction> getStripeTransactionByAdmin(int roundId, int userId) {
-		return stripeService.getTransactions(roundId, userId);
+	public List<StripeAuctionTransaction> getStripeTransactionByAdmin(int roundId, int userId) {
+		return stripeAuctionService.selectByIds(roundId, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<StripeTransaction> getStripeTransaction(int roundId) {
+	public List<StripeAuctionTransaction> getStripeTransaction(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
-		return stripeService.getTransactions(roundId, id);
+		return stripeAuctionService.selectByIds(roundId, id);
 	}
 
 	@PreAuthorize("isAuthenticated()")
@@ -67,8 +67,9 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		String paymentMethodId
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int id = userDetails.getId();
-		return stripeService.createStripeForAuction(roundId, id, amount, paymentIntentId, paymentMethodId);
+        int userId = userDetails.getId();
+		StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId);
+		return stripeAuctionService.createNewTransaction(m);
 	}
 
 	@PreAuthorize("isAuthenticated()")

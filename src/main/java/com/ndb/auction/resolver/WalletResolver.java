@@ -48,7 +48,8 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     public PayResponse depositWithStripe(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
+        // return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
+        return null;
     }
 
     // Deposit with Plaid.com

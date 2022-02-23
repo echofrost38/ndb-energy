@@ -100,6 +100,26 @@ public class CoinpaymentAuctionDao extends BaseOracleDao implements ITransaction
 			}
 		}, userId);
     }
+
+	public List<? extends Transaction> selectByAuctionId(int auctionId) {
+        String sql = "SELECT * FROM TBL_COINPAYMENT_AUCTION WHERE AUCTION_ID = ?";
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentAuctionTransaction>() {
+			@Override
+			public CoinpaymentAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, auctionId);
+    }
+
+	public List<? extends Transaction> select(int userId, int auctionId) {
+        String sql = "SELECT * FROM TBL_COINPAYMENT_AUCTION WHERE USER_ID = ? AND AUCTION_ID = ?";
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentAuctionTransaction>() {
+			@Override
+			public CoinpaymentAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, userId, auctionId);
+    }
     
     @Override
     public Transaction selectById(int id) {
@@ -120,6 +140,11 @@ public class CoinpaymentAuctionDao extends BaseOracleDao implements ITransaction
 		return jdbcTemplate.update(sql, status, id);
     }
 
+	public int updateStatus(int id, int status, Double _amount, String _type) {
+		String sql = "UPDATE TBL_COINPAYMENT_AUCTION SET STATUS=?, UPDATE_AT=SYSDATE, CRYPTO_AMOUNT = ?, CRYPTO_TYPE = ? WHERE ID=?";
+		return jdbcTemplate.update(sql, status, _amount, _type,  id);
+	}
+
     @Override
     public List<CryptoDepositTransaction> selectByDepositAddress(String depositAddress) {
         // TODO Auto-generated method stub
@@ -131,5 +156,10 @@ public class CoinpaymentAuctionDao extends BaseOracleDao implements ITransaction
         String sql = "UPDATE TBL_COINPAYMENT_AUCTION SET DEPOSIT_ADDR=? WHERE ID=?";
         return jdbcTemplate.update(sql, address, id);
     }
+
+	public int deleteExpired(double days) {
+		String sql = "DELETE FROM TBL_COINPAYMENT_AUCTION WHERE SYSDATE-CREATED_AT>?";
+		return jdbcTemplate.update(sql, days);
+	}
     
 }

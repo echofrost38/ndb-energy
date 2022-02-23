@@ -2,19 +2,19 @@ extend type Query {
 	getStripePubKey : String!
 	getStripeTransactionsByRound(
 		roundId: String!
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	getStripeTransactionsByUser
-	 : [StripeTransaction]
+	 : [StripeAuctionTransaction]
 	getStripeTransactionsByAdmin(
 		 userId: String!
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	getStripeTransaction(
 		roundId: String!,
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	getStripeTransactionByAdmin(
 		roundId: String!,
 		userId: String
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	getCryptoTransactionById(
 		id: Int!
 	) : CryptoTransaction

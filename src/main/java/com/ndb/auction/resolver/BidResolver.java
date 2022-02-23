@@ -19,29 +19,22 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	public Bid placeBid(
 		int roundId, 
 		Long tokenAmount, 
-		Long tokenPrice, 
-		int payment, 
-		String cryptoType
+		Long tokenPrice
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int userId = userDetails.getId();
-		// if(!sumsubService.checkThreshold(userId, "bid", tokenAmount * tokenPrice)) {
-		// 	throw new UnauthorizedException("Please verify your identification", "tokenAmount");
-		// }
-		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice, payment, cryptoType);
+		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
 	public Bid increaseBid(
 		int roundId, 
 		Long tokenAmount, 
-		Long tokenPrice, 
-		Integer payment, 
-		String cryptoType
+		Long tokenPrice
 		) {
 			UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			int id = userDetails.getId();
-			return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice, payment, cryptoType);
+			return bidService.increaseBid(id, roundId, tokenAmount, tokenPrice);
 		}
 		
 	@PreAuthorize("isAuthenticated()")

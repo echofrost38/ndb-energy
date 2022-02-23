@@ -1,4 +1,4 @@
-package com.ndb.auction.service.payment;
+package com.ndb.auction.service.payment.coinpayment;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,7 +11,8 @@ import com.ndb.auction.models.transactions.CryptoDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
-import com.ndb.auction.service.BaseService;
+import com.ndb.auction.service.payment.ICryptoDepositService;
+import com.ndb.auction.service.payment.ITransactionService;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,7 +24,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CoinpaymentAuctionService extends BaseService implements ITransactionService, ICryptoDepositService {
+public class CoinpaymentAuctionService extends CoinpaymentBaseService implements ITransactionService, ICryptoDepositService {
 
     protected CloseableHttpClient client;
 
@@ -86,14 +87,12 @@ public class CoinpaymentAuctionService extends BaseService implements ITransacti
 
     @Override
     public List<? extends Transaction> selectAll(String orderBy) {
-        // TODO Auto-generated method stub
-        return null;
+        return coinpaymentAuctionDao.selectAll(orderBy);
     }
 
     @Override
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        // TODO Auto-generated method stub
-        return null;
+        return coinpaymentAuctionDao.selectByUser(userId, orderBy);
     }
 
     @Override
@@ -103,8 +102,23 @@ public class CoinpaymentAuctionService extends BaseService implements ITransacti
 
     @Override
     public int update(int id, int status) {
-        // TODO Auto-generated method stub
-        return 0;
+        return coinpaymentAuctionDao.update(id, status);
+    }
+
+    public List<? extends Transaction> selectByAuctionId(int auctionId) {
+        return coinpaymentAuctionDao.selectByAuctionId(auctionId);
+    }
+
+    public List<? extends Transaction> select(int userId, int auctionId) {
+        return coinpaymentAuctionDao.select(userId, auctionId);
+    }
+
+    public int updateTransaction(int id, int status, Double cryptoAmount, String cryptoType) {
+        return coinpaymentAuctionDao.updateStatus(id, status, cryptoAmount, cryptoType);
+    }
+
+    public int deleteExpired(double days) {
+        return coinpaymentAuctionDao.deleteExpired(days);
     }
 
 }

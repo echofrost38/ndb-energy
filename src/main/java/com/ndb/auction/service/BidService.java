@@ -17,8 +17,8 @@ import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.transaction.CryptoTransaction;
+import com.ndb.auction.models.transactions.StripeAuctionTransaction;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.StripeTransaction;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
@@ -27,7 +27,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
-import com.ndb.auction.service.payment.StripeService;
+import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.utils.Sort;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class BidService extends BaseService {
 	private Sort sort;
 
 	@Autowired
-	private StripeService stripeService;
+	private StripeAuctionService stripeService;
 
 	@Autowired
 	private CryptoService cryptoService;
@@ -59,9 +59,7 @@ public class BidService extends BaseService {
 			int userId,
 			int roundId,
 			long tokenAmount,
-			long tokenPrice,
-			int payType,
-			String cryptoType) {
+			long tokenPrice) {
 		// Check existing
 		Bid bid = bidDao.getBid(userId, roundId);
 		if (bid != null) {
@@ -69,7 +67,7 @@ public class BidService extends BaseService {
 		}
 
 		// create new pending bid
-		double totalPrice = Double.valueOf(tokenAmount * tokenPrice);
+		// double totalPrice = Double.valueOf(tokenAmount * tokenPrice);
 		bid = new Bid(userId, roundId, tokenAmount, tokenPrice);
 
 		// check Round is opened.
@@ -87,39 +85,29 @@ public class BidService extends BaseService {
 			throw new BidException("Token price must be larget than min price.", "tokenPrice");
 		}
 
-		if (payType == Bid.CRYPTO) {
-			long leftTime = auction.getEndedAt() - System.currentTimeMillis();
-			if (leftTime < 10 * 60 * 1000) {
-				throw new BidException("Bid must be placed 10 minutes before the end of round.", "roundId");
-			}
-		}
-
-		// set bid type
-		bid.setPayType(payType);
-
 		// check pay type : WALLET!!!!!
-		if (payType == Bid.WALLET) {
-			// check user's wallet!
-			double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
+		// if (payType == Bid.WALLET) {
+		// 	// check user's wallet!
+		// 	double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
 
-			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-			CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+		// 	int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+		// 	CryptoBalance balance = balanceDao.selectById(userId, tokenId);
 			
-			if (balance.getFree() < cryptoAmount) {
-				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
-			}
+		// 	if (balance.getFree() < cryptoAmount) {
+		// 		throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
+		// 	}
 
-			balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
+		// 	balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
 
-			Map<String, BidHolding> holdingList = bid.getHoldingList();
-			BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
-			holdingList.put(cryptoType, hold);
-			bid.setHoldingList(holdingList);
+		// 	Map<String, BidHolding> holdingList = bid.getHoldingList();
+		// 	BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
+		// 	holdingList.put(cryptoType, hold);
+		// 	bid.setHoldingList(holdingList);
 
-			bidDao.placeBid(bid);
-			updateBidRanking(userId, roundId);
-			return bid;
-		}
+		// 	bidDao.placeBid(bid);
+		// 	updateBidRanking(bid);
+		// 	return bid;
+		// }
 
 		// save with pending status
 		bidDao.placeBid(bid);
@@ -173,42 +161,20 @@ public class BidService extends BaseService {
 		return bidDao.getBidListByUser(userId);
 	}
 
-	public Bid getBid(Integer round, int userId) {
-		return bidDao.getBid(userId, round);
-	}
-
 	public Bid getBid(int roundId, int userId) {
 		return bidDao.getBid(userId, roundId);
-	}
-
-	public Bid updateBid(int userId, int roundId, long tokenAmount, long tokenPrice) {
-
-		Bid bid = bidDao.getBid(userId, roundId);
-
-		// check null
-		if (bid == null) {
-			throw new BidException("Bid is not yet placed.", "roundId");
-		}
-
-		bid.setTokenAmount(tokenAmount);
-		bid.setTokenPrice(tokenPrice);
-		bid.setTotalPrice(tokenPrice * tokenAmount);
-		bid.setPendingIncrease(false);
-
-		return bidDao.updateBid(bid);
 	}
 
 	/**
 	 * It is called from Payment service with user id and round number.
 	 */
-	public void updateBidRanking(int userId, int roundId) {
-
+	public void updateBidRanking(Bid bid) {
+		int roundId = bid.getRoundId();
+		int userId = bid.getUserId();
 		Auction currentRound = auctionDao.getAuctionById(roundId);
 
 		addAuctionpoint(userId, currentRound.getRound());
 
-		// sorting must be updated!!!!
-		Bid bid = bidDao.getBid(userId, roundId);
 		List<Bid> bidList = bidDao.getBidListByRound(roundId);
 		Bid _bidArray[] = new Bid[bidList.size()];
 		bidList.toArray(_bidArray);
@@ -308,8 +274,8 @@ public class BidService extends BaseService {
 			long totalPrice = 0;
 
 			// check stripe
-			List<StripeTransaction> fiatTxns = stripeService.getTransactions(roundId, userId);
-			for (StripeTransaction fiatTransaction : fiatTxns) {
+			List<StripeAuctionTransaction> fiatTxns = stripeService.selectByIds(roundId, userId);
+			for (StripeAuctionTransaction fiatTransaction : fiatTxns) {
 
 				// Processing Stripe CAPTURE or CANCEL
 				boolean result = stripeService.UpdateTransaction(fiatTransaction.getId(), bid.getStatus());
@@ -425,15 +391,16 @@ public class BidService extends BaseService {
 		}
 	}
 
-	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice, int payType,
-			String cryptoType) {
+	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice) {
+		
 		Bid originalBid = bidDao.getBid(userId, roundId);
 		if (originalBid == null) {
 			throw new BidException("Bid is not yet placed.", "roundId");
 		}
 
 		if (originalBid.isPendingIncrease()) {
-			throw new BidException("Bid is not yet placed.", "roundId");
+			// throw new BidException("", "roundId");
+			originalBid.setPendingIncrease(false);
 		}
 
 		long _tokenAmount = originalBid.getTokenAmount();
@@ -446,47 +413,52 @@ public class BidService extends BaseService {
 			throw new BidException("New price must be larger than original price.", "tokenPrice");
 		}
 
+		// previous total amount!
 		long _total = _tokenAmount * _tokenPrice;
+		
+		// new total amount!
 		long newTotal = tokenAmount * tokenPrice;
+		
+		// more paid
 		double delta = newTotal - _total;
 
-		// check pay type : WALLET!!!!!
-		if (payType == Bid.WALLET) {
-			// check user's wallet!
+		// // check pay type : WALLET!!!!!
+		// if (payType == Bid.WALLET) {
+		// 	// check user's wallet!
 
-			// get crypto price!!
-			double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
-			int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-			CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+		// 	// get crypto price!!
+		// 	double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
+		// 	int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+		// 	CryptoBalance balance = balanceDao.selectById(userId, tokenId);
 
-			if (balance.getFree() < cryptoAmount) {
-				throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
-			}
-			balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
+		// 	if (balance.getFree() < cryptoAmount) {
+		// 		throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
+		// 	}
+		// 	balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
 
-			Map<String, BidHolding> holdingList = originalBid.getHoldingList();
-			BidHolding hold = null;
-			if (holdingList.containsKey(cryptoType)) {
-				hold = holdingList.get(cryptoType);
-				double currentAmount = hold.getCrypto();
-				hold.setCrypto(currentAmount + cryptoAmount);
-			} else {
-				hold = new BidHolding(cryptoAmount, delta);
-				holdingList.put(cryptoType, hold);
-			}
-			bidDao.updateBid(originalBid);
-			updateBidRanking(userId, roundId);
+		// 	Map<String, BidHolding> holdingList = originalBid.getHoldingList();
+		// 	BidHolding hold = null;
+		// 	if (holdingList.containsKey(cryptoType)) {
+		// 		hold = holdingList.get(cryptoType);
+		// 		double currentAmount = hold.getCrypto();
+		// 		hold.setCrypto(currentAmount + cryptoAmount);
+		// 	} else {
+		// 		hold = new BidHolding(cryptoAmount, delta);
+		// 		holdingList.put(cryptoType, hold);
+		// 	}
+		// 	bidDao.updateBid(originalBid);
+		// 	updateBidRanking(originalBid);
 
-			return originalBid;
-		}
+		// 	return originalBid;
+		// }
 
-		originalBid.setTempTokenAmount(tokenAmount);
-		originalBid.setTempTokenPrice(tokenPrice);
-		originalBid.setDelta(delta);
-		originalBid.setPendingIncrease(true);
-		bidDao.updateBid(originalBid);
+		bidDao.updateTemp(userId, roundId, tokenAmount, tokenPrice);
 
 		return originalBid;
+	}
+
+	public int increaseAmount(int userId, int roundId, long tokenAmount, long tokenPrice) {
+		return bidDao.increaseAmount(userId, roundId, tokenAmount, tokenPrice);
 	}
 
 	public List<Bid> getBidList() {

@@ -23,7 +23,7 @@ import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.TokenAssetService;
-import com.ndb.auction.service.payment.CoinpaymentAuctionService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.user.UserAvatarService;
 import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
@@ -36,9 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 public class BaseController {
-
-    @Autowired
-    CryptoService cryptoService;
 
     @Autowired
     BidService bidService;

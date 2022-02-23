@@ -22,11 +22,12 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
-import com.ndb.auction.service.payment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
-import com.ndb.auction.service.payment.StripeService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
+import com.ndb.auction.service.payment.stripe.StripeAuctionService;
+import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
@@ -58,10 +59,6 @@ public class BaseResolver {
 
 	@Autowired
 	TotpService totpService;
-
-	@Autowired
-    protected
-	StripeService stripeService;
 
 	@Autowired
 	AvatarService avatarService;
@@ -138,4 +135,10 @@ public class BaseResolver {
 
 	@Autowired
 	protected CoinpaymentAuctionService coinpaymentAuctionService;
+
+	@Autowired
+	protected StripeAuctionService stripeAuctionService;
+
+	@Autowired
+	protected StripeBaseService stripeBaseService;
 }

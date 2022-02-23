@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StripePresaleTransaction extends StripeTransaction {
+public class StripePresaleTransaction extends StripeDepositTransaction {
     
 }

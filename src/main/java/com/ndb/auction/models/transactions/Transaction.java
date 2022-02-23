@@ -12,5 +12,6 @@ public class Transaction {
     protected int userId;
     protected Double amount;
     protected Long createdAt;
+    protected Long confirmedAt;
     protected Boolean status;
 }

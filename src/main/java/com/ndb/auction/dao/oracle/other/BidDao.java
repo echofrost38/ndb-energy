@@ -75,6 +75,16 @@ public class BidDao extends BaseOracleDao {
 		return m;
 	}
 
+	public int updateTemp(int userId, int auctionId, Long newTokenAmount, Long newTokenPrice) {
+		String sql = "UPDATE TBL_BID SET TEMP_TOKEN_AMOUNT = ?, TEMP_TOKEN_PRICE = ?, PENDING_INCREASE = ? WHERE USER_ID = ? AND ROUND_ID = ?";
+		return jdbcTemplate.update(sql, newTokenAmount, newTokenPrice, true, userId, auctionId);
+	}
+
+	public int increaseAmount(int userId, int auctionId, Long amount, Long price) {
+		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT = ?, TOTAL_PRICE = ?, PENDING_INCREASE = ? WHERE USER_ID = ? AND ROUND_ID = ?";
+		return jdbcTemplate.update(sql, amount, price, false, userId, auctionId);
+	}
+
 	public List<Bid> getBidListByRound(int roundId) {
 		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE ROUND_ID=? AND STATUS!=0 ORDER BY TOKEN_PRICE DESC";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {

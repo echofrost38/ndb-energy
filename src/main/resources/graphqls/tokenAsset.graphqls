@@ -15,10 +15,6 @@ extend type Mutation {
     deleteTokenAsset(
         id: Int!
     ) : Int!
-    updateSymbol(
-        id: Int,
-        symbol: String
-    ) : Int
 }
 
 schema {

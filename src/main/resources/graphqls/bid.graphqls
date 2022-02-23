@@ -2,16 +2,12 @@ extend type Mutation {
 	placeBid(
 		roundId: Int!,
 		tokenAmount: Float!,
-		tokenPrice: Float!,
-		payment: Int!,
-		cryptoType: String,
+		tokenPrice: Float!
 	) : Bid	
 	increaseBid(
 		roundId: Int!,
 		tokenAmount: Float!,
-		tokenPrice: Float!,
-		payment: Int!,
-		cryptoType: String,
+		tokenPrice: Float!
 	) : Bid
 	closeBid(
 		roundId: Int!

@@ -1,4 +1,4 @@
-package com.ndb.auction.dao.oracle.transactions;
+package com.ndb.auction.dao.oracle.transactions.stripe;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
+import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.StripeAuctionTransaction;
 import com.ndb.auction.models.transactions.Transaction;
 

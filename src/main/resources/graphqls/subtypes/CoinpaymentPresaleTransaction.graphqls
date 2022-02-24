@@ -1,0 +1,15 @@
+type CoinpaymentPresaleTransaction {
+    id: Int,
+    userId: Int,
+    amount: Float,
+    createdAt: Float,
+    status: Boolean, 
+    cryptoType: String,
+    network: String,
+    cryptoAmount: Float,
+    confirmedAt: Float,
+    depositAddress: String,
+    coin: String,
+    presaleId: Int,
+    orderId: Int
+}

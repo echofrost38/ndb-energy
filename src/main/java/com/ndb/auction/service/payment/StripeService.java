@@ -29,54 +29,6 @@
 // @Service
 // public class StripeService extends BaseService {
 	
-// 	public PayResponse payStripeForPresale(
-// 		int orderId, 
-// 		int userId, 
-// 		Long amount, 
-// 		String paymentIntentId,
-// 		String paymentMethodId
-// 	) {
-// 		PaymentIntent intent = null;
-// 		PayResponse response = new PayResponse();
-		
-// 		PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
-// 		if(presaleOrder == null) {
-// 			throw new UserNotFoundException("no_presale_order", "orderId");
-// 		}
-
-// 		// check amount 
-// 		Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-// 		if(orderAmount * 100 > amount) {
-// 			throw new UserNotFoundException("no_enough_funds", "amount");
-// 		}
-
-// 		try {
-// 			if(paymentMethodId != null) {
-// 				PaymentIntentCreateParams createParams = PaymentIntentCreateParams.builder()
-// 					.setAmount(amount)
-// 					.setCurrency("USD")	
-// 					.setConfirm(true)
-// 					.setPaymentMethod(paymentIntentId)
-// 					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-// 					.build();
-// 				intent = PaymentIntent.create(createParams);
-				
-// 			} else if (paymentIntentId != null) {
-// 				intent = PaymentIntent.retrieve(paymentIntentId);
-// 				intent = intent.confirm();
-// 			}
-			
-// 			if(intent != null && intent.getStatus().equals("succeeded")) {
-// 				handlePresaleOrder(userId, presaleOrder);
-// 			}
-// 			response = generateResponse(intent, response);
-
-// 		} catch (Exception e) {
-// 			response.setError(e.getMessage());
-// 		}
-
-// 		return response;
-// 	}
 
 // 	public PayResponse payStripeForDeposit(		
 // 		int userId, 
@@ -154,49 +106,7 @@
 	
 	
 
-// 	private void handlePresaleOrder(int userId, PreSaleOrder order) {
-// 		User user = userDao.selectById(userId);
 
-// 		// processing order
-// 		Long ndb = order.getNdbAmount();
-// 		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
-// 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-// 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-// 			balanceDao.addFreeBalance(userId, tokenId, ndb);
-// 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
-// 			ndbCoinService.transferNDB(userId, order.getExtAddr(), Double.valueOf(ndb));
-// 		}
-
-// 		// update user tier points
-// 		List<Tier> tierList = tierService.getUserTiers();
-// 		TaskSetting taskSetting = taskSettingService.getTaskSetting();
-// 		TierTask tierTask = tierTaskService.getTierTask(user.getId());
-// 		double presalePoint = tierTask.getDirect();
-// 		presalePoint += taskSetting.getDirect() * fiatAmount;
-// 		tierTask.setDirect(presalePoint);
-
-// 		double newPoint = user.getTierPoint() + taskSetting.getDirect() * fiatAmount;
-// 		int tierLevel = 0;
-
-// 		// check change in level
-// 		for (Tier tier : tierList) {
-// 			if(tier.getPoint() <= newPoint) {
-// 				tierLevel = tier.getLevel();
-// 			}
-// 		}
-
-// 		userDao.updateTier(userId, tierLevel, newPoint);
-// 		tierTaskService.updateTierTask(tierTask);
-// 		presaleOrderDao.updateStatus(order.getId());
-// 		presaleDao.udpateSold(order.getId(), ndb);
-
-// 		// send notification to user for payment result!!
-// 		notificationService.sendNotification(
-// 			userId,
-// 			Notification.PAYMENT_RESULT,
-// 			"PAYMENT CONFIRMED",
-// 			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
-// 	}
 	
 // 	private void handleDepositSuccess(int userId, Long amount, String currency) {
 // 		User user = userDao.selectById(userId);

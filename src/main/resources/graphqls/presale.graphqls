@@ -16,12 +16,6 @@ extend type Mutation {
         destination: Int,
         extAddr: String
     ) : PreSaleOrder
-    # payment for presale
-    createChargeForPresale(
-        orderId: Int,
-        amount: Float,
-        currency: String
-    ) : String
 }
 
 extend type Query {

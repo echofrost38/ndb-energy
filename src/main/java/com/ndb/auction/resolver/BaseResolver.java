@@ -26,13 +26,16 @@ import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
+import com.ndb.auction.service.payment.stripe.StripePresaleService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.IPChecking;
+import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
@@ -65,10 +68,6 @@ public class BaseResolver {
 
 	@Autowired
 	ProfileService profileService;
-
-	@Autowired
-    protected
-	CryptoService cryptoService;
 
 	@Autowired
 	NotificationService notificationService;
@@ -137,8 +136,17 @@ public class BaseResolver {
 	protected CoinpaymentAuctionService coinpaymentAuctionService;
 
 	@Autowired
+	protected CoinpaymentPresaleService	coinpaymentPresaleService;
+
+	@Autowired
 	protected StripeAuctionService stripeAuctionService;
 
 	@Autowired
+	protected StripePresaleService stripePresaleService;
+
+	@Autowired
 	protected StripeBaseService stripeBaseService;
+
+	@Autowired
+	protected ThirdAPIUtils thirdAPIUtils;
 }

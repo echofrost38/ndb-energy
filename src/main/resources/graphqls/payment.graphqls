@@ -1,58 +1,8 @@
 extend type Query {
 	getStripePubKey : String!
-	getStripeTransactionsByRound(
-		roundId: String!
-	) : [StripeAuctionTransaction]
-	getStripeTransactionsByUser
-	 : [StripeAuctionTransaction]
-	getStripeTransactionsByAdmin(
-		 userId: String!
-	) : [StripeAuctionTransaction]
-	getStripeTransaction(
-		roundId: String!,
-	) : [StripeAuctionTransaction]
-	getStripeTransactionByAdmin(
-		roundId: String!,
-		userId: String
-	) : [StripeAuctionTransaction]
-	getCryptoTransactionById(
-		id: Int!
-	) : CryptoTransaction
-	getCryptoTransactionByUser 
-	  : [CryptoTransaction]
-	getCryptoTransactionByAdmin(
-		userId: Int!
-	) : [CryptoTransaction]
-	getCryptoTransactionByRound(
-		roundId: Int!
-	) : [CryptoTransaction]
-	getCryptoTransaction(
-		roundId: Int!,
-	) : [CryptoTransaction]
-	getCryptoTransactions(
-		roundId: Int!,
-		userId: Int
-	) : [CryptoTransaction]
 	getExchangeRate : String
-}
-
-extend type Mutation {
-	stripePayment (
-		roundId: Int,
-		amount: Float,
-		paymentIntentId: String,
-		paymentMethodId: String
-	) : PayResponse!
-	createCryptoPaymentForAuction(
-		roundId: Int!,
-		amount: Float!,
-		cryptoType: String,
-		network: String,
-		coin: String!
-	) : CoinpaymentAuctionTransaction
 }
 
 schema {
    query: Query,
-   mutation: Mutation
 }

@@ -28,8 +28,8 @@ public class BidDao extends BaseOracleDao {
 		m.setPrefix(rs.getString("PREFIX"));
 		m.setName(rs.getString("NAME"));
 		m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
-		m.setTotalPrice(rs.getLong("TOTAL_PRICE"));
 		m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
+		m.setTotalPrice(m.getTokenAmount() * m.getTokenPrice());
 		m.setTempTokenAmount(rs.getLong("TEMP_TOKEN_AMOUNT"));
 		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
@@ -85,7 +85,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public int increaseAmount(int userId, int auctionId, Long amount, Long price) {
-		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT = ?, TOTAL_PRICE = ?, PENDING_INCREASE = ? WHERE USER_ID = ? AND ROUND_ID = ?";
+		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT = ?, TOKEN_PRICE = ?, PENDING_INCREASE = ? WHERE USER_ID = ? AND ROUND_ID = ?";
 		return jdbcTemplate.update(sql, amount, price, false, userId, auctionId);
 	}
 

@@ -1,0 +1,56 @@
+extend type Query {
+	getStripeAuctionTxByRound(
+		roundId: String!
+	) : [StripeAuctionTransaction]
+	getStripeAuctionTxByUser
+	 : [StripeAuctionTransaction]
+	getStripeAuctionTxByAdmin(
+		 userId: String!
+	) : [StripeAuctionTransaction]
+	getStripeAuctionTx(
+		roundId: String!,
+	) : [StripeAuctionTransaction]
+	getStripeAuctionTxForRoundByAdmin(
+		roundId: String!,
+		userId: String
+	) : [StripeAuctionTransaction]
+    getCryptoAuctionTxById(
+		id: Int!
+	) : CoinpaymentAuctionTransaction
+	getCryptoAuctionTxByUser 
+	  : [CoinpaymentAuctionTransaction]
+	getCryptoAuctionTxByAdmin(
+		userId: Int!
+	) : [CoinpaymentAuctionTransaction]
+	getCryptoAuctionTxByRound(
+		roundId: Int!
+	) : [CoinpaymentAuctionTransaction]
+	getCryptoAuctionTx(
+		roundId: Int!,
+	) : [CoinpaymentAuctionTransaction]
+	getCryptoAuctionTxPerRoundByAdmin(
+		roundId: Int!,
+		userId: Int
+	) : [CoinpaymentAuctionTransaction]
+}
+
+extend type Mutation {
+    payStripeForAuction (
+		roundId: Int,
+		amount: Float,
+		paymentIntentId: String,
+		paymentMethodId: String
+	) : PayResponse!
+    createCryptoPaymentForAuction(
+		roundId: Int!,
+		amount: Float!,
+		cryptoType: String,
+		network: String,
+		coin: String!
+	) : CoinpaymentAuctionTransaction
+}
+
+schema {
+   query: Query,
+   mutation: Mutation
+} 

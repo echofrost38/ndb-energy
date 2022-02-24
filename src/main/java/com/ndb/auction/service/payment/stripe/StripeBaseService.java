@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StripeBaseService extends BaseService {
+    
     @Value("${stripe.secret.key}")
 	private String stripeSecretKey;
 

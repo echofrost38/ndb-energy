@@ -1,12 +1,13 @@
 package com.ndb.auction.service.payment.coinpayment;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.ndb.auction.exceptions.AuctionException;
-import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.presale.PreSale;
+import com.ndb.auction.models.presale.PreSaleOrder;
+import com.ndb.auction.models.transactions.CoinpaymentPresaleTransaction;
 import com.ndb.auction.models.transactions.CryptoDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
@@ -22,28 +23,23 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CoinpaymentAuctionService extends CoinpaymentBaseService implements ITransactionService, ICryptoDepositService {
+public class CoinpaymentPresaleService  extends CoinpaymentBaseService implements ITransactionService, ICryptoDepositService {
 
     @Override
-    public List<CryptoDepositTransaction> selectByDepositAddress(String depositAddress) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Transaction createNewTransaction(Transaction _m) throws ClientProtocolException, IOException {
-        CoinpaymentAuctionTransaction m = (CoinpaymentAuctionTransaction)_m;
+    public Transaction createNewTransaction(Transaction _m)
+            throws UnsupportedEncodingException, ClientProtocolException, IOException {
+        CoinpaymentPresaleTransaction m = (CoinpaymentPresaleTransaction)_m;
         
         // round existing
-        Auction round = auctionDao.getAuctionById(m.getAuctionId());
-        if (round == null) {
+        PreSale presale = presaleDao.selectById(m.getPresaleId());
+        if (presale == null) {
             throw new AuctionException("Round doesn't exist.", "roundId");
         }
 
         // check bid
-        Bid bid = bidDao.getBid(m.getUserId(), m.getAuctionId());
-        if (bid == null) {
-            throw new AuctionException("No bid.", "roundId");
+        PreSaleOrder presaleOrder = presaleOrderDao.selectById(m.getOrderId());
+        if(presaleOrder == null || presaleOrder.getStatus() == 1) {
+            throw new AuctionException("Order doesn't exist.", "roundId");
         }
 
         HttpPost post = new HttpPost(COINS_API_URL);
@@ -53,10 +49,10 @@ public class CoinpaymentAuctionService extends CoinpaymentBaseService implements
         post.addHeader("Cookie2", "$Version=1");
         post.addHeader("Accept-Language", "en-US");
         
-        m = (CoinpaymentAuctionTransaction) coinpaymentAuctionDao.insert(m);
+        m = (CoinpaymentPresaleTransaction) coinpaymentPresaleDao.insert(m);
 
         // get address
-        String ipnUrl = COINSPAYMENT_IPN_URL + "/bid/" + m.getId();
+        String ipnUrl = COINSPAYMENT_IPN_URL + "/presale/" + m.getId();
         CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(m.getCoin(), ipnUrl);
         
         String payload = request.toString();
@@ -72,45 +68,51 @@ public class CoinpaymentAuctionService extends CoinpaymentBaseService implements
         AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
         if(!addressResponse.getError().equals("ok")) return null;
         String address = addressResponse.getResult().getAddress();
-        coinpaymentAuctionDao.insertDepositAddress(m.getId(), address);
+        coinpaymentPresaleDao.insertDepositAddress(m.getId(), address);
         m.setDepositAddress(address);
         return m;
     }
 
     @Override
+    public List<CryptoDepositTransaction> selectByDepositAddress(String depositAddress) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
-        return coinpaymentAuctionDao.selectAll(orderBy);
+        return coinpaymentPresaleDao.selectAll(orderBy);
     }
 
     @Override
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        return coinpaymentAuctionDao.selectByUser(userId, orderBy);
+        return coinpaymentPresaleDao.selectByUser(userId, orderBy);
     }
 
     @Override
     public Transaction selectById(int id) {
-        return coinpaymentAuctionDao.selectById(id);
+        return coinpaymentPresaleDao.selectById(id);
     }
 
     @Override
     public int update(int id, int status) {
-        return coinpaymentAuctionDao.update(id, status);
+        return coinpaymentPresaleDao.update(id, status);
     }
 
-    public List<? extends Transaction> selectByAuctionId(int auctionId) {
-        return coinpaymentAuctionDao.selectByAuctionId(auctionId);
+    public List<? extends Transaction> selectByPresaleId(int presaleId) {
+        return coinpaymentPresaleDao.selectByPresaleId(presaleId);
     }
 
-    public List<? extends Transaction> select(int userId, int auctionId) {
-        return coinpaymentAuctionDao.select(userId, auctionId);
+    public List<? extends Transaction> select(int userId, int presaleId) {
+        return coinpaymentPresaleDao.select(userId, presaleId);
     }
 
     public int updateTransaction(int id, int status, Double cryptoAmount, String cryptoType) {
-        return coinpaymentAuctionDao.updateStatus(id, status, cryptoAmount, cryptoType);
+        return coinpaymentPresaleDao.updateStatus(id, status, cryptoAmount, cryptoType);
     }
 
     public int deleteExpired(double days) {
-        return coinpaymentAuctionDao.deleteExpired(days);
+        return coinpaymentPresaleDao.deleteExpired(days);
     }
-
+        
 }

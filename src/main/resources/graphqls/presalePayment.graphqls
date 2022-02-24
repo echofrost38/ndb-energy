@@ -1,0 +1,60 @@
+extend type Mutation {
+    payStripeForPreSale(
+        presaleId: Int,
+        orderId: Int,
+        amount: Float,
+        paymentIntentId: String,
+        paymentMethodId: String
+    ) : PayResponse
+    # payment for presale
+    createChargeForPresale(
+        presaleId: Int,
+        orderId: Int,
+        amount: Float,
+        coin: String,
+        network: String,
+        cryptoType: String,
+        cryptoAmount: Float
+    ) : String
+}
+
+extend type Query {
+    # for Stripe
+    getStripePresaleTx(
+        orderBy: String
+    ) : [StripePresaleTransaction]
+    getStripePresaleTxByUser(
+        userId: Int,
+        orderBy: String
+    ) : [StripePresaleTransaction]
+    getStripePresaleTxById(
+        id: Int
+    ) : StripePresaleTransaction
+    getStripePresaleTxByPresaleId(
+        userId: Int,
+        presaleId: Int,
+        orderBy: String
+    ) : [StripePresaleTransaction]
+    # for Coinpayment
+    getAllCryptoPresaleTx(
+        orderBy: String
+    ) : [CoinpaymentPresaleTransaction]
+    getCryptoPresaleTxByUser(
+        orderBy: String
+    ) : [CoinpaymentPresaleTransaction]
+    getCryptoPresaleTxById(
+        id: Int
+    ) : CoinpaymentPresaleTransaction
+    getCryptoPresaleTxByAdmin(
+        userId: Int,
+        presaleId: Int
+    ) : [CoinpaymentPresaleTransaction]
+    getCryptoPresaleTx(
+        presaleId: Int
+    ) : [CoinpaymentPresaleTransaction]
+}
+
+schema {
+    mutation: Mutation,
+    query: Query
+}

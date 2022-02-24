@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.io.IOException;
 import java.util.List;
 
-import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.StripeAuctionTransaction;
 import com.ndb.auction.payload.response.PayResponse;
@@ -31,36 +30,36 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeAuctionTransaction> getStripeTransactionsByRound(int roundId) {
+	public List<StripeAuctionTransaction> getStripeAuctionTxByRound(int roundId) {
 		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByRound(roundId, null);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<StripeAuctionTransaction> getStripeTransactionsByUser() {
+	public List<StripeAuctionTransaction> getStripeAuctionTxByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
 		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(id, null);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeAuctionTransaction> getStripeTransactionsByAdmin(int userId) {
+	public List<StripeAuctionTransaction> getStripeAuctionTxByAdmin(int userId) {
 		return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(userId, null);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<StripeAuctionTransaction> getStripeTransactionByAdmin(int roundId, int userId) {
+	public List<StripeAuctionTransaction> getStripeAuctionTxForRoundByAdmin(int roundId, int userId) {
 		return stripeAuctionService.selectByIds(roundId, userId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<StripeAuctionTransaction> getStripeTransaction(int roundId) {
+	public List<StripeAuctionTransaction> getStripeAuctionTx(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
 		return stripeAuctionService.selectByIds(roundId, id);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public PayResponse stripePayment(
+	public PayResponse payStripeForAuction(
 		int roundId, 
 		Long amount, 
 		String paymentIntentId,
@@ -82,46 +81,46 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 
 	// @PreAuthorize("isAuthenticated()")
 	public String getExchangeRate() throws ParseException, IOException {
-		return cryptoService.getExchangeRate();
+		return coinpaymentAuctionService.getExchangeRate();
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public CryptoTransaction getCryptoTransactionById(int id) {
-		return cryptoService.getTransactionById(id);
+	public CoinpaymentAuctionTransaction getCryptoAuctionTxById(int id) {
+		return (CoinpaymentAuctionTransaction) coinpaymentAuctionService.selectById(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactionByAdmin(int userId) {
-		return cryptoService.getTransactionByUser(userId);
+	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByAdmin(int userId) {
+		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	public List<CryptoTransaction> getCryptoTransactionByUser() {
+	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return cryptoService.getTransactionByUser(userId);
+		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactionByRound(int roundId) {
-		return cryptoService.getTransactionByRound(roundId);
+	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByRound(int roundId) {
+		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByAuctionId(roundId);
 	}
 	
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public List<CryptoTransaction> getCryptoTransactions(int roundId, int userId) {
-		return cryptoService.getTransaction(roundId, userId);
+	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxPerRoundByAdmin(int roundId, int userId) {
+		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public List<CryptoTransaction> getCryptoTransaction(int roundId) {
+	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTx(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return cryptoService.getTransaction(roundId, userId);
+		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public double getCryptoPrice(String symbol) {
-		return cryptoService.getCryptoPriceBySymbol(symbol);
+		return 	thirdAPIUtils.getCryptoPriceBySymbol(symbol);
 	}
 
 }

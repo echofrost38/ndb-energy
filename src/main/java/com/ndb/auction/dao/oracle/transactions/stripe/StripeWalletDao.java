@@ -10,7 +10,7 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
-import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "TBL_STRIPE_WALLET")
 public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
     
-    private static StripeDepositTransaction extract(ResultSet rs) throws SQLException {
-		StripeDepositTransaction m = new StripeDepositTransaction();
+    private static StripeWalletTransaction extract(ResultSet rs) throws SQLException {
+		StripeWalletTransaction m = new StripeWalletTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setAmount(rs.getLong("AMOUNT"));
@@ -43,9 +43,9 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
     
     @Override
     public Transaction insert(Transaction _m) {
-        StripeDepositTransaction m = (StripeDepositTransaction) _m;
+        StripeWalletTransaction m = (StripeWalletTransaction) _m;
         String sql = "INSERT INTO TBL_STRIPE_WALLET(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID)"
-        + " VALUES(SEQ_STRIPE_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?)";
+        + " VALUES(SEQ_STRIPE_WALLET.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -73,9 +73,9 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<StripeDepositTransaction>() {
+		return jdbcTemplate.query(sql, new RowMapper<StripeWalletTransaction>() {
 			@Override
-			public StripeDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+			public StripeWalletTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
 		});
@@ -87,9 +87,9 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<StripeDepositTransaction>() {
+		return jdbcTemplate.query(sql, new RowMapper<StripeWalletTransaction>() {
 			@Override
-			public StripeDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+			public StripeWalletTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
 		}, userId);
@@ -98,9 +98,9 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
     @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_STRIPE_WALLET WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<StripeDepositTransaction>() {
+		return jdbcTemplate.query(sql, new ResultSetExtractor<StripeWalletTransaction>() {
 			@Override
-			public StripeDepositTransaction extractData(ResultSet rs) throws SQLException {
+			public StripeWalletTransaction extractData(ResultSet rs) throws SQLException {
 				if (!rs.next())
 					return null;
 				return extract(rs);

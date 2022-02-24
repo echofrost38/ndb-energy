@@ -59,24 +59,24 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 				+ " VALUES(SEQ_COINPAY_PRESALE.NEXTVAL,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
-				new PreparedStatementCreator() {
-					@Override
-					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-						PreparedStatement ps = connection.prepareStatement(sql,
-								new String[] { "ID" });
-						int i = 1;
-						ps.setInt(i++, m.getUserId());
-						ps.setDouble(i++, m.getAmount());
-						ps.setString(i++, m.getCryptoType());
-                        ps.setString(i++, m.getNetwork());
-						ps.setDouble(i++, m.getCryptoAmount());
-                        ps.setString(i++, m.getDepositAddress());
-                        ps.setString(i++, m.getCoin());
-                        ps.setInt(i++, m.getPresaleId());
-						ps.setInt(i++, m.getOrderId());
-						return ps;
-					}
-				}, keyHolder);
+			new PreparedStatementCreator() {
+				@Override
+				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					PreparedStatement ps = connection.prepareStatement(sql,
+							new String[] { "ID" });
+					int i = 1;
+					ps.setInt(i++, m.getUserId());
+					ps.setDouble(i++, m.getAmount());
+					ps.setString(i++, m.getCryptoType());
+					ps.setString(i++, m.getNetwork());
+					ps.setDouble(i++, m.getCryptoAmount());
+					ps.setString(i++, m.getDepositAddress());
+					ps.setString(i++, m.getCoin());
+					ps.setInt(i++, m.getPresaleId());
+					ps.setInt(i++, m.getOrderId());
+					return ps;
+				}
+			}, keyHolder);
 		m.setId(keyHolder.getKey().intValue());
 		return m;
     }

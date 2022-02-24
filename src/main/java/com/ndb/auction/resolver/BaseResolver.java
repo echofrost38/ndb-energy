@@ -26,6 +26,7 @@ import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripePresaleService;
@@ -141,6 +142,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected CoinpaymentPresaleService	coinpaymentPresaleService;
+
+	@Autowired
+	protected CoinpaymentWalletService coinpaymentWalletService;
 
 	@Autowired
 	protected StripeAuctionService stripeAuctionService;

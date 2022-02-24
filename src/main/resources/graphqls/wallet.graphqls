@@ -1,12 +1,43 @@
 extend type Query {
     getBalances : [BalancePayload]
+    
+    # Get Coinpayment Transaction for Deposit
+    getCoinpaymentDepositTx(
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
+    getCoinpaymentDepositTxByUser(
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
+    getCoinpaymentDepositTxByAdmin(
+        userId: Int,
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
+    getCoinpaymentDepositTxById(
+        id: Int
+    ) : CoinpaymentWalletTransaction
 
+    # # Get Stripe Transaction for deposit
+    getStripeDepositTx(
+        orderBy: String
+    ) : [StripeWalletTransaction]
+    getStripeDepositTxByUser(
+        orderBy: String
+    ) : [StripeWalletTransaction]
+    getStripeDepositTxByAdmin(
+        userId: Int,
+        orderBy: String
+    ) : [StripeWalletTransaction]
+    getStripeDepositTxById(
+        id: Int
+    ) : StripeWalletTransaction
 }
 
 extend type Mutation {
     createChargeForDeposit(
-        currency: String!
-    ) : String
+        coin: String,
+        network: String,
+        cryptoType: String
+    ) : CoinpaymentWalletTransaction
     withdrawCrypto(
         to: String,
         amount: Float,
@@ -25,5 +56,6 @@ extend type Mutation {
 }
 
 schema {
-    query: Query
+    query: Query,
+    mutation: Mutation
 }

@@ -16,7 +16,7 @@ import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
-import com.ndb.auction.models.transaction.CryptoTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
@@ -27,6 +27,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.utils.Sort;
 
@@ -53,7 +54,7 @@ public class BidService extends BaseService {
 	private StripeAuctionService stripeService;
 
 	@Autowired
-	private CryptoService cryptoService;
+	private CoinpaymentAuctionService coinpaymentAuctionService;
 
 	public Bid placeNewBid(
 			int userId,
@@ -291,9 +292,10 @@ public class BidService extends BaseService {
 				}
 			}
 
-			List<CryptoTransaction> cryptoTxns = cryptoService.getTransaction(roundId, userId);
-			for (CryptoTransaction cryptoTransaction : cryptoTxns) {
-				if (cryptoTransaction.getStatus() != CryptoTransaction.CONFIRMED) {
+			List<CoinpaymentAuctionTransaction> cryptoTxns = 
+				(List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+			for (CoinpaymentAuctionTransaction cryptoTransaction : cryptoTxns) {
+				if (!cryptoTransaction.getStatus()) {
 					continue;
 				}
 				if (bid.getStatus() == Bid.WINNER) {

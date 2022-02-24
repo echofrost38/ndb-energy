@@ -27,15 +27,9 @@ import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transaction.CoinsPaymentDao;
-import com.ndb.auction.dao.oracle.transaction.CryptoTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.WithdrawTransactionDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentAuctionDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -144,9 +138,6 @@ public class BaseService {
     public StripeTransactionDao stripeDao;
 
     @Autowired
-    public CryptoTransactionDao cryptoTransactionDao;
-
-    @Autowired
     public NotificationService notificationService;
 
     @Autowired
@@ -217,12 +208,6 @@ public class BaseService {
 
     @Autowired
     protected ThirdAPIUtils apiUtils;
-
-    @Autowired
-    protected CoinpaymentAuctionDao coinpaymentAuctionDao;
-
-    @Autowired
-    protected CoinpaymentPresaleDao coinpaymentPresaleDao;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

@@ -10,6 +10,7 @@ import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
@@ -22,8 +23,9 @@ import org.springframework.stereotype.Service;
 public class StripeWalletService extends StripeBaseService implements ITransactionService, IStripeDepositService {
 
     @Override
-    public PayResponse createNewTransaction(StripeDepositTransaction m) {
-        int userId = m.getUserId();
+    public PayResponse createNewTransaction(StripeDepositTransaction _m) {
+        StripeWalletTransaction m = (StripeWalletTransaction)_m;
+		int userId = m.getUserId();
         PaymentIntent intent = null;
 		PayResponse response = new PayResponse();
 		try {
@@ -39,7 +41,7 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 			} else if (m.getPaymentIntentId() != null) {
 				intent = PaymentIntent.retrieve(m.getPaymentIntentId());
 				intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeWalletDao.insert(m);
+                m = (StripeWalletTransaction) stripeWalletDao.insert(m);
 			}
 
 			if(intent != null && intent.getStatus().equals("succeeded")) {

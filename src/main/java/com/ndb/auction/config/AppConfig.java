@@ -2,7 +2,9 @@ package com.ndb.auction.config;
 
 import java.util.Date;
 
-import com.ndb.auction.service.CryptoService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -23,13 +25,21 @@ public class AppConfig {
     }
 
     @Autowired
-    CryptoService cryptoService;
+    CoinpaymentAuctionService coinpaymentAuctionService;
+
+    @Autowired
+    CoinpaymentPresaleService coinpaymentPresaleService;
+
+    @Autowired
+    CoinpaymentWalletService coinpaymentWalletService;
 
     @Scheduled(fixedDelay = 3600 * 1000)
     public void scheduleFixedRateTask() {
         if (!appStartUp)
             return;
-        int count = cryptoService.deleteExpired();
+        int count = coinpaymentAuctionService.deleteExpired(1);
+        count += coinpaymentPresaleService.deleteExpired(1);
+        count += coinpaymentWalletService.deleteExpired(1);
         System.out.println(count + " crypto transactions deleted on " + new Date());
     }
 

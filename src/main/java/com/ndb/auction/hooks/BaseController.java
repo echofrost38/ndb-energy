@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.service.BidService;
-import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.PresaleOrderService;
@@ -24,11 +23,14 @@ import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.TokenAssetService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
+import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
 import com.ndb.auction.service.user.UserAvatarService;
 import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.UserWalletService;
 
@@ -90,6 +92,15 @@ public class BaseController {
 
     @Autowired
     protected CoinpaymentAuctionService coinpaymentAuctionService;
+
+    @Autowired
+    protected CoinpaymentPresaleService coinpaymentPresaleService;
+
+    @Autowired
+    protected CoinpaymentWalletService coinpaymentWalletService;
+
+    @Autowired
+    protected ThirdAPIUtils apiUtil;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

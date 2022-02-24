@@ -2,6 +2,9 @@ package com.ndb.auction.service.payment.coinpayment;
 
 import java.io.IOException;
 
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentAuctionDao;
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao;
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentWalletDao;
 import com.ndb.auction.payload.request.CoinPaymentsRateRequest;
 import com.ndb.auction.service.BaseService;
 
@@ -12,9 +15,19 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CoinpaymentBaseService extends BaseService {
     
+    @Autowired
+    protected CoinpaymentAuctionDao coinpaymentAuctionDao;
+
+    @Autowired
+    protected CoinpaymentPresaleDao coinpaymentPresaleDao;
+
+    @Autowired
+    protected CoinpaymentWalletDao coinpaymentWalletDao;
+
     protected CloseableHttpClient client;
 
     public CoinpaymentBaseService() {

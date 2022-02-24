@@ -19,7 +19,6 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.service.BaseService;
-import com.ndb.auction.service.CryptoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,9 +29,6 @@ import freemarker.template.TemplateException;
 
 @Service
 public class UserService extends BaseService {
-
-	@Autowired
-	CryptoService cryptoService;
 
 	@Autowired
 	PasswordEncoder encoder;

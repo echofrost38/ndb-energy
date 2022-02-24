@@ -7,15 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CoinpaymentPresaleTransaction extends CoinpaymentTransaction {
+public class CoinpaymentWalletTransaction extends CoinpaymentTransaction {
     
-    private int presaleId;
-    private int orderId;
-
-    public CoinpaymentPresaleTransaction(int userId, int presaleId, int orderId, Long amount, String coin, String network, Double cryptoAmount, String cryptoType) {
+    public CoinpaymentWalletTransaction(int userId, Long amount, String coin, String network, Double cryptoAmount, String cryptoType) {
         this.userId = userId;
-        this.presaleId = presaleId;
-        this.orderId = orderId;
         this.network = network;
         this.cryptoType = cryptoType;
         this.cryptoAmount = cryptoAmount;
@@ -23,4 +18,5 @@ public class CoinpaymentPresaleTransaction extends CoinpaymentTransaction {
         this.status = false;
         this.depositAddress = "";
     }
+
 }

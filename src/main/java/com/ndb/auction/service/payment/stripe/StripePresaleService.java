@@ -8,9 +8,9 @@ import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
-import com.ndb.auction.models.transactions.StripeDepositTransaction;
-import com.ndb.auction.models.transactions.StripePresaleTransaction;
 import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
@@ -58,10 +58,12 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 			} else {
 				intent = PaymentIntent.retrieve(m.getPaymentIntentId());
 				intent = intent.confirm();
+				m = (StripePresaleTransaction) stripePresaleDao.insert(m);
 			}
 			
 			if(intent != null && intent.getStatus().equals("succeeded")) {
 				handlePresaleOrder(userId, presaleOrder);
+				stripePresaleDao.update(m.getId(), 1);
 			}
 			response = generateResponse(intent, response);
 

@@ -1,4 +1,4 @@
-package com.ndb.auction.models.transactions;
+package com.ndb.auction.models.transactions.stripe;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

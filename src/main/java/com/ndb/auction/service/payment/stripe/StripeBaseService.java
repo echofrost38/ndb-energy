@@ -2,6 +2,9 @@ package com.ndb.auction.service.payment.stripe;
 
 import javax.annotation.PostConstruct;
 
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
@@ -23,6 +26,15 @@ public class StripeBaseService extends BaseService {
 
 	@Autowired 
 	protected BidService bidService;
+
+    @Autowired
+    protected StripeAuctionDao stripeAuctionDao;
+
+    @Autowired 
+    protected StripePresaleDao stripePresaleDao;
+
+    @Autowired
+    protected StripeWalletDao stripeWalletDao;
 
     @PostConstruct
     public void init() {

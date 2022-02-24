@@ -3,8 +3,8 @@ package com.ndb.auction.resolver.payment;
 import java.io.IOException;
 import java.util.List;
 
-import com.ndb.auction.models.transactions.CoinpaymentPresaleTransaction;
-import com.ndb.auction.models.transactions.StripePresaleTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
+import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;

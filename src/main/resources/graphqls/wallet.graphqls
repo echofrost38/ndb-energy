@@ -4,7 +4,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    getDepositAddress(
+    createChargeForDeposit(
         currency: String!
     ) : String
     withdrawCrypto(
@@ -12,7 +12,7 @@ extend type Mutation {
         amount: Float,
         tokenSymbol: String
     ) : Boolean
-    depositWithStripe(
+    payStripeForDeposit(
         amount: Float,
         currencyName: String,
         paymentIntentId: String,

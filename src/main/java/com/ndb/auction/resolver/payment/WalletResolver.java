@@ -1,4 +1,4 @@
-package com.ndb.auction.resolver;
+package com.ndb.auction.resolver.payment;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,8 +6,10 @@ import java.util.List;
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.balance.CryptoBalance;
+import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.resolver.BaseResolver;
 
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,21 +39,43 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     
     // get deposit address 
     @PreAuthorize("isAuthenticated()")
-    public String getDepositAddress(String currency) throws ClientProtocolException, IOException {
+    public String createChargeForDeposit(String currency) throws ClientProtocolException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return depositService.getDepositAddress(userId, currency);
     }
-
+    
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse depositWithStripe(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
+    public PayResponse payStripeForDeposit(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        // return stripeService.payStripeForDeposit(userId, amount, currencyName, paymentIntentId, paymentMethodId);
-        return null;
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, paymentIntentId, paymentMethodId);
+        return stripeWalletService.createNewTransaction(m);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public List<StripeDepositTransaction> getStripeDepositTx(String orderBy) {
+        return (List<StripeDepositTransaction>) stripeWalletService.selectAll(orderBy);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<StripeDepositTransaction> getStripeDepositTxByUser(String orderBy) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return (List<StripeDepositTransaction>) stripeWalletService.selectByUser(userId, orderBy);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<StripeDepositTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
+        return (List<StripeDepositTransaction>) stripeWalletService.selectByUser(userId, orderBy);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public StripeDepositTransaction getStripeDepositTxById(int id) {
+        return (StripeDepositTransaction) stripeWalletService.selectById(id);
+    }
+    
     // Deposit with Plaid.com
     @PreAuthorize("isAuthenticated()")
     public String depositWithPlaid() throws IOException {

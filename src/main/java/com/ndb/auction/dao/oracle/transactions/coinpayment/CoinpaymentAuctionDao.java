@@ -10,9 +10,9 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.dao.oracle.transactions.ICryptoDepositTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
-import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.CryptoDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;

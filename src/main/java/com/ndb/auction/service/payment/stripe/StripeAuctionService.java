@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.transactions.StripeAuctionTransaction;
-import com.ndb.auction.models.transactions.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.PaymentIntent;

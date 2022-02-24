@@ -9,7 +9,6 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
-import com.ndb.auction.service.CryptoService;
 import com.ndb.auction.service.FiatAssetService;
 import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.InternalBalanceService;
@@ -30,6 +29,7 @@ import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripePresaleService;
+import com.ndb.auction.service.payment.stripe.StripeWalletService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
@@ -106,18 +106,22 @@ public class BaseResolver {
 	TierTaskService tierTaskService;
 
 	@Autowired
+	protected
 	BaseVerifyService baseVerifyService;
 
 	@Autowired
+    protected
 	InternalBalanceService internalBalanceService;
 
 	@Autowired
 	protected PresaleService presaleService;
 
 	@Autowired
+    protected
 	ShuftiService shuftiService;
 
 	@Autowired
+    protected
 	DepositService depositService;
 
 	@Autowired
@@ -146,6 +150,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected StripeBaseService stripeBaseService;
+
+	@Autowired
+	protected StripeWalletService stripeWalletService;
 
 	@Autowired
 	protected ThirdAPIUtils thirdAPIUtils;

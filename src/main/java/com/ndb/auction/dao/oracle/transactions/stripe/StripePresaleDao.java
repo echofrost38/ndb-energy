@@ -9,8 +9,8 @@ import java.util.List;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
-import com.ndb.auction.models.transactions.StripePresaleTransaction;
 import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;

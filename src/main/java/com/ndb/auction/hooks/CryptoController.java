@@ -9,7 +9,7 @@ import com.ndb.auction.exceptions.IPNExceptions;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transaction.CryptoTransaction;
 import com.ndb.auction.models.transaction.DepositTransaction;
-import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;

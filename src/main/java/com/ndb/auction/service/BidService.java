@@ -17,7 +17,7 @@ import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.transaction.CryptoTransaction;
-import com.ndb.auction.models.transactions.StripeAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;

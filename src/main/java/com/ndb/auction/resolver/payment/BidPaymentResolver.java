@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.io.IOException;
 import java.util.List;
 
-import com.ndb.auction.models.transactions.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.transactions.StripeAuctionTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;

@@ -35,6 +35,7 @@ import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentAuctionDao
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -222,12 +223,6 @@ public class BaseService {
 
     @Autowired
     protected CoinpaymentPresaleDao coinpaymentPresaleDao;
-
-    @Autowired
-    protected StripeAuctionDao stripeAuctionDao;
-
-    @Autowired 
-    protected StripePresaleDao stripePresaleDao;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

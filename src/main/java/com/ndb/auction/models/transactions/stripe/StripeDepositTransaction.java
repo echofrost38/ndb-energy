@@ -1,4 +1,6 @@
-package com.ndb.auction.models.transactions;
+package com.ndb.auction.models.transactions.stripe;
+
+import com.ndb.auction.models.transactions.FiatDepositTransaction;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,4 +18,16 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     
     protected String paymentMethodId;
     protected String paymentIntentId;
+
+    public StripeDepositTransaction(
+        int userId,
+        Long amount,
+        String paymentIntentId,
+        String paymentMethodId
+    ) {
+        this.userId = userId;
+        this.amount = amount;
+        this.paymentIntentId = paymentIntentId;
+        this.paymentMethodId = paymentMethodId;
+    }
 }

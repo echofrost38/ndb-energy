@@ -127,6 +127,11 @@ public class BidService extends BaseService {
 		TaskSetting taskSetting = taskSettingService.getTaskSetting();
 		List<Tier> tiers = tierService.getUserTiers();
 
+		if(tierTask == null) {
+			tierTask = new TierTask(userId);
+			tierTaskService.updateTierTask(tierTask);
+		}
+
 		if (tierTask.getAuctions().contains(roundNumber)) {
 			return;
 		}

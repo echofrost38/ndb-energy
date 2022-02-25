@@ -69,14 +69,13 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     }
                 }
                 bidService.updateBidRanking(bid);
-                response.setError("After ranking");
             }
 			response = generateResponse(intent, response);
                         
         } catch (Exception e) {
             // Handle "hard declines" e.g. insufficient funds, expired card, etc
             // See https://stripe.com/docs/declines/codes for more
-        	// response.setError();
+        	response.setError(e.getMessage());
         }
 		return response;
     }

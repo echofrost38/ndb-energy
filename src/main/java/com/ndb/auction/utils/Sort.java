@@ -38,10 +38,10 @@ public class Sort {
                 i++;
             } else if(L[i].getTokenPrice() == R[j].getTokenPrice()) {
             	// equal price
-            	if(L[i].getTotalPrice() > R[j].getTotalPrice()) {
+            	if(L[i].getTokenAmount() > R[j].getTokenAmount()) {
             		arr[k] = L[i];
                     i++;
-            	} else if (L[i].getTotalPrice() == R[j].getTotalPrice()) {
+            	} else if (L[i].getTokenAmount() == R[j].getTokenAmount()) {
             		if(L[i].getPlacedAt() <= R[j].getPlacedAt()) {
             			arr[k] = L[i];
                         i++;

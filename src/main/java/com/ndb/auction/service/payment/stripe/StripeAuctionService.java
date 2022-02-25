@@ -62,7 +62,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     bid.setTokenAmount(bid.getTempTokenAmount());
                     bid.setTokenPrice(bid.getTempTokenPrice());
                 } else {
-                    long totalPrice = bid.getTotalPrice();
+                    long totalPrice = bid.getTokenAmount();
                     if(totalPrice > usdAmount) {
                         response.setError("Insufficient funds");
 						return response;

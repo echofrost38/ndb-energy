@@ -38,9 +38,10 @@ public class Bid {
 
     private int roundId;
     private Long tokenAmount;
-    
-    private Long totalPrice;
     private Long tokenPrice;
+
+    private Double totalAmount;
+    private Double paidAmount;
 
     private Long tempTokenAmount;
     private Long tempTokenPrice;
@@ -60,7 +61,8 @@ public class Bid {
     	this.roundId = roundId;
     	this.tokenAmount = tokenAmount;
     	this.tokenPrice = tokenPrice;
-    	this.totalPrice = tokenAmount * tokenPrice;
+    	this.totalAmount = (double) (tokenAmount * tokenPrice);
+        this.paidAmount = 0.0;
     	this.placedAt = new Date().getTime();
     	this.updatedAt = this.placedAt;
     	this.status = NOT_CONFIRMED;

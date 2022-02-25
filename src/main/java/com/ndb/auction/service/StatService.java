@@ -68,11 +68,11 @@ public class StatService extends BaseService {
                     max = tokenPrice;
                 priceArr[cnt] = tokenPrice; // TODO: long -> double
 
-                total += bid.getTotalPrice();
+                total += bid.getTokenAmount();
                 if (bid.getStatus() == Bid.WINNER) {
-                    win += bid.getTotalPrice();
+                    win += bid.getTokenAmount();
                 } else {
-                    failed += bid.getTotalPrice();
+                    failed += bid.getTokenAmount();
                 }
 
                 cnt++;
@@ -121,11 +121,11 @@ public class StatService extends BaseService {
                 priceArr[cnt] = tokenPrice;
                 cnt++;
 
-                total += bid.getTotalPrice();
+                total += bid.getTokenAmount();
                 if (bid.getStatus() == Bid.WINNER) {
-                    win += bid.getTotalPrice();
+                    win += bid.getTokenAmount();
                 } else {
-                    failed += bid.getTotalPrice();
+                    failed += bid.getTokenAmount();
                 }
 
             }
@@ -203,7 +203,7 @@ public class StatService extends BaseService {
             long win = 0;
             for (Bid bid : bidList) {
                 if (bid.getStatus() == Bid.WINNER) {
-                    win += bid.getTotalPrice();
+                    win += bid.getTokenAmount();
                 }
             }
             RoundPerform1 roundPerform1 = new RoundPerform1(roundNumber, win, startedRound.getSold());
@@ -231,11 +231,11 @@ public class StatService extends BaseService {
 
             double win = 0, failed = 0, total = 0, winRate = 0, failedRate = 0;
             for (Bid bid : bidList) {
-                total += bid.getTotalPrice();
+                total += bid.getTokenAmount();
                 if (bid.getStatus() == Bid.WINNER) {
-                    win += bid.getTotalPrice();
+                    win += bid.getTokenAmount();
                 } else {
-                    failed += bid.getTotalPrice();
+                    failed += bid.getTokenAmount();
                 }
 
                 winRate = total == 0 ? 0 : win / total;

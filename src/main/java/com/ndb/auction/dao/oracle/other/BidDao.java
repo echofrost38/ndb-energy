@@ -29,7 +29,8 @@ public class BidDao extends BaseOracleDao {
 		m.setName(rs.getString("NAME"));
 		m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
 		m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
-		m.setTotalPrice(m.getTokenAmount() * m.getTokenPrice());
+		m.setTotalAmount((double) (m.getTokenAmount() * m.getTokenPrice()));
+		m.setPaidAmount(rs.getDouble("PAID_AMOUNT"));
 		m.setTempTokenAmount(rs.getLong("TEMP_TOKEN_AMOUNT"));
 		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
@@ -45,14 +46,14 @@ public class BidDao extends BaseOracleDao {
 
 	public Bid placeBid(Bid m) {
 		String sql = "MERGE INTO TBL_BID USING DUAL ON (USER_ID=? AND ROUND_ID=?)"
-				+ "WHEN MATCHED THEN UPDATE SET TOKEN_AMOUNT=?, TOTAL_PRICE=?, TOKEN_PRICE=?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, DELTA=?, PENDING_INCREASE=?, "
+				+ "WHEN MATCHED THEN UPDATE SET TOKEN_AMOUNT=?, TOTAL_AMOUNT=?, TOKEN_PRICE=?, PAID_AMOUNT = ?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, DELTA=?, PENDING_INCREASE=?, "
 				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?"
-				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_PRICE, TOKEN_PRICE, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
+				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_AMOUNT, TOKEN_PRICE, PAID_AMOUNT, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
 				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS)"
 				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
-		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalPrice(), m.getTokenPrice(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
+		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
 			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
-			m.getTotalPrice(), m.getTokenPrice(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
+			m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
 			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus()
 		);
 		return m;
@@ -71,12 +72,18 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public Bid updateBid(Bid m) {
-		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT=?, TOTAL_PRICE=?, TOKEN_PRICE=?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, "
+		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT=?, TOTAL_AMOUNT=?, TOKEN_PRICE=?, PAID_AMOUNT = ?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, "
 				+ "DELTA=?, PENDING_INCREASE=?, HOLDING=?, PAY_TYPE=?, CRYPTO_TYPE=?, UPDATE_DATE=SYSDATE, STATUS=? WHERE USER_ID=? AND ROUND_ID=?";
-		jdbcTemplate.update(sql, m.getTokenAmount(), m.getTotalPrice(), m.getTokenPrice(), m.getTempTokenAmount(),
+		jdbcTemplate.update(sql, m.getTokenAmount(), m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(),
 				m.getTempTokenPrice(), m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()),
 				m.getPayType(), m.getCryptoType(), m.getStatus(), m.getUserId(), m.getRoundId());
 		return m;
+	}
+
+	// For update paid amount 
+	public int updatePaid(int userId, int auctionId, Double morePaid) {
+		String sql = "UPDATE TBL_BID SET PAID_AMOUNT = PAID_AMOUNT + ? WHERE USER_ID = ? AND ROUND_ID = ?";
+		return jdbcTemplate.update(sql, morePaid, userId, auctionId);
 	}
 
 	public int updateTemp(int userId, int auctionId, Long newTokenAmount, Long newTokenPrice) {

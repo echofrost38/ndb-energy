@@ -106,8 +106,8 @@ public class CryptoController extends BaseController {
                 bid.setTokenAmount(bid.getTempTokenAmount());
                 bid.setTokenPrice(bid.getTempTokenPrice());
             } else {
-                long totalPrice = bid.getTotalPrice();
-                if (totalPrice > fiatAmount) {
+                long totalAmount = bid.getTokenAmount();
+                if (totalAmount > fiatAmount) {
                     new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                 }
 

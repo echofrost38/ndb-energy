@@ -62,6 +62,7 @@ public class StripeBaseService extends BaseService {
             response.setRequiresAction(true);
             break;
         case "requires_payment_method":
+            response.setError("requires_payment_method");
         	break;
         case "requires_capture":
         	response.setRequiresAction(false);

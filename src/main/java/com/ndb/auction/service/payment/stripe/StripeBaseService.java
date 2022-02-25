@@ -52,6 +52,8 @@ public class StripeBaseService extends BaseService {
 		}
 		switch (intent.getStatus()) {
         case "requires_action":
+            response.setRequiresAction(true);
+            break;
         case "requires_source_action":
             // Card requires authentication
             response.setClientSecret(intent.getClientSecret());

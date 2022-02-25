@@ -50,7 +50,7 @@ public class BidDao extends BaseOracleDao {
 				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?"
 				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_AMOUNT, TOKEN_PRICE, PAID_AMOUNT, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
 				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS)"
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
 		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
 			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
 			m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 

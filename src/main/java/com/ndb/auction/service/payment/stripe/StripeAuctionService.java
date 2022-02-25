@@ -49,7 +49,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 if(bid == null) {
                     throw new BidException("no_bid", "auctionId");
                 }
-                response.setError("Bid exists");
+
 				double usdAmount = m.getAmount()/100.0;
 				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
@@ -68,7 +68,6 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
 						return response;
                     }
                 }
-                response.setError("before ranking");
                 bidService.updateBidRanking(bid);
                 response.setError("After ranking");
             }

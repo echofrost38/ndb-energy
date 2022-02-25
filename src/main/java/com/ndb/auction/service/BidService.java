@@ -209,19 +209,19 @@ public class BidService extends BaseService {
 			Bid tempBid = newList[i];
 			
 			if (status) {
-				win += newList[i].getTokenPrice();
+				win += tempBid.getTokenAmount();
 				if(tempBid.getStatus() != Bid.WINNER) {
 					tempBid.setStatus(Bid.WINNER);
 					statusChanged = true;
 				}
 			} else {
-				fail += newList[i].getTokenPrice();
+				fail += tempBid.getTokenAmount();
 				if(tempBid.getStatus() != Bid.FAILED) {
 					tempBid.setStatus(Bid.FAILED);
 					statusChanged = true;
 				}
 			}
-			availableToken -= bid.getTokenAmount();
+			availableToken -= tempBid.getTokenAmount();
 
 			if (availableToken < 0) {
 				status = false; // change to fail
@@ -230,7 +230,7 @@ public class BidService extends BaseService {
 			}
 
 			if(statusChanged) {
-				bidDao.updateBid(tempBid);
+				bidDao.updateStatus(tempBid.getUserId(), tempBid.getRoundId(), tempBid.getStatus());
 	
 				// send Notification
 				notificationService.sendNotification(

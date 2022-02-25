@@ -80,6 +80,11 @@ public class BidDao extends BaseOracleDao {
 		return m;
 	}
 
+	public int updateStatus(int userId, int roundId, int status) {
+		String sql = "UPDATE TBL_BID SET STATUS = ?, UPDATE_DATE=SYSDATE WHERE USER_ID=? AND ROUND_ID=?";
+		return jdbcTemplate.update(sql, status, userId, roundId);
+	}
+
 	// For update paid amount 
 	public int updatePaid(int userId, int auctionId, Double morePaid) {
 		String sql = "UPDATE TBL_BID SET PAID_AMOUNT = PAID_AMOUNT + ? WHERE USER_ID = ? AND ROUND_ID = ?";

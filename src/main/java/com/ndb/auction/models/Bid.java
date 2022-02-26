@@ -55,6 +55,8 @@ public class Bid {
     private Long placedAt;
     private Long updatedAt; 
     private int status;
+
+    private int ranking;
     
     public Bid(int userId, int roundId, Long tokenAmount, Long tokenPrice) {
     	this.userId = userId;

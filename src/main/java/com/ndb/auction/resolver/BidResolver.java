@@ -86,4 +86,10 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		bidService.closeBid(roundId);
 		return "Success";
 	}
+
+	public int makeConfirmed(int userId, int roundId) {
+		Bid bid = bidService.getBid(roundId, userId);
+		bidService.updateBidRanking(bid);
+		return 1;
+	}
 }

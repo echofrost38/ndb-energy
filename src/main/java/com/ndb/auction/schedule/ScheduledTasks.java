@@ -199,13 +199,13 @@ public class ScheduledTasks {
 			if (startedCounter == 0) {
 				// end round!
 				auctionService.endAuction(startedRound.getId());
-
-				statService.updateRoundCache(startedRound.getRound());
-
+				
 				// bid processing
 				// ********* checking delayed more 1s ************
 				bidService.closeBid(startedRound.getRound());
+				
 				startedRound = null;
+				statService.updateRoundCache(startedRound.getRound());
 			}
 		}
 	

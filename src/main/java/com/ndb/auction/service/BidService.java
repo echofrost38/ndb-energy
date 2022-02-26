@@ -1,5 +1,6 @@
 package com.ndb.auction.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,8 +17,6 @@ import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
@@ -25,6 +24,8 @@ import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
@@ -56,6 +57,27 @@ public class BidService extends BaseService {
 	@Autowired
 	private CoinpaymentAuctionService coinpaymentAuctionService;
 
+	// cache bid list for ongoing auction round
+	private List<Bid> currentBidList;
+
+	public BidService() {
+		this.currentBidList = null;
+	}
+
+	// fill bid list
+	private synchronized void fillBidList(int roundId) {
+		if ( currentBidList == null ) {
+			currentBidList = new ArrayList<>();
+		} else {
+			currentBidList.clear();
+		}
+		currentBidList = bidDao.getBidListByRound(roundId);
+		Bid bids[] = new Bid[currentBidList.size()];
+		currentBidList.toArray(bids);
+		sort.mergeSort(bids, 0, bids.length - 1);
+		currentBidList = Arrays.asList(bids);
+	}
+ 
 	public Bid placeNewBid(
 			int userId,
 			int roundId,
@@ -158,6 +180,11 @@ public class BidService extends BaseService {
 			throw new AuctionException("There is no round.", "round");
 		}
 
+		if(auction.getStatus() == Auction.STARTED) {
+			if(currentBidList == null) fillBidList(auction.getId());
+			return currentBidList;
+		}
+
 		List<Bid> bidList = bidDao.getBidListByRound(auction.getId());
 		Bid _bidArray[] = new Bid[bidList.size()];
 		bidList.toArray(_bidArray);
@@ -166,6 +193,17 @@ public class BidService extends BaseService {
 	}
 
 	public List<Bid> getBidListByRoundId(int round) {
+		// check round status
+		Auction currentRound = auctionDao.getAuctionById(round);
+		if(currentRound == null) {
+			throw new AuctionException("There is no round.", "round");
+		}
+
+		if(currentRound.getStatus() == Auction.STARTED) {
+			if(currentBidList == null) fillBidList(round);
+			return currentBidList;
+		}
+
 		return bidDao.getBidListByRound(round);
 	}
 
@@ -186,19 +224,28 @@ public class BidService extends BaseService {
 		int userId = bid.getUserId();
 		Auction currentRound = auctionDao.getAuctionById(roundId);
 
-		addAuctionpoint(userId, currentRound.getRound());
+		// check round status
+		if(currentRound.getStatus() != Auction.STARTED) {
+			return;
+		}
 
-		List<Bid> bidList = bidDao.getBidListByRound(roundId);
-		Bid _bidArray[] = new Bid[bidList.size()];
-		bidList.toArray(_bidArray);
-		Bid newList[] = Arrays.copyOf(_bidArray, _bidArray.length + 1);
-		newList[_bidArray.length] = bid;
+		// assume winner!
+		addAuctionpoint(userId, currentRound.getRound());
+		
+		if(currentBidList == null) fillBidList(roundId);
+		
+		currentBidList.add(bid);
+		bidDao.updateStatus(userId, roundId, 1);
+		
+		Bid newList[] = new Bid[currentBidList.size()];
+		currentBidList.toArray(newList);
 
 		// Sort Bid List by
 		// 1. Token Price
 		// 2. Total Price ( Amount of pay )
 		// 3. Placed time ( early is winner )
 		sort.mergeSort(newList, 0, newList.length - 1);
+		currentBidList = Arrays.asList(newList);
 
 		// true : winner, false : fail
 		boolean status = true;
@@ -213,6 +260,13 @@ public class BidService extends BaseService {
 			boolean statusChanged = false;
 			Bid tempBid = newList[i];
 			
+			// Rank changed
+			if(tempBid.getRanking() != (i+1)) {
+				statusChanged = true;
+				tempBid.setRanking(i+1);
+			}
+
+			// status changed Winner or failer
 			if (status) {
 				win += tempBid.getTokenAmount();
 				if(tempBid.getStatus() != Bid.WINNER) {
@@ -235,7 +289,7 @@ public class BidService extends BaseService {
 			}
 
 			if(statusChanged) {
-				bidDao.updateStatus(tempBid.getUserId(), tempBid.getRoundId(), tempBid.getStatus());
+				// bidDao.updateStatus(tempBid.getUserId(), tempBid.getRoundId(), tempBid.getStatus());
 	
 				// send Notification
 				notificationService.sendNotification(
@@ -268,17 +322,9 @@ public class BidService extends BaseService {
 		double avatarToken = auction.getToken();
 		double totalToken = auction.getTotalToken();
 
-		// Assume all status already confirmed when new bid is placed
-		List<Bid> _bidList = bidDao.getBidListByRound(roundId);
-		Bid bids[] = new Bid[_bidList.size()];
-		_bidList.toArray(bids);
-
-		sort.mergeSort(bids, 0, bids.length - 1);
-
-		List<Bid> bidList = Arrays.asList(bids);
-
 		// processing all bids
-		ListIterator<Bid> iterator = bidList.listIterator();
+		if(currentBidList == null) fillBidList(roundId);
+		ListIterator<Bid> iterator = currentBidList.listIterator();
 		while (iterator.hasNext()) {
 
 			Bid bid = iterator.next();
@@ -312,7 +358,6 @@ public class BidService extends BaseService {
 					double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
 					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
 					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
-
 				} else {
 					// hold -> release
 					String cryptoType = cryptoTransaction.getCryptoType();

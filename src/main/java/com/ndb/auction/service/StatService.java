@@ -28,7 +28,6 @@ public class StatService extends BaseService {
 
     private synchronized void buildRoundStatCache() {
         List<Auction> roundList = auctionDao.getAuctionByStatus(Auction.ENDED);
-        ;
 
         int size = roundList.size();
         if (size == 0) {

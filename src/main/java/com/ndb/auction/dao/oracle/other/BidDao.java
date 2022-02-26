@@ -41,20 +41,21 @@ public class BidDao extends BaseOracleDao {
 		m.setPlacedAt(rs.getTimestamp("REG_DATE").getTime());
 		m.setUpdatedAt(rs.getTimestamp("UPDATE_DATE").getTime());
 		m.setStatus(rs.getInt("STATUS"));
+		m.setRanking(rs.getInt("RANKING"));
 		return m;
 	}
 
 	public Bid placeBid(Bid m) {
 		String sql = "MERGE INTO TBL_BID USING DUAL ON (USER_ID=? AND ROUND_ID=?)"
 				+ "WHEN MATCHED THEN UPDATE SET TOKEN_AMOUNT=?, TOTAL_AMOUNT=?, TOKEN_PRICE=?, PAID_AMOUNT = ?, TEMP_TOKEN_AMOUNT=?, TEMP_TOKEN_PRICE=?, DELTA=?, PENDING_INCREASE=?, "
-				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?"
+				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?,RANKING=? "
 				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_AMOUNT, TOKEN_PRICE, PAID_AMOUNT, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
-				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS)"
+				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS, RANKING)"
 				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
 		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
-			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
+			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getRanking(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
 			m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
-			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus()
+			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getRanking()
 		);
 		return m;
 	}
@@ -102,7 +103,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByRound(int roundId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE ROUND_ID=? AND STATUS!=0 ORDER BY TOKEN_PRICE DESC";
+		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE ROUND_ID=? AND STATUS != 0 ORDER BY TOKEN_PRICE DESC";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -112,7 +113,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByUser(int userId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE USER_ID=? AND STATUS!=0 ORDER BY ROUND_ID";
+		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID WHERE USER_ID=? ORDER BY ROUND_ID";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {

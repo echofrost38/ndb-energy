@@ -9,6 +9,12 @@ extend type Mutation {
 		tokenAmount: Float!,
 		tokenPrice: Float!
 	) : Bid
+
+	# for only test
+	makeConfirmed(
+		userId: Int,
+		roundId: Int
+	) : Int
 	closeBid(
 		roundId: Int!
 	) : String

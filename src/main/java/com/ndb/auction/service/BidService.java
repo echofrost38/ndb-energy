@@ -180,12 +180,7 @@ public class BidService extends BaseService {
 			if(currentBidList == null) fillBidList(auction.getId());
 			return currentBidList;
 		}
-
-		List<Bid> bidList = bidDao.getBidListByRound(auction.getId());
-		Bid _bidArray[] = new Bid[bidList.size()];
-		bidList.toArray(_bidArray);
-		sort.mergeSort(_bidArray, 0, _bidArray.length - 1);
-		return Arrays.asList(_bidArray);
+		return bidDao.getBidListByRound(auction.getId());
 	}
 
 	public List<Bid> getBidListByRoundId(int round) {
@@ -241,7 +236,6 @@ public class BidService extends BaseService {
 		// 2. Total Price ( Amount of pay )
 		// 3. Placed time ( early is winner )
 		sort.mergeSort(newList, 0, newList.length - 1);
-		currentBidList = Arrays.asList(newList);
 
 		// true : winner, false : fail
 		boolean status = true;

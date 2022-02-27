@@ -16,7 +16,8 @@ type Bid {
 	cryptoType: String,
 	placedAt: Float,
 	updatedAt: Float,
-	status: Int
+	status: Int,
+	ranking: Int
 }
 
 type BidHoldings {

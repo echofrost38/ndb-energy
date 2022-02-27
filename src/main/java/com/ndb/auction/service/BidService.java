@@ -72,6 +72,22 @@ public class BidService extends BaseService {
 			currentBidList.clear();
 		}
 		currentBidList = bidDao.getBidListByRound(roundId);
+
+		// set Ranking!
+		if(currentBidList.size() == 0) return;
+
+		Bid bids[] = new Bid[currentBidList.size()];
+		currentBidList.toArray(bids);
+		sort.mergeSort(bids, 0, bids.length - 1);
+
+		// set ranking
+		currentBidList.clear();
+		int len = bids.length;
+		for (int i = 0; i < len; i++) {
+			Bid bid = bids[i];
+			bid.setRanking(i + 1);
+			currentBidList.add(bid);
+		}
 	}
  
 	public Bid placeNewBid(

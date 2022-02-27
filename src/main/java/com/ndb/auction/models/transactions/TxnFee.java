@@ -1,4 +1,4 @@
-package com.ndb.auction.models.transactions.coinpayment;
+package com.ndb.auction.models.transactions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CoinpaymentFee {
+public class TxnFee {
     private int id;
     private int tierLevel;
     private Double fee;

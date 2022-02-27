@@ -10,6 +10,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TxnFee {
+
+    public TxnFee(int tierLevel, double fee) {
+        this.fee = fee;
+        this.tierLevel = tierLevel;
+    }
+
     private int id;
     private int tierLevel;
     private Double fee;

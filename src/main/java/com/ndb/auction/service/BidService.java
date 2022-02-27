@@ -241,7 +241,18 @@ public class BidService extends BaseService {
 		
 		if(currentBidList == null) fillBidList(roundId);
 		
-		currentBidList.add(bid);
+		// checking already exists
+		boolean exists = false;
+		for (Bid _bid : currentBidList) {
+			if(_bid.getUserId() == userId && _bid.getRoundId() == roundId) {
+				_bid = bid;
+				exists = true;
+			}
+		}
+		if(!exists) {
+			currentBidList.add(bid);
+		}
+
 		bidDao.updateStatus(userId, roundId, 1);
 		
 		Bid newList[] = new Bid[currentBidList.size()];

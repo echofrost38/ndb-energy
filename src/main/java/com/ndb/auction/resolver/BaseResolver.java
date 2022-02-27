@@ -24,6 +24,7 @@ import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
+import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
@@ -160,4 +161,7 @@ public class BaseResolver {
 
 	@Autowired
 	protected ThirdAPIUtils thirdAPIUtils;
+
+	@Autowired
+	protected TxnFeeService txnFeeService;
 }

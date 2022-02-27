@@ -71,6 +71,7 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		return stripeAuctionService.createNewTransaction(m);
 	}
 
+	// for Coinpayments
 	@PreAuthorize("isAuthenticated()")
 	public CoinpaymentAuctionTransaction createCryptoPaymentForAuction(int roundId, Long amount, String cryptoType, String network, String coin) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

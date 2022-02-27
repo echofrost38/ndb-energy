@@ -248,6 +248,7 @@ public class BidService extends BaseService {
 				currentBidList.remove(_bid);
 				currentBidList.add(bid);
 				exists = true;
+				break;
 			}
 		}
 		if(!exists) {

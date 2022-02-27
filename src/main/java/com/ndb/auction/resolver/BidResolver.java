@@ -92,4 +92,5 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		bidService.updateBidRanking(bid);
 		return 1;
 	}
+
 }

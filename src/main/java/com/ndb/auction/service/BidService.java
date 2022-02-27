@@ -245,7 +245,8 @@ public class BidService extends BaseService {
 		boolean exists = false;
 		for (Bid _bid : currentBidList) {
 			if(_bid.getUserId() == userId && _bid.getRoundId() == roundId) {
-				_bid = bid;
+				currentBidList.remove(_bid);
+				currentBidList.add(bid);
 				exists = true;
 			}
 		}

@@ -72,10 +72,6 @@ public class BidService extends BaseService {
 			currentBidList.clear();
 		}
 		currentBidList = bidDao.getBidListByRound(roundId);
-		Bid bids[] = new Bid[currentBidList.size()];
-		currentBidList.toArray(bids);
-		sort.mergeSort(bids, 0, bids.length - 1);
-		currentBidList = Arrays.asList(bids);
 	}
  
 	public Bid placeNewBid(

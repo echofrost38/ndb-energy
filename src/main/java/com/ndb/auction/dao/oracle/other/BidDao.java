@@ -51,7 +51,7 @@ public class BidDao extends BaseOracleDao {
 				+ "HOLDING=?,PAY_TYPE=?,CRYPTO_TYPE=?,REG_DATE=SYSDATE,UPDATE_DATE=SYSDATE,STATUS=?,RANKING=? "
 				+ "WHEN NOT MATCHED THEN INSERT(USER_ID, ROUND_ID, TOKEN_AMOUNT, TOTAL_AMOUNT, TOKEN_PRICE, PAID_AMOUNT, TEMP_TOKEN_AMOUNT, TEMP_TOKEN_PRICE, "
 				+ "DELTA, PENDING_INCREASE, HOLDING, PAY_TYPE, CRYPTO_TYPE, REG_DATE, UPDATE_DATE, STATUS, RANKING)"
-				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?)";
+				+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE,?,?)";
 		jdbcTemplate.update(sql, m.getUserId(), m.getRoundId(), m.getTokenAmount(), m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
 			m.getDelta(), m.isPendingIncrease(), gson.toJson(m.getHoldingList()), m.getPayType(), m.getCryptoType(), m.getStatus(), m.getRanking(), m.getUserId(), m.getRoundId(), m.getTokenAmount(), 
 			m.getTotalAmount(), m.getTokenPrice(), m.getPaidAmount(), m.getTempTokenAmount(), m.getTempTokenPrice(), 
@@ -90,6 +90,11 @@ public class BidDao extends BaseOracleDao {
 	public int updatePaid(int userId, int auctionId, Double morePaid) {
 		String sql = "UPDATE TBL_BID SET PAID_AMOUNT = PAID_AMOUNT + ? WHERE USER_ID = ? AND ROUND_ID = ?";
 		return jdbcTemplate.update(sql, morePaid, userId, auctionId);
+	}
+
+	public int updateRanking(int userId, int auctionId, int ranking) {
+		String sql = "UPDATE TBL_BID SET RANKING=? WHERE USER_ID=? AND ROUND_ID=?";
+		return jdbcTemplate.update(sql, ranking, userId, auctionId);
 	}
 
 	public int updateTemp(int userId, int auctionId, Long newTokenAmount, Long newTokenPrice) {

@@ -441,6 +441,9 @@ public class BidService extends BaseService {
 
 			}
 
+			// save bid ranking!
+			bidDao.updateRanking(bid.getUserId(), bid.getRoundId(), bid.getRanking());
+
 			notificationService.sendNotification(
 				bid.getUserId(), 
 				Notification.BID_CLOSED, 

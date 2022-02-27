@@ -15,6 +15,6 @@ public class CoinPaymentsRateRequest {
 
     @Override
     public String toString() {
-        return "cmd=rates&accepted=" + (onlyAccepted ? "1" : "0") + "&short=" + (onlyShort ? "1" : "0");
+        return "cmd=rates&accepted=" + (onlyAccepted ? "2" : "0") + "&short=" + (onlyShort ? "1" : "0");
     }
 }

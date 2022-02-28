@@ -1,7 +1,6 @@
 package com.ndb.auction.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -470,6 +469,9 @@ public class BidService extends BaseService {
 				String.format("Your Bid closed. You %s", bid.getStatus() == Bid.WINNER ? "won!" : "failed")
 			);
 		}
+
+		// clear current bid list!
+		currentBidList = null;
 	}
 
 	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice) {
@@ -533,7 +535,7 @@ public class BidService extends BaseService {
 		// 	return originalBid;
 		// }
 
-		bidDao.updateTemp(userId, roundId, tokenAmount, tokenPrice);
+		bidDao.updateTemp(userId, roundId, tokenAmount, tokenPrice, delta);
 
 		return originalBid;
 	}

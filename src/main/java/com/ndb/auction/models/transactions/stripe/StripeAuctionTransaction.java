@@ -14,16 +14,17 @@ public class StripeAuctionTransaction extends StripeDepositTransaction {
         int auctionId,
         Long amount,
         String paymentIntentId,
-        String paymentMethodId
+        String paymentMethodId,
+        boolean isSaveCard
     ) {
         this.userId = userId;
         this.auctionId = auctionId;
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
         this.fiatType = "USD";
-        this.fiatAmount = amount;
         this.amount = amount;
         this.bidId = 0;
+        this.isSaveCard = isSaveCard;
     }
     
     private int auctionId;

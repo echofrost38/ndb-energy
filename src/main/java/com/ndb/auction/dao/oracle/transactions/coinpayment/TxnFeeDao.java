@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Repository
 @NoArgsConstructor
-@Table(name = "TBL_COINPAY_FEE")
+@Table(name = "TBL_TXN_FEE")
 public class TxnFeeDao extends BaseOracleDao {
     
     private static TxnFee extract(ResultSet rs) throws SQLException {
@@ -32,7 +32,7 @@ public class TxnFeeDao extends BaseOracleDao {
 	}
 
     public TxnFee insert(TxnFee m) {
-        String sql = "INSERT INTO TBL_COINPAY_FEE(ID,TIER_LEVEL,FEE)VALUES(SEQ_COINPAY_FEE.NEXTVAL,?,?)";
+        String sql = "INSERT INTO TBL_TXN_FEE(ID,TIER_LEVEL,FEE)VALUES(SEQ_COINPAY_FEE.NEXTVAL,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 			new PreparedStatementCreator() {
@@ -41,7 +41,6 @@ public class TxnFeeDao extends BaseOracleDao {
 					PreparedStatement ps = connection.prepareStatement(sql,
 							new String[] { "ID" });
 					int i = 1;
-					ps.setInt(i++, m.getId());
 					ps.setInt(i++, m.getTierLevel());
                     ps.setDouble(i++, m.getFee());
 					return ps;
@@ -52,7 +51,7 @@ public class TxnFeeDao extends BaseOracleDao {
     }
 
     public List<TxnFee> selectAll() {
-        String sql = "SELECT * FROM TBL_COINPAY_FEE ORDER BY TIER_LEVEL";
+        String sql = "SELECT * FROM TBL_TXN_FEE ORDER BY TIER_LEVEL";
         return jdbcTemplate.query(sql, new RowMapper<TxnFee>() {
 			@Override
 			public TxnFee mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -62,7 +61,7 @@ public class TxnFeeDao extends BaseOracleDao {
     }
 
     public int update(TxnFee m) {
-        String sql = "UPDATE TBL_COINPAY_FEE SET TIER_LEVEL=?,FEE=? WHERE ID = ?";
+        String sql = "UPDATE TBL_TXN_FEE SET TIER_LEVEL=?,FEE=? WHERE ID = ?";
         return jdbcTemplate.update(sql, m.getTierLevel(), m.getFee(), m.getId());
     }
 

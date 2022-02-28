@@ -6,10 +6,16 @@ import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
+import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.PaymentMethod;
+import com.stripe.model.PaymentMethod.Card;
+import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import org.springframework.stereotype.Service;
@@ -26,16 +32,31 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
             if (m.getPaymentIntentId() == null) {
             	
             	// Create new PaymentIntent for the order
-                PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
+                PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency("usd")
-                        .setAmount(m.getAmount().longValue())
+                        .setAmount(m.getAmount())
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
-                        .setConfirm(true)
-                        .build();
+                        .setConfirm(true);
+                
+                // check save card
+                if(m.isSaveCard()) {
+                    Customer customer = Customer.create(new CustomerCreateParams.Builder().build());
+                    createParams.setCustomer(customer.getId());
+                    createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+
+                    // save customer
+                    PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
+                    Card card = method.getCard();
+                    StripeCustomer stripeCustomer = new StripeCustomer(
+                        m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
+                    );
+                    stripeCustomerDao.insert(stripeCustomer);
+                }
+
                 // Create a PaymentIntent with the order amount and currency
-                intent = PaymentIntent.create(createParams);
+                intent = PaymentIntent.create(createParams.build());
                 stripeAuctionDao.insert(m);
             } else {
                 // Confirm the paymentIntent to collect the money
@@ -50,10 +71,11 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     throw new BidException("no_bid", "auctionId");
                 }
 
-				double usdAmount = m.getAmount()/100.0;
+				double paidAmount = intent.getAmount().doubleValue();
 				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
-                    if(pendingPrice > usdAmount) {
+                    Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
+                    if(totalOrder > paidAmount) {
                         response.setError("Insufficient funds");
 						return response;
                     }
@@ -62,8 +84,9 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     bid.setTokenAmount(bid.getTempTokenAmount());
                     bid.setTokenPrice(bid.getTempTokenPrice());
                 } else {
-                    long totalPrice = bid.getTokenAmount();
-                    if(totalPrice > usdAmount) {
+                    Long totalPrice = bid.getTokenAmount();
+                    Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
+                    if(totalOrder > paidAmount) {
                         response.setError("Insufficient funds");
 						return response;
                     }

@@ -3,14 +3,18 @@ package com.ndb.auction.service.payment;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ndb.auction.dao.oracle.transactions.coinpayment.TxnFeeDao;
 import com.ndb.auction.models.transactions.TxnFee;
-import com.ndb.auction.service.BaseService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TxnFeeService extends BaseService {
+public class TxnFeeService {
     
+    @Autowired
+    private TxnFeeDao txnFeeDao;
+
     // cache
     private List<TxnFee> txnFeeList;
 
@@ -51,6 +55,16 @@ public class TxnFeeService extends BaseService {
         txnFeeDao.deleteById(id);
         fillList();
         return txnFeeList;
+    }
+
+    public double getFee(int tierLevel) {
+        if(txnFeeList == null) fillList();
+        for (TxnFee txnFee : txnFeeList) {
+            if(txnFee.getTierLevel() == tierLevel) {
+                return txnFee.getFee();
+            }
+        }
+        return 0.0;
     }
 
 }

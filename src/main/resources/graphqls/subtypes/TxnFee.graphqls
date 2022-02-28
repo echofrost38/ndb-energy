@@ -1,0 +1,5 @@
+type TxnFee {
+    id: Int,
+    tierLevel: Int,
+    fee: Float
+}

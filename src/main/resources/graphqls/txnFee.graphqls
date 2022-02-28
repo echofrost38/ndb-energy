@@ -1,0 +1,23 @@
+extend type Mutation {
+    createNewFee(
+        tierLevel: Int,
+        fee: Float
+    ) : [TxnFee]
+    update(
+        id: Int,
+        tierLevel: Int,
+        fee: Float
+    ) : [TxnFee]
+    delete(
+        id: Int
+    ) : [TxnFee]
+}
+
+extend type Query {
+    getAllFees : [TxnFee]
+}
+
+schema {
+   query: Query,
+   mutation: Mutation
+}

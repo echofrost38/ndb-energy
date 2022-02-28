@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
@@ -44,6 +45,14 @@ public class StripeBaseService extends BaseService {
 	public String getPublicKey( ) {
 		return stripePublicKey;
 	}
+
+    public Double getTotalOrder(int userId, double amount) {
+        double stripeFee = amount * 2.9; 
+        User user = userDao.selectById(userId);
+        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        double tierFee = tierFeeRate * amount;
+        return amount * 100 + stripeFee + tierFee + 30;
+    }
 
     protected PayResponse generateResponse(PaymentIntent intent, PayResponse response) {
 		if(intent == null) {

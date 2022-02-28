@@ -61,13 +61,14 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	@PreAuthorize("isAuthenticated()")
 	public PayResponse payStripeForAuction(
 		int roundId, 
-		Long amount, 
+		Long amount,
 		String paymentIntentId,
-		String paymentMethodId
+		String paymentMethodId,
+		boolean isSaveCard
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId);
+		StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId, isSaveCard);
 		return stripeAuctionService.createNewTransaction(m);
 	}
 

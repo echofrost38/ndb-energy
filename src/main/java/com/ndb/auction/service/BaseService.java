@@ -31,6 +31,7 @@ import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.WithdrawTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.coinpayment.TxnFeeDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
@@ -42,6 +43,7 @@ import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.balance.FiatBalance;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
+import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
@@ -211,7 +213,10 @@ public class BaseService {
     protected ThirdAPIUtils apiUtils;
 
     @Autowired
-    protected TxnFeeDao txnFeeDao;
+    protected StripeCustomerDao stripeCustomerDao;
+
+    @Autowired
+    protected TxnFeeService txnFeeService;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

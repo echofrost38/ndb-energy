@@ -45,9 +45,10 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     Customer customer = Customer.create(new CustomerCreateParams.Builder().build());
                     createParams.setCustomer(customer.getId());
                     createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
-
+                    
                     // save customer
                     PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
+                    
                     Card card = method.getCard();
                     StripeCustomer stripeCustomer = new StripeCustomer(
                         m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
@@ -72,6 +73,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 }
 
 				double paidAmount = intent.getAmount().doubleValue();
+                double alreadyPaid = bid.getPaidAmount();
+
 				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
@@ -86,7 +89,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 } else {
                     Long totalPrice = bid.getTokenAmount();
                     Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
-                    if(totalOrder > paidAmount) {
+                    bidDao.updatePaid(bid.getUserId(), bid.getRoundId(), paidAmount);
+                    if(totalOrder > (paidAmount + alreadyPaid)) {
                         response.setError("Insufficient funds");
 						return response;
                     }

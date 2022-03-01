@@ -552,4 +552,8 @@ public class BidService extends BaseService {
 		return bidDao.getBidListFrom(from);
 	}
 
+	public int updatePaid(int userId, int auctionId, double paid) {
+		return bidDao.updatePaid(userId, auctionId, paid);
+	}
+
 }

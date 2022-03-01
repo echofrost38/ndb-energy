@@ -108,7 +108,11 @@ public class CryptoController extends BaseController {
                 bid.setTotalAmount((double) (bid.getTokenAmount() * bid.getTokenPrice()));
             } else {
                 Double totalAmount = bid.getTotalAmount();
-                if (totalAmount > fiatAmount) {
+                Double totalOrder = getTotalOrder(bid.getUserId(), totalAmount);
+                Double alreadyPaid = bid.getPaidAmount();
+                bidService.updatePaid(bid.getUserId(), bid.getRoundId(), fiatAmount);
+                
+                if (totalOrder > (fiatAmount + alreadyPaid)) {
                     new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                 }
 
@@ -381,6 +385,14 @@ public class CryptoController extends BaseController {
 	    }
 
         return new ResponseEntity<>(HttpStatus.OK); 
+    }
+
+    private Double getTotalOrder(int userId, double totalPrice) {
+        double coinpaymentFee = totalPrice * 0.5 / 100;
+        User user = userService.getUserById(userId);
+        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        double tierFee = tierFeeRate * totalPrice / 100;
+        return totalPrice + coinpaymentFee + tierFee;
     }
 
 }

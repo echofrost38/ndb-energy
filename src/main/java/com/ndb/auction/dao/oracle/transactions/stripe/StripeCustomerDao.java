@@ -34,7 +34,7 @@ public class StripeCustomerDao extends BaseOracleDao {
 
     public int insert(StripeCustomer m) {
         String sql = "INSERT INTO TBL_STRIPE_CUSTOMER(ID,USER_ID,CUSTOMER_ID,BRAND,COUNTRY,EXP_MONTH,EXP_YEAR,LAST4)"
-            + "VALUES(SEQ_STRIPE_CUSTOMER.NEXTVAL,?,?,?,?,?,?,?,?)";
+            + "VALUES(SEQ_STRIPE_CUSTOMER.NEXTVAL,?,?,?,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getCustomerId(), m.getBrand(), m.getCountry(), m.getExpMonth(), m.getExpYear(), m.getLast4());
     }
 

@@ -42,7 +42,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 
                 // check save card
                 if(m.isSaveCard()) {
-                    Customer customer = Customer.create(new CustomerCreateParams.Builder().build());
+                    Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
                     createParams.setCustomer(customer.getId());
                     createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
                     
@@ -53,6 +53,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     StripeCustomer stripeCustomer = new StripeCustomer(
                         m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
                     );
+                    
                     stripeCustomerDao.insert(stripeCustomer);
                 }
 

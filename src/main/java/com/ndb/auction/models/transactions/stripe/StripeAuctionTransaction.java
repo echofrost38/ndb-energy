@@ -22,6 +22,7 @@ public class StripeAuctionTransaction extends StripeDepositTransaction {
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
         this.fiatType = "USD";
+        this.fiatAmount = amount;
         this.amount = amount;
         this.bidId = 0;
         this.isSaveCard = isSaveCard;

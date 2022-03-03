@@ -21,7 +21,7 @@ public class TokenAssetService {
     private Map<String, Integer> assetMap;
     private Map<Integer, TokenAsset> assetIdMap;
 
-    public int getTokenIdBySymbol(String symbol) {
+    public Integer getTokenIdBySymbol(String symbol) {
         if(assetMap == null) {
             fillList();
         }

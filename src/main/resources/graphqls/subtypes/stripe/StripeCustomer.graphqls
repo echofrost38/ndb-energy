@@ -1,0 +1,10 @@
+type StripeCustomer {
+    id: Int,
+    userId: Int,
+    customerId: String,
+    brand: String,
+    country: String,
+    expMonth: Float,
+    expYear: Float,
+    last4: String
+}

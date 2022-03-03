@@ -24,12 +24,14 @@ import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.utils.Sort;
+import com.stripe.model.PaymentIntent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -346,119 +348,83 @@ public class BidService extends BaseService {
 		while (iterator.hasNext()) {
 
 			Bid bid = iterator.next();
-
 			int userId = bid.getUserId();
-			long totalPrice = 0;
-
-			// check stripe
-			List<StripeAuctionTransaction> fiatTxns = stripeService.selectByIds(roundId, userId);
-			for (StripeAuctionTransaction fiatTransaction : fiatTxns) {
-
-				// Processing Stripe CAPTURE or CANCEL
-				boolean result = stripeService.UpdateTransaction(fiatTransaction.getId(), bid.getStatus());
-				if (result && (bid.getStatus() == Bid.WINNER)) {
-					totalPrice += fiatTransaction.getAmount();
-				}
-			}
-
-			List<CoinpaymentAuctionTransaction> cryptoTxns = 
-				(List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
-			for (CoinpaymentAuctionTransaction cryptoTransaction : cryptoTxns) {
-				if (!cryptoTransaction.getStatus()) {
-					continue;
-				}
-				if (bid.getStatus() == Bid.WINNER) {
-					String sAmount = cryptoTransaction.getAmount().toString();
-					totalPrice += Long.valueOf(sAmount);
-
-					// release held token
-					String cryptoType = cryptoTransaction.getCryptoType();
-					double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
-					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
-				} else {
-					// hold -> release
-					String cryptoType = cryptoTransaction.getCryptoType();
-					Double cryptoAmount = Double.valueOf(cryptoTransaction.getCryptoAmount());
-
-					int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-					CryptoBalance balance = balanceDao.selectById(userId, tokenId);
-					if(balance.getHold() < cryptoAmount) {
-						continue;
+			Boolean captureError = false;
+			// check bid status 
+			// A) if winner 
+			if(bid.getStatus() == Bid.WINNER) {
+				
+				// 1) check Stripe transaction to capture!
+				List<StripeAuctionTransaction> stripeTxns = stripeService.selectByIds(roundId, userId);
+				for (StripeAuctionTransaction stripeTransaction : stripeTxns) {
+					try {
+						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
+						intent.capture();
+					} catch (Exception e) {
+						captureError = true;
+						break;
 					}
-					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);
 				}
-			}
 
-			// check wallet payment
-			Map<String, BidHolding> walletPayments = bid.getHoldingList();
-			Set<String> keySet = walletPayments.keySet();
-			for (String _cryptoType : keySet) {
-				BidHolding holding = walletPayments.get(_cryptoType);
-				if (bid.getStatus() == Bid.WINNER) {
-					totalPrice += holding.getUsd();
-					
-					double cryptoAmount = holding.getCrypto();
-					int tokenId = tokenAssetService.getTokenIdBySymbol(_cryptoType);
-					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
+				// 2) check Coinpayment remove hold token
+				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
+					// get crypto type and amount
+					String cryptoType = coinpaymentTxn.getCryptoType();
+					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();
 
-				} else {
-
-					double cryptoAmount = holding.getCrypto();
-					int tokenId = tokenAssetService.getTokenIdBySymbol(_cryptoType);
-					CryptoBalance balance = balanceDao.selectById(userId, tokenId);
-					if(balance.getHold() < cryptoAmount) {
-						continue;
+					// deduct hold value
+					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+					if(tokenId == null) {
+						captureError = true;
+						break;
 					}
-					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);
+					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
 				}
-			}
+	
+				// 3) Check Paypal transaction to capture
+				List<PaypalAuctionTransaction> paypalTxns = paypalAuctionDao.selectByIds(userId, roundId);
+				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
+					// capture?
 
-			// checking Round AVATAR
-			boolean roundAvatarWinner = true;
-			UserAvatar userAvatar = userAvatarDao.selectById(userId);
-			String purchasedJsonString;
-			if (userAvatar != null && (purchasedJsonString = userAvatar.getPurchased()) != null
-					&& !purchasedJsonString.isEmpty()) {
-				JsonObject purchasedJson = JsonParser.parseString(purchasedJsonString).getAsJsonObject();
-				for (AvatarComponent component : avatarComponents)
-					block_c: {
-						JsonElement el = purchasedJson.get(String.valueOf(component.getGroupId()));
-						if (el == null || el.isJsonNull()) {
-							roundAvatarWinner = false;
-							break;
-						}
-						JsonArray array = el.getAsJsonArray();
-						for (JsonElement e : array) {
-							if (e.getAsString().equals(component.getCompId())) {
-								break block_c;
+				}
+
+				// 4) Wallet payment holding
+
+				// 5) Avatar checking!
+				boolean roundAvatarWinner = true;
+				UserAvatar userAvatar = userAvatarDao.selectById(userId);
+				String purchasedJsonString;
+				if (userAvatar != null && (purchasedJsonString = userAvatar.getPurchased()) != null
+						&& !purchasedJsonString.isEmpty()) {
+					JsonObject purchasedJson = JsonParser.parseString(purchasedJsonString).getAsJsonObject();
+					for (AvatarComponent component : avatarComponents)
+						block_c: {
+							JsonElement el = purchasedJson.get(String.valueOf(component.getGroupId()));
+							if (el == null || el.isJsonNull()) {
+								roundAvatarWinner = false;
+								break;
 							}
+							JsonArray array = el.getAsJsonArray();
+							for (JsonElement e : array) {
+								if (e.getAsString().equals(component.getCompId())) {
+									break block_c;
+								}
+							}
+							roundAvatarWinner = false;
 						}
-						roundAvatarWinner = false;
-					}
-			}
-
-			// check total price and NDB wallet!!
-			if (bid.getStatus() == Bid.WINNER) {
-				long tokenPrice = bid.getTokenPrice();
-				long token = totalPrice / tokenPrice;
-				if (roundAvatarWinner) {
-					token += avatarToken;
 				}
+	
+				// 6) Allocate NDB Token
+				Long ndb = bid.getTokenAmount();
+				if(roundAvatarWinner) ndb += auction.getToken();
+				int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+				balanceDao.addFreeBalance(userId, ndbId, ndb);
 
-				if (totalToken < token) {
-					// add ndb
-					int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
-					balanceDao.addFreeBalance(userId, ndbId, totalToken);
-					totalToken = 0;
-				} else {
-					int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
-					balanceDao.addFreeBalance(userId, ndbId, token);
-					totalToken -= token;
-				}
+			} else if (bid.getStatus() == Bid.FAILED) { // B) if lost
+				
 
 			}
-
 			// save bid ranking!
 			bidDao.updateRanking(bid.getUserId(), bid.getRoundId(), bid.getRanking());
 

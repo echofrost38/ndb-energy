@@ -132,6 +132,16 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
 		}, orderId);
     }
 
+    public List<PaypalAuctionTransaction> selectByIds(int userId, int roundId) {
+        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE USER_ID = ? AND ROUND_ID = ?";
+		return jdbcTemplate.query(sql, new RowMapper<PaypalAuctionTransaction>() {
+			@Override
+			public PaypalAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, userId, roundId);
+    }
+
     public int updateOrderStatus(int id, String status) {
         String sql = "UPDATE TBL_PAYAPL_AUCTION SET ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);

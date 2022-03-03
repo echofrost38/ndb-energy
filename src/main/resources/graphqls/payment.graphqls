@@ -1,8 +1,16 @@
 extend type Query {
 	getStripePubKey : String!
 	getExchangeRate : String
+	getSavedCards : [StripeCustomer]
+}
+
+extend type Mutation {
+	deleteCard(
+		id: Int
+	) : Int
 }
 
 schema {
    query: Query,
+   mutation: Mutation
 }

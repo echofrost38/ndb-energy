@@ -49,7 +49,7 @@ public class PresaleResolver extends BaseResolver implements GraphQLQueryResolve
 
     /// PreSaleOrder
     @PreAuthorize("isAuthenticated()")
-    public PreSaleOrder placePreSaleOrder(int presaleId, Long ndbAmount, Long ndbPrice, int destination, String extAddr) {
+    public PreSaleOrder placePreSaleOrder(int presaleId, Long ndbAmount, int destination, String extAddr) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -64,6 +64,7 @@ public class PresaleResolver extends BaseResolver implements GraphQLQueryResolve
         }
 
         // create new Presale order
+        Long ndbPrice = presale.getTokenPrice();
         PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, extAddr);
         return presaleOrderService.placePresaleOrder(presaleOrder);
     }

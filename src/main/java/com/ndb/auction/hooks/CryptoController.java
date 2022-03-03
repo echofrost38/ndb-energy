@@ -40,6 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CryptoController extends BaseController {
 
+    private final double COINPAYMENT_FEE = 0.5;
+
     @PostMapping("/ipn/bid/{id}")
     @ResponseBody
     public Object coinPaymentsBidIpn(@PathVariable("id") int id, HttpServletRequest request) {
@@ -109,10 +111,10 @@ public class CryptoController extends BaseController {
             } else {
                 Double totalAmount = bid.getTotalAmount();
                 Double totalOrder = getTotalOrder(bid.getUserId(), totalAmount);
-                Double alreadyPaid = bid.getPaidAmount();
-                bidService.updatePaid(bid.getUserId(), bid.getRoundId(), fiatAmount);
+                // Double alreadyPaid = bid.getPaidAmount();
+                // bidService.updatePaid(bid.getUserId(), bid.getRoundId(), fiatAmount);
                 
-                if (totalOrder > (fiatAmount + alreadyPaid)) {
+                if (totalOrder > fiatAmount) {
                     new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                 }
 
@@ -211,8 +213,9 @@ public class CryptoController extends BaseController {
 
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
             Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
-            
-            if(totalPrice > fiatAmount) {
+            Double totalOrder = getTotalOrder(txn.getUserId(), totalPrice);
+
+            if(totalOrder > fiatAmount) {
                 new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
     
@@ -230,10 +233,10 @@ public class CryptoController extends BaseController {
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(user.getId());
             double presalePoint = tierTask.getDirect();
-            presalePoint += taskSetting.getDirect() * fiatAmount;
+            presalePoint += taskSetting.getDirect() * totalPrice;
             tierTask.setDirect(presalePoint);
     
-            double newPoint = user.getTierPoint() + taskSetting.getDirect() * fiatAmount;
+            double newPoint = user.getTierPoint() + taskSetting.getDirect() * totalPrice;
             int tierLevel = 0;
     
             // check change in level
@@ -388,11 +391,9 @@ public class CryptoController extends BaseController {
     }
 
     private Double getTotalOrder(int userId, double totalPrice) {
-        double coinpaymentFee = totalPrice * 0.5 / 100;
         User user = userService.getUserById(userId);
         Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-        double tierFee = tierFeeRate * totalPrice / 100;
-        return totalPrice + coinpaymentFee + tierFee;
+        return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
     }
 
 }

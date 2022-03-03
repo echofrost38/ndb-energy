@@ -170,7 +170,7 @@ public class ScheduledTasks {
 
 	public void setPresaleStart(PreSale presale) {
 		this.startedPresale = presale;
-		this.startedPresaleCounter = presale.getStartedAt() - System.currentTimeMillis();
+		this.startedPresaleCounter = presale.getEndedAt() - System.currentTimeMillis();
 		this.startedPresaleCounter /= 1000;
 	}
 
@@ -223,6 +223,7 @@ public class ScheduledTasks {
 
 		if (startedPresale != null && startedPresaleCounter > 0L) {
 			startedPresaleCounter--;
+			System.out.println("Presale counter: " + startedPresaleCounter.toString());
 			if(startedPresaleCounter == 0) {
 				// end
 				presaleService.closePresale(startedPresale.getId());

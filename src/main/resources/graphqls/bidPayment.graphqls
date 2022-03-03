@@ -49,6 +49,11 @@ extend type Mutation {
 		network: String,
 		coin: String!
 	) : CoinpaymentAuctionTransaction
+	paypalForAuction(
+		roundId: Int,
+		amount: Float,
+		currencyCode: String,
+	) : OrderResponseDTO
 }
 
 schema {

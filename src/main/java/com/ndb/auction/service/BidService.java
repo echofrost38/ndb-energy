@@ -300,10 +300,10 @@ public class BidService extends BaseService {
 			}
 			availableToken -= tempBid.getTokenAmount();
 
-			if (availableToken < 0) {
+			if (availableToken < 0 && status) {
 				status = false; // change to fail
-				win -= availableToken;
-				fail += availableToken;
+				win -= Math.abs(availableToken);
+				fail += Math.abs(availableToken);
 			}
 
 			if(statusChanged) {

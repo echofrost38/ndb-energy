@@ -1,0 +1,26 @@
+enum PaymentLandingPage {
+    LOGIN,
+    BILLING,
+    NO_PREFERENCE
+}
+
+type OrderResponseDTO {
+    id: String,
+    status: OrderStatus,
+    links: [LinkDTO]
+}
+
+type LinkDTO {
+    href: String,
+    rel: String,
+    method: String
+}
+
+enum OrderStatus {
+    CREATED,
+    SAVED,
+    APPROVED,
+    VOIDED,
+    COMPLETED,
+    PAYER_ACTION_REQUIRED
+}

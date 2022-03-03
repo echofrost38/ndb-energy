@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class StripeBaseService extends BaseService {
     
+    private final double STRIPE_FEE = 2.9;
+
     @Value("${stripe.secret.key}")
 	private String stripeSecretKey;
 
@@ -46,12 +48,12 @@ public class StripeBaseService extends BaseService {
 		return stripePublicKey;
 	}
 
+    // total order! 
+    // total = 100 / (100 - gateway fee - tier fee) * (amount + fixed fee)
     public Double getTotalOrder(int userId, double amount) {
-        double stripeFee = amount * 2.9; 
         User user = userDao.selectById(userId);
         Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-        double tierFee = tierFeeRate * amount;
-        return amount * 100 + stripeFee + tierFee + 30;
+        return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
     }
 
     protected PayResponse generateResponse(PaymentIntent intent, PayResponse response) {

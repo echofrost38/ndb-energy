@@ -181,7 +181,7 @@ public class ScheduledTasks {
 		if (readyRound != null && readyCounter > 0L) {
 			readyCounter--;
 			System.out.println("Ready counter: " + readyCounter.toString());
-			if (readyCounter == 0) {
+			if (readyCounter <= 0) {
 				// ended count down ! trigger to start this round!!
 
 				startedRound = readyRound;
@@ -196,7 +196,7 @@ public class ScheduledTasks {
 		if (startedRound != null && startedCounter > 0L) {
 			startedCounter--;
 			System.out.println("Started counter: " + startedCounter.toString());
-			if (startedCounter == 0) {
+			if (startedCounter <= 0) {
 				// end round!
 				auctionService.endAuction(startedRound.getId());
 				

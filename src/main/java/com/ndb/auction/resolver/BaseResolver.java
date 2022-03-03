@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import com.google.gson.Gson;
@@ -22,12 +23,12 @@ import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.payment.DepositService;
-import com.ndb.auction.service.payment.PaypalService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
+import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripePresaleService;
@@ -47,65 +48,68 @@ public class BaseResolver {
 
 	protected static Gson gson = new Gson();
 
-	@Autowired
-	AuctionService auctionService;
+	@Value("${paypal.callbackUrl}")
+    protected String PAYPAL_CALLBACK_URL;
 
 	@Autowired
-	BidService bidService;
+	protected AuctionService auctionService;
 
 	@Autowired
-	UserService userService;
+	protected BidService bidService;
 
 	@Autowired
-	AuthenticationManager authenticationManager;
+	protected UserService userService;
 
 	@Autowired
-	JwtUtils jwtUtils;
+	protected AuthenticationManager authenticationManager;
 
 	@Autowired
-	TotpService totpService;
+	protected JwtUtils jwtUtils;
 
 	@Autowired
-	AvatarService avatarService;
+	protected TotpService totpService;
 
 	@Autowired
-	ProfileService profileService;
+	protected AvatarService avatarService;
 
 	@Autowired
-	NotificationService notificationService;
+	protected ProfileService profileService;
 
 	@Autowired
-	StatService statService;
+	protected NotificationService notificationService;
 
 	@Autowired
-	OAuth2RegistrationService oAuth2RegistrationService;
+	protected StatService statService;
 
 	@Autowired
-	FinancialService financialService;
+	protected OAuth2RegistrationService oAuth2RegistrationService;
 
 	@Autowired
-	UserWalletService userWalletService;
+	protected FinancialService financialService;
 
 	@Autowired
-	NdbWalletService ndbWalletService;
+	protected UserWalletService userWalletService;
 
 	@Autowired
-	IPChecking ipChecking;
+	protected NdbWalletService ndbWalletService;
 
 	@Autowired
-	KYBService kybService;
+	protected IPChecking ipChecking;
 
 	@Autowired
-	TokenAssetService tokenAssetService;
+	protected KYBService kybService;
 
 	@Autowired
-	UserVerifyService userVerifyService;
+	protected TokenAssetService tokenAssetService;
 
 	@Autowired
-	UserSecurityService userSecurityService;
+	protected UserVerifyService userVerifyService;
 
 	@Autowired
-	TierTaskService tierTaskService;
+	protected UserSecurityService userSecurityService;
+
+	@Autowired
+	protected TierTaskService tierTaskService;
 
 	@Autowired
 	protected
@@ -164,4 +168,7 @@ public class BaseResolver {
 
 	@Autowired
 	protected TxnFeeService txnFeeService;
+
+	@Autowired
+	protected PaypalAuctionService paypalAuctionService;
 }

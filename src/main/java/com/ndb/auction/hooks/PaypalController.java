@@ -1,72 +1,51 @@
 package com.ndb.auction.hooks;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
+import java.net.http.HttpResponse;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
+import com.ndb.auction.payload.response.paypal.OrderStatus;
+import com.paypal.api.payments.Order;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.ndb.auction.models.transaction.PaypalOrder;
-import com.ndb.auction.service.payment.PaypalService;
-import com.paypal.api.payments.Links;
-import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.PayPalRESTException;
+@RestController
+@RequestMapping("/paypal")
+public class PaypalController extends BaseController {
 
-@Controller
-public class PaypalController {
+	@GetMapping(value = "/auction")
+    public ResponseEntity<String> paymentSuccess(HttpServletRequest request) {
+        String orderId = request.getParameter("token");
+        
+		// find Paypal order by ID
+        PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByOrderId(orderId);
 
-	// @Value("${website.url}")
-	// private String WEBSITE_URL;
+		// update PayPal 
+        paypalAuctionService.updateOrderStatus(m.getId(), OrderStatus.APPROVED.toString());
 
-	// @Autowired
-	// PaypalService service;
+        // udpate bid ranking
+        Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
+        if(bid == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
 
-	// public static final String SUCCESS_URL = "paypal/success";
-	// public static final String CANCEL_URL = "paypal/cancel";
+        if(bid.isPendingIncrease()) {           
+            bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
+            bid.setTokenAmount(bid.getTempTokenAmount());
+            bid.setTokenPrice(bid.getTempTokenPrice());
+        } 
+        bidService.updateBidRanking(bid);
+        
 
-	// @PostMapping("/paypal")
-	// public String payment(@ModelAttribute("order") PaypalOrder order) {
-	// 	try {
-	// 		Payment payment = service.createPayment(
-	// 			order.getPrice(), 
-	// 			order.getCurrency(), 
-	// 			order.getIntent(), 
-	// 			order.getDescription(), 
-	// 			WEBSITE_URL + CANCEL_URL,
-	// 			WEBSITE_URL + SUCCESS_URL);
+        return ResponseEntity.ok().body("Payment success");
+    }
 
-	// 		for(Links link:payment.getLinks()) {
-	// 			if(link.getRel().equals("approval_url")) {
-	// 				return "redirect:"+link.getHref();
-	// 			}
-	// 		}
-			
-	// 	} catch (PayPalRESTException e) {
-		
-	// 		e.printStackTrace();
-	// 	}
-	// 	return "redirect:/";
-	// }
-	
-	// @GetMapping(value = CANCEL_URL)
-	// public String cancelPay() {
-	// 	return "cancel";
-	// }
 
-	// @GetMapping(value = SUCCESS_URL)
-	// public String successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
-	// 	try {
-	// 		Payment payment = service.executePayment(paymentId, payerId);
-	// 		System.out.println(payment.toJSON());
-	// 		if (payment.getState().equals("approved")) {
-	// 			return "success";
-	// 		}
-	// 	} catch (PayPalRESTException e) {
-	// 		System.out.println(e.getMessage());
-	// 	}
-	// 	return "redirect:/";
-	// }
 
 }

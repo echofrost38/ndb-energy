@@ -30,7 +30,7 @@ import com.ndb.auction.dao.oracle.transaction.CoinsPaymentDao;
 import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
 import com.ndb.auction.dao.oracle.transaction.WithdrawTransactionDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.TxnFeeDao;
+import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
@@ -217,6 +217,9 @@ public class BaseService {
 
     @Autowired
     protected TxnFeeService txnFeeService;
+
+    @Autowired
+    protected PaypalAuctionDao paypalAuctionDao;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

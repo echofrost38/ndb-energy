@@ -26,6 +26,7 @@ import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
+import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
 import com.ndb.auction.service.user.UserAvatarService;
 import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
@@ -105,6 +106,9 @@ public class BaseController {
 
     @Autowired
     protected TxnFeeService txnFeeService;
+
+    @Autowired
+    protected PaypalAuctionService paypalAuctionService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

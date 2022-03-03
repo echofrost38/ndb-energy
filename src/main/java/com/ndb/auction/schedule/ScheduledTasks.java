@@ -203,9 +203,8 @@ public class ScheduledTasks {
 				// bid processing
 				// ********* checking delayed more 1s ************
 				bidService.closeBid(startedRound.getRound());
-				
-				startedRound = null;
 				statService.updateRoundCache(startedRound.getRound());
+				startedRound = null;
 			}
 		}
 	

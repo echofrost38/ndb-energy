@@ -26,6 +26,7 @@ public class AuctionService extends BaseService {
 
 		// Started at checking
 		if (System.currentTimeMillis() > auction.getStartedAt()) {
+			System.out.println(System.currentTimeMillis());
 			throw new AuctionException("Round start time is invalid.", String.valueOf(auction.getId()));
 		}
 

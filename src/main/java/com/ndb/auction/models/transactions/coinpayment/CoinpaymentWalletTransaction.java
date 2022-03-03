@@ -12,6 +12,7 @@ public class CoinpaymentWalletTransaction extends CoinpaymentTransaction {
     public CoinpaymentWalletTransaction(int userId, Long amount, String coin, String network, Double cryptoAmount, String cryptoType) {
         this.userId = userId;
         this.network = network;
+        this.amount = 0L;
         this.cryptoType = cryptoType;
         this.cryptoAmount = cryptoAmount;
         this.coin = coin;

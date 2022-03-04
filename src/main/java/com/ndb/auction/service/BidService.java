@@ -427,8 +427,51 @@ public class BidService extends BaseService {
 				balanceDao.addFreeBalance(userId, ndbId, ndb);
 
 			} else if (bid.getStatus() == Bid.FAILED) { // B) if lost
-				
+				// 1) check Stripe transaction to capture!
+				List<StripeAuctionTransaction> stripeTxns = stripeService.selectByIds(roundId, userId);
+				for (StripeAuctionTransaction stripeTransaction : stripeTxns) {
+					try {
+						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
+						intent.cancel();
+					} catch (Exception e) {
+						captureError = true;
+						break;
+					}
+				}
 
+				// 2) check Coinpayment remove hold token
+				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
+					// get crypto type and amount
+					String cryptoType = coinpaymentTxn.getCryptoType();
+					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();
+
+					// deduct hold value
+					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+					if(tokenId == null) {
+						captureError = true;
+						break;
+					}
+					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);
+				}
+
+				// 3) Check Paypal transaction to capture
+				List<PaypalAuctionTransaction> paypalTxns = paypalAuctionDao.selectByIds(userId, roundId);
+				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
+					// capture?
+					
+				}
+
+				// 4) Wallet payment holding
+				Map<String, BidHolding> holdingList = bid.getHoldingList();
+				Set<String> keySet = holdingList.keySet();
+				for (String key : keySet) {
+					BidHolding holding = holdingList.get(key);
+					// deduct hold balance
+					int tokenId = tokenAssetService.getTokenIdBySymbol(key);
+					balanceDao.releaseHoldBalance(userId, tokenId, holding.getCrypto());
+				}
+				
 			}
 			// save bid ranking!
 			bidDao.updateRanking(bid.getUserId(), bid.getRoundId(), bid.getRanking());

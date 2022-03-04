@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.Value;
 
 @Component
 public class BidPaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
@@ -272,6 +271,8 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		bidService.increaseAmount(userId, roundId, newAmount, newPrice);
 
 		// update bid Ranking
+		bid.setTokenAmount(newAmount);
+		bid.setTokenPrice(newPrice);
 		bidService.updateBidRanking(bid);
 		return "SUCCESS";
 	}

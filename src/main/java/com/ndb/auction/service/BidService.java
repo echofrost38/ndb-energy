@@ -20,7 +20,6 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
-import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
@@ -339,8 +338,6 @@ public class BidService extends BaseService {
 		Auction auction = auctionDao.getAuctionByRound(roundId);
 		List<AvatarSet> avatar = auctionAvatarDao.selectById(auction.getId());
 		List<AvatarComponent> avatarComponents = avatarComponentDao.getAvatarComponentsBySet(avatar);
-		double avatarToken = auction.getToken();
-		double totalToken = auction.getTotalToken();
 
 		// processing all bids
 		if(currentBidList == null) fillBidList(roundId);
@@ -386,10 +383,18 @@ public class BidService extends BaseService {
 				List<PaypalAuctionTransaction> paypalTxns = paypalAuctionDao.selectByIds(userId, roundId);
 				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
 					// capture?
-
+					
 				}
 
 				// 4) Wallet payment holding
+				Map<String, BidHolding> holdingList = bid.getHoldingList();
+				Set<String> keySet = holdingList.keySet();
+				for (String key : keySet) {
+					BidHolding holding = holdingList.get(key);
+					// deduct hold balance
+					int tokenId = tokenAssetService.getTokenIdBySymbol(key);
+					balanceDao.deductHoldBalance(userId, tokenId, holding.getCrypto());
+				}
 
 				// 5) Avatar checking!
 				boolean roundAvatarWinner = true;
@@ -464,42 +469,10 @@ public class BidService extends BaseService {
 
 		// previous total amount!
 		long _total = _tokenAmount * _tokenPrice;
-		
 		// new total amount!
-		long newTotal = tokenAmount * tokenPrice;
-		
+		long newTotal = tokenAmount * tokenPrice;		
 		// more paid
 		double delta = newTotal - _total;
-
-		// // check pay type : WALLET!!!!!
-		// if (payType == Bid.WALLET) {
-		// 	// check user's wallet!
-
-		// 	// get crypto price!!
-		// 	double cryptoAmount = delta / cryptoService.getCryptoPriceBySymbol(cryptoType);
-		// 	int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-		// 	CryptoBalance balance = balanceDao.selectById(userId, tokenId);
-
-		// 	if (balance.getFree() < cryptoAmount) {
-		// 		throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
-		// 	}
-		// 	balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
-
-		// 	Map<String, BidHolding> holdingList = originalBid.getHoldingList();
-		// 	BidHolding hold = null;
-		// 	if (holdingList.containsKey(cryptoType)) {
-		// 		hold = holdingList.get(cryptoType);
-		// 		double currentAmount = hold.getCrypto();
-		// 		hold.setCrypto(currentAmount + cryptoAmount);
-		// 	} else {
-		// 		hold = new BidHolding(cryptoAmount, delta);
-		// 		holdingList.put(cryptoType, hold);
-		// 	}
-		// 	bidDao.updateBid(originalBid);
-		// 	updateBidRanking(originalBid);
-
-		// 	return originalBid;
-		// }
 
 		bidDao.updateTemp(userId, roundId, tokenAmount, tokenPrice, delta);
 
@@ -520,6 +493,10 @@ public class BidService extends BaseService {
 
 	public int updatePaid(int userId, int auctionId, double paid) {
 		return bidDao.updatePaid(userId, auctionId, paid);
+	}
+
+	public int updateHolding(Bid bid){
+		return bidDao.updateBidHolding(bid);
 	}
 
 }

@@ -1,9 +1,5 @@
 package com.ndb.auction.models;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
-
-@DynamoDBDocument
 public class BidHolding {
     
     private Double crypto;
@@ -18,7 +14,6 @@ public class BidHolding {
         this.usd = usd;
     }
 
-    @DynamoDBAttribute(attributeName = "crypto")
     public Double getCrypto() {
         return crypto;
     }
@@ -26,7 +21,6 @@ public class BidHolding {
         this.crypto = crypto;
     }
 
-    @DynamoDBAttribute(attributeName = "usd")
     public Double getUsd() {
         return usd;
     }

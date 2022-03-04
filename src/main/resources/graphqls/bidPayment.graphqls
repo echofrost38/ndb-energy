@@ -54,6 +54,10 @@ extend type Mutation {
 		amount: Float,
 		currencyCode: String,
 	) : OrderResponseDTO
+	payWalletForAuction(
+		roundId: Int,
+		cryptoType: String
+	) : String
 }
 
 schema {

@@ -29,6 +29,13 @@ public class InternalBalanceService extends BaseService {
         return balanceDao.selectById(userId, tokenId);
     }
 
+    public double getFreeBalance(int userId, String symbol) {
+        int tokenId = tokenAssetService.getTokenIdBySymbol(symbol);
+        CryptoBalance balance = balanceDao.selectById(userId, tokenId);
+        if(balance == null) return 0.0;
+        return balance.getFree();
+    }
+
     public int addFreeBalance(int userId, String cryptoType, Double amount) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
         return balanceDao.addFreeBalance(userId, tokenId, amount);
@@ -37,6 +44,11 @@ public class InternalBalanceService extends BaseService {
     public int addHoldBalance(int userId, String cryptoType, Double amount) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
         return balanceDao.addHoldBalance(userId, tokenId, amount);
+    }
+
+    public int makeHoldBalance(int userId, String cryptoType, double amount) {
+        int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+        return balanceDao.makeHoldBalance(userId, tokenId, amount);
     }
 
     public int deductFree(int userId, String cryptoType, Double amount) {

@@ -3,11 +3,13 @@ package com.ndb.auction.resolver.payment;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
@@ -153,9 +155,14 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	public OrderResponseDTO paypalForAuction(int roundId, Double amount, String currencyCode) throws Exception {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+
+		if(amount <= 0) throw new AuctionException("bad_request", "amount");
 		
 		// check bid status
 		Auction round = auctionService.getAuctionById(roundId);
+		if(round == null) {
+			throw new AuctionException("no_auction", "roundId");
+		}
 		if(round.getStatus() != Auction.STARTED) {
 			throw new AuctionException("not_started_auction", "roundId");
 		}
@@ -164,9 +171,17 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 			throw new BidException("not_bid", "roundId");
 		}
 		
+		Double checkoutAmount = 0.0;
+		if(bid.isPendingIncrease()) {
+			double pendingPrice = bid.getDelta();
+			checkoutAmount = getPayPalTotalOrder(userId, pendingPrice);
+		} else {
+			Double totalPrice = bid.getTotalAmount();
+			checkoutAmount = getPayPalTotalOrder(userId, totalPrice);
+		}
+
+
 		OrderDTO order = new OrderDTO();
-		Double totalPrice = bid.getTotalAmount();
-		Double checkoutAmount = getTotalOrder(userId, totalPrice);
 
 		DecimalFormat df = new DecimalFormat("#.00");
 		PurchaseUnit unit = new PurchaseUnit(df.format(checkoutAmount), currencyCode);
@@ -178,7 +193,6 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);
         
-		
 		OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
 		// Create not confirmed transaction
@@ -194,10 +208,72 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		return orderResponse;
 	}
 
-	private double getTotalOrder(int userId, double amount) {
+	private double getPayPalTotalOrder(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-		return 100 * (amount + 30) / (100 - PAYPAL_FEE - tierFeeRate);
+		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
+	}
+
+	// NDB Wallet
+	@PreAuthorize("isAuthenticated()")
+	public String payWalletForAuction(int roundId, String cryptoType) {
+		Auction auction = auctionService.getAuctionById(roundId);
+		if(auction == null) {
+			throw new AuctionException("no_auction", "roundId");
+		}
+		if(auction.getStatus() != Auction.STARTED) {
+			throw new AuctionException("not_started", "roundId");
+		}
+
+		// Get Bid
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+		
+		Bid bid = bidService.getBid(roundId, userId);
+		User user = userService.getUserById(userId);
+		if(bid == null) throw new BidException("no_bid", "roundId");
+
+		// Get total order in USD
+		double totalOrder = 0.0;
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		if(bid.isPendingIncrease()) {
+			double delta = bid.getDelta();
+			totalOrder = 100 * delta / (100 - tierFeeRate);
+		} else {
+			double totalPrice = (double) (bid.getTokenPrice() * bid.getTokenAmount());
+			totalOrder = 100 * totalPrice / (100 - tierFeeRate);
+		}
+
+		// check crypto Type balance
+		double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+		double cryptoAmount = totalOrder / cryptoPrice; // required amount!
+		double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
+		if(freeBalance < cryptoAmount) throw new BidException("insufficient", "amount");
+
+		// make hold
+		internalBalanceService.makeHoldBalance(userId, cryptoType, cryptoAmount);
+		
+		// update holding list
+		Map<String, BidHolding> holdingList = bid.getHoldingList();
+		BidHolding hold = null;
+		if(holdingList.containsKey(cryptoType)) {
+			hold = holdingList.get(cryptoType);
+			double currentAmount = hold.getCrypto();
+			hold.setCrypto(currentAmount + cryptoAmount);
+		} else {
+			hold = new BidHolding(cryptoAmount, totalOrder);
+			holdingList.put(cryptoType, hold);
+		}
+
+		// update bid
+		bidService.updateHolding(bid);
+		long newAmount = bid.getTempTokenAmount();
+		long newPrice = bid.getTempTokenPrice();
+		bidService.increaseAmount(userId, roundId, newAmount, newPrice);
+
+		// update bid Ranking
+		bidService.updateBidRanking(bid);
+		return "SUCCESS";
 	}
 
 }

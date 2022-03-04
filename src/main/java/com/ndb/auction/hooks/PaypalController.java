@@ -1,13 +1,10 @@
 package com.ndb.auction.hooks;
 
-import java.net.http.HttpResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.payload.response.paypal.OrderStatus;
-import com.paypal.api.payments.Order;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +36,9 @@ public class PaypalController extends BaseController {
             bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
             bid.setTokenAmount(bid.getTempTokenAmount());
             bid.setTokenPrice(bid.getTempTokenPrice());
-        } 
+        } else {
+
+        }
         bidService.updateBidRanking(bid);
         
 

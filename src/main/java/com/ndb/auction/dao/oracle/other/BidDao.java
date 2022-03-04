@@ -6,9 +6,12 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.BidHolding;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -35,7 +38,8 @@ public class BidDao extends BaseOracleDao {
 		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
 		m.setPendingIncrease(rs.getBoolean("PENDING_INCREASE"));
-		m.setHoldingList(gson.fromJson(rs.getString("HOLDING"), Map.class));
+		Type type = new TypeToken<Map<String, BidHolding>>() {}.getType();
+		m.setHoldingList(gson.fromJson(rs.getString("HOLDING"), type));
 		m.setPayType(rs.getInt("PAY_TYPE"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));
 		m.setPlacedAt(rs.getTimestamp("REG_DATE").getTime());

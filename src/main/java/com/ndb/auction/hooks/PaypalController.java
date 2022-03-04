@@ -41,10 +41,7 @@ public class PaypalController extends BaseController {
         }
         bidService.updateBidRanking(bid);
         
-
         return ResponseEntity.ok().body("Payment success");
     }
-
-
 
 }

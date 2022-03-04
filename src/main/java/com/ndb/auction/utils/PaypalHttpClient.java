@@ -3,6 +3,7 @@ package com.ndb.auction.utils;
 import static com.ndb.auction.utils.PaypalEndpoints.GET_ACCESS_TOKEN;
 import static com.ndb.auction.utils.PaypalEndpoints.GET_CLIENT_TOKEN;
 import static com.ndb.auction.utils.PaypalEndpoints.ORDER_CHECKOUT;
+import static com.ndb.auction.utils.PaypalEndpoints.CREATE_PAYOUTS;
 import static com.ndb.auction.utils.PaypalEndpoints.createUrl;
 
 import java.net.URI;
@@ -15,9 +16,11 @@ import java.util.Base64;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.config.PaypalConfig;
 import com.ndb.auction.payload.response.paypal.AccessTokenResponseDTO;
+import com.ndb.auction.payload.response.paypal.BatchHeader;
 import com.ndb.auction.payload.response.paypal.ClientTokenDTO;
 import com.ndb.auction.payload.response.paypal.OrderDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
+import com.ndb.auction.payload.response.paypal.PayoutsDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -79,7 +82,20 @@ public class PaypalHttpClient {
         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         var content = response.body();
         return objectMapper.readValue(content, OrderResponseDTO.class);
+    }
 
+    public BatchHeader createPayout(PayoutsDTO payoutDTO) throws Exception {
+        var accessTokenDto = getAccessToken();
+        var payload = objectMapper.writeValueAsString(payoutDTO);
+        var request = HttpRequest.newBuilder()
+            .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CREATE_PAYOUTS)))
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+            .POST(HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        var content = response.body();
+        return objectMapper.readValue(content, BatchHeader.class);
     }
 
 

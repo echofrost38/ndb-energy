@@ -12,4 +12,5 @@ type Auction {
 	sold: Float,
 	stats: AuctionStats,
 	status: Int,
+	kind: Int
 }

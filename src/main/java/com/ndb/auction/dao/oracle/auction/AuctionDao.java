@@ -40,6 +40,7 @@ public class AuctionDao extends BaseOracleDao {
 				rs.getLong("QTY"), rs.getLong("WIN"), rs.getLong("FAIL")));
 		m.setToken(rs.getLong("TOKEN"));
 		m.setStatus(rs.getInt("STATUS"));
+		m.setKind(1);
 		return m;
 	}
 

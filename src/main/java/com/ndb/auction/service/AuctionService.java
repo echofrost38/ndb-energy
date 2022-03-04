@@ -55,7 +55,7 @@ public class AuctionService extends BaseService {
 		if(presales.size() != 0) {
 			throw new AuctionException("started_presale", String.valueOf(auction.getId()));
 		}
-		auctionDao.createNewAuction(auction);
+		auction = auctionDao.createNewAuction(auction);
 		schedule.setNewCountdown(auction);
 		return auction;
 	}

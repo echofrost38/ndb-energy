@@ -1,7 +1,6 @@
 extend type Mutation {
     # create new Presale
     createNewPresale(
-        round: Int!,
         startedAt: Float!,
         endedAt: Float!,
         tokenAmount: Float!,

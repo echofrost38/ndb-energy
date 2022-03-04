@@ -31,6 +31,7 @@ public class PreSale extends BaseModel {
     private Long sold;
 
     private int status;
+    private int kind;
 
     private List<PreSaleCondition> conditions;
 

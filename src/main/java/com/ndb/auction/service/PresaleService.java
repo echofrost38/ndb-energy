@@ -69,6 +69,10 @@ public class PresaleService extends BaseService {
         return presaleDao.updateStatus(presaleId, PreSale.STARTED);
     }
 
+    public int getNewRound() {
+        return presaleDao.getNewRound();
+    }
+
     public int closePresale(int presaleId) {
         notificationService.broadcastNotification(
             Notification.ROUND_FINISHED, 

@@ -9,6 +9,7 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.presale.PreSale;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -30,7 +31,20 @@ public class PreSaleDao extends BaseOracleDao {
         m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
         m.setSold(rs.getLong("SOLD"));
         m.setStatus(rs.getInt("STATUS"));
+		m.setKind(2);
 		return m;
+	}
+
+	public int getNewRound() {
+		String sql = "SELECT MAX(ROUND) LAST_ROUND FROM TBL_PRESALE";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Integer>() {
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				if(!rs.next())
+					return null;
+				return rs.getInt("LAST_ROUND") + 1;					
+			}
+		});
 	}
 
     public int insert(PreSale m) {

@@ -7,5 +7,6 @@ type PreSale {
     tokenPrice: Float,
     sold: Float,
     status: Int,
-    conditions: [PreSaleCondition]
+    conditions: [PreSaleCondition],
+    kind: Int
 }

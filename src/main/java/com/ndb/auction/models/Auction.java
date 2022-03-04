@@ -34,6 +34,7 @@ public class Auction extends BaseModel {
     private Long token;
 
     private int status;
+	private int kind;
     
     public Auction(int _round, Long _startedAt, Long duration, Long _totalToken, Long _minPrice, List<AvatarSet> avatar, Long token) {
     	this.round = _round;

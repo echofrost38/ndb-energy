@@ -21,13 +21,16 @@ public class PresaleResolver extends BaseResolver implements GraphQLQueryResolve
     // create new presale round
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public int createNewPresale(
-        int round,
         Long startedAt,
         Long endedAt,
         Long tokenAmount,
         Long tokenPrice,
         List<PreSaleCondition> conditions
     ) {
+        int lastAuctionRound = auctionService.getNewRound();
+        int lastPresaleRound = presaleService.getNewRound();
+        int round = lastAuctionRound > lastPresaleRound ? lastAuctionRound : lastPresaleRound;
+
         PreSale presale = new PreSale(round, startedAt, endedAt, tokenAmount, tokenPrice, conditions);
         return presaleService.createNewPresale(presale);
     }

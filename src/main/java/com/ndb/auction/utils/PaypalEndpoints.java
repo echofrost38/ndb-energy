@@ -3,7 +3,8 @@ package com.ndb.auction.utils;
 public enum PaypalEndpoints {
     GET_ACCESS_TOKEN("/v1/oauth2/token"),
     GET_CLIENT_TOKEN("/v1/identity/generate-token"),
-    ORDER_CHECKOUT("/v2/checkout/orders");
+    ORDER_CHECKOUT("/v2/checkout/orders"),
+    CREATE_PAYOUTS("/v1/payments/payouts");
 
     private final String path;
 

@@ -380,7 +380,6 @@ public class CryptoController extends BaseController {
                 "Deposit Successful", 
                 String.format("You have successfully deposited %f %s", amount, cryptoType));
     
-			depositTxnDao.updateStatus(id, currency, amount, fiatAmount);
 	    } else if (status < 0) {
 	        //payment error, this is usually final but payments will sometimes be reopened if there was no exchange rate conversion or with seller consent
 	    } else {

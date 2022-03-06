@@ -335,7 +335,7 @@ public class BidService extends BaseService {
 	// not sychnorized
 	public void closeBid(int roundId) {
 
-		Auction auction = auctionDao.getAuctionByRound(roundId);
+		Auction auction = auctionDao.getAuctionById(roundId);
 		List<AvatarSet> avatar = auctionAvatarDao.selectById(auction.getId());
 		List<AvatarComponent> avatarComponents = avatarComponentDao.getAvatarComponentsBySet(avatar);
 

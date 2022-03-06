@@ -47,12 +47,18 @@ extend type Mutation {
         amount: Float,
         currencyName: String,
         paymentIntentId: String,
-        paymentMethodId: String
+        paymentMethodId: String,
+        isSaveCard: Boolean
     ) : PayResponse
     depositWithPlaid : String
     plaidExchangeToken(
         publicToken: String
     ): String
+    paypalWithdrawRequest(
+        email: String,
+        withdrawAmount: Float,
+        sourceToken: String
+    ) : PaypalWithdraw
 }
 
 schema {

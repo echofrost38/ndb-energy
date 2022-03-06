@@ -202,8 +202,8 @@ public class ScheduledTasks {
 				
 				// bid processing
 				// ********* checking delayed more 1s ************
-				bidService.closeBid(startedRound.getRound());
-				statService.updateRoundCache(startedRound.getRound());
+				bidService.closeBid(startedRound.getId());
+				statService.updateRoundCache(startedRound.getId());
 				startedRound = null;
 			}
 		}
@@ -249,7 +249,7 @@ public class ScheduledTasks {
 			if(ndbCoinService.checkConfirmation(target)) {
 				// set success
 				System.out.println("SUCCESS: " + hash);
-				withdrawService.updateStatus(hash);
+				// withdrawService.updateStatus(hash);
 				pendingTransactions.remove(hash);
 			}
 		}

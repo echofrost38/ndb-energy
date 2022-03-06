@@ -21,6 +21,7 @@ public class PreSaleOrder extends BaseModel {
         this.ndbPrice = ndbPrice;
         this.destination = destination;
         this.extAddr = extAddr;
+        this.status = 0;
     }
 
     public static int INTERNAL = 1;

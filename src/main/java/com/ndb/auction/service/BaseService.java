@@ -26,10 +26,6 @@ import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
-import com.ndb.auction.dao.oracle.transaction.CoinsPaymentDao;
-import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
-import com.ndb.auction.dao.oracle.transaction.StripeTransactionDao;
-import com.ndb.auction.dao.oracle.transaction.WithdrawTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
@@ -38,6 +34,7 @@ import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
+import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.models.TokenAsset;
 import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.balance.FiatBalance;
@@ -138,9 +135,6 @@ public class BaseService {
     public AvatarProfileSetDao avatarSetDao;
 
     @Autowired
-    public StripeTransactionDao stripeDao;
-
-    @Autowired
     public NotificationService notificationService;
 
     @Autowired
@@ -186,16 +180,7 @@ public class BaseService {
     public PreSaleConditionDao presaleConditionDao;
 
     @Autowired
-    public DepositTransactionDao depositTxnDao;
-
-    @Autowired
     public PreSaleOrderDao presaleOrderDao;
-
-    @Autowired
-    protected WithdrawTransactionDao withdrawTxnDao;
-
-    @Autowired
-    protected CoinsPaymentDao coinpaymentsDao;
 
     @Autowired
     protected FiatBalanceDao fiatBalanceDao;
@@ -220,6 +205,9 @@ public class BaseService {
 
     @Autowired
     protected PaypalAuctionDao paypalAuctionDao;
+
+    @Autowired
+    protected PaypalWithdrawDao paypalWithdrawDao;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

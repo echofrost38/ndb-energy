@@ -9,12 +9,16 @@ import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
+import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.PaymentMethod;
+import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import org.springframework.stereotype.Service;
@@ -23,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class StripePresaleService extends StripeBaseService implements ITransactionService, IStripeDepositService {
 
     @Override
-    public PayResponse createNewTransaction(StripeDepositTransaction _m) {
+    public PayResponse createNewTransaction(StripeDepositTransaction _m, boolean isSaveCard) {
         StripePresaleTransaction m = (StripePresaleTransaction)_m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
@@ -37,23 +41,35 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 			throw new UserNotFoundException("no_presale_order", "orderId");
 		}
 
-        // check amount 
-		Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-		if(orderAmount * 100 > amount) {
-			throw new UserNotFoundException("no_enough_funds", "amount");
-		}
-
         try {
 			if(m.getPaymentIntentId() == null) {
-				PaymentIntentCreateParams createParams = PaymentIntentCreateParams.builder()
+				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
 					.setAmount(amount)
 					.setCurrency("USD")	
 					.setConfirm(true)
 					.setPaymentMethod(m.getPaymentMethodId())
 					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                     .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-					.build();
-				intent = PaymentIntent.create(createParams);
+					.setConfirm(true);
+				
+				// check save card
+				if(isSaveCard) {
+					var customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
+					createParams.setCustomer(customer.getId());
+					createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+					
+					// save customer
+					var method = PaymentMethod.retrieve(m.getPaymentMethodId());
+					
+					var card = method.getCard();
+					var stripeCustomer = new StripeCustomer(
+						m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
+					);
+					
+					stripeCustomerDao.insert(stripeCustomer);
+				}
+				
+				intent = PaymentIntent.create(createParams.build());
 				
 			} else {
 				intent = PaymentIntent.retrieve(m.getPaymentIntentId());
@@ -62,6 +78,15 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 			}
 			
 			if(intent != null && intent.getStatus().equals("succeeded")) {
+				
+				// check amount 
+				long paidAmount = intent.getAmount();
+				Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
+				double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
+				if(totalOrder * 100 > paidAmount) {
+					throw new UserNotFoundException("no_enough_funds", "amount");
+				}
+
 				handlePresaleOrder(userId, presaleOrder);
 				stripePresaleDao.update(m.getId(), 1);
 			}
@@ -110,6 +135,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 		// processing order
 		Long ndb = order.getNdbAmount();
 		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
+		
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
 			balanceDao.addFreeBalance(userId, tokenId, ndb);

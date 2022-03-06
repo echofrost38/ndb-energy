@@ -59,11 +59,18 @@ public class PresalePaymentResolver extends BaseResolver implements GraphQLQuery
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSale(int presaleId, int orderId, Long amount, String paymentIntentId, String paymentMethodId) {
+    public PayResponse payStripeForPreSale(
+        int presaleId, 
+        int orderId, 
+        Long amount, 
+        String paymentIntentId, 
+        String paymentMethodId,
+        boolean isSaveCard
+    ) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId, paymentMethodId);
-        return stripePresaleService.createNewTransaction(m);
+        return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")

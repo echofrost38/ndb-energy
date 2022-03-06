@@ -71,11 +71,11 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForDeposit(Long amount, String currencyName, String paymentIntentId, String paymentMethodId) {
+    public PayResponse payStripeForDeposit(Long amount, String currencyName, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeWalletTransaction m = new StripeWalletTransaction(userId, amount, paymentIntentId, paymentMethodId);
-        return stripeWalletService.createNewTransaction(m);
+        return stripeWalletService.createNewTransaction(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -1,6 +1,7 @@
-package com.ndb.auction.payload.response.paypal;
+package com.ndb.auction.payload.request.paypal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 
 import lombok.Data;
 

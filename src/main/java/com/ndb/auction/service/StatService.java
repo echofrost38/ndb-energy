@@ -95,15 +95,15 @@ public class StatService extends BaseService {
 
     }
 
-    public synchronized void updateRoundCache(Integer roundNumber) {
+    public synchronized void updateRoundCache(int roundId) {
         if (roundChanceList == null) {
             buildRoundStatCache();
         }
 
-        Auction round = auctionDao.getAuctionByRound(roundNumber);
+        Auction round = auctionDao.getAuctionById(roundId);
 
         if (round != null) {
-            List<Bid> bidList = bidDao.getBidListByRound(roundNumber);
+            List<Bid> bidList = bidDao.getBidListByRound(roundId);
 
             long min = Long.MAX_VALUE, max = 0, std = 0;
             StandardDeviation standardDeviation = new StandardDeviation();
@@ -130,14 +130,14 @@ public class StatService extends BaseService {
             }
             winRate = total == 0 ? 0 : win / total;
             failedRate = total == 0 ? 0 : failed / total;
-            RoundChance chance = new RoundChance(roundNumber, winRate, failedRate);
+            RoundChance chance = new RoundChance(round.getRound(), winRate, failedRate);
             roundChanceList.add(chance);
 
-            RoundPerform1 roundPerform1 = new RoundPerform1(roundNumber, win, round.getSold());
+            RoundPerform1 roundPerform1 = new RoundPerform1(round.getRound(), win, round.getSold());
             roundPerform1List.add(roundPerform1);
 
             std = (long)standardDeviation.evaluate(priceArr); // TODO: double -> long
-            RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
+            RoundPerform2 roundPerform2 = new RoundPerform2(round.getRound(), min, max, std);
             roundPerform2List.add(roundPerform2);
         }
     }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
@@ -14,18 +15,20 @@ import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransac
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.request.paypal.OrderDTO;
+import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
+import com.ndb.auction.payload.request.paypal.PurchaseUnit;
 import com.ndb.auction.payload.response.PayResponse;
-import com.ndb.auction.payload.response.paypal.OrderDTO;
+import com.ndb.auction.payload.response.paypal.CaptureOrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
-import com.ndb.auction.payload.response.paypal.PayPalAppContextDTO;
 import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
-import com.ndb.auction.payload.response.paypal.PurchaseUnit;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
 
 import org.apache.http.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -37,6 +40,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class BidPaymentResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 	
+	@Value("${website.url}")
+	private String WEBSITE_URL;
+
 	private final double PAYPAL_FEE = 5;
 
 	private final PaypalHttpClient payPalHttpClient;
@@ -92,8 +98,8 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId, isSaveCard);
-		return stripeAuctionService.createNewTransaction(m);
+		StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId);
+		return stripeAuctionService.createNewTransaction(m, isSaveCard);
 	}
 
 	// for Coinpayments
@@ -179,7 +185,6 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 			checkoutAmount = getPayPalTotalOrder(userId, totalPrice);
 		}
 
-
 		OrderDTO order = new OrderDTO();
 
 		DecimalFormat df = new DecimalFormat("#.00");
@@ -187,8 +192,9 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		order.getPurchaseUnits().add(unit);
 		
 		var appContext = new PayPalAppContextDTO();
-        appContext.setReturnUrl(PAYPAL_CALLBACK_URL + "/auction");
-        appContext.setBrandName("Auction Round");
+        
+		appContext.setReturnUrl(WEBSITE_URL + "/capture");
+		appContext.setBrandName("Auction Round");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);
         
@@ -205,6 +211,25 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 
 		// return Order response
 		return orderResponse;
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public boolean captureOrder(String orderId) throws Exception {
+		PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByOrderId(orderId);
+		if(m == null) {  // check null
+			throw new UserNotFoundException("There is no such order", "orderId");
+		}
+
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+		if(m.getUserId() != userId) {
+			throw new UserNotFoundException("User doesn't match.", "user");
+		}
+
+		CaptureOrderResponseDTO responseDTO = payPalHttpClient.captureOrder(orderId);
+		if(responseDTO.getStatus().equals("COMPLETED")) {
+			return true;
+		} else return false;
 	}
 
 	private double getPayPalTotalOrder(int userId, double amount) {

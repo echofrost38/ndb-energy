@@ -22,7 +22,6 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
-import com.ndb.auction.service.payment.DepositService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
@@ -38,6 +37,7 @@ import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.service.utils.TotpService;
+import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
@@ -124,12 +124,7 @@ public class BaseResolver {
 	protected PresaleService presaleService;
 
 	@Autowired
-    protected
-	ShuftiService shuftiService;
-
-	@Autowired
-    protected
-	DepositService depositService;
+    protected ShuftiService shuftiService;
 
 	@Autowired
 	protected PresaleOrderService presaleOrderService;
@@ -175,4 +170,7 @@ public class BaseResolver {
 
 	@Autowired
 	protected StripeCustomerService stripeCustomerService;
+
+	@Autowired
+	protected PaypalWithdrawService paypalWithdrawService;
 }

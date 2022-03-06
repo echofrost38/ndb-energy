@@ -1,0 +1,13 @@
+type PaypalWithdraw {
+    id: Int,
+    userId: Int,
+    sourceToken: String,
+    withdrawAmount: Float,
+    status: Int,
+    deniedReason: String,
+    requestedAt: Float,
+    confirmedAt: Float,
+    senderBatchId: String,
+    senderItemId: String,
+    receiver: String
+}

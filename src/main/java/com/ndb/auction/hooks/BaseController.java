@@ -12,7 +12,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.dao.oracle.transaction.DepositTransactionDao;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.NotificationService;
@@ -73,9 +72,6 @@ public class BaseController {
 
     @Autowired
     TaskSettingService taskSettingService;
-    
-    @Autowired
-    DepositTransactionDao depositTxnDao;
 
     @Autowired
     InternalBalanceService balanceService;

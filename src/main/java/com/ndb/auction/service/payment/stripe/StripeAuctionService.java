@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class StripeAuctionService extends StripeBaseService implements ITransactionService, IStripeDepositService {
 
     @Override
-    public PayResponse createNewTransaction(StripeDepositTransaction _m) {
+    public PayResponse createNewTransaction(StripeDepositTransaction _m, boolean isSaveCard) {
         StripeAuctionTransaction m = (StripeAuctionTransaction)_m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
@@ -40,7 +40,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                         .setConfirm(true);
                 
                 // check save card
-                if(m.isSaveCard()) {
+                if(isSaveCard) {
                     Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
                     createParams.setCustomer(customer.getId());
                     createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
@@ -73,12 +73,11 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 }
 
 				double paidAmount = intent.getAmount().doubleValue();
-                double alreadyPaid = bid.getPaidAmount();
 
 				if(bid.isPendingIncrease()) {
                     double pendingPrice = bid.getDelta();
                     Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
-                    if(totalOrder > paidAmount) {
+                    if(totalOrder * 100 > paidAmount) {
                         response.setError("Insufficient funds");
 						return response;
                     }
@@ -89,8 +88,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 } else {
                     Long totalPrice = bid.getTokenAmount();
                     Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
-                    bidDao.updatePaid(bid.getUserId(), bid.getRoundId(), paidAmount);
-                    if(totalOrder > (paidAmount + alreadyPaid)) {
+                    if(totalOrder * 100 > paidAmount) {
                         response.setError("Insufficient funds");
 						return response;
                     }

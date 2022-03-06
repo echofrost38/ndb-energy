@@ -1,4 +1,4 @@
-package com.ndb.auction.payload.response.paypal;
+package com.ndb.auction.payload.request.paypal;
 
 import java.io.Serializable;
 import java.util.ArrayList;

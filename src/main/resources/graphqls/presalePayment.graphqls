@@ -4,7 +4,8 @@ extend type Mutation {
         orderId: Int,
         amount: Float,
         paymentIntentId: String,
-        paymentMethodId: String
+        paymentMethodId: String,
+        isSaveCard: Boolean
     ) : PayResponse
     # payment for presale
     createChargeForPresale(

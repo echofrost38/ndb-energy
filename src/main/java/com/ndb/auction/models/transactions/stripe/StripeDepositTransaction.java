@@ -19,8 +19,6 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     protected String paymentMethodId;
     protected String paymentIntentId;
 
-    protected boolean isSaveCard;
-
     public StripeDepositTransaction(
         int userId,
         Long amount,

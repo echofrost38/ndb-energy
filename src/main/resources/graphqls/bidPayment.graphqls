@@ -54,6 +54,9 @@ extend type Mutation {
 		amount: Float,
 		currencyCode: String,
 	) : OrderResponseDTO
+	captureOrder(
+		orderId: String
+	) : Boolean
 	payWalletForAuction(
 		roundId: Int,
 		cryptoType: String

@@ -1,4 +1,4 @@
-package com.ndb.auction.payload.response.paypal;
+package com.ndb.auction.payload.request.paypal;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

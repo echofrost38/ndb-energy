@@ -5,7 +5,6 @@ import java.math.BigInteger;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.models.transaction.WithdrawTransaction;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.WithdrawService;
 
@@ -74,7 +73,7 @@ public class NDBCoinService {
         Double value = ((double)lvalue) / 10000.0;
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
-        withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
+        // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
 
         // add to unconfirmed list
         schedule.addPendingTxn(txnHash, blockNumber);
@@ -108,8 +107,7 @@ public class NDBCoinService {
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
             String transactionHash = receipt.getTransactionHash();
-            WithdrawTransaction withTxn = new WithdrawTransaction(userId, transactionHash);
-            withdrawService.createNewWithdrawTxn(withTxn);
+            // withdrawService.createNewWithdrawTxn(withTxn);
 
         } catch (Exception e) {
             return false;

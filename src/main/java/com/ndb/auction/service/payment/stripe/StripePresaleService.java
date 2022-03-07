@@ -3,11 +3,16 @@ package com.ndb.auction.service.payment.stripe;
 import java.util.List;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
+import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.Customer;
@@ -123,4 +128,50 @@ public class StripePresaleService extends StripeBaseService implements ITransact
     public List<? extends Transaction> selectByPresale(int userId, int presaleId, String orderBy) {
         return stripePresaleDao.selectByPresale(userId, presaleId, orderBy);
     }
+
+	private void handlePresaleOrder(int userId, PreSaleOrder order) {
+		User user = userDao.selectById(userId);
+
+		// processing order
+		Long ndb = order.getNdbAmount();
+		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
+		
+		if(order.getDestination() == PreSaleOrder.INTERNAL) {
+			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
+			balanceDao.addFreeBalance(userId, tokenId, ndb);
+		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
+			ndbCoinService.transferNDB(userId, order.getExtAddr(), Double.valueOf(ndb));
+		}
+
+		// update user tier points
+		List<Tier> tierList = tierService.getUserTiers();
+		TaskSetting taskSetting = taskSettingService.getTaskSetting();
+		TierTask tierTask = tierTaskService.getTierTask(user.getId());
+		double presalePoint = tierTask.getDirect();
+		presalePoint += taskSetting.getDirect() * fiatAmount;
+		tierTask.setDirect(presalePoint);
+
+		double newPoint = user.getTierPoint() + taskSetting.getDirect() * fiatAmount;
+		int tierLevel = 0;
+
+		// check change in level
+		for (Tier tier : tierList) {
+			if(tier.getPoint() <= newPoint) {
+				tierLevel = tier.getLevel();
+			}
+		}
+
+		userDao.updateTier(userId, tierLevel, newPoint);
+		tierTaskService.updateTierTask(tierTask);
+		presaleOrderDao.updateStatus(order.getId());
+		presaleDao.udpateSold(order.getId(), ndb);
+
+		// send notification to user for payment result!!
+		notificationService.sendNotification(
+			userId,
+			Notification.PAYMENT_RESULT,
+			"PAYMENT CONFIRMED",
+			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
+	}
+
 }

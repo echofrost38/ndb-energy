@@ -53,7 +53,7 @@ extend type Mutation {
 		roundId: Int,
 		currencyCode: String,
 	) : OrderResponseDTO
-	captureOrderForAuction(
+	captureOrder(
 		orderId: String
 	) : Boolean
 	payWalletForAuction(

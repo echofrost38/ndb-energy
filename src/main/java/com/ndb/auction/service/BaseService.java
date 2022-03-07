@@ -27,7 +27,6 @@ import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
-import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.UserAvatarDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
@@ -36,12 +35,9 @@ import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
-import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.presale.PreSaleOrder;
-import com.ndb.auction.models.tier.Tier;
-import com.ndb.auction.models.tier.TierTask;
-import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.TokenAsset;
+import com.ndb.auction.models.balance.CryptoBalance;
+import com.ndb.auction.models.balance.FiatBalance;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
@@ -213,9 +209,6 @@ public class BaseService {
     @Autowired
     protected PaypalWithdrawDao paypalWithdrawDao;
 
-    @Autowired
-    protected PaypalPresaleDao paypalPresaleDao;
-
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {
@@ -235,48 +228,25 @@ public class BaseService {
         return result;
     }
 
-    public void handlePresaleOrder(int userId, PreSaleOrder order) {
-		User user = userDao.selectById(userId);
+    public Double getTotalBalance(int userId) {
 
-		// processing order
-		Long ndb = order.getNdbAmount();
-		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
-		
-		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-			balanceDao.addFreeBalance(userId, tokenId, ndb);
-		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
-			ndbCoinService.transferNDB(userId, order.getExtAddr(), Double.valueOf(ndb));
-		}
+        double totalBalance = 0.0;
+        
+        // calculate crypto balance
+        List<CryptoBalance> cryptoBalances = balanceDao.selectByUserId(userId, null);
+        for (CryptoBalance cryptoBalance : cryptoBalances) {
+            TokenAsset asset = tokenAssetService.getTokenAssetById(cryptoBalance.getTokenId());
+            double _price = thirdAPI.getCryptoPriceBySymbol(asset.getTokenSymbol());
+            double _balance = _price * (cryptoBalance.getFree() + cryptoBalance.getHold());
+            totalBalance += _balance;
+        }
 
-		// update user tier points
-		List<Tier> tierList = tierService.getUserTiers();
-		TaskSetting taskSetting = taskSettingService.getTaskSetting();
-		TierTask tierTask = tierTaskService.getTierTask(user.getId());
-		double presalePoint = tierTask.getDirect();
-		presalePoint += taskSetting.getDirect() * fiatAmount;
-		tierTask.setDirect(presalePoint);
+        List<FiatBalance> fiatBalances = fiatBalanceDao.selectByUserId(userId, null);
+        for (FiatBalance fiatBalance : fiatBalances) {
+            
 
-		double newPoint = user.getTierPoint() + taskSetting.getDirect() * fiatAmount;
-		int tierLevel = 0;
+        }
 
-		// check change in level
-		for (Tier tier : tierList) {
-			if(tier.getPoint() <= newPoint) {
-				tierLevel = tier.getLevel();
-			}
-		}
-
-		userDao.updateTier(userId, tierLevel, newPoint);
-		tierTaskService.updateTierTask(tierTask);
-		presaleOrderDao.updateStatus(order.getId());
-		presaleDao.updateSold(order.getPresaleId(), ndb);
-
-		// send notification to user for payment result!!
-		notificationService.sendNotification(
-			userId,
-			Notification.PAYMENT_RESULT,
-			"PAYMENT CONFIRMED",
-			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
-	}
+        return 0.0;
+    }
 }

@@ -78,6 +78,42 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 		return response;
     }
 
+	public PayResponse createTransactionWithSavedCard(StripeDepositTransaction _m, String customerId) {
+		StripeWalletTransaction m = (StripeWalletTransaction)_m;
+		int userId = m.getUserId();
+		PaymentIntent intent = null;
+		PayResponse response = new PayResponse();
+		try {
+			if(m.getPaymentIntentId() == null) {
+				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+						.setAmount(m.getAmount())
+						.setCurrency("USD")
+						.setCustomer(customerId)
+						.setConfirm(true)
+						.setPaymentMethod(m.getPaymentMethodId())
+						.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
+
+				intent = PaymentIntent.create(createParams.build());
+			} else if (m.getPaymentIntentId() != null) {
+				intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+				intent = intent.confirm();
+				m = (StripeWalletTransaction) stripeWalletDao.insert(m);
+			}
+
+			if(intent != null && intent.getStatus().equals("succeeded")) {
+
+				// get real payment!
+
+				handleDepositSuccess(userId, intent.getAmount(), intent.getCurrency());
+				stripeWalletDao.update(m.getId(), 1);
+			}
+			response = generateResponse(intent, response);
+		} catch (Exception e) {
+			response.setError(e.getMessage());
+		}
+		return response;
+	}
+
     @Override
     public List<? extends StripeDepositTransaction> selectByIntentId(String intentId) {
         // TODO Auto-generated method stub

@@ -120,7 +120,7 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
     }
 
     @Override
-    public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
+    public PaypalDepositTransaction selectByOrderId(String orderId) {
         String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE ORDER_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalAuctionTransaction>() {
 			@Override

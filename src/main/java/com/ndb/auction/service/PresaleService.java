@@ -94,7 +94,7 @@ public class PresaleService extends BaseService {
     }
 
     public int addSoldAmount(int presaleId, Long sold) {
-        return presaleDao.updateSold(presaleId, sold);
+        return presaleDao.udpateSold(presaleId, sold);
     }
 
     public List<PreSaleCondition> getConditionsById(int presaleId) {

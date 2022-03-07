@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -244,6 +247,18 @@ public class BaseController {
     	} catch (Exception e) {
     		return null;
     	}
+    }
+
+    protected Map<String, String> getHeadersInfo(HttpServletRequest request) {
+        Map < String, String > map = new HashMap < String, String > ();
+        @SuppressWarnings("rawtypes")
+        Enumeration headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String key = (String) headerNames.nextElement();
+            String value = request.getHeader(key);
+            map.put(key, value);
+        }
+        return map;
     }
 
 }

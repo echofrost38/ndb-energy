@@ -51,7 +51,6 @@ extend type Mutation {
 	) : CoinpaymentAuctionTransaction
 	paypalForAuction(
 		roundId: Int,
-		amount: Float,
 		currencyCode: String,
 	) : OrderResponseDTO
 	captureOrder(

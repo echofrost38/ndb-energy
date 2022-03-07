@@ -21,6 +21,7 @@ import com.ndb.auction.payload.request.paypal.PurchaseUnit;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.payload.response.paypal.CaptureOrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
+import com.ndb.auction.payload.response.paypal.OrderStatus;
 import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -157,12 +158,10 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 
 	// for paypal payments!
 	@PreAuthorize("isAuthenticated()")
-	public OrderResponseDTO paypalForAuction(int roundId, Double amount, String currencyCode) throws Exception {
+	public OrderResponseDTO paypalForAuction(int roundId, String currencyCode) throws Exception {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
-		if(amount <= 0) throw new AuctionException("bad_request", "amount");
-		
 		// check bid status
 		Auction round = auctionService.getAuctionById(roundId);
 		if(round == null) {
@@ -177,12 +176,13 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		}
 		
 		Double checkoutAmount = 0.0;
+		Double amount = 0.0;
 		if(bid.isPendingIncrease()) {
-			double pendingPrice = bid.getDelta();
-			checkoutAmount = getPayPalTotalOrder(userId, pendingPrice);
+			amount = bid.getDelta();
+			checkoutAmount = getPayPalTotalOrder(userId, amount);
 		} else {
-			Double totalPrice = bid.getTotalAmount();
-			checkoutAmount = getPayPalTotalOrder(userId, totalPrice);
+			amount = bid.getTotalAmount();
+			checkoutAmount = getPayPalTotalOrder(userId, amount);
 		}
 
 		OrderDTO order = new OrderDTO();
@@ -201,7 +201,7 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 		OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
 		// Create not confirmed transaction
-        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, amount.longValue(), null, null);
+        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, (long)(amount * 100), null, null);
 
 		// set order id and status
         entity.setPaypalOrderId(orderResponse.getId());
@@ -215,19 +215,29 @@ public class BidPaymentResolver extends BaseResolver implements GraphQLMutationR
 
 	@PreAuthorize("isAuthenticated()")
 	public boolean captureOrder(String orderId) throws Exception {
-		PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByOrderId(orderId);
-		if(m == null) {  // check null
-			throw new UserNotFoundException("There is no such order", "orderId");
-		}
-
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		if(m.getUserId() != userId) {
-			throw new UserNotFoundException("User doesn't match.", "user");
-		}
-
+		
 		CaptureOrderResponseDTO responseDTO = payPalHttpClient.captureOrder(orderId);
-		if(responseDTO.getStatus().equals("COMPLETED")) {
+		if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {
+			// fetch transaction
+			PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByOrderId(orderId);
+			if(m == null) throw new BidException("There is no transaction", "orderId");
+			if(m.getUserId() != userId) {
+				throw new UserNotFoundException("User doesn't match.", "user");
+			}
+
+			// check Bid
+			Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
+			if(bid == null) throw new BidException("There is no bid.", "orderId");
+			if(bid.getStatus() != Bid.NOT_CONFIRMED && !bid.isPendingIncrease()) 
+				throw new BidException("Cannot capture.", "orderId");
+
+			// update transaction status
+			paypalAuctionService.updateOrderStatus(m.getId(), OrderStatus.COMPLETED.toString());
+
+			// update bid 
+			bidService.updateBidRanking(bid);
 			return true;
 		} else return false;
 	}

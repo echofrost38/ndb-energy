@@ -143,7 +143,7 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
     }
 
     public int updateOrderStatus(int id, String status) {
-        String sql = "UPDATE TBL_PAYAPL_AUCTION SET ORDER_STATUS = ? WHERE ID = ?";
+        String sql = "UPDATE TBL_PAYAPL_AUCTION SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
     }
     

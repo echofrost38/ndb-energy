@@ -2,13 +2,17 @@ package com.ndb.auction.hooks;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
-import com.ndb.auction.payload.response.paypal.OrderStatus;
+import com.google.gson.Gson;
+import com.ndb.auction.config.PaypalConfig;
+import com.ndb.auction.payload.response.paypal.WebhookEvent;
+import com.paypal.api.payments.Event;
+import com.paypal.base.Constants;
+import com.paypal.base.rest.APIContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,32 +20,45 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/paypal")
 public class PaypalController extends BaseController {
 
-	@GetMapping(value = "/auction")
+    private final PaypalConfig paypalConfig;
+    public static final String WEBHOOK_ID = "6SP16862L7635611T";
+
+    @Autowired
+    public PaypalController(PaypalConfig paypalConfig) {
+        this.paypalConfig = paypalConfig;
+    }
+
+	@PostMapping(value = "/auction")
     public ResponseEntity<String> paymentSuccess(HttpServletRequest request) {
-        String orderId = request.getParameter("token");
         
-		// find Paypal order by ID
-        PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByOrderId(orderId);
+        try {
+            APIContext apiContext = new APIContext(
+                paypalConfig.getClientId(),
+                paypalConfig.getClientSecret(),
+                paypalConfig.getMode()
+            );
+            apiContext.addConfiguration(Constants.PAYPAL_WEBHOOK_ID, WEBHOOK_ID);
+            var headerMap = getHeadersInfo(request);
+            var reqBody = getBody(request);
+            Boolean result = Event.validateReceivedEvent(apiContext, headerMap, reqBody);
 
-		// update PayPal 
-        paypalAuctionService.updateOrderStatus(m.getId(), OrderStatus.APPROVED.toString());
-
-        // udpate bid ranking
-        Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
-        if(bid == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        if(bid.isPendingIncrease()) {           
-            bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
-            bid.setTokenAmount(bid.getTempTokenAmount());
-            bid.setTokenPrice(bid.getTempTokenPrice());
-        } else {
-
-        }
-        bidService.updateBidRanking(bid);
+            if(!result) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            WebhookEvent hookEvent = new Gson().fromJson(reqBody, WebhookEvent.class);
         
-        return ResponseEntity.ok().body("Payment success");
+            switch (hookEvent.getEvent_type()) {
+                case "PAYMENT.PAYOUTSBATCH.SUCCESS":
+                    
+                    break;
+                case "PAYMENT.PAYOUTSBATCH.DENIED":
+                    
+                    break;
+            }
+            return ResponseEntity.ok().body("Payment success");
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

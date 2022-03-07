@@ -130,7 +130,7 @@ public class ScheduledTasks {
 			PreSale presale = presales.get(0);
 			if(presale.getStartedAt() < currentTime && presale.getEndedAt() > currentTime) {
 				setPresaleStart(presale);
-				System.out.println(String.format("PreSale Round %d has been started.", presale.getId()));
+				System.out.println(String.format("PreSale Round %d has been started.", presale.getRound()));
 				return;
 			} else {
 				presaleService.closePresale(presale.getId());

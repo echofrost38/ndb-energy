@@ -127,30 +127,6 @@ public class BidService extends BaseService {
 			throw new BidException("Token price must be larget than min price.", "tokenPrice");
 		}
 
-		// check pay type : WALLET!!!!!
-		// if (payType == Bid.WALLET) {
-		// 	// check user's wallet!
-		// 	double cryptoAmount = totalPrice / cryptoService.getCryptoPriceBySymbol(cryptoType);
-
-		// 	int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
-		// 	CryptoBalance balance = balanceDao.selectById(userId, tokenId);
-			
-		// 	if (balance.getFree() < cryptoAmount) {
-		// 		throw new BidException("You don't have enough balance in wallet.", "tokenAmount");
-		// 	}
-
-		// 	balanceDao.makeHoldBalance(userId, tokenId, cryptoAmount);
-
-		// 	Map<String, BidHolding> holdingList = bid.getHoldingList();
-		// 	BidHolding hold = new BidHolding(cryptoAmount, totalPrice);
-		// 	holdingList.put(cryptoType, hold);
-		// 	bid.setHoldingList(holdingList);
-
-		// 	bidDao.placeBid(bid);
-		// 	updateBidRanking(bid);
-		// 	return bid;
-		// }
-
 		// save with pending status
 		bidDao.placeBid(bid);
 		return bid;
@@ -319,7 +295,6 @@ public class BidService extends BaseService {
 						i + 1, tempBid.getStatus() == Bid.WINNER ? "WINNER" : "FAILED")
 				);
 			}
-			
 		}
 
 		// update & save new auction stats
@@ -377,13 +352,6 @@ public class BidService extends BaseService {
 						break;
 					}
 					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
-				}
-	
-				// 3) Check Paypal transaction to capture
-				List<PaypalAuctionTransaction> paypalTxns = paypalAuctionDao.selectByIds(userId, roundId);
-				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
-					// capture?
-					
 				}
 
 				// 4) Wallet payment holding
@@ -457,9 +425,11 @@ public class BidService extends BaseService {
 
 				// 3) Check Paypal transaction to capture
 				List<PaypalAuctionTransaction> paypalTxns = paypalAuctionDao.selectByIds(userId, roundId);
+				int usdtId = tokenAssetService.getTokenIdBySymbol("USDT");
 				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
-					// capture?
-					
+					// convert into USDT balance!
+					double paypalAmount = paypalTxn.getAmount().doubleValue();
+					balanceDao.addFreeBalance(userId, usdtId, paypalAmount);
 				}
 
 				// 4) Wallet payment holding

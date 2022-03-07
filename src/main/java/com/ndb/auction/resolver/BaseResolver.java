@@ -1,9 +1,5 @@
 package com.ndb.auction.resolver;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-
 import com.google.gson.Gson;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
@@ -22,12 +18,14 @@ import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
+import com.ndb.auction.service.TokenAssetService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
 import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
+import com.ndb.auction.service.payment.paypal.PaypalPresaleService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripeCustomerService;
@@ -43,9 +41,16 @@ import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.UserWalletService;
-import com.ndb.auction.service.TokenAssetService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 
 public class BaseResolver {
+
+    @Value("${website.url}")
+	protected String WEBSITE_URL;
+	protected final double PAYPAL_FEE = 5;
 
 	protected static Gson gson = new Gson();
 
@@ -173,4 +178,7 @@ public class BaseResolver {
 
 	@Autowired
 	protected PaypalWithdrawService paypalWithdrawService;
+
+	@Autowired
+	protected PaypalPresaleService paypalPresaleService;
 }

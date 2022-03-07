@@ -17,6 +17,15 @@ extend type Mutation {
         cryptoType: String,
         cryptoAmount: Float
     ) : String
+    # for paypal
+    paypalForPresale(
+        presaleId: Int,
+        orderId: Int,
+        currencyCode: String
+    ) : OrderResponseDTO
+    captureOrderForPresale(
+        orderId: String
+    ) : Boolean
 }
 
 extend type Query {

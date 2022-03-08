@@ -314,7 +314,7 @@ public class CryptoController extends BaseController {
         }
 
         Double amount = getDouble(request, "amount");
-        Double fiatAmount = getDouble(request, "fiat_amount");
+        // Double fiatAmount = getDouble(request, "fiat_amount");
 		
 		int status = getInt(request, "status");
 		log.info("IPN status : {}", status);

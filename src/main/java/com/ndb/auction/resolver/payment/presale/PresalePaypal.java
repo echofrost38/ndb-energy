@@ -1,13 +1,19 @@
 package com.ndb.auction.resolver.payment.presale;
 
+import java.text.DecimalFormat;
+import java.util.List;
+
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.transactions.paypal.PaypalPresaleTransaction;
+import com.ndb.auction.payload.request.paypal.OrderDTO;
+import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
+import com.ndb.auction.payload.request.paypal.PurchaseUnit;
 import com.ndb.auction.payload.response.paypal.CaptureOrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderStatus;
+import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
@@ -40,8 +46,24 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
             throw new BidException("There is no presale order.", "orderId");
         }
         Long amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
-        PaypalPresaleTransaction m = new PaypalPresaleTransaction(userId, presaleId, orderId, amount, null, null);
+        
+        var checkoutAmount = getPayPalTotalOrder(userId, amount);
+        
+        var order = new OrderDTO();
+        var df = new DecimalFormat("#.00");
+        var unit = new PurchaseUnit(df.format(checkoutAmount), currencyCode);
+        order.getPurchaseUnits().add(unit);
+        
+        var appContext = new PayPalAppContextDTO();
+        
+        appContext.setReturnUrl(WEBSITE_URL + "app/payment");
+		appContext.setBrandName("Presale Round");
+        appContext.setLandingPage(PaymentLandingPage.BILLING);
+        order.setApplicationContext(appContext);
+        OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
+        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, amount, 
+            orderResponse.getId(), orderResponse.getStatus().toString());
         return paypalPresaleService.insert(m);
     }
 
@@ -71,5 +93,25 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
 			return true;
 		} else return false;
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
+    public List<PaypalPresaleTransaction> getAllPaypalPresaleTxns(String orderBy) {
+        return (List<PaypalPresaleTransaction>) paypalPresaleService.selectAll(orderBy);
+    }
     
+    @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
+    public List<PaypalPresaleTransaction> getPaypalPresaleTxnsByUser(String orderBy) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return (List<PaypalPresaleTransaction>) paypalPresaleService.selectByUser(userId, orderBy);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public PaypalPresaleTransaction getPaypalPresaleTxn(int id) {
+        return (PaypalPresaleTransaction) paypalPresaleService.selectById(id);
+    }
+
+
 }

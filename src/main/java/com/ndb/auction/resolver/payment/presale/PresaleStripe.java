@@ -33,11 +33,13 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
     }
 
     @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
     public List<StripePresaleTransaction> getStripePresaleTx(String orderBy) {
         return (List<StripePresaleTransaction>) stripePresaleService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
     public List<StripePresaleTransaction> getStripePresaleTxByUser(int userId, String orderBy) {
         return (List<StripePresaleTransaction>) stripePresaleService.selectByUser(userId, orderBy);
     }
@@ -48,6 +50,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
     }
 
     @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
     public List<StripePresaleTransaction> getStripePresaleTxByPresaleId(int userId, int presaleId, String orderBy) {
         return (List<StripePresaleTransaction>) stripePresaleService.selectByPresale(userId, presaleId, orderBy);
     }

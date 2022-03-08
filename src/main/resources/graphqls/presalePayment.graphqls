@@ -62,6 +62,16 @@ extend type Query {
     getCryptoPresaleTx(
         presaleId: Int
     ) : [CoinpaymentPresaleTransaction]
+    # for paypal
+    getAllPaypalPresaleTxns(
+        orderBy: String
+    ) : [PaypalPresaleTransaction]
+    getPaypalPresaleTxnsByUser(
+        orderBy: String
+    ) : [PaypalPresaleTransaction]
+    getPaypalPresaleTxn(
+        id: Int
+    ) : PaypalPresaleTransaction
 }
 
 schema {

@@ -16,7 +16,7 @@ extend type Query {
         id: Int
     ) : CoinpaymentWalletTransaction
 
-    # # Get Stripe Transaction for deposit
+    # Get Stripe Transaction for deposit
     getStripeDepositTx(
         orderBy: String
     ) : [StripeWalletTransaction]
@@ -30,6 +30,17 @@ extend type Query {
     getStripeDepositTxById(
         id: Int
     ) : StripeWalletTransaction
+
+    # for paypal
+    getAllPaypalDepositTxns(
+        orderBy: String
+    ) : [PaypalDepositTransaction]
+    getPaypalDepositTxnsByUser(
+        orderBy: String
+    ) : [PaypalDepositTransaction]
+    getPaypalDepositTxnById(
+        id: Int
+    ) : PaypalDepositTransaction
 }
 
 extend type Mutation {

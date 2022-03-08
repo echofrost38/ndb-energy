@@ -26,12 +26,14 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
         return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.createNewTransaction(m);
     }
 
+    @SuppressWarnings("unchecked")
     @PreAuthorize("isAuthenticated()")
     public List<CoinpaymentPresaleTransaction> getAllCryptoPresaleTx(String orderBy) {
         return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
     public List<CoinpaymentPresaleTransaction> getCryptoPresaleTxByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
@@ -44,11 +46,13 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
     public List<CoinpaymentPresaleTransaction> getCryptoPresaleTxByAdmin(int userId, int presaleId) {
         return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.select(userId, presaleId);
     }
 
     @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
     public List<CoinpaymentPresaleTransaction> getCryptoPresaleTx(int presaleId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();

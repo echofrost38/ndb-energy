@@ -1,0 +1,14 @@
+type PaypalPresaleTransaction {
+    id: Int,
+    userId: Int,
+    amount: Float,
+    createdAt: Float,
+    confirmedAt: Float,
+    status: Boolean,
+    fiatType: String,
+    fiatAmount: Float,
+    paypalOrderId: String,
+    paypalOrderStatus: String,
+    presaleId: Int,
+    orderId: Int
+}

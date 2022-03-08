@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver;
 
 import com.google.gson.Gson;
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.security.jwt.JwtUtils;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.AvatarService;
@@ -181,4 +182,16 @@ public class BaseResolver {
 
 	@Autowired
 	protected PaypalPresaleService paypalPresaleService;
+
+	protected double getPayPalTotalOrder(int userId, double amount) {
+		User user = userService.getUserById(userId);
+		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
+	}
+
+	protected double getPaypalFee(int userId, double amount) {
+		User user = userService.getUserById(userId);
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		return amount * (PAYPAL_FEE + tierFeeRate) / 100 + 0.3;
+	}
 }

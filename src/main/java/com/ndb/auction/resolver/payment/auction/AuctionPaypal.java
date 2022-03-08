@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver.payment.auction;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
@@ -8,7 +9,6 @@ import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
-import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
 import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
 import com.ndb.auction.payload.request.paypal.PurchaseUnit;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -74,7 +75,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		
 		var appContext = new PayPalAppContextDTO();
         
-		appContext.setReturnUrl(WEBSITE_URL + "/capture");
+		appContext.setReturnUrl(WEBSITE_URL + "app/payment");
 		appContext.setBrandName("Auction Round");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);
@@ -94,6 +95,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		return orderResponse;
 	}
 
+	@Transactional
 	@PreAuthorize("isAuthenticated()")
 	public boolean captureOrderForAuction(String orderId) throws Exception {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -123,9 +125,23 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		} else return false;
 	}
 
-	private double getPayPalTotalOrder(int userId, double amount) {
-		User user = userService.getUserById(userId);
-		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
+	public List<PaypalAuctionTransaction> getAllPaypalAuctionTxns(String orderBy) {
+		return (List<PaypalAuctionTransaction>) paypalAuctionService.selectAll(orderBy);
 	}
+
+	@PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
+    public List<PaypalAuctionTransaction> getPaypalAuctionTxnsByUser(String orderBy) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return (List<PaypalAuctionTransaction>) paypalAuctionService.selectByUser(userId, orderBy);
+    }
+	
+	@PreAuthorize("isAuthenticated()")
+    public PaypalAuctionTransaction getPaypalAuctionTxn(int id) {
+        return (PaypalAuctionTransaction) paypalAuctionService.selectById(id);
+    }
+
 }

@@ -1,0 +1,16 @@
+type PaypalDepositTransaction {
+    id: Int,
+    userId: Int,
+    amount: Float,
+    createdAt: Float,
+    confirmedAt: Float,
+    status: Boolean,
+    fiatType: String,
+    fiatAmount: Float,
+    paypalOrderId: String,
+    paypalOrderStatus: String,
+    cryptoType: String,
+    cryptoPrice: Float,
+    fee: Float,
+    deposited: Float
+}

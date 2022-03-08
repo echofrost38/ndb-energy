@@ -10,8 +10,8 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
-import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
+import com.ndb.auction.models.transactions.paypal.PaypalPresaleTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -24,11 +24,11 @@ import lombok.NoArgsConstructor;
 
 @Repository
 @NoArgsConstructor
-@Table(name = "TBL_PAYPAL_AUCTION")
-public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, IPaypalDao {
+@Table(name = "TBL_PAYPAL_PRESALE")
+public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, IPaypalDao {
     
-    private static PaypalAuctionTransaction extract(ResultSet rs) throws SQLException {
-		PaypalAuctionTransaction m = new PaypalAuctionTransaction();
+    private static PaypalPresaleTransaction extract(ResultSet rs) throws SQLException {
+		PaypalPresaleTransaction m = new PaypalPresaleTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setAmount(rs.getLong("AMOUNT"));
@@ -39,16 +39,29 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
         m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
         m.setPaypalOrderId(rs.getString("ORDER_ID"));
         m.setPaypalOrderStatus(rs.getString("ORDER_STATUS"));
-		m.setAuctionId(rs.getInt("AUCTION_ID"));
-        m.setBidId(rs.getInt("BID_ID"));
+		m.setPresaleId(rs.getInt("PRESALE_ID"));
+        m.setOrderId(rs.getInt("P_ORDER_ID"));
 		return m;
 	}
+    
+    @Override
+    public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
+        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE ORDER_ID=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalPresaleTransaction>() {
+			@Override
+			public PaypalPresaleTransaction extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, orderId);
+    }
 
     @Override
     public Transaction insert(Transaction _m) {
-        PaypalAuctionTransaction m = (PaypalAuctionTransaction) _m;
-        String sql = "INSERT INTO TBL_PAYPAL_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,AUCTION_ID,BID_ID)"
-        + " VALUES(SEQ_PAYPAL_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
+        PaypalPresaleTransaction m = (PaypalPresaleTransaction) _m;
+        String sql = "INSERT INTO TBL_PAYPAL_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,PRESALE_ID,P_ORDER_ID)"
+        + " VALUES(SEQ_PAYPAL_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -63,8 +76,8 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
                         ps.setDouble(i++, m.getFiatAmount());
                         ps.setString(i++, m.getPaypalOrderId());
                         ps.setString(i++, m.getPaypalOrderStatus());
-                        ps.setInt(i++, m.getAuctionId());
-                        ps.setInt(i++, m.getBidId());
+                        ps.setInt(i++, m.getPresaleId());
+                        ps.setInt(i++, m.getOrderId());
                         return ps;
                     }
                 }, keyHolder);
@@ -74,13 +87,13 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
 
     @Override
     public List<? extends Transaction> selectAll(String orderBy) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION";
+        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<PaypalAuctionTransaction>() {
+		return jdbcTemplate.query(sql, new RowMapper<PaypalPresaleTransaction>() {
 			@Override
-			public PaypalAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+			public PaypalPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
 		});
@@ -88,13 +101,13 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
 
     @Override
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE USER_ID = ?";
+        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ?";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<PaypalAuctionTransaction>() {
+		return jdbcTemplate.query(sql, new RowMapper<PaypalPresaleTransaction>() {
 			@Override
-			public PaypalAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+			public PaypalPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
 		}, userId);
@@ -102,10 +115,10 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
 
     @Override
     public Transaction selectById(int id) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalAuctionTransaction>() {
+        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE ID=?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalPresaleTransaction>() {
 			@Override
-			public PaypalAuctionTransaction extractData(ResultSet rs) throws SQLException {
+			public PaypalPresaleTransaction extractData(ResultSet rs) throws SQLException {
 				if (!rs.next())
 					return null;
 				return extract(rs);
@@ -119,32 +132,19 @@ public class PaypalAuctionDao extends BaseOracleDao implements ITransactionDao, 
         return 0;
     }
 
-    @Override
-    public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE ORDER_ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalAuctionTransaction>() {
+    public List<PaypalPresaleTransaction> selectByIds(int userId, int presaleId) {
+        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND PRESALE_ID = ?";
+		return jdbcTemplate.query(sql, new RowMapper<PaypalPresaleTransaction>() {
 			@Override
-			public PaypalAuctionTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
+			public PaypalPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		}, orderId);
-    }
-
-    public List<PaypalAuctionTransaction> selectByIds(int userId, int roundId) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE USER_ID = ? AND ROUND_ID = ?";
-		return jdbcTemplate.query(sql, new RowMapper<PaypalAuctionTransaction>() {
-			@Override
-			public PaypalAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId, roundId);
+		}, userId, presaleId);
     }
 
     public int updateOrderStatus(int id, String status) {
-        String sql = "UPDATE TBL_PAYAPL_AUCTION SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
+        String sql = "UPDATE TBL_PAYPAL_PRESALE SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
     }
-    
+        
 }

@@ -1,5 +1,7 @@
 package com.ndb.auction.service;
 
+import java.util.List;
+
 import com.ndb.auction.models.presale.PreSaleOrder;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -31,5 +33,15 @@ public class PresaleOrderService extends BaseService {
     public int updateStatus(int orderId) {
         return presaleOrderDao.updateStatus(orderId);
     }
+
+    public List<PreSaleOrder> getPresaleOrders(int presaleId) {
+        return presaleOrderDao.selectByPresaleId(presaleId);
+    }
+
+    public List<PreSaleOrder> getPresaleOrdersByUserId(int userId) {
+        return presaleOrderDao.selectAllByUserId(userId);
+    }
+
+    
 
 }

@@ -7,13 +7,6 @@ extend type Mutation {
         tokenPrice: Float!,
         conditions: [PreSaleConditionInput!]!
     ) : Int
-    # create new order
-    placePreSaleOrder(
-        presaleId: Int,
-        ndbAmount: Float,
-        destination: Int,
-        extAddr: String
-    ) : PreSaleOrder
 }
 
 extend type Query {

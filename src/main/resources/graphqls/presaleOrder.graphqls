@@ -1,0 +1,24 @@
+extend type Mutation {
+    # create new order
+    placePreSaleOrder(
+        presaleId: Int,
+        ndbAmount: Float,
+        destination: Int,
+        extAddr: String
+    ) : PreSaleOrder
+}
+
+extend type Query {
+    getPresaleOrders(
+        presaleId: Int
+    ) : [PreSaleOrder]
+    getPresaleOrdersByUser : [PreSaleOrder]
+    getPresaleById(
+        id: Int
+    ) : PreSaleOrder
+}
+
+schema {
+    mutation: Mutation,
+    query: Query
+}

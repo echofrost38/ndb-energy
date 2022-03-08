@@ -64,7 +64,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
     }
 
     public List<PreSaleOrder> selectByPresaleId(int presaleId) {
-        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE PRESALE_ID = ?";
+        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE PRESALE_ID = ? AND STATUS = 1";
         return jdbcTemplate.query(sql, new RowMapper<PreSaleOrder>() {
 			@Override
 			public PreSaleOrder mapRow(ResultSet rs, int rownumber) throws SQLException {

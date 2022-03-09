@@ -30,17 +30,6 @@ extend type Query {
     getStripeDepositTxById(
         id: Int
     ) : StripeWalletTransaction
-
-    # for paypal
-    getAllPaypalDepositTxns(
-        orderBy: String
-    ) : [PaypalDepositTransaction]
-    getPaypalDepositTxnsByUser(
-        orderBy: String
-    ) : [PaypalDepositTransaction]
-    getPaypalDepositTxnById(
-        id: Int
-    ) : PaypalDepositTransaction
 }
 
 extend type Mutation {

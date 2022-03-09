@@ -35,6 +35,8 @@ public class PaypalDepositTransaction extends FiatDepositTransaction {
     ) {
         this.userId = userId;
         this.amount = amount;
+        this.fiatAmount = amount;
+        this.fiatType = "USD";
         this.cryptoType = cryptoType;
         this.cryptoPrice = cryptoPrice;
         this.paypalOrderId = paypalOrderId;

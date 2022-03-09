@@ -1,4 +1,0 @@
-type ExtWallet {
-   key: String!,
-   value: String!
-}

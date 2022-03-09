@@ -1,0 +1,23 @@
+extend type Query {
+    # for paypal
+    getAllPaypalDepositTxns(
+        orderBy: String
+    ) : [PaypalDepositTransaction]
+    getPaypalDepositTxnsByUser(
+        orderBy: String
+    ) : [PaypalDepositTransaction]
+    getPaypalDepositTxnById(
+        id: Int
+    ) : PaypalDepositTransaction
+}
+
+extend type Mutation {
+    paypalForDeposit(
+        amount: Float,
+        currencyCode: String,
+        cryptoType: String
+    ) : OrderResponseDTO
+    captureOrderForDeposit(
+        orderId: String
+    ) : Boolean
+}

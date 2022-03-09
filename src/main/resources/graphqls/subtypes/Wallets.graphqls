@@ -1,4 +1,0 @@
-type Wallets {
-   key: String,
-   value: Wallet
-}

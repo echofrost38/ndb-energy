@@ -48,7 +48,7 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
     
     @Override
     public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
-        String sql = "SELECT * FROM TBL_PAYPAL_AUCTION WHERE ORDER_ID=?";
+        String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE ORDER_ID=?";
 		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalDepositTransaction>() {
 			@Override
 			public PaypalDepositTransaction extractData(ResultSet rs) throws SQLException {
@@ -63,7 +63,7 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
     public Transaction insert(Transaction _m) {
         PaypalDepositTransaction m = (PaypalDepositTransaction) _m;
         String sql = "INSERT INTO TBL_PAYPAL_DEPOSIT(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
-        + " VALUES(SEQ_PAYPAL_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?,?)";
+        + " VALUES(SEQ_PAYPAL_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {

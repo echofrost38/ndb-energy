@@ -34,6 +34,8 @@ public class PreSaleOrderDao extends BaseOracleDao {
         m.setNdbAmount(rs.getLong("NDB_AMOUNT"));
         m.setNdbPrice(rs.getLong("NDB_PRICE"));
         m.setStatus(rs.getInt("STATUS"));
+        m.setPrefix(rs.getString("PREFIX"));
+        m.setName(rs.getString("NAME"));
         m.setCreatedAt(rs.getTimestamp("STARTED_AT").getTime());
         m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
         return m;
@@ -64,7 +66,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
     }
 
     public List<PreSaleOrder> selectByPresaleId(int presaleId) {
-        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE PRESALE_ID = ? AND STATUS = 1";
+        String sql = "SELECT TBL_PRESALE_ORDER.*, TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_PRESALE_ORDER LEFT JOIN TBL_USER_AVATAR ON TBL_PRESALE_ORDER.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_PRESALE_ORDER.PRESALE_ID = ? AND TBL_PRESALE_ORDER.STATUS = 1 ORDER BY TBL_PRESALE_ORDER.NDB_AMOUNT DESC";
         return jdbcTemplate.query(sql, new RowMapper<PreSaleOrder>() {
 			@Override
 			public PreSaleOrder mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -74,17 +76,17 @@ public class PreSaleOrderDao extends BaseOracleDao {
     }
 
     public List<PreSaleOrder> selectByUserId(int presaleId, int userId) {
-        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE PRESALE_ID = ? AND USER_ID = ?";
+        String sql = "SELECT TBL_PRESALE_ORDER.*, TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_PRESALE_ORDER LEFT JOIN TBL_USER_AVATAR ON TBL_PRESALE_ORDER.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_PRESALE_ORDER.USER_ID = ? AND TBL_PRESALE_ORDER.PRESALE_ID = ? AND TBL_PRESALE_ORDER.STATUS = 1 ORDER BY TBL_PRESALE_ORDER.NDB_AMOUNT DESC";
         return jdbcTemplate.query(sql, new RowMapper<PreSaleOrder>() {
 			@Override
 			public PreSaleOrder mapRow(ResultSet rs, int rownumber) throws SQLException {
 				return extract(rs);
 			}
-		}, presaleId, userId);
+		}, userId, presaleId);
     }
 
     public List<PreSaleOrder> selectAllByUserId (int userId) {
-        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE USER_ID = ?";
+        String sql = "SELECT TBL_PRESALE_ORDER.*, TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_PRESALE_ORDER LEFT JOIN TBL_USER_AVATAR ON TBL_PRESALE_ORDER.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_PRESALE_ORDER.USER_ID = ? AND TBL_PRESALE_ORDER.STATUS = 1 ORDER BY TBL_PRESALE_ORDER.NDB_AMOUNT DESC";
         return jdbcTemplate.query(sql, new RowMapper<PreSaleOrder>() {
 			@Override
 			public PreSaleOrder mapRow(ResultSet rs, int rownumber) throws SQLException {
@@ -94,7 +96,7 @@ public class PreSaleOrderDao extends BaseOracleDao {
     }
 
     public PreSaleOrder selectById(int orderId) {
-        String sql = "SELECT * FROM TBL_PRESALE_ORDER WHERE ID=?";
+        String sql = "SELECT TBL_PRESALE_ORDER.*, TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME FROM TBL_PRESALE_ORDER LEFT JOIN TBL_USER_AVATAR ON TBL_PRESALE_ORDER.USER_ID=TBL_USER_AVATAR.ID WHERE TBL_PRESALE_ORDER.ID = ?";
         return jdbcTemplate.query(sql, new ResultSetExtractor<PreSaleOrder>() {
 			@Override
 			public PreSaleOrder extractData(ResultSet rs) throws SQLException {

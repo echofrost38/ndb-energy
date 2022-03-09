@@ -42,7 +42,10 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         double fee = getPaypalFee(userId, amount);
-        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        double cryptoPrice = 1.0;
+        if(!cryptoType.equals("USDT")) {
+            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        } 
         double deposited = (amount - fee) / cryptoPrice;
 
         var order = new OrderDTO();
@@ -50,7 +53,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         order.getPurchaseUnits().add(unit);
 
         var appContext = new PayPalAppContextDTO();
-        appContext.setReturnUrl(WEBSITE_URL + "app/payment");
+        appContext.setReturnUrl(WEBSITE_URL + "/app/payment");
 		appContext.setBrandName("Deposit");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);
@@ -88,6 +91,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
                 Notification.PAYMENT_RESULT,
                 "PAYMENT CONFIRMED",
                 "You have successfully deposited " + m.getDeposited() + m.getCryptoType() + ".");
+            return true;
         }
         return false;
     }

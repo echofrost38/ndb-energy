@@ -44,5 +44,9 @@ public class PaypalDepositService extends PaypalBaseService implements ITransact
     public int updateOrderStatus(int id, String status) {
         return paypalDepositDao.updateOrderStatus(id, status);
     }
+
+    public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
+        return paypalDepositDao.selectByPaypalOrderId(orderId);
+    }
     
 }

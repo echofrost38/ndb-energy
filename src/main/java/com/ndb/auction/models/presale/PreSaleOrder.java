@@ -22,6 +22,8 @@ public class PreSaleOrder extends BaseModel {
         this.destination = destination;
         this.extAddr = extAddr;
         this.status = 0;
+        this.prefix = null;
+        this.name = null;
     }
 
     public static int INTERNAL = 1;
@@ -29,6 +31,9 @@ public class PreSaleOrder extends BaseModel {
 
     private int userId;
     private int presaleId;
+
+    private String prefix;
+    private String name;
 
     private int destination;
     private String extAddr;

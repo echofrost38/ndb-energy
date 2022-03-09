@@ -19,4 +19,14 @@ public class StripeWalletTransaction extends StripeDepositTransaction {
         this.fiatType = "USD";
     }
 
+    public StripeWalletTransaction(int userId, Long amount) {
+        this.userId = userId;
+        this.amount = amount;
+        this.paymentIntentId = null;
+        this.paymentMethodId = null;
+        this.status = false;
+        this.fiatAmount = amount;
+        this.fiatType = "USD";
+    }
+
 }

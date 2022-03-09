@@ -90,7 +90,6 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 						.setCurrency("USD")
 						.setCustomer(customerId)
 						.setConfirm(true)
-						.setPaymentMethod(m.getPaymentMethodId())
 						.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
 				intent = PaymentIntent.create(createParams.build());

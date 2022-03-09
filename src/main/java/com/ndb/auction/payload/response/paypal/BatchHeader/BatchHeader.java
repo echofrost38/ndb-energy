@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class BatchHeader {
+    private String payout_batch_id;
     private String batch_status;
     private SenderBatchHeader sender_batch_header;
     private Amount amount;

@@ -62,7 +62,8 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
                 return paypalWithdrawDao.confirmWithdrawRequest(requestId, BaseWithdraw.DENIED, "Cannot create payout");
             }
-            paypalWithdrawDao.updatePaypalID(m.getId(), batchId, itemId);
+
+            paypalWithdrawDao.updatePaypalID(m.getId(), batchHeaderResponse.getPayout_batch_id(), batchId, itemId);
         }
         return paypalWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }
@@ -85,6 +86,10 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
     @Override
     public BaseWithdraw getWithdrawRequestById(int id) {
         return paypalWithdrawDao.selectById(id);
+    }
+
+    public PaypalWithdraw getWithdrawByPayoutId(String payoutId) {
+        return paypalWithdrawDao.selectByPayoutId(payoutId);
     }
 
     /// paypal withdraw utils

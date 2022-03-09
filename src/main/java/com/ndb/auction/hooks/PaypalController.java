@@ -4,7 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
 import com.ndb.auction.config.PaypalConfig;
+import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.payload.response.paypal.WebhookEvent;
+import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 import com.paypal.api.payments.Event;
 import com.paypal.base.Constants;
 import com.paypal.base.rest.APIContext;
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/paypal")
 public class PaypalController extends BaseController {
+
+    @Autowired
+    private PaypalWithdrawService papalWithdrawService;
 
     private final PaypalConfig paypalConfig;
     public static final String WEBHOOK_ID = "6SP16862L7635611T";
@@ -49,10 +55,32 @@ public class PaypalController extends BaseController {
         
             switch (hookEvent.getEvent_type()) {
                 case "PAYMENT.PAYOUTSBATCH.SUCCESS":
-                    
+                    String payoutId = hookEvent.getResource().getBatch_header().getPayout_batch_id();
+                    PaypalWithdraw m = papalWithdrawService.getWithdrawByPayoutId(payoutId);
+
+                    // check pending status
+                    double tokenAmount = m.getTokenAmount();
+                    balanceService.deductFree(m.getUserId(), m.getSourceToken(), tokenAmount);
+                    notificationService.sendNotification(
+                        m.getUserId(),
+                        Notification.WITHDRAW_SUCCESS,
+                        "WITHDRAW SUCCESS",
+                        "Your withdraw request has been done successfully."
+                    );
                     break;
                 case "PAYMENT.PAYOUTSBATCH.DENIED":
-                    
+                    String _payoutId = hookEvent.getResource().getBatch_header().getPayout_batch_id();
+                    PaypalWithdraw _m = papalWithdrawService.getWithdrawByPayoutId(_payoutId);
+
+                    // check pending status
+                    double _tokenAmount = _m.getTokenAmount();
+                    balanceService.deductFree(_m.getUserId(), _m.getSourceToken(), _tokenAmount);
+                    notificationService.sendNotification(
+                        _m.getUserId(),
+                        Notification.WITHDRAW_SUCCESS,
+                        "WITHDRAW FAILED",
+                        "Your withdraw request has been failed."
+                    );
                     break;
             }
             return ResponseEntity.ok().body("Payment success");

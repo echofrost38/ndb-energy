@@ -40,6 +40,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         m.setConfirmedAt(rs.getTimestamp("CONFIRMED_AT").getTime());
         m.setSenderBatchId(rs.getString("BATCH_ID"));
         m.setSenderItemId(rs.getString("ITEM_ID"));
+        m.setPayoutBatchId(rs.getString("PAYOUT_ID"));
         m.setReceiver(rs.getString("RECEIVER"));
 		return m;
     }
@@ -125,10 +126,22 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
 			}
 		}, id);
     }
+
+    public PaypalWithdraw selectByPayoutId(String payoutId) {
+        String sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE PAYOUT_ID=?";
+        return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalWithdraw>() {
+			@Override
+			public PaypalWithdraw extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, payoutId);
+    }
     
-    public int updatePaypalID(int id, String batchId, String itemId) {
-        var sql = "UPDATE TBL_PAYPAL_WITHDRAW SET BATCH_ID=?,ITEM_ID=? WHERE ID = ?";
-        return jdbcTemplate.update(sql, batchId, itemId, id);
+    public int updatePaypalID(int id, String payoutId, String batchId, String itemId) {
+        var sql = "UPDATE TBL_PAYPAL_WITHDRAW SET PAYOUT_ID=?,BATCH_ID=?,ITEM_ID=? WHERE ID = ?";
+        return jdbcTemplate.update(sql, payoutId, batchId, itemId, id);
     }
 
 }

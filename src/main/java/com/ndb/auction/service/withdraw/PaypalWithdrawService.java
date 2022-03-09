@@ -1,5 +1,6 @@
 package com.ndb.auction.service.withdraw;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
@@ -8,9 +9,9 @@ import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.payload.request.paypal.Item;
 import com.ndb.auction.payload.request.paypal.PayoutsDTO;
 import com.ndb.auction.payload.request.paypal.SenderBatchHeader;
+import com.ndb.auction.payload.response.paypal.BatchHeader.Amount;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.utils.PaypalHttpClient;
-import com.paypal.api.payments.Amount;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,15 +48,18 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var batchId = generateBatchId(m);
             var batchHeader = new SenderBatchHeader(batchId);
             var itemId = generateItemId(m);
-            var amount = new Amount(String.valueOf(m.getWithdrawAmount()), "USD");
+
+            var df = new DecimalFormat("#.00");
+
+            var amount = new Amount("USD", df.format(m.getWithdrawAmount()));
             var item = new Item(amount, itemId, m.getReceiver());   
             var payoutsDTO = new PayoutsDTO(batchHeader, item);
 
             // sending payout to PayPal
-            var batchHeaderResponse = payPalHttpClient.createPayout(payoutsDTO);
-            
+            var response = payPalHttpClient.createPayout(payoutsDTO);
+            var batchHeaderResponse = response.getBatch_header();
             // check status!
-            if(batchHeaderResponse.getBatch_status().equals("DENIED")) {
+            if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
                 return paypalWithdrawDao.confirmWithdrawRequest(requestId, BaseWithdraw.DENIED, "Cannot create payout");
             }
             paypalWithdrawDao.updatePaypalID(m.getId(), batchId, itemId);

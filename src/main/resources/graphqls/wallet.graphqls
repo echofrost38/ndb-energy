@@ -61,11 +61,6 @@ extend type Mutation {
     plaidExchangeToken(
         publicToken: String
     ): String
-    paypalWithdrawRequest(
-        email: String,
-        withdrawAmount: Float,
-        sourceToken: String
-    ) : PaypalWithdraw
 }
 
 schema {

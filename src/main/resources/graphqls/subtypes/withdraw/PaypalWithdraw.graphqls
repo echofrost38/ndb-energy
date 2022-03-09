@@ -1,8 +1,12 @@
 type PaypalWithdraw {
     id: Int,
     userId: Int,
+    targetCurrency: String, 
     sourceToken: String,
+    tokenPrice: Float,
     withdrawAmount: Float,
+    fee: Float,
+    tokenAmount: Float, 
     status: Int,
     deniedReason: String,
     requestedAt: Float,

@@ -194,4 +194,10 @@ public class BaseResolver {
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
 		return amount * (PAYPAL_FEE + tierFeeRate) / 100 + 0.3;
 	}
+
+	protected double getPaypalWithdrawFee(int userId, double amount) {
+		User user = userService.getUserById(userId);
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		return amount * tierFeeRate / 100 + 0.3;
+	}
 }

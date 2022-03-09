@@ -1,0 +1,34 @@
+extend type Mutation {
+    # PayPal mutation
+    paypalWithdrawRequest(
+        email: String,
+        target: String,
+        withdrawAmount: Float,
+        sourceToken: String
+    ) : PaypalWithdraw
+    confirmPaypalWithdraw(
+        id: Int,
+        status: Int,
+        deniedReason: String
+    ) : Int
+}
+
+extend type Query {
+    # PayPal Queries
+    getPaypalWithdrawByUser(
+        userId: Int
+    ) : [PaypalWithdraw]
+    getPaypalWithdrawByStatus(
+        userId: Int,
+        status: Int
+    ) : [PaypalWithdraw]
+    getPaypalPendingWithdrawRequests : [PaypalWithdraw]
+    getPaypalWithdrawById(
+        id: Int
+    ) : PaypalWithdraw
+}
+
+schema {
+    query: Query,
+    mutation: Mutation
+}

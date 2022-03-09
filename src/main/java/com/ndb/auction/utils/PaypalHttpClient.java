@@ -18,7 +18,6 @@ import java.util.Base64;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.config.PaypalConfig;
-import com.ndb.auction.payload.request.paypal.BatchHeader;
 import com.ndb.auction.payload.request.paypal.EventType;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
 import com.ndb.auction.payload.request.paypal.PayoutsDTO;
@@ -27,6 +26,7 @@ import com.ndb.auction.payload.response.paypal.AccessTokenResponseDTO;
 import com.ndb.auction.payload.response.paypal.CaptureOrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.ClientTokenDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
+import com.ndb.auction.payload.response.paypal.PayoutResponseDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,7 +105,7 @@ public class PaypalHttpClient {
         return objectMapper.readValue(content, OrderResponseDTO.class);
     }
 
-    public BatchHeader createPayout(PayoutsDTO payoutDTO) throws Exception {
+    public PayoutResponseDTO createPayout(PayoutsDTO payoutDTO) throws Exception {
         var accessTokenDto = getAccessToken();
         var payload = objectMapper.writeValueAsString(payoutDTO);
         var request = HttpRequest.newBuilder()
@@ -116,7 +116,7 @@ public class PaypalHttpClient {
             .build();
         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         var content = response.body();
-        return objectMapper.readValue(content, BatchHeader.class);
+        return objectMapper.readValue(content, PayoutResponseDTO.class);
     }
 
     public Object createWebhook(Webhook webhook) throws Exception {

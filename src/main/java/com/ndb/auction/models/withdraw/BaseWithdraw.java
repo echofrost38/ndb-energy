@@ -18,8 +18,13 @@ public class BaseWithdraw {
     protected int userId;
     
     // withdraw details
+    protected String targetCurrency;
+    protected double withdrawAmount; // usd
+    protected double fee; // usd
+
     protected String sourceToken;
-    protected double withdrawAmount;
+    protected double tokenPrice;
+    protected double tokenAmount; // crypto amount to withdraw
 
     // pending flag
     // pending  : 1

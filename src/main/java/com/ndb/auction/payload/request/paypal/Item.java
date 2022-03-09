@@ -1,6 +1,7 @@
 package com.ndb.auction.payload.request.paypal;
 
-import com.paypal.api.payments.Amount;
+
+import com.ndb.auction.payload.response.paypal.BatchHeader.Amount;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,10 @@ public class Item {
         this.amount = amount;
         this.sender_item_id = sender_item_id;
         this.receiver = receiver;
-        this.recipient_wallet = "PAYPAL";
+        this.recipient_type = "EMAIL";
     }
 
-    private String recipient_wallet;
+    private String recipient_type;
     private Amount amount;
     private String note;
     private String sender_item_id;

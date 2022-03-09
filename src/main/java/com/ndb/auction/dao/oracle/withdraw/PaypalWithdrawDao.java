@@ -28,8 +28,12 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         PaypalWithdraw m = new PaypalWithdraw();
         m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
+        m.setTargetCurrency(rs.getString("TARGET"));
 		m.setSourceToken(rs.getString("SOURCE"));
+        m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
         m.setWithdrawAmount(rs.getDouble("AMOUNT"));
+        m.setFee(rs.getDouble("FEE"));
+        m.setTokenAmount((m.getWithdrawAmount() + m.getFee()) / m.getTokenPrice());
         m.setStatus(rs.getInt("STATUS"));
         m.setDeniedReason(rs.getString("REASON"));
         m.setRequestedAt(rs.getTimestamp("REQUESTED_AT").getTime());
@@ -43,8 +47,8 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     @Override
     public BaseWithdraw insert(BaseWithdraw baseWithdraw) {
         var m = (PaypalWithdraw)baseWithdraw;
-        var sql = "INSERT INTO TBL_PAYPAL_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,AUCTION_ID,BID_ID)"
-        + " VALUES(SEQ_PAYPAL_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
+        var sql = "INSERT INTO TBL_PAYPAL_WITHDRAW(ID,USER_ID,TARGET,SOURCE,TOKEN_PRICE,AMOUNT,FEE,STATUS,REASON,REQUESTED_AT,CONFIRMED_AT,BATCH_ID,ITEM_ID,RECEIVER)"
+        + " VALUES(SEQ_PAYPAL_WITHDRAW.NEXTVAL,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?)";
         var keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -54,12 +58,12 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
                                 new String[] { "ID" });
                         int i = 1;
                         ps.setInt(i++, m.getUserId());
+                        ps.setString(i++, m.getTargetCurrency());
                         ps.setString(i++, m.getSourceToken());
+                        ps.setDouble(i++, m.getTokenPrice());
                         ps.setDouble(i++, m.getWithdrawAmount());
-                        ps.setInt(i++, m.getStatus());
+                        ps.setDouble(i++, m.getFee());
                         ps.setString(i++, m.getDeniedReason());
-                        ps.setLong(i++, m.getRequestedAt());
-                        ps.setLong(i++, m.getConfirmedAt());
                         ps.setString(i++, m.getSenderBatchId());
                         ps.setString(i++, m.getSenderItemId());
                         ps.setString(i++, m.getReceiver());
@@ -72,7 +76,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
 
     @Override
     public int confirmWithdrawRequest(int requestId, int status, String reason) {
-        var sql = "UPDATE TBL_PAYPAL_WITHDRAW SET CONFIMRED_AT = SYSDATE, STATUS = ?, REASON = ? WHERE ID = ?";
+        var sql = "UPDATE TBL_PAYPAL_WITHDRAW SET CONFIRMED_AT = SYSDATE, STATUS = ?, REASON = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, reason, requestId);
     }
 

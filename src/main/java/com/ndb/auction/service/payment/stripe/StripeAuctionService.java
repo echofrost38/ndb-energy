@@ -72,26 +72,26 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     throw new BidException("no_bid", "auctionId");
                 }
 
-				double paidAmount = intent.getAmount().doubleValue();
+				// double paidAmount = intent.getAmount().doubleValue();
 
 				if(bid.isPendingIncrease()) {
-                    double pendingPrice = bid.getDelta();
-                    Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
-                    if(totalOrder * 100 > paidAmount) {
-                        response.setError("Insufficient funds");
-						return response;
-                    }
+                    // double pendingPrice = bid.getDelta();
+                    // Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
+                    // if(totalOrder * 100 > paidAmount) {
+                    //     response.setError("Insufficient funds");
+					// 	return response;
+                    // }
                     
                     bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
                     bid.setTokenAmount(bid.getTempTokenAmount());
                     bid.setTokenPrice(bid.getTempTokenPrice());
                 } else {
-                    Long totalPrice = bid.getTokenAmount();
-                    Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
-                    if(totalOrder * 100 > paidAmount) {
-                        response.setError("Insufficient funds");
-						return response;
-                    }
+                    // Long totalPrice = bid.getTokenAmount();
+                    // Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
+                    // if(totalOrder * 100 > paidAmount) {
+                    //     response.setError("Insufficient funds");
+					// 	return response;
+                    // }
                 }
                 bidService.updateBidRanking(bid);
             }

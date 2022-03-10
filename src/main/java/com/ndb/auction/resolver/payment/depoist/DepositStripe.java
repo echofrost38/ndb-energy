@@ -2,11 +2,14 @@ package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
 
+import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.payment.stripe.StripeDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -16,22 +19,30 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class DepositStripe extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
+
+    private final StripeDepositService stripeDepositService;
+
+    @Autowired
+    public DepositStripe(StripeDepositService stripeDepositService) {
+        this.stripeDepositService = stripeDepositService;
+    }
+
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForDeposit(Long amount, String currencyName, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse stripeForDeposit(Long amount, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        StripeWalletTransaction m = new StripeWalletTransaction(userId, amount, paymentIntentId, paymentMethodId);
-        return stripeWalletService.createNewTransaction(m, isSaveCard);
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId, paymentMethodId);
+        return stripeDepositService.createDeposit(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForDepositWithSavedCard(Long amount, int cardId) {
+    public PayResponse stripeForDepositWithSavedCard(Long amount, String cryptoType, int cardId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         String customerId = stripeCustomerService.getSavedCard(cardId).getCustomerId();
-        StripeWalletTransaction m = new StripeWalletTransaction(userId, amount);
-        return stripeWalletService.createTransactionWithSavedCard(m, customerId);
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType);
+        return stripeDepositService.createDepositWithSavedCard(m, customerId);
     }
 
     @PreAuthorize("isAuthenticated()")

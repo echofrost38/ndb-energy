@@ -9,6 +9,7 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
+import com.ndb.auction.utils.ThirdAPIUtils;
 import com.stripe.Stripe;
 import com.stripe.model.PaymentIntent;
 
@@ -39,6 +40,9 @@ public class StripeBaseService extends BaseService {
     @Autowired
     protected StripeWalletDao stripeWalletDao;
 
+    @Autowired
+    protected ThirdAPIUtils thirdAPIUtils;
+
     @PostConstruct
     public void init() {
     	Stripe.apiKey = stripeSecretKey;
@@ -52,8 +56,12 @@ public class StripeBaseService extends BaseService {
     // total = 100 / (100 - gateway fee - tier fee) * (amount + fixed fee)
     public Double getTotalOrder(int userId, double amount) {
         User user = userDao.selectById(userId);
-        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
+    }
+
+    public Double getStripeFee(double amount) {
+        return ((amount * STRIPE_FEE) / 100) + 0.30;
     }
 
     protected PayResponse generateResponse(PaymentIntent intent, PayResponse response) {

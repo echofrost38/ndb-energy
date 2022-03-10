@@ -20,4 +20,16 @@ extend type Mutation {
     captureOrderForDeposit(
         orderId: String
     ) : Boolean
+    stripeForDeposit(
+        amount: Float,
+        cryptoType: String,
+        paymentIntentId: String,
+        paymentMethodId: String,
+        isSaveCard: Boolean
+    ) : PayResponse
+    stripeForDepositWithSavedCard(
+        amount: Float,
+        cryptoType: String,
+        cardId: Int
+    ) : PayResponse
 }

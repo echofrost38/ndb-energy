@@ -19,15 +19,54 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     protected String paymentMethodId;
     protected String paymentIntentId;
 
+    private String cryptoType;
+    private Double cryptoPrice;
+    private Double fee;
+    private Double deposited;
+
     public StripeDepositTransaction(
         int userId,
         Long amount,
+        String cryptoType,
         String paymentIntentId,
         String paymentMethodId
     ) {
         this.userId = userId;
         this.amount = amount;
+        this.cryptoType = cryptoType;
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
+    }
+
+    public StripeDepositTransaction(
+            int userId,
+            Long amount,
+            String cryptoType,
+            Double cryptoPrice,
+            String paymentIntentId,
+            String paymentMethodId,
+            Double fee,
+            Double deposited
+    ) {
+        this.userId = userId;
+        this.amount = amount;
+        this.fiatAmount = amount;
+        this.fiatType = "USD";
+        this.cryptoType = cryptoType;
+        this.cryptoPrice = cryptoPrice;
+        this.paymentIntentId = paymentIntentId;
+        this.paymentMethodId = paymentMethodId;
+        this.fee = fee;
+        this.deposited = deposited;
+    }
+
+    public StripeDepositTransaction(
+            int userId,
+            Long amount,
+            String cryptoType
+    ) {
+        this.userId = userId;
+        this.amount = amount;
+        this.cryptoType = cryptoType;
     }
 }

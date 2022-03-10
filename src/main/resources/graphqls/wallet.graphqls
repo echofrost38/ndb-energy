@@ -43,17 +43,6 @@ extend type Mutation {
         amount: Float,
         tokenSymbol: String
     ) : Boolean
-    payStripeForDeposit(
-        amount: Float,
-        currencyName: String,
-        paymentIntentId: String,
-        paymentMethodId: String,
-        isSaveCard: Boolean
-    ) : PayResponse
-    payStripeForDepositWithSavedCard(
-        amount: Float,
-        cardId: Int
-    ) : PayResponse
     depositWithPlaid : String
     plaidExchangeToken(
         publicToken: String

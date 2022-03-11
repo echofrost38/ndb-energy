@@ -24,7 +24,7 @@ public class BaseWithdraw {
 
     protected String sourceToken;
     protected double tokenPrice;
-    protected double tokenAmount; // crypto amount to withdraw
+    protected double tokenAmount; // requested crypto amount to withdraw
 
     // pending flag
     // pending  : 1

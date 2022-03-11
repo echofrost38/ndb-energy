@@ -189,6 +189,7 @@ public class ScheduledTasks {
 
 				int id = readyRound.getId();
 				auctionService.startAuction(id);
+				readyRound = null;
 			}
 		}
 
@@ -215,9 +216,8 @@ public class ScheduledTasks {
 				startedPresale = readyPresale;
 				startedPresaleCounter = (readyPresale.getEndedAt() - readyPresale.getStartedAt()) / 1000;
 				presaleService.startPresale(readyPresale.getId());
-				readyPresale = null;
-				
 				System.out.println("Started counter: " + startedPresaleCounter.toString());
+				readyPresale = null;
 			}
 		}
 
@@ -229,9 +229,9 @@ public class ScheduledTasks {
 				presaleService.closePresale(startedPresale.getId());
 				startedPresale = null;
 				System.out.println("Presale Ended: " + startedPresaleCounter.toString());
+				startedPresale = null;
 			}
 		}
-		
 	}
 
 	// add pending list

@@ -91,7 +91,7 @@ public class NotificationDao extends BaseOracleDao {
 	}
 
 	public String setReadFlagAll(int userId) {
-		String sql = "UPDATE TBL_NOTIFICATION SET READ=1 WHERE USER_ID=? ORDER BY ID DESC";
+		String sql = "UPDATE TBL_NOTIFICATION SET READ=1 WHERE USER_ID=?";
 		jdbcTemplate.update(sql, userId);
 		return "Success";
 	}

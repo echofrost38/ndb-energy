@@ -11,11 +11,25 @@ extend type Mutation {
         status: Int,
         deniedReason: String
     ) : Int
+
+    # Crypto mutation
+    cryptoWithdrawRequest(
+        amount: Float,
+        sourceToken: String,
+        network: String,
+        des: String
+    ) : CryptoWithdraw
+    confirmCryptoWithdraw(
+        requestId: Int,
+        status: Int,
+        reason: String
+    ) : Int
 }
 
 extend type Query {
     # PayPal Queries
-    getPaypalWithdrawByUser(
+    getPaypalWithdrawByUser : [PaypalWithdraw]
+    getPaypalWithdrawByUserByAdmin(
         userId: Int
     ) : [PaypalWithdraw]
     getPaypalWithdrawByStatus(
@@ -26,6 +40,23 @@ extend type Query {
     getPaypalWithdrawById(
         id: Int
     ) : PaypalWithdraw
+
+    # Crypto queries
+    getCryptoWithdrawByUser : [CryptoWithdraw]
+    getCryptoWithdrawByUserByAdmin(
+        userId: Int
+    ) : [CryptoWithdraw]
+    getCryptoWithdrawByStatus(
+        status: Int
+    ) : [CryptoWithdraw]
+    getCryptoWithdrawByStatusByAdmin(
+        userId: Int,
+        status: Int
+    ) : [CryptoWithdraw]
+    getCryptoPendingWithdrawRequests : [CryptoWithdraw]
+    getCryptoWithdrawById(
+        id: Int
+    ) : CryptoWithdraw
 }
 
 schema {

@@ -36,7 +36,6 @@ import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.service.utils.TotpService;
-import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
@@ -178,9 +177,6 @@ public class BaseResolver {
 	protected StripeCustomerService stripeCustomerService;
 
 	@Autowired
-	protected PaypalWithdrawService paypalWithdrawService;
-
-	@Autowired
 	protected PaypalPresaleService paypalPresaleService;
 
 	protected double getPayPalTotalOrder(int userId, double amount) {
@@ -199,5 +195,11 @@ public class BaseResolver {
 		User user = userService.getUserById(userId);
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
 		return amount * tierFeeRate / 100 + 0.3;
+	}
+
+	protected double getCryptoFee(int userId, double amount) {
+		User user = userService.getUserById(userId);
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		return amount * tierFeeRate / 100;
 	}
 }

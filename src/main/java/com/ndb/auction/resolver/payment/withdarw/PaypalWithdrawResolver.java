@@ -6,7 +6,9 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
+	@Autowired
+	protected PaypalWithdrawService paypalWithdrawService;
+
     // Create paypal withdraw request!
     /**
      * 
@@ -71,9 +76,18 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<PaypalWithdraw> getPaypalWithdrawByUser(int userId) {
+    public List<PaypalWithdraw> getPaypalWithdrawByUser() {
+        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @SuppressWarnings("unchecked")
+    public List<PaypalWithdraw> getPaypalWithdrawByUserByAdmin(int userId) {
+        return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
+    }
+
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
@@ -91,7 +105,4 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
     public PaypalWithdraw getPaypalWithdrawById(int id) {
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id);
     }
-
-
-
 }

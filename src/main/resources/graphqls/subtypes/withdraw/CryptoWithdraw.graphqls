@@ -1,0 +1,15 @@
+type CryptoWithdraw {
+    id: Int,
+    userId: Int,
+    sourceToken: String,
+    tokenPrice: Float,
+    withdrawAmount: Float,
+    fee: Float,
+    tokenAmount: Float,
+    status: Int,
+    deniedReason: String,
+    requestedAt: Float,
+    confirmedAt: Float,
+    network: String,
+    destination: String
+}

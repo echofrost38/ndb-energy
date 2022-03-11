@@ -28,6 +28,10 @@ public class ThirdAPIUtils {
 
     public double getCryptoPriceBySymbol(String symbol) {
         try {
+            if(symbol.equals("USDT")) {
+                return 1.0;
+            }
+
             String symbolPair = symbol + "USDT";
             CoinPrice objs = binanceAPI.get()
                     .uri(uriBuilder -> uriBuilder.path("/ticker/price")

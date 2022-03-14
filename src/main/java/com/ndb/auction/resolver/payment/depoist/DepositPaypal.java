@@ -59,11 +59,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = 
-            new PaypalDepositTransaction(
-                userId, amount, cryptoType, cryptoPrice, 
-                orderResponse.getId(), orderResponse.getStatus().toString(), fee, deposited
-            );
+        var m = new PaypalDepositTransaction(userId, amount, cryptoType, cryptoPrice, orderResponse.getId(), orderResponse.getStatus().toString(), fee, deposited);
                 
         paypalDepositService.insert(m);
         return orderResponse;

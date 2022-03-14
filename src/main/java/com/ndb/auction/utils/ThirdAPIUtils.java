@@ -3,8 +3,10 @@ package com.ndb.auction.utils;
 import com.google.gson.Gson;
 import com.ndb.auction.payload.CoinPrice;
 import com.ndb.auction.payload.response.FiatConverted;
+import com.ndb.auction.payload.response.FreaksResponse;
 
 import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +16,10 @@ public class ThirdAPIUtils {
 
     private WebClient binanceAPI;
     private WebClient xchangeAPI;
+    private WebClient freaksAPI;
+
+    @Value("${freaks.api.key}")
+    private String freaksApiKey;
 
     private static Gson gson = new Gson();
 
@@ -23,6 +29,9 @@ public class ThirdAPIUtils {
             .build();
         this.xchangeAPI = webClientBuilder
             .baseUrl("https://api.exchangerate.host")
+            .build();
+        this.freaksAPI = webClientBuilder
+            .baseUrl("https://api.currencyfreaks.com")
             .build();
     }
 
@@ -66,6 +75,25 @@ public class ThirdAPIUtils {
                 .block();
             FiatConverted fiatConverted = gson.fromJson(converted, FiatConverted.class);
             return fiatConverted.getResult();
+        } catch (Exception e) {
+        
+        }
+        return 0.0;
+    }
+
+    public double getCurrencyRate(String from) {
+        try {
+            String converted = freaksAPI.get()
+                .uri(uriBuilder -> uriBuilder.path("/latest")
+                    .queryParam("symbols", from)
+                    .queryParam("apikey", freaksApiKey)
+                    .build())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+            var rates = gson.fromJson(converted, FreaksResponse.class);
+            String rateString = rates.getRates().get(from);
+            return Double.parseDouble(rateString);
         } catch (Exception e) {
         
         }

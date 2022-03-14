@@ -1,5 +1,7 @@
 package com.ndb.auction.resolver;
 
+import java.util.Random;
+
 import com.google.gson.Gson;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.security.jwt.JwtUtils;
@@ -197,9 +199,15 @@ public class BaseResolver {
 		return amount * tierFeeRate / 100 + 0.3;
 	}
 
-	protected double getCryptoFee(int userId, double amount) {
+	protected double getTierFee(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
 		return amount * tierFeeRate / 100;
+	}
+
+	protected String getBankUID() {
+		Random rnd = new Random();
+		int number = rnd.nextInt(999999999);
+		return String.format("%06d", number);
 	}
 }

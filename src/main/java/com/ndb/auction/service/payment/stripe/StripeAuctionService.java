@@ -147,7 +147,6 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
 	public boolean UpdateTransaction(int id, Integer status) {
 		
 		PaymentIntent intent;
-		
 		StripeAuctionTransaction tx = (StripeAuctionTransaction) stripeAuctionDao.selectById(id);
 		if(tx == null) {
 			return false;

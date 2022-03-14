@@ -9,9 +9,26 @@ extend type Query {
     getPaypalDepositTxnById(
         id: Int
     ) : PaypalDepositTransaction
+
+    # bank deposit queries
+    getAllBankDepositTxns(
+        orderBy: String
+    ) : [BankDepositTransaction]
+    getBankDepositTxnsByUser(
+        orderBy: String
+    ) : [BankDepositTransaction]
+    getBankDepositTxnById(
+        id: Int
+    ) : BankDepositTransaction
+    getBankDepositTxnByIdByAdmin(
+        id: Int
+    ) : BankDepositTransaction
+    getUnconfirmedBankDepositTxns : [BankDepositTransaction]
+    getUnconfirmedBankDepositTxnsByUser : [BankDepositTransaction]    
 }
 
 extend type Mutation {
+    # paypal deposit
     paypalForDeposit(
         amount: Float,
         currencyCode: String,
@@ -20,6 +37,8 @@ extend type Mutation {
     captureOrderForDeposit(
         orderId: String
     ) : Boolean
+    
+    # stripe deposit
     stripeForDeposit(
         amount: Float,
         cryptoType: String,
@@ -32,4 +51,14 @@ extend type Mutation {
         cryptoType: String,
         cardId: Int
     ) : PayResponse
+
+    # bank deposit
+    bankForDeposit(
+        amount: Float,
+        currencyCode: String,
+        cryptoType: String
+    ) : BankDepositTransaction
+    confirmBankDeposit(
+        id: Int
+    ) : Int
 }

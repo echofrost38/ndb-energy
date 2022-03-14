@@ -42,7 +42,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         }
 
         // double totalUSD = amount * cryptoPrice;
-        double fee = getCryptoFee(userId, amount);
+        double fee = getTierFee(userId, amount);
         double withdrawAmount = amount - fee;
 
         var m = new CryptoWithdraw(userId, withdrawAmount, fee, sourceToken, cryptoPrice, amount, network, des); 

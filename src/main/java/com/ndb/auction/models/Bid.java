@@ -37,6 +37,7 @@ public class Bid {
     private String name;
 
     private int roundId;
+    private int round;
     private Long tokenAmount;
     private Long tokenPrice;
 

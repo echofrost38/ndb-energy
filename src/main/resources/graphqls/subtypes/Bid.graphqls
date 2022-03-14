@@ -3,6 +3,7 @@ type Bid {
 	prefix: String,
 	name: String,
 	roundId: Int,
+	round: Int,
 	tokenAmount: Float,
 	totalAmount: Float,
 	paidAmount: Float,

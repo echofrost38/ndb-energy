@@ -93,6 +93,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
 					// 	return response;
                     // }
                 }
+                bid.setPayType(Bid.STRIPE);
                 bidService.updateBidRanking(bid);
             }
 			response = generateResponse(intent, response);

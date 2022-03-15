@@ -352,12 +352,6 @@ public class UserService extends BaseService {
 		return "Failed";
 	}
 
-	public String changeEmail(int id, String newEmail) {
-		if(userDao.updateEmail(id,newEmail) > 0)
-			return "Success";
-		return "Failed";
-	}
-
 	private boolean sendEmailCode(User user, String template) {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {

@@ -82,7 +82,7 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 			bid.setTokenAmount(newAmount);
 			bid.setTokenPrice(newPrice);
 		}
-
+		bid.setPayType(Bid.WALLET);
 		bidService.updateBidRanking(bid);
 		return "SUCCESS";
 	}

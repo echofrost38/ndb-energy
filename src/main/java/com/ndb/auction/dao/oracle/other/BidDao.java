@@ -91,9 +91,9 @@ public class BidDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, gson.toJson(bid.getHoldingList()), bid.getUserId(), bid.getRoundId());
 	}
 
-	public int updateStatus(int userId, int roundId, int status) {
-		String sql = "UPDATE TBL_BID SET STATUS = ?, UPDATE_DATE=SYSDATE WHERE USER_ID=? AND ROUND_ID=?";
-		return jdbcTemplate.update(sql, status, userId, roundId);
+	public int updateStatus(int userId, int roundId, int payType, int status) {
+		String sql = "UPDATE TBL_BID SET STATUS = ?, UPDATE_DATE=SYSDATE, PAY_TYPE=? WHERE USER_ID=? AND ROUND_ID=?";
+		return jdbcTemplate.update(sql, status, payType, userId, roundId);
 	}
 
 	// For update paid amount 
@@ -118,7 +118,7 @@ public class BidDao extends BaseOracleDao {
 	}
 
 	public List<Bid> getBidListByRound(int roundId) {
-		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME, TBL_AUCTION.ROUND FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID LEFT JOIN TBL_AUCTION on TBL_BID.ROUND_ID = TBL_AUCTION.ID WHERE ROUND_ID=? AND STATUS != 0 ORDER BY TOKEN_PRICE DESC";
+		String sql = "SELECT TBL_BID.*,TBL_USER_AVATAR.PREFIX, TBL_USER_AVATAR.NAME, TBL_AUCTION.ROUND FROM TBL_BID LEFT JOIN TBL_USER_AVATAR on TBL_BID.USER_ID=TBL_USER_AVATAR.ID LEFT JOIN TBL_AUCTION on TBL_BID.ROUND_ID = TBL_AUCTION.ID WHERE TBL_BID.ROUND_ID=? AND TBL_BID.STATUS != 0 ORDER BY TBL_BID.TOKEN_PRICE DESC";
 		return jdbcTemplate.query(sql, new RowMapper<Bid>() {
 			@Override
 			public Bid mapRow(ResultSet rs, int rownumber) throws SQLException {

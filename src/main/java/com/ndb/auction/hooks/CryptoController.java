@@ -142,6 +142,7 @@ public class CryptoController extends BaseController {
             
             // Change crypto Hold amount!!!!!!!!!!!!!!!
             balanceService.addHoldBalance(txn.getUserId(), cryptoType, Double.valueOf(amount));
+            bid.setPayType(Bid.CRYPTO);
             bidService.updateBidRanking(bid);
 
             coinpaymentAuctionService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);

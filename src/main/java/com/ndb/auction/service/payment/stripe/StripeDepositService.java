@@ -50,7 +50,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
                     var card = method.getCard();
                     var stripeCustomer = new StripeCustomer(
-                            m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
+                            m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
                     );
 
                     stripeCustomerDao.insert(stripeCustomer);
@@ -75,7 +75,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         return response;
     }
 
-    public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, String customerId) {
+    public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, StripeCustomer customer) {
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
@@ -84,8 +84,9 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                         .setAmount(m.getAmount())
                         .setCurrency("USD")
-                        .setCustomer(customerId)
+                        .setCustomer(customer.getCustomerId())
                         .setConfirm(true)
+                        .setPaymentMethod(customer.getPaymentMethod())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
                 intent = PaymentIntent.create(createParams.build());
@@ -107,7 +108,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     private void handleDepositSuccess(int userId, PaymentIntent intent, String cryptoType) {
 
-        long amount = intent.getAmount();
+        double amount = intent.getAmount() / 100.00;
         double fee = getStripeFee(amount);
         double cryptoPrice = 1.0;
         if(!cryptoType.equals("USDT")) {
@@ -116,7 +117,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         double deposited = (amount - fee) / cryptoPrice;
         var m = new StripeDepositTransaction(
-                userId,amount,cryptoType,cryptoPrice, intent.getId(),
+                userId,(long) amount,cryptoType,cryptoPrice, intent.getId(),
                 intent.getPaymentMethod(),fee,deposited);
 
         insert(m);
@@ -125,7 +126,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "Deposit Successful",
-                String.format("You have successfully deposited %f %s", Double.valueOf(amount) / 100, cryptoType)
+                String.format("You have successfully deposited %f %s", amount / 100, cryptoType)
         );
     }
 

@@ -58,7 +58,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 					
 					var card = method.getCard();
 					var stripeCustomer = new StripeCustomer(
-						m.getUserId(), customer.getId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
+						m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
 					);
 					
 					stripeCustomerDao.insert(stripeCustomer);

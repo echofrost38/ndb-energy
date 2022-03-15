@@ -21,9 +21,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Bid {
 
-    public static final int CREDIT = 1;
+    public static final int STRIPE = 1;
     public static final int CRYPTO = 2;
-    public static final int WALLET = 3;
+    public static final int PAYPAL = 3;
+    public static final int WALLET = 4;
+    // public static final int BANK   = 5;
 	
 	public static final int NOT_CONFIRMED = 0;
 	public static final int WINNER 		  = 1;

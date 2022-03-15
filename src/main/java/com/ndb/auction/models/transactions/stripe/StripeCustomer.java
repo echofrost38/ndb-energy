@@ -11,7 +11,8 @@ public class StripeCustomer {
     
     public StripeCustomer(
         int userId, 
-        String customerId, 
+        String customerId,
+        String paymentMethod,
         String brand,
         String country, 
         Long expMonth,
@@ -20,6 +21,7 @@ public class StripeCustomer {
     {
         this.userId = userId;
         this.customerId = customerId;
+        this.paymentMethod = paymentMethod;
         this.brand = brand;
         this.country = country;
         this.expMonth = expMonth;
@@ -39,4 +41,5 @@ public class StripeCustomer {
     private Long expMonth;
     private Long expYear;
     private String last4;
+    private String paymentMethod;
 }

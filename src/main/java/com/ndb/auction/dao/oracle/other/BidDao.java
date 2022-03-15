@@ -91,9 +91,9 @@ public class BidDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, gson.toJson(bid.getHoldingList()), bid.getUserId(), bid.getRoundId());
 	}
 
-	public int updateStatus(int userId, int roundId, int status) {
-		String sql = "UPDATE TBL_BID SET STATUS = ?, UPDATE_DATE=SYSDATE WHERE USER_ID=? AND ROUND_ID=?";
-		return jdbcTemplate.update(sql, status, userId, roundId);
+	public int updateStatus(int userId, int roundId, int payType, int status) {
+		String sql = "UPDATE TBL_BID SET STATUS = ?, UPDATE_DATE=SYSDATE, PAY_TYPE=? WHERE USER_ID=? AND ROUND_ID=?";
+		return jdbcTemplate.update(sql, status, payType, userId, roundId);
 	}
 
 	// For update paid amount 

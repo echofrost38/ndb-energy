@@ -24,6 +24,7 @@ extend type Mutation {
   ): String
   changeRole(email: String!, role: String!): String
   changePassword(newPassword: String!): String!
+  changeEmail(newEmail: String!): String!
   deleteAccount: String!
   confirmDeleteAccount(text: String!): String!
 }

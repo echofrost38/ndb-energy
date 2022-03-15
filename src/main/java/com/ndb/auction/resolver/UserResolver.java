@@ -47,6 +47,14 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.changePassword(id, newPassword);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public String changeEmail(String newEmail) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
+        return userService.changeEmail(id, newEmail);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public GeoLocation addDisallowed(String country, String countryCode) {
         return userService.addDisallowed(country, countryCode);

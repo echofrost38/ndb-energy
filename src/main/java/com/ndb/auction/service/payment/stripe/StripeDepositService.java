@@ -6,6 +6,7 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
@@ -21,10 +22,13 @@ import java.util.List;
 public class StripeDepositService extends StripeBaseService implements ITransactionService {
 
     private final StripeDepositDao stripeDepositDao;
+    private final InternalBalanceService internalBalanceService;
 
     @Autowired
-    public StripeDepositService(StripeDepositDao stripeDepositDao) {
+    public StripeDepositService(StripeDepositDao stripeDepositDao,
+                                InternalBalanceService internalBalanceService) {
         this.stripeDepositDao = stripeDepositDao;
+        this.internalBalanceService = internalBalanceService;
     }
 
     public PayResponse createDeposit(StripeDepositTransaction m, boolean isSaveCard) {
@@ -121,6 +125,8 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                 intent.getPaymentMethod(),fee,deposited);
 
         insert(m);
+
+        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
 
         notificationService.sendNotification(
                 userId,

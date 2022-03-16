@@ -24,13 +24,13 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
 
     @Override
     public PayResponse createNewTransaction(StripeDepositTransaction _m, boolean isSaveCard) {
-        StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
+        StripeAuctionTransaction m = (StripeAuctionTransaction)_m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
         try {
             if (m.getPaymentIntentId() == null) {
-
-                // Create new PaymentIntent for the order
+            	
+            	// Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency("usd")
                         .setAmount(m.getAmount())
@@ -38,21 +38,21 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
                         .setConfirm(true);
-
+                
                 // check save card
-                if (isSaveCard) {
+                if(isSaveCard) {
                     Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
                     createParams.setCustomer(customer.getId());
                     createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
-
+                    
                     // save customer
                     PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
-
+                    
                     Card card = method.getCard();
                     StripeCustomer stripeCustomer = new StripeCustomer(
-                            m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
+                        m.getUserId(), customer.getId(), m.getPaymentMethodId(),card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
                     );
-
+                    
                     stripeCustomerDao.insert(stripeCustomer);
                 }
 
@@ -65,23 +65,23 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 intent = intent.confirm();
             }
 
-            if (intent.getStatus().equals("requires_capture")) {
+            if(intent.getStatus().equals("requires_capture")) {
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
-                Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
-                if (bid == null) {
+				Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
+                if(bid == null) {
                     throw new BidException("no_bid", "auctionId");
                 }
 
-                // double paidAmount = intent.getAmount().doubleValue();
+				// double paidAmount = intent.getAmount().doubleValue();
 
-                if (bid.isPendingIncrease()) {
+				if(bid.isPendingIncrease()) {
                     // double pendingPrice = bid.getDelta();
                     // Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
                     // if(totalOrder * 100 > paidAmount) {
                     //     response.setError("Insufficient funds");
-                    // 	return response;
+					// 	return response;
                     // }
-
+                    
                     bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
                     bid.setTokenAmount(bid.getTempTokenAmount());
                     bid.setTokenPrice(bid.getTempTokenPrice());
@@ -90,86 +90,19 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                     // Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
                     // if(totalOrder * 100 > paidAmount) {
                     //     response.setError("Insufficient funds");
-                    // 	return response;
+					// 	return response;
                     // }
                 }
-                bid.setPayType(Bid.STRIPE);
                 bidService.updateBidRanking(bid);
             }
-            response = generateResponse(intent, response);
-
+			response = generateResponse(intent, response);
+                        
         } catch (Exception e) {
             // Handle "hard declines" e.g. insufficient funds, expired card, etc
             // See https://stripe.com/docs/declines/codes for more
-            response.setError(e.getMessage());
+        	response.setError(e.getMessage());
         }
-        return response;
-    }
-
-    public PayResponse createNewTransactionWithSavedCard(StripeDepositTransaction _m, StripeCustomer customer) {
-        StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
-        PaymentIntent intent;
-        PayResponse response = new PayResponse();
-        try {
-            if (m.getPaymentIntentId() == null) {
-                // Create new PaymentIntent for the order
-                PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
-                        .setCurrency("usd")
-                        .setAmount(m.getAmount())
-                        .setCustomer(customer.getCustomerId())
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
-                        .setConfirm(true);
-
-                // Create a PaymentIntent with the order amount and currency
-                intent = PaymentIntent.create(createParams.build());
-                stripeAuctionDao.insert(m);
-            } else {
-                // Confirm the paymentIntent to collect the money
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-            }
-
-            if (intent.getStatus().equals("requires_capture")) {
-                stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
-                Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
-                if (bid == null) {
-                    throw new BidException("no_bid", "auctionId");
-                }
-
-                // double paidAmount = intent.getAmount().doubleValue();
-
-                if (bid.isPendingIncrease()) {
-                    // double pendingPrice = bid.getDelta();
-                    // Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
-                    // if(totalOrder * 100 > paidAmount) {
-                    //     response.setError("Insufficient funds");
-                    // 	return response;
-                    // }
-
-                    bidService.increaseAmount(bid.getUserId(), bid.getRoundId(), bid.getTempTokenAmount(), bid.getTempTokenPrice());
-                    bid.setTokenAmount(bid.getTempTokenAmount());
-                    bid.setTokenPrice(bid.getTempTokenPrice());
-                } else {
-                    // Long totalPrice = bid.getTokenAmount();
-                    // Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
-                    // if(totalOrder * 100 > paidAmount) {
-                    //     response.setError("Insufficient funds");
-                    // 	return response;
-                    // }
-                }
-                bid.setPayType(Bid.STRIPE);
-                bidService.updateBidRanking(bid);
-            }
-            response = generateResponse(intent, response);
-
-        } catch (Exception e) {
-            // Handle "hard declines" e.g. insufficient funds, expired card, etc
-            // See https://stripe.com/docs/declines/codes for more
-            response.setError(e.getMessage());
-        }
-        return response;
+		return response;
     }
 
     @Override
@@ -210,29 +143,29 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
         return stripeAuctionDao.update(userId, auctionId, intentId);
     }
 
-    // update payments - called by closeBid
-    public boolean UpdateTransaction(int id, Integer status) {
-
-        PaymentIntent intent;
-        StripeAuctionTransaction tx = (StripeAuctionTransaction) stripeAuctionDao.selectById(id);
-        if (tx == null) {
-            return false;
-        }
-
-        String paymentIntentId = tx.getPaymentIntentId();
-        try {
-            intent = PaymentIntent.retrieve(paymentIntentId);
-            if (status == Bid.WINNER) {
-                intent.capture();
-                stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CAPTURED);
-            } else {
-                intent.cancel();
-                stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CANCELED);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-        return true;
-    }
+	// update payments - called by closeBid
+	public boolean UpdateTransaction(int id, Integer status) {
+		
+		PaymentIntent intent;
+		StripeAuctionTransaction tx = (StripeAuctionTransaction) stripeAuctionDao.selectById(id);
+		if(tx == null) {
+			return false;
+		}
+		
+		String paymentIntentId = tx.getPaymentIntentId();
+		try {
+			intent = PaymentIntent.retrieve(paymentIntentId);
+			if(status == Bid.WINNER) {
+				intent.capture();		
+				stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CAPTURED);
+			} else {
+				intent.cancel();
+				stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CANCELED);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return false;
+		}	
+		return true;
+	}
 }

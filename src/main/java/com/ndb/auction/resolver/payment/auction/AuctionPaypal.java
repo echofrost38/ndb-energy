@@ -120,7 +120,6 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 			paypalAuctionService.updateOrderStatus(m.getId(), OrderStatus.COMPLETED.toString());
 
 			// update bid 
-			bid.setPayType(Bid.PAYPAL);
 			bidService.updateBidRanking(bid);
 			return true;
 		} else return false;

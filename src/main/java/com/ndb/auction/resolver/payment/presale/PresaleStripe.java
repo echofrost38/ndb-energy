@@ -2,7 +2,6 @@ package com.ndb.auction.resolver.payment.presale;
 
 import java.util.List;
 
-import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
@@ -17,21 +16,20 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-
+    
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSale(int presaleId, int orderId, Long amount, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public PayResponse payStripeForPreSale(
+        int presaleId, 
+        int orderId, 
+        Long amount, 
+        String paymentIntentId, 
+        String paymentMethodId,
+        boolean isSaveCard
+    ) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId, paymentMethodId);
         return stripePresaleService.createNewTransaction(m, isSaveCard);
-    }
-
-    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Long amount, int cardId) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount);
-        return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }
 
     @PreAuthorize("isAuthenticated()")

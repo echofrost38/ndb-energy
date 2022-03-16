@@ -81,24 +81,19 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, StripeCustomer customer) {
         int userId = m.getUserId();
-        PaymentIntent intent = null;
+        PaymentIntent intent;
         PayResponse response = new PayResponse();
         try {
-            if(m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(m.getAmount())
-                        .setCurrency("USD")
-                        .setCustomer(customer.getCustomerId())
-                        .setConfirm(true)
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
-                intent = PaymentIntent.create(createParams.build());
-            } else if (m.getPaymentIntentId() != null) {
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeDepositDao.insert(m);
-            }
+            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                    .setAmount(m.getAmount())
+                    .setCurrency("USD")
+                    .setCustomer(customer.getCustomerId())
+                    .setConfirm(true)
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
+
+            intent = PaymentIntent.create(createParams.build());
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
                 handleDepositSuccess(userId, intent, m.getCryptoType());

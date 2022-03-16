@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.presale;
 
 import java.util.List;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 import com.ndb.auction.payload.response.PayResponse;
@@ -26,10 +27,14 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 
+    @PreAuthorize("isAuthenticated()")
     public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Long amount, int cardId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
+        if(userId != customer.getUserId()){
+            throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");
+        }
         StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }

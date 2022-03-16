@@ -19,10 +19,10 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     protected String paymentMethodId;
     protected String paymentIntentId;
 
-    protected String cryptoType;
-    protected Double cryptoPrice;
-    protected Double fee;
-    protected Double deposited;
+    private String cryptoType;
+    private Double cryptoPrice;
+    private Double fee;
+    private Double deposited;
 
     public StripeDepositTransaction(int userId, Long amount, String cryptoType, String paymentIntentId, String paymentMethodId) {
         this.userId = userId;

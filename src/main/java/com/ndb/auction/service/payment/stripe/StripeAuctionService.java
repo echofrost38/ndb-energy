@@ -106,30 +106,24 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
         return response;
     }
 
-    public PayResponse createNewTransactionWithSavedCard(StripeDepositTransaction _m, StripeCustomer customer) {
-        StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
+    public PayResponse createNewTransactionWithSavedCard(StripeAuctionTransaction m, StripeCustomer customer) {
         PaymentIntent intent;
         PayResponse response = new PayResponse();
         try {
-            if (m.getPaymentIntentId() == null) {
-                // Create new PaymentIntent for the order
-                PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
-                        .setCurrency("usd")
-                        .setAmount(m.getAmount())
-                        .setCustomer(customer.getCustomerId())
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
-                        .setConfirm(true);
 
-                // Create a PaymentIntent with the order amount and currency
-                intent = PaymentIntent.create(createParams.build());
-                stripeAuctionDao.insert(m);
-            } else {
-                // Confirm the paymentIntent to collect the money
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-            }
+            // Create new PaymentIntent for the order
+            PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
+                    .setCurrency("usd")
+                    .setAmount(m.getAmount())
+                    .setCustomer(customer.getCustomerId())
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                    .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
+                    .setConfirm(true);
+
+            // Create a PaymentIntent with the order amount and currency
+            intent = PaymentIntent.create(createParams.build());
+            stripeAuctionDao.insert(m);
 
             if (intent.getStatus().equals("requires_capture")) {
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
@@ -154,7 +148,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 } else {
                     // Long totalPrice = bid.getTokenAmount();
                     // Double totalOrder = getTotalOrder(bid.getUserId(), totalPrice.doubleValue());
-                    // if(totalOrder * 100 > paidAmount) {
+                    // if(totalOrder * 100 > bid.getPaidAmount()) {
                     //     response.setError("Insufficient funds");
                     // 	return response;
                     // }

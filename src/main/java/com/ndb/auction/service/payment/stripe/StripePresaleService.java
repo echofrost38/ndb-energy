@@ -85,8 +85,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         return response;
     }
 
-    public PayResponse createNewTransactionWithSavedCard(StripeDepositTransaction _m, StripeCustomer customer) {
-        StripePresaleTransaction m = (StripePresaleTransaction) _m;
+    public PayResponse createNewTransactionWithSavedCard(StripePresaleTransaction m, StripeCustomer customer) {
+
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
@@ -100,16 +100,18 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         }
 
         try {
-            if (m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount).setCurrency("USD").setCustomer(customer.getCustomerId()).setConfirm(true).setPaymentMethod(customer.getPaymentMethod()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
 
-                intent = PaymentIntent.create(createParams.build());
+            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                    .setAmount(amount)
+                    .setCurrency("USD")
+                    .setCustomer(customer.getCustomerId())
+                    .setConfirm(true)
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                    .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+                    .setConfirm(true);
 
-            } else {
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
-            }
+            intent = PaymentIntent.create(createParams.build());
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 

@@ -22,4 +22,14 @@ public class StripePresaleTransaction extends StripeDepositTransaction {
         this.fiatAmount = amount;
         this.fiatType = "USD";
     }
+
+    public StripePresaleTransaction(int userId, int presaleId, int orderId, Long amount) {
+        this.userId = userId;
+        this.presaleId = presaleId;
+        this.orderId = orderId;
+        this.amount = amount;
+        this.status = false;
+        this.fiatAmount = amount;
+        this.fiatType = "USD";
+    }
 }

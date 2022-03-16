@@ -10,27 +10,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class StripeDepositTransaction extends FiatDepositTransaction {
-    
+
     public static final Integer INITIATED = 0;
-	public static final Integer AUTHORIZED = 1;
-	public static final Integer CAPTURED = 2;
-	public static final Integer CANCELED = 3;
-    
+    public static final Integer AUTHORIZED = 1;
+    public static final Integer CAPTURED = 2;
+    public static final Integer CANCELED = 3;
+
     protected String paymentMethodId;
     protected String paymentIntentId;
 
-    private String cryptoType;
-    private Double cryptoPrice;
-    private Double fee;
-    private Double deposited;
+    protected String cryptoType;
+    protected Double cryptoPrice;
+    protected Double fee;
+    protected Double deposited;
 
-    public StripeDepositTransaction(
-        int userId,
-        Long amount,
-        String cryptoType,
-        String paymentIntentId,
-        String paymentMethodId
-    ) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, String paymentIntentId, String paymentMethodId) {
         this.userId = userId;
         this.amount = amount;
         this.cryptoType = cryptoType;
@@ -38,16 +32,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.paymentMethodId = paymentMethodId;
     }
 
-    public StripeDepositTransaction(
-            int userId,
-            Long amount,
-            String cryptoType,
-            Double cryptoPrice,
-            String paymentIntentId,
-            String paymentMethodId,
-            Double fee,
-            Double deposited
-    ) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
         this.userId = userId;
         this.amount = amount;
         this.fiatAmount = amount;
@@ -60,11 +45,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.deposited = deposited;
     }
 
-    public StripeDepositTransaction(
-            int userId,
-            Long amount,
-            String cryptoType
-    ) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType) {
         this.userId = userId;
         this.amount = amount;
         this.cryptoType = cryptoType;

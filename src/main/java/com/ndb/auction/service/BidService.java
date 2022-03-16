@@ -231,7 +231,7 @@ public class BidService extends BaseService {
 			currentBidList.add(bid);
 		}
 
-		bidDao.updateStatus(userId, roundId, 1);
+		bidDao.updateStatus(userId, roundId, bid.getPayType(), 1);
 		
 		Bid newList[] = new Bid[currentBidList.size()];
 		currentBidList.toArray(newList);
@@ -308,6 +308,7 @@ public class BidService extends BaseService {
 	}
 
 	// not sychnorized
+	@SuppressWarnings("unchecked")
 	public void closeBid(int roundId) {
 
 		Auction auction = auctionDao.getAuctionById(roundId);

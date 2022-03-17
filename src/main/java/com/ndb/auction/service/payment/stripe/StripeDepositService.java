@@ -92,7 +92,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
                     .setPaymentMethod(customer.getPaymentMethod())
-                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.AUTOMATIC);
 
             intent = PaymentIntent.create(createParams.build());
             }

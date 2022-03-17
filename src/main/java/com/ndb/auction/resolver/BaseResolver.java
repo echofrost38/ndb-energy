@@ -37,6 +37,7 @@ import com.ndb.auction.service.payment.stripe.StripeWalletService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.service.user.WhitelistService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.utils.ThirdAPIUtils;
@@ -181,27 +182,38 @@ public class BaseResolver {
 	@Autowired
 	protected PaypalPresaleService paypalPresaleService;
 
+	@Autowired
+	protected WhitelistService whitelistService;
+
 	protected double getPayPalTotalOrder(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
 		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
 	}
 
 	protected double getPaypalFee(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
 		return amount * (PAYPAL_FEE + tierFeeRate) / 100 + 0.3;
 	}
 
 	protected double getPaypalWithdrawFee(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
 		return amount * tierFeeRate / 100 + 0.3;
 	}
 
 	protected double getTierFee(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
 		return amount * tierFeeRate / 100;
 	}
 

@@ -8,6 +8,7 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.tier.Tier;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -43,6 +44,18 @@ public class TierDao extends BaseOracleDao {
 				return extract(rs);
 			}
 		});
+	}
+
+	public Tier selectByLevel(int level) {
+		String sql = "SELECT * FROM TBL_TIER WHERE T_LEVEL = ?";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Tier>() {
+			@Override
+			public Tier extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
+		}, level);
 	}
 
 	public Tier updateUserTier(Tier m) {

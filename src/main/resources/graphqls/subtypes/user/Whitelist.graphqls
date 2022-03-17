@@ -1,0 +1,4 @@
+type Whitelist {
+    userId: Int,
+    reason: String
+}

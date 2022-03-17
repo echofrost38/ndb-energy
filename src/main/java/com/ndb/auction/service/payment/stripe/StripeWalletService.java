@@ -2,6 +2,8 @@ package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
 
+import com.ndb.auction.dao.oracle.other.TierDao;
+import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.balance.FiatBalance;
@@ -13,6 +15,7 @@ import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.Customer;
@@ -181,6 +184,11 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 				if(tier.getPoint() <= newPoint) {
 					tierLevel = tier.getLevel();
 				}
+			}
+			var tier = tierDao.selectByLevel(tierLevel);
+			if(tier.getName().equals("Diamond")) {
+				var m = new Whitelist(user.getId(), "Diamond Level");
+				whitelistDao.insert(m);
 			}
 			userDao.updateTier(user.getId(), tierLevel, newPoint);
 			tierTaskService.updateTierTask(tierTask);

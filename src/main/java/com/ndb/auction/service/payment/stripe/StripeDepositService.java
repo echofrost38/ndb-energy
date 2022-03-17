@@ -115,7 +115,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
     private void handleDepositSuccess(int userId, PaymentIntent intent, String cryptoType) {
 
         double amount = intent.getAmount() / 100.00;
-        double fee = getStripeFee(amount);
+        double fee = getStripeFee(userId, amount);
         double cryptoPrice = 1.0;
         if(!cryptoType.equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);

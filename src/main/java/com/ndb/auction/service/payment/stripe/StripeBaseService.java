@@ -62,8 +62,12 @@ public class StripeBaseService extends BaseService {
         return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
     }
 
-    public Double getStripeFee(double amount) {
-        return ((amount * STRIPE_FEE) / 100) + 0.30;
+    public Double getStripeFee(int userId, double amount) {
+        User user = userDao.selectById(userId);
+        double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        var white = whitelistDao.selectByUserId(userId);
+        if(white != null) tierFeeRate = 0.0;
+        return (amount * (STRIPE_FEE + tierFeeRate) / 100) + 0.3;
     }
 
     protected PayResponse generateResponse(PaymentIntent intent, PayResponse response) {

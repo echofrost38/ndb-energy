@@ -6,6 +6,7 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
@@ -21,10 +22,13 @@ import java.util.List;
 public class StripeDepositService extends StripeBaseService implements ITransactionService {
 
     private final StripeDepositDao stripeDepositDao;
+    private final InternalBalanceService internalBalanceService;
 
     @Autowired
-    public StripeDepositService(StripeDepositDao stripeDepositDao) {
+    public StripeDepositService(StripeDepositDao stripeDepositDao,
+                                InternalBalanceService internalBalanceService) {
         this.stripeDepositDao = stripeDepositDao;
+        this.internalBalanceService = internalBalanceService;
     }
 
     public PayResponse createDeposit(StripeDepositTransaction m, boolean isSaveCard) {
@@ -77,24 +81,19 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, StripeCustomer customer) {
         int userId = m.getUserId();
-        PaymentIntent intent = null;
+        PaymentIntent intent;
         PayResponse response = new PayResponse();
         try {
-            if(m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(m.getAmount())
-                        .setCurrency("USD")
-                        .setCustomer(customer.getCustomerId())
-                        .setConfirm(true)
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
-                intent = PaymentIntent.create(createParams.build());
-            } else if (m.getPaymentIntentId() != null) {
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeDepositDao.insert(m);
-            }
+            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                    .setAmount(m.getAmount())
+                    .setCurrency("USD")
+                    .setCustomer(customer.getCustomerId())
+                    .setConfirm(true)
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
+
+            intent = PaymentIntent.create(createParams.build());
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
                 handleDepositSuccess(userId, intent, m.getCryptoType());
@@ -122,11 +121,13 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         insert(m);
 
+        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
+
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "Deposit Successful",
-                String.format("You have successfully deposited %f %s", amount / 100, cryptoType)
+                String.format("You have successfully deposited %f %s", deposited , cryptoType)
         );
     }
 

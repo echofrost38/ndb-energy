@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
@@ -19,7 +18,6 @@ import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
-import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.BaseService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -529,12 +527,6 @@ public class UserService extends BaseService {
 	}
 
 	public int updateTier(int id, int tierLevel, Double tierPoint) {
-		// If tierLevel is Diamond automatically added into Whitelist
-		var tier = tierDao.selectByLevel(tierLevel);
-		if(tier.getName().equals("Diamond")) {
-			var m = new Whitelist(id, "Diamond Level");
-			whitelistDao.insert(m);
-		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 

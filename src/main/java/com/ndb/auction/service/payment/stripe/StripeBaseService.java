@@ -57,8 +57,6 @@ public class StripeBaseService extends BaseService {
     public Double getTotalOrder(int userId, double amount) {
         User user = userDao.selectById(userId);
         double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-        var white = whitelistDao.selectByUserId(userId);
-		if(white != null) tierFeeRate = 0.0;
         return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
     }
 

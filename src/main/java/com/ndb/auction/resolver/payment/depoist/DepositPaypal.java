@@ -53,7 +53,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         order.getPurchaseUnits().add(unit);
 
         var appContext = new PayPalAppContextDTO();
-        appContext.setReturnUrl(WEBSITE_URL + "/app/wallet");
+        appContext.setReturnUrl(WEBSITE_URL + "/app/payment");
 		appContext.setBrandName("Deposit");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);

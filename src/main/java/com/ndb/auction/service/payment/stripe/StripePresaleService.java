@@ -23,7 +23,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
     @Override
     public PayResponse createNewTransaction(StripeDepositTransaction _m, boolean isSaveCard) {
-        StripePresaleTransaction m = (StripePresaleTransaction)_m;
+        StripePresaleTransaction m = (StripePresaleTransaction) _m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
@@ -32,66 +32,107 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         int orderId = m.getOrderId();
         Long amount = m.getAmount();
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
-		if(presaleOrder == null) {
-			throw new UserNotFoundException("no_presale_order", "orderId");
-		}
+        if (presaleOrder == null) {
+            throw new UserNotFoundException("no_presale_order", "orderId");
+        }
 
         try {
-			if(m.getPaymentIntentId() == null) {
-				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-					.setAmount(amount)
-					.setCurrency("USD")	
-					.setConfirm(true)
-					.setPaymentMethod(m.getPaymentMethodId())
-					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+            if (m.getPaymentIntentId() == null) {
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
+
+                // check save card
+                if (isSaveCard) {
+                    var customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
+                    createParams.setCustomer(customer.getId());
+                    createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+
+                    // save customer
+                    var method = PaymentMethod.retrieve(m.getPaymentMethodId());
+
+                    var card = method.getCard();
+                    var stripeCustomer = new StripeCustomer(m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4());
+
+                    stripeCustomerDao.insert(stripeCustomer);
+                }
+
+                intent = PaymentIntent.create(createParams.build());
+
+            } else {
+                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+                intent = intent.confirm();
+                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+            }
+
+            if (intent != null && intent.getStatus().equals("succeeded")) {
+
+                // check amount
+                long paidAmount = intent.getAmount();
+                Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
+                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
+                if (totalOrder * 100 > paidAmount) {
+                    throw new UserNotFoundException("no_enough_funds", "amount");
+                }
+
+                handlePresaleOrder(userId, presaleOrder);
+                stripePresaleDao.update(m.getId(), 1);
+            }
+            response = generateResponse(intent, response);
+
+        } catch (Exception e) {
+            response.setError(e.getMessage());
+        }
+
+        return response;
+    }
+
+    public PayResponse createNewTransactionWithSavedCard(StripePresaleTransaction m, StripeCustomer customer) {
+
+        PaymentIntent intent;
+        PayResponse response = new PayResponse();
+
+        // getting ready
+        int userId = m.getUserId();
+        int orderId = m.getOrderId();
+        Long amount = m.getAmount();
+        PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
+        if (presaleOrder == null) {
+            throw new UserNotFoundException("no_presale_order", "orderId");
+        }
+
+        try {
+
+            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                    .setAmount(amount)
+                    .setCurrency("USD")
+                    .setCustomer(customer.getCustomerId())
+                    .setConfirm(true)
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                     .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-					.setConfirm(true);
-				
-				// check save card
-				if(isSaveCard) {
-					var customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
-					createParams.setCustomer(customer.getId());
-					createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
-					
-					// save customer
-					var method = PaymentMethod.retrieve(m.getPaymentMethodId());
-					
-					var card = method.getCard();
-					var stripeCustomer = new StripeCustomer(
-						m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
-					);
-					
-					stripeCustomerDao.insert(stripeCustomer);
-				}
-				
-				intent = PaymentIntent.create(createParams.build());
-				
-			} else {
-				intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-				intent = intent.confirm();
-				m = (StripePresaleTransaction) stripePresaleDao.insert(m);
-			}
-			
-			if(intent != null && intent.getStatus().equals("succeeded")) {
-				
-				// check amount 
-				long paidAmount = intent.getAmount();
-				Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-				double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
-				if(totalOrder * 100 > paidAmount) {
-					throw new UserNotFoundException("no_enough_funds", "amount");
-				}
+                    .setConfirm(true);
 
-				handlePresaleOrder(userId, presaleOrder);
-				stripePresaleDao.update(m.getId(), 1);
-			}
-			response = generateResponse(intent, response);
+            intent = PaymentIntent.create(createParams.build());
 
-		} catch (Exception e) {
-			response.setError(e.getMessage());
-		}
+            if (intent != null && intent.getStatus().equals("succeeded")) {
 
-		return response;
+                // check amount
+                long paidAmount = intent.getAmount();
+                Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
+                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
+                if (totalOrder * 100 > paidAmount) {
+                    throw new UserNotFoundException("no_enough_funds", "amount");
+                }
+
+                handlePresaleOrder(userId, presaleOrder);
+                stripePresaleDao.update(m.getId(), 1);
+            }
+            response = generateResponse(intent, response);
+
+        } catch (Exception e) {
+            response.setError(e.getMessage());
+        }
+
+        return response;
     }
 
     @Override

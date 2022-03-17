@@ -64,7 +64,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             } else if (m.getPaymentIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeDepositDao.insert(m);
+                m = insert(m);
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -81,9 +81,10 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, StripeCustomer customer) {
         int userId = m.getUserId();
-        PaymentIntent intent;
+        PaymentIntent intent = null;
         PayResponse response = new PayResponse();
         try {
+            if(m.getPaymentIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                     .setAmount(m.getAmount())
@@ -94,6 +95,12 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                     .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
             intent = PaymentIntent.create(createParams.build());
+            }
+            else if (m.getPaymentIntentId() != null) {
+                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+                intent = intent.confirm();
+                m = insert(m);
+            }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
                 handleDepositSuccess(userId, intent, m.getCryptoType());

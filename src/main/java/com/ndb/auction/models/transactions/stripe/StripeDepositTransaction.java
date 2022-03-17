@@ -46,8 +46,11 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     }
 
     public StripeDepositTransaction(int userId, Long amount, String cryptoType) {
-        this.userId = userId;
-        this.amount = amount;
-        this.cryptoType = cryptoType;
+        this(userId, amount, cryptoType, null, null);
+    }
+
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, String paymentIntentId) {
+        this(userId, amount, cryptoType, paymentIntentId, null);
+
     }
 }

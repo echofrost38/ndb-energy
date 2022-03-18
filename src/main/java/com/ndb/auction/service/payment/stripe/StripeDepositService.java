@@ -35,10 +35,11 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
+        Double totalAmount = getTotalAmount(userId,m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(m.getAmount())
+                        .setAmount(totalAmount.longValue())
                         .setCurrency("USD")
                         .setConfirm(true)
                         .setPaymentMethod(m.getPaymentMethodId())
@@ -70,7 +71,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             if(intent != null && intent.getStatus().equals("succeeded")) {
 
                 // get real payment!
-                handleDepositSuccess(userId, intent, m.getCryptoType());
+                handleDepositSuccess(userId, intent, m);
             }
             response = generateResponse(intent, response);
         } catch (Exception e) {
@@ -83,11 +84,12 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
+        Double totalAmount = getTotalAmount(userId,m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                    .setAmount(m.getAmount())
+                    .setAmount(totalAmount.longValue())
                     .setCurrency("USD")
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
@@ -105,7 +107,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
-                handleDepositSuccess(userId, intent, m.getCryptoType());
+                handleDepositSuccess(userId, intent, m);
             }
             response = generateResponse(intent, response);
         } catch (Exception e) {
@@ -114,29 +116,28 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         return response;
     }
 
-    private void handleDepositSuccess(int userId, PaymentIntent intent, String cryptoType) {
+    private void handleDepositSuccess(int userId, PaymentIntent intent, StripeDepositTransaction m) {
 
-        double amount = intent.getAmount() / 100.00;
-        double fee = getStripeFee(userId, amount);
+        double fee = getStripeFee(userId, m.getAmount());
         double cryptoPrice = 1.0;
-        if(!cryptoType.equals("USDT")) {
-            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        if(!m.getCryptoType().equals("USDT")) {
+            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
         }
 
-        double deposited = (amount - fee) / cryptoPrice;
-        var m = new StripeDepositTransaction(
-                userId,(long) amount,cryptoType,cryptoPrice, intent.getId(),
+        double deposited = m.getAmount() / cryptoPrice;
+        var depositTransaction = new StripeDepositTransaction(
+                userId, m.getAmount(),m.getCryptoType(),cryptoPrice, intent.getId(),
                 intent.getPaymentMethod(),fee,deposited);
 
-        insert(m);
+        insert(depositTransaction);
 
-        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
+        internalBalanceService.addFreeBalance(userId, m.getCryptoType(), deposited);
 
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "Deposit Successful",
-                String.format("You have successfully deposited %f %s", deposited , cryptoType)
+                String.format("You have successfully deposited %f %s", deposited , m.getCryptoType())
         );
     }
 

@@ -70,6 +70,12 @@ public class StripeBaseService extends BaseService {
         return (amount * (STRIPE_FEE + tierFeeRate) / 100) + 0.3;
     }
 
+    public double getTotalAmount(int userId, double amount) {
+        amount = amount / 100.00;
+        double fee = getStripeFee(userId, amount);
+        return amount + fee;
+    }
+
     protected PayResponse generateResponse(PaymentIntent intent, PayResponse response) {
 		if(intent == null) {
 			response.setError("Unrecognized status");

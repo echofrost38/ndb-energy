@@ -64,7 +64,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             } else if (m.getPaymentIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = insert(m);
+                insert(m);
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -92,14 +92,16 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
                     .setPaymentMethod(customer.getPaymentMethod())
-                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.AUTOMATIC);
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
             intent = PaymentIntent.create(createParams.build());
             }
             else if (m.getPaymentIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
-                intent = intent.confirm();
-                m = insert(m);
+                if(intent.getStatus().equals("requires_confirmation")){
+                    intent = intent.confirm();
+                    insert(m);
+                }
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -138,8 +140,8 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         );
     }
 
-    public StripeDepositTransaction insert(StripeDepositTransaction m) {
-        return (StripeDepositTransaction) stripeDepositDao.insert(m);
+    public int insert(StripeDepositTransaction m) {
+        return stripeDepositDao.insert(m);
     }
 
     @Override

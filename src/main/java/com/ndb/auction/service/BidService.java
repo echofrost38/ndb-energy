@@ -163,8 +163,11 @@ public class BidService extends BaseService {
 		tierTaskService.updateTierTask(tierTask); // TODO: why update?
 		var tier = tierDao.selectByLevel(level);
 		if(tier.getName().equals("Diamond")) {
-			var m = new Whitelist(userId, "Diamond Level");
-			whitelistDao.insert(m);
+			var m = whitelistDao.selectByUserId(userId);
+            if(m == null) {
+                m = new Whitelist(userId, "Diamond Level");
+                whitelistDao.insert(m);
+            }
 		}
 		userDao.updateTier(userId, level, point);
 	}

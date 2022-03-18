@@ -14,8 +14,12 @@ public class WhitelistService {
     private WhitelistDao whitelistDao;
 
     public int insert(int userId, String reason) {
-        Whitelist m = new Whitelist(userId, reason);
-        return whitelistDao.insert(m);
+        var m = whitelistDao.selectByUserId(userId);
+        if(m == null) {
+            m = new Whitelist(userId, "Diamond Level");
+            whitelistDao.insert(m);
+        }
+        return 1;
     }
 
     public Whitelist selectByUser(int userId) {

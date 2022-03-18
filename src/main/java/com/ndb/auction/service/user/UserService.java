@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
@@ -532,8 +531,11 @@ public class UserService extends BaseService {
 		// If tierLevel is Diamond automatically added into Whitelist
 		var tier = tierDao.selectByLevel(tierLevel);
 		if(tier.getName().equals("Diamond")) {
-			var m = new Whitelist(id, "Diamond Level");
-			whitelistDao.insert(m);
+			var m = whitelistDao.selectByUserId(id);
+            if(m != null) {
+                m = new Whitelist(id, "Diamond Level");
+                whitelistDao.insert(m);
+            }
 		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}

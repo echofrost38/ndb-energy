@@ -4,7 +4,6 @@ import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.BaseService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 public class PaypalBaseService extends BaseService {

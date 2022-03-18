@@ -7,6 +7,9 @@ input NamesInput {
 }
 
 extend type Mutation {
+	changeName(
+		newName: String!
+	): String
 	setAvatar(
 		prefix: String!,
 		name: String!

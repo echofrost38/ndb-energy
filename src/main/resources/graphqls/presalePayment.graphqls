@@ -7,12 +7,6 @@ extend type Mutation {
         paymentMethodId: String,
         isSaveCard: Boolean
     ) : PayResponse
-    payStripeForPreSaleWithSavedCard(
-        presaleId: Int,
-        orderId: Int,
-        amount: Float,
-        cardId: Int,
-    ) : PayResponse
     # payment for presale
     createChargeForPresale(
         presaleId: Int,

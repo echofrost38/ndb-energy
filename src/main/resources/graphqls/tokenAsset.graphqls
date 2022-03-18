@@ -19,10 +19,6 @@ extend type Mutation {
         id: Int,
         symbol: String
     ) : Int
-    updateFavorAssets(
-        assets: String
-    ) : Int
-    selectFavorAssets : [String]
 }
 
 schema {

@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ndb.auction.dao.oracle.FavorAssetDao;
 import com.ndb.auction.dao.oracle.TokenAssetDao;
-import com.ndb.auction.models.FavorAsset;
 import com.ndb.auction.models.TokenAsset;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,6 @@ public class TokenAssetService {
     
     @Autowired
     private TokenAssetDao tokenAssetDao;
-
-    @Autowired
-    private FavorAssetDao favorAssetDao;
 
     private List<TokenAsset> assetList;
     private Map<String, Integer> assetMap;
@@ -81,14 +76,5 @@ public class TokenAssetService {
         int result = tokenAssetDao.updateDeleted(id);
         this.fillList();
         return result;
-    }
-
-    public int insertOrUpdate(int userId, String favorAssets) {
-        FavorAsset m = new FavorAsset(userId, favorAssets);
-        return favorAssetDao.insertOrUpdate(m);
-    }
-
-    public FavorAsset selectFavorAsset(int userId) {
-        return favorAssetDao.selectByUserId(userId);
     }
 }

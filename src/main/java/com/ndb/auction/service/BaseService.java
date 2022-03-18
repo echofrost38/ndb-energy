@@ -23,6 +23,7 @@ import com.ndb.auction.dao.oracle.balance.FiatBalanceDao;
 import com.ndb.auction.dao.oracle.other.BidDao;
 import com.ndb.auction.dao.oracle.other.GeoLocationDao;
 import com.ndb.auction.dao.oracle.other.NotificationDao;
+import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleConditionDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
@@ -34,6 +35,7 @@ import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserKybDao;
 import com.ndb.auction.dao.oracle.user.UserSecurityDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
+import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.models.Notification;
@@ -42,6 +44,7 @@ import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
@@ -64,7 +67,6 @@ public class BaseService {
     public static final String COINS_API_URL = "https://www.coinpayments.net/api.php";
 
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
-    public final static String CONFIRM_EMAIL_CHANGE_TEMPLATE = "confirmEmailChange.ftlh";
     public final static String _2FA_TEMPLATE = "2faEmail.ftlh";
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
@@ -217,6 +219,12 @@ public class BaseService {
     @Autowired
     protected PaypalPresaleDao paypalPresaleDao;
 
+    @Autowired
+    protected WhitelistDao whitelistDao;
+
+    @Autowired
+    protected TierDao tierDao;
+
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {
@@ -266,6 +274,12 @@ public class BaseService {
 			if(tier.getPoint() <= newPoint) {
 				tierLevel = tier.getLevel();
 			}
+		}
+
+        var tier = tierDao.selectByLevel(tierLevel);
+		if(tier.getName().equals("Diamond")) {
+			var m = new Whitelist(userId, "Diamond Level");
+			whitelistDao.insert(m);
 		}
 
 		userDao.updateTier(userId, tierLevel, newPoint);

@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Repository
 @NoArgsConstructor
 @Table(name = "TBL_STRIPE_AUCTION")
-public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
+public class StripeAuctionDao extends BaseOracleDao {
 
     private static StripeAuctionTransaction extract(ResultSet rs) throws SQLException {
 		StripeAuctionTransaction m = new StripeAuctionTransaction();
@@ -43,83 +43,41 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
 		return m;
 	}
 
-    @Override
-    public Transaction insert(Transaction _m) {
+    public int insert(Transaction _m) {
         StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
         String sql = "INSERT INTO TBL_STRIPE_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,AUCTION_ID,BID_ID)"
         + " VALUES(SEQ_STRIPE_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(
-                new PreparedStatementCreator() {
-                    @Override
-                    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                        PreparedStatement ps = connection.prepareStatement(sql,
-                                new String[] { "ID" });
-                        int i = 1;
-                        ps.setInt(i++, m.getUserId());
-                        ps.setDouble(i++, m.getAmount());
-                        ps.setString(i++, m.getFiatType());
-                        ps.setDouble(i++, m.getFiatAmount());
-                        ps.setString(i++, m.getPaymentMethodId());
-                        ps.setString(i++, m.getPaymentIntentId());
-                        ps.setInt(i++, m.getAuctionId());
-                        ps.setInt(i++, m.getBidId());
-                        return ps;
-                    }
-                }, keyHolder);
-        m.setId(keyHolder.getKey().intValue());
-        return m;
+        return jdbcTemplate.update(sql,m.getUserId(), m.getAmount(), m.getFiatType(), m.getFiatAmount(), m.getPaymentMethodId(), m.getPaymentIntentId(), m.getAuctionId(), m.getBidId());
     }
 
-    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
         String sql = "SELECT * FROM TBL_STRIPE_AUCTION";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<StripeAuctionTransaction>() {
-			@Override
-			public StripeAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
-    @Override
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
         String sql = "SELECT * FROM TBL_STRIPE_AUCTION WHERE USER_ID = ?";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<StripeAuctionTransaction>() {
-			@Override
-			public StripeAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
-    @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_STRIPE_AUCTION WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<StripeAuctionTransaction>() {
-			@Override
-			public StripeAuctionTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
 		}, id);
     }
 
     public List<StripeAuctionTransaction> selectByIds(int auctionId, int userId) {
         String sql = "SELECT * FROM TBL_STRIPE_AUCTION WHERE USER_ID = ? AND AUCTION_ID=?";
-		return jdbcTemplate.query(sql, new RowMapper<StripeAuctionTransaction>() {
-			@Override
-			public StripeAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId, auctionId);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, auctionId);
     }
 
     public List<StripeAuctionTransaction> selectByRound(int auctionId, String orderBy) {
@@ -127,15 +85,9 @@ public class StripeAuctionDao extends BaseOracleDao implements ITransactionDao {
         if (orderBy == null)
             orderBy = "ID";
         sql += " ORDER BY " + orderBy;
-        return jdbcTemplate.query(sql, new RowMapper<StripeAuctionTransaction>() {
-			@Override
-			public StripeAuctionTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, auctionId);
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), auctionId);
     }
 
-    @Override
     public int update(int id, int status) {
         String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, UPDATED_AT=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, status, id);

@@ -6,6 +6,11 @@ type Query {
   getUserCount: Int
   getPaginatedUsers(key: String, limit: Int!): [User]
   getDisallowed: [GeoLocation]
+  getWhitelistByUser(
+    userId: Int
+  ) : Whitelist
+  getWhitelists : [Whitelist]
+  checkWhitelist: Whitelist
 }
 
 extend type Mutation {
@@ -24,10 +29,15 @@ extend type Mutation {
   ): String
   changeRole(email: String!, role: String!): String
   changePassword(newPassword: String!): String!
-  requestEmailChange: String!
-  confirmEmailChange(code: String!, newEmail: String!): String!
   deleteAccount: String!
   confirmDeleteAccount(text: String!): String!
+  putInWhitelist(
+    userId: Int,
+    reason: String
+  ) : Int
+  removeFromWhitelist(
+    userId: Int
+  ) : Int
 }
 
 schema {

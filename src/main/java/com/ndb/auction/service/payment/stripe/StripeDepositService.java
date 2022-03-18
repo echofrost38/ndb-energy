@@ -6,6 +6,7 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
@@ -21,10 +22,13 @@ import java.util.List;
 public class StripeDepositService extends StripeBaseService implements ITransactionService {
 
     private final StripeDepositDao stripeDepositDao;
+    private final InternalBalanceService internalBalanceService;
 
     @Autowired
-    public StripeDepositService(StripeDepositDao stripeDepositDao) {
+    public StripeDepositService(StripeDepositDao stripeDepositDao,
+                                InternalBalanceService internalBalanceService) {
         this.stripeDepositDao = stripeDepositDao;
+        this.internalBalanceService = internalBalanceService;
     }
 
     public PayResponse createDeposit(StripeDepositTransaction m, boolean isSaveCard) {
@@ -60,7 +64,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             } else if (m.getPaymentIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeDepositDao.insert(m);
+                m = insert(m);
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -81,19 +85,21 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         PayResponse response = new PayResponse();
         try {
             if(m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(m.getAmount())
-                        .setCurrency("USD")
-                        .setCustomer(customer.getCustomerId())
-                        .setConfirm(true)
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
-                intent = PaymentIntent.create(createParams.build());
-            } else if (m.getPaymentIntentId() != null) {
+            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                    .setAmount(m.getAmount())
+                    .setCurrency("USD")
+                    .setCustomer(customer.getCustomerId())
+                    .setConfirm(true)
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.AUTOMATIC);
+
+            intent = PaymentIntent.create(createParams.build());
+            }
+            else if (m.getPaymentIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripeDepositTransaction) stripeDepositDao.insert(m);
+                m = insert(m);
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -109,7 +115,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
     private void handleDepositSuccess(int userId, PaymentIntent intent, String cryptoType) {
 
         double amount = intent.getAmount() / 100.00;
-        double fee = getStripeFee(amount);
+        double fee = getStripeFee(userId, amount);
         double cryptoPrice = 1.0;
         if(!cryptoType.equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
@@ -122,11 +128,13 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         insert(m);
 
+        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
+
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "Deposit Successful",
-                String.format("You have successfully deposited %f %s", amount / 100, cryptoType)
+                String.format("You have successfully deposited %f %s", deposited , cryptoType)
         );
     }
 

@@ -38,14 +38,14 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDepositWithSavedCard(Long amount, String cryptoType, int cardId) {
+    public PayResponse stripeForDepositWithSavedCard(Long amount, String cryptoType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if(userId != customer.getUserId()){
             throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");
         }
-        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType);
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId);
         return stripeDepositService.createDepositWithSavedCard(m, customer);
     }
 

@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.KYCSetting;
-import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.Names;
+import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -21,9 +25,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.exceptions.UserNotFoundException;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -169,6 +170,19 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return shuftiService.getShuftiReference(userId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public String changeEmail(String newEmail) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return null;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public int confirmChangeEmail(String email, Map<String,String> codeMap) {
+        
+        return 0;
     }
 
 }

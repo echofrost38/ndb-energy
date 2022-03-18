@@ -34,6 +34,10 @@ public class TierService {
 		return tier;
 	}
 
+	public Tier selectByLevel(int level) {
+		return tierDao.selectByLevel(level);
+	}
+
 	public List<Tier> getUserTiers() {
 		if(this.tierList == null) {
 			fillTierList();

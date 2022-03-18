@@ -42,6 +42,10 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 		// Get total order in USD
 		double totalOrder = 0.0;
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
+
 		if(bid.isPendingIncrease()) {
 			double delta = bid.getDelta();
 			totalOrder = 100 * delta / (100 - tierFeeRate);
@@ -82,7 +86,7 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 			bid.setTokenAmount(newAmount);
 			bid.setTokenPrice(newPrice);
 		}
-
+		bid.setPayType(Bid.WALLET);
 		bidService.updateBidRanking(bid);
 		return "SUCCESS";
 	}

@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
+import com.ndb.auction.dao.oracle.other.TierDao;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
@@ -18,6 +19,7 @@ import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
+import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.BaseService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +79,7 @@ public class UserService extends BaseService {
 			userVerify.setEmailVerified(true);
 			userVerifyDao.insert(userVerify);
 
-			// add internal balance
+			// add internal balance 
 			int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
 			balanceDao.addFreeBalance(user.getId(), ndbId, 0);
 
@@ -104,7 +106,7 @@ public class UserService extends BaseService {
 	}
 
 
-
+	
 	public String request2FA(String email, String method, String phone) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
@@ -131,7 +133,7 @@ public class UserService extends BaseService {
 			} else {
 				// Generate proper TOTP code
 				String code = totpService.get2FACode(email);
-
+				
 				switch (method) {
 					case "app":
 					String tfaSecret = totpService.generateSecret();
@@ -152,22 +154,22 @@ public class UserService extends BaseService {
 					} catch (MessagingException | IOException | TemplateException e) {
 						return "error"; // or exception
 					}
-					default:
+					default: 
 					return String.format("There is no %s", method);
 				}
 			}
 		}
 		currentSecurity = userSecurityDao.insert(currentSecurity);
-
+		
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
-
+		
 		if (userVerify == null || !userVerify.isEmailVerified()) {
 			throw new UnauthorizedException("Your account is not verified", "email");
 		}
-
+		
 		// Generate proper TOTP code
 		String code = totpService.get2FACode(email);
-
+		
 		switch (method) {
 			case "app":
 			String tfaSecret = totpService.generateSecret();
@@ -189,10 +191,10 @@ public class UserService extends BaseService {
 				return "error"; // or exception
 			}
 		}
-
+		
 		return null;
 	}
-
+	
 	public String disable2FA(int userId, String method) {
 		try{
 			userSecurityDao.updateTfaDisabled(userId, method, false);
@@ -201,14 +203,14 @@ public class UserService extends BaseService {
 		}
 		return "Success";
 	}
-
+	
 	public String confirmRequest2FA(String email, String method, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
 			throw new UserNotFoundException("Cannot find user by " + email, "email");
 		}
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
-
+		
 		if (userVerify == null || !userVerify.isEmailVerified()) {
 			throw new UnauthorizedException("Your account is not verified", "email");
 		}
@@ -220,7 +222,7 @@ public class UserService extends BaseService {
 
 		boolean status = false;
 		int userSecurityId = 0;
-
+		
 		for(UserSecurity userSecurity : userSecurities) {
 			if (userSecurity.getAuthType().equals(method)) {
 				if (method.equals("app")) {
@@ -253,7 +255,7 @@ public class UserService extends BaseService {
 			String method;
 			if (userSecurity == null || (method = userSecurity.getAuthType()) == null)
 				return "error";
-
+			
 			if(userSecurity.isTfaEnabled()) {
 				mfaEnabled = true;
 			} else {
@@ -352,39 +354,10 @@ public class UserService extends BaseService {
 		return "Failed";
 	}
 
-	public String requestEmailChange(int id) {
-        User user = userDao.selectById(id);
-        if(sendEmailCode(user,CONFIRM_EMAIL_CHANGE_TEMPLATE)) return "Sent";
-        else return "Error";
-	}
-
-	public String confirmEmailChange(int id,  String code, String newEmail) {
-        User user = userDao.selectById(id);
-        boolean status = totpService.checkVerifyCode(user.getEmail(),code);
-        if(status) {
-            try {
-				totpService.clearOTP(user.getEmail());
-                userDao.updateEmail(id,newEmail);
-                return "Success";
-            } catch (Exception e){
-                return "Error";
-            }
-        }
-        else{
-            return "Invalid Code";
-        }
-	}
-
-	public String changeName(int id, String newName) {
-		if(userAvatarDao.changeName(id, newName) > 0)
-			return "Success";
-		return "Failed";
-	}
-
 	private boolean sendEmailCode(User user, String template) {
 		String code = totpService.getVerifyCode(user.getEmail());
 		try {
-			mailService.sendVerifyEmail(user, code, template);
+			mailService.sendVerifyEmail(user, code, VERIFY_TEMPLATE);
 		} catch (Exception e) {
 			return false; // or exception
 		}
@@ -393,7 +366,7 @@ public class UserService extends BaseService {
 
 	public User getUserById(int id) {
 		User user = userDao.selectById(id);
-
+		
 		user.setAvatar(userAvatarDao.selectById(id));
 		user.setSecurity(userSecurityDao.selectByUserId(id));
 		user.setVerify(userVerifyDao.selectById(id));
@@ -498,7 +471,7 @@ public class UserService extends BaseService {
 		}
 		return "Success";
 	}
-
+	
 	@Transactional
 	public String createNewUser(User user, String rPassword) {
 
@@ -556,6 +529,12 @@ public class UserService extends BaseService {
 	}
 
 	public int updateTier(int id, int tierLevel, Double tierPoint) {
+		// If tierLevel is Diamond automatically added into Whitelist
+		var tier = tierDao.selectByLevel(tierLevel);
+		if(tier.getName().equals("Diamond")) {
+			var m = new Whitelist(id, "Diamond Level");
+			whitelistDao.insert(m);
+		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 

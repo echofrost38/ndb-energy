@@ -49,7 +49,8 @@ extend type Mutation {
     stripeForDepositWithSavedCard(
         amount: Float,
         cryptoType: String,
-        cardId: Int
+        cardId: Int,
+        paymentIntentId: String
     ) : PayResponse
 
     # bank deposit

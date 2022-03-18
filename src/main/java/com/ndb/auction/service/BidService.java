@@ -10,6 +10,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ndb.auction.dao.oracle.other.TierDao;
+import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
@@ -27,6 +29,7 @@ import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
+import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.utils.Sort;
@@ -158,6 +161,11 @@ public class BidService extends BaseService {
 			}
 		}
 		tierTaskService.updateTierTask(tierTask); // TODO: why update?
+		var tier = tierDao.selectByLevel(level);
+		if(tier.getName().equals("Diamond")) {
+			var m = new Whitelist(userId, "Diamond Level");
+			whitelistDao.insert(m);
+		}
 		userDao.updateTier(userId, level, point);
 	}
 
@@ -231,7 +239,7 @@ public class BidService extends BaseService {
 			currentBidList.add(bid);
 		}
 
-		bidDao.updateStatus(userId, roundId, 1);
+		bidDao.updateStatus(userId, roundId, bid.getPayType(), 1);
 		
 		Bid newList[] = new Bid[currentBidList.size()];
 		currentBidList.toArray(newList);
@@ -308,6 +316,7 @@ public class BidService extends BaseService {
 	}
 
 	// not sychnorized
+	@SuppressWarnings("unchecked")
 	public void closeBid(int roundId) {
 
 		Auction auction = auctionDao.getAuctionById(roundId);

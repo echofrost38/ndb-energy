@@ -19,17 +19,17 @@ extend type Query {
     # Get Stripe Transaction for deposit
     getStripeDepositTx(
         orderBy: String
-    ) : [StripeWalletTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxByUser(
         orderBy: String
-    ) : [StripeWalletTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxByAdmin(
         userId: Int,
         orderBy: String
-    ) : [StripeWalletTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxById(
         id: Int
-    ) : StripeWalletTransaction
+    ) : StripeDepositTransaction
 }
 
 extend type Mutation {

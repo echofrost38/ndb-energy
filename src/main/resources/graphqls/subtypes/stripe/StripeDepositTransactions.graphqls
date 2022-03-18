@@ -1,0 +1,16 @@
+type StripeDepositTransaction {
+    id: Int,
+    userId: Int!,
+    amount: Float,
+    createdAt: Float,
+    confirmedAt: Float,
+    status: Boolean,
+    fiatType: String,
+    fiatAmount: Float,
+    paymentIntentId: String,
+    paymentMethodId: String,
+    cryptoType: String,
+    cryptoPrice: Float,
+    fee: Float,
+    deposited: Float
+}

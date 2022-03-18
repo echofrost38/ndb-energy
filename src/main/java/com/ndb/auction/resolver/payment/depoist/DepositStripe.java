@@ -51,26 +51,26 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<StripeWalletTransaction> getStripeDepositTx(String orderBy) {
-        return (List<StripeWalletTransaction>) stripeWalletService.selectAll(orderBy);
+    public List<StripeDepositTransaction> getStripeDepositTx(String orderBy) {
+        return (List<StripeDepositTransaction>) stripeDepositService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<StripeWalletTransaction> getStripeDepositTxByUser(String orderBy) {
+    public List<StripeDepositTransaction> getStripeDepositTxByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<StripeWalletTransaction>) stripeWalletService.selectByUser(userId, orderBy);
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
-    public List<StripeWalletTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
-        return (List<StripeWalletTransaction>) stripeWalletService.selectByUser(userId, orderBy);
+    public List<StripeDepositTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public StripeWalletTransaction getStripeDepositTxById(int id) {
-        return (StripeWalletTransaction) stripeWalletService.selectById(id);
+    public StripeDepositTransaction getStripeDepositTxById(int id) {
+        return (StripeDepositTransaction) stripeDepositService.selectById(id);
     }
 }

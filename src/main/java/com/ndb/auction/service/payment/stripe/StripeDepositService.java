@@ -118,15 +118,16 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     private void handleDepositSuccess(int userId, PaymentIntent intent, StripeDepositTransaction m) {
 
-        double fee = getStripeFee(userId, m.getAmount());
+        double amount = m.getAmount() / 100.00;
+        double fee = getStripeFee(userId, amount);
         double cryptoPrice = 1.0;
         if(!m.getCryptoType().equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
         }
 
-        double deposited = m.getAmount() / cryptoPrice;
+        double deposited = amount / cryptoPrice;
         var depositTransaction = new StripeDepositTransaction(
-                userId, m.getAmount(),m.getCryptoType(),cryptoPrice, intent.getId(),
+                userId, (long) amount ,m.getCryptoType(),cryptoPrice, intent.getId(),
                 intent.getPaymentMethod(),fee,deposited);
 
         insert(depositTransaction);

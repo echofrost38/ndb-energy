@@ -71,7 +71,6 @@ public class StripeBaseService extends BaseService {
     }
 
     public double getTotalAmount(int userId, double amount) {
-        amount = amount / 100.00;
         double fee = getStripeFee(userId, amount);
         return amount + fee;
     }

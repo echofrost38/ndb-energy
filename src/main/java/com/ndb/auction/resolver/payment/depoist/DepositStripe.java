@@ -5,7 +5,6 @@ import java.util.List;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
-import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.payment.stripe.StripeDepositService;

@@ -17,6 +17,7 @@ import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
 import com.ndb.auction.service.user.UserDetailsImpl;
 

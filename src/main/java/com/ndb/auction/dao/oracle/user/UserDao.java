@@ -208,11 +208,6 @@ public class UserDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, password, id);
 	}
 
-	public int updateEmail(int id, String email) {
-		String sql = "UPDATE TBL_USER SET EMAIL=? WHERE ID=?";
-		return jdbcTemplate.update(sql, email, id);
-	}
-
 	public int updateName(int id, String name) {
 		String sql = "UPDATE TBL_USER SET NAME=? WHERE ID=?";
 		return jdbcTemplate.update(sql, name, id);

@@ -52,9 +52,9 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
     public int insert(Transaction _m) {
         StripeDepositTransaction m = (StripeDepositTransaction) _m;
         String sql = "INSERT INTO TBL_STRIPE_DEPOSIT(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,INTENT_ID,METHOD_ID,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
-                + " VALUES(SEQ_STRIPE_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?,?)";
+                + " VALUES(SEQ_STRIPE_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?)";
 
-        return jdbcTemplate.update(sql, m.getUserId(), m.getAmount(), m.getFiatType(),
+        return jdbcTemplate.update(sql, m.getUserId(), m.getAmount(), m.getStatus(), m.getFiatType(),
                 m.getFiatAmount(), m.getPaymentIntentId(), m.getPaymentMethodId(),
                 m.getCryptoType(), m.getCryptoPrice(), m.getFee(), m.getDeposited());
         }

@@ -30,6 +30,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.cryptoType = cryptoType;
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
+        this.status = false;
     }
 
     public StripeDepositTransaction(int userId, Long amount, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
@@ -43,6 +44,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.paymentMethodId = paymentMethodId;
         this.fee = fee;
         this.deposited = deposited;
+        this.status = false;
     }
 
     public StripeDepositTransaction(int userId, Long amount, String cryptoType) {

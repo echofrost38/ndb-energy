@@ -21,9 +21,11 @@ public class StripeAuctionTransaction extends StripeDepositTransaction {
     }
 
     public StripeAuctionTransaction(int userId, int auctionId, Long amount) {
-        this.userId = userId;
-        this.auctionId = auctionId;
-        this.amount = amount;
+       this(userId, auctionId, amount,null,null);
+    }
+
+    public StripeAuctionTransaction(int userId, int auctionId, Long amount, String paymentIntentId ) {
+     this(userId, auctionId, amount, paymentIntentId, null);
     }
 
     private int auctionId;

@@ -12,6 +12,7 @@ extend type Mutation {
         orderId: Int,
         amount: Float,
         cardId: Int,
+        paymentIntentId: String
     ) : PayResponse
     # payment for presale
     createChargeForPresale(

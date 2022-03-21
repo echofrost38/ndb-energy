@@ -28,14 +28,14 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Long amount, int cardId) {
+    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Long amount, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if(userId != customer.getUserId()){
             throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");
         }
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }
 

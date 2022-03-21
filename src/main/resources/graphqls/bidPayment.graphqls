@@ -57,7 +57,8 @@ extend type Mutation {
 	payStripeForAuctionWithSavedCard (
 		roundId: Int,
 		amount: Float,
-		cardId: Int
+		cardId: Int,
+		paymentIntentId: String
 	) : PayResponse!
     createCryptoPaymentForAuction(
 		roundId: Int!,

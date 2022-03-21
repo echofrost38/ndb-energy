@@ -101,17 +101,24 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         try {
 
-            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                    .setAmount(amount)
-                    .setCurrency("USD")
-                    .setCustomer(customer.getCustomerId())
-                    .setConfirm(true)
-                    .setPaymentMethod(customer.getPaymentMethod())
-                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                    .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-                    .setConfirm(true);
+            if(m.getPaymentIntentId() == null) {
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                        .setAmount(amount)
+                        .setCurrency("USD")
+                        .setCustomer(customer.getCustomerId())
+                        .setConfirm(true)
+                        .setPaymentMethod(customer.getPaymentMethod())
+                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+                        .setConfirm(true);
 
-            intent = PaymentIntent.create(createParams.build());
+                intent = PaymentIntent.create(createParams.build());
+            }
+            else {
+                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+                intent = intent.confirm();
+                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+            }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 

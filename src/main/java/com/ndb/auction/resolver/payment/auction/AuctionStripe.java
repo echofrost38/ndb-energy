@@ -67,14 +67,14 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Long amount, int cardId) {
+    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Long amount, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if (userId != customer.getUserId()) {
             throw new UnauthorizedException("The user is not authorized to use this card.", "USER_ID");
         }
-        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount);
+        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId);
         return stripeAuctionService.createNewTransactionWithSavedCard(m, customer);
     }
 }

@@ -1,22 +1,15 @@
 package com.ndb.auction.dao.oracle.transactions.stripe;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
-import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -101,6 +94,11 @@ public class StripeAuctionDao extends BaseOracleDao {
     public int updatePaymentStatus(String paymentIntentId, int status) {
         String sql = "UPDATE TBL_STRIPE_AUCTION SET STATUS=?, UPDATED_AT=SYSDATE WHERE INTENT_ID=?";
 		return jdbcTemplate.update(sql, status, paymentIntentId);
+    }
+
+    public List<StripeAuctionTransaction> selectRange(int userId, long from, long to) {
+        String sql = "SELECT * FROM TBL_STRIPE_AUCTION WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     
 }

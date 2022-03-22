@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -13,8 +14,6 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -79,12 +78,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy + " DESC";
-		return jdbcTemplate.query(sql, new RowMapper<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
@@ -93,25 +87,17 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
-		}, id);
+		return jdbcTemplate.query(sql, rs -> {
+            if(!rs.next())
+                return null;
+            return extract(rs);
+        }, id);
     }
 
     @Override
@@ -122,34 +108,26 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 
     public BankDepositTransaction selectByUid(String uid) {
         String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE UID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
-		}, uid);
+		return jdbcTemplate.query(sql, rs -> {
+            if(!rs.next())
+                return null;
+            return extract(rs);
+        }, uid);
     }
 
     public List<BankDepositTransaction> selectUnconfirmedByAdmin() {
         String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE STATUS = 0 ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, new RowMapper<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public List<BankDepositTransaction> selectUnconfirmedByUser(int userId) {
         String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE USER_ID = ? AND STATUS = 0 ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, new RowMapper<BankDepositTransaction>() {
-			@Override
-			public BankDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
+    }
+
+    public List<BankDepositTransaction> selectRange(int userId, long from, long to) {
+        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
 
 }

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -14,8 +15,6 @@ import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -49,13 +48,10 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
     @Override
     public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE ORDER_ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalDepositTransaction>() {
-			@Override
-			public PaypalDepositTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
 		}, orderId);
     }
 
@@ -95,12 +91,7 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<PaypalDepositTransaction>() {
-			@Override
-			public PaypalDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
@@ -109,24 +100,16 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<PaypalDepositTransaction>() {
-			@Override
-			public PaypalDepositTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		return jdbcTemplate.query(sql,(rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<PaypalDepositTransaction>() {
-			@Override
-			public PaypalDepositTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
 		}, id);
     }
 
@@ -139,6 +122,11 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
     public int updateOrderStatus(int id, String status) {
         String sql = "UPDATE TBL_PAYPAL_DEPOSIT SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
+    }
+
+    public List<PaypalDepositTransaction> selectRange(int userId, long from, long to) {
+        String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     
 }

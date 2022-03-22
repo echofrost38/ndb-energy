@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -12,8 +13,6 @@ import com.ndb.auction.models.withdraw.BaseWithdraw;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
@@ -82,47 +81,34 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     @Override
     public List<? extends BaseWithdraw> selectByUser(int userId) {
         var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID = ?";
-        return jdbcTemplate.query(sql, new RowMapper<CryptoWithdraw>() {
-			@Override
-			public CryptoWithdraw mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectByStatus(int userId, int status) {
         var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID=? AND STATUS=?";
-        return jdbcTemplate.query(sql, new RowMapper<CryptoWithdraw>() {
-			@Override
-			public CryptoWithdraw mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId, status);
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectPendings() {
         var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE STATUS=1";
-        return jdbcTemplate.query(sql, new RowMapper<CryptoWithdraw>() {
-			@Override
-			public CryptoWithdraw mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
     public BaseWithdraw selectById(int id) {
         String sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<CryptoWithdraw>() {
-			@Override
-			public CryptoWithdraw extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
 		}, id);
+    }
+
+    public List<CryptoWithdraw> selectRange(int userId, long from, long to) {
+        var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID = ? AND REQUESTED_AT > ? AND REQUESTED_AT < ?";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     
 }

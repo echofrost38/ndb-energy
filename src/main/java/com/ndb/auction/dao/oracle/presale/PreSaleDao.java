@@ -1,5 +1,7 @@
 package com.ndb.auction.dao.oracle.presale;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -10,8 +12,11 @@ import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.presale.PreSale;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;
@@ -47,10 +52,29 @@ public class PreSaleDao extends BaseOracleDao {
 		});
 	}
 
-    public int insert(PreSale m) {
+    public PreSale insert(PreSale m) {
         String sql = "INSERT INTO TBL_PRESALE(ID,ROUND,STARTED_AT,ENDED_AT,TOKEN_AMOUNT,TOKEN_PRICE,SOLD,STATUS)"
             + "VALUES(SEQ_PRESALE.NEXTVAL,?,?,?,?,?,?,?)";
-        return jdbcTemplate.update(sql, m.getRound(), new Timestamp(m.getStartedAt()), new Timestamp(m.getEndedAt()), m.getTokenAmount(), m.getTokenPrice(), 0L, 1);
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+			jdbcTemplate.update(
+				new PreparedStatementCreator() {
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+						PreparedStatement ps = connection.prepareStatement(sql.toString(),
+								new String[] { "ID" });
+						int i = 1;
+						ps.setInt(i++, m.getRound());
+						ps.setTimestamp(i++, new Timestamp(m.getStartedAt()));
+						ps.setTimestamp(i++, new Timestamp(m.getEndedAt()));
+						ps.setLong(i++, m.getTokenAmount());
+						ps.setLong(i++, m.getTokenPrice());
+						ps.setLong(i++, m.getSold());
+						ps.setInt(i++, m.getStatus());
+						return ps;
+					}
+				}, keyHolder);
+			m.setId(keyHolder.getKey().intValue());
+			return m;
     }
 
     public PreSale selectById(int id) {

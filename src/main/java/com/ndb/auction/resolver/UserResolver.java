@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
+
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
-import com.ndb.auction.models.transactions.Statement;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.UserVerify;
@@ -153,11 +153,5 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
-    public Statement getStatement(long from, long to) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return financialService.selectStatements(userId, from, to);
-    }
 
 }

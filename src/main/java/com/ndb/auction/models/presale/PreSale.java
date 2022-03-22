@@ -49,7 +49,6 @@ public class PreSale extends BaseModel {
         this.tokenAmount = tokenAmount;
         this.tokenPrice = tokenPrice;
         this.conditions = conditions;
-        this.sold = 0l;
     }
 
 }

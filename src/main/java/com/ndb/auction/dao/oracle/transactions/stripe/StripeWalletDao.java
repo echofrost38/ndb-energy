@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -118,11 +117,6 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
     public int updatePaymentStatus(String paymentIntentId, int status) {
         String sql = "UPDATE TBL_STRIPE_WALLET SET STATUS=?, UPDATED_AT=SYSDATE WHERE INTENT_ID=?";
 		return jdbcTemplate.update(sql, status, paymentIntentId);
-    }
-
-    public List<StripeWalletTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_STRIPE_WALLET WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     
 }

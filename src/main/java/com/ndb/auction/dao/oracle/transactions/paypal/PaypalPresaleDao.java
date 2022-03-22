@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -146,11 +145,6 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
     public int updateOrderStatus(int id, String status) {
         String sql = "UPDATE TBL_PAYPAL_PRESALE SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
-    }
-
-    public List<PaypalPresaleTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
         
 }

@@ -10,6 +10,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ndb.auction.dao.oracle.other.TierDao;
+import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;

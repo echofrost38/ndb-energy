@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -16,6 +15,8 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -86,7 +87,12 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentPresaleTransaction>() {
+			@Override
+			public CoinpaymentPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		});
     }
 
     @Override
@@ -95,26 +101,44 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentPresaleTransaction>() {
+			@Override
+			public CoinpaymentPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, userId);
     }
 
     public List<? extends Transaction> selectByPresaleId(int presaleId) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE PRESALE_ID = ?";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), presaleId);
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentPresaleTransaction>() {
+			@Override
+			public CoinpaymentPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, presaleId);
     }
 
     public List<? extends Transaction> select(int userId, int presaleId) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE USER_ID = ? AND PRESALE_ID = ?";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, presaleId);
+		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentPresaleTransaction>() {
+			@Override
+			public CoinpaymentPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
+				return extract(rs);
+			}
+		}, userId, presaleId);
     }
 
     @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE ID=?";
-		return jdbcTemplate.query(sql,  rs -> {
-			if (!rs.next())
-				return null;
-			return extract(rs);
+		return jdbcTemplate.query(sql, new ResultSetExtractor<CoinpaymentPresaleTransaction>() {
+			@Override
+			public CoinpaymentPresaleTransaction extractData(ResultSet rs) throws SQLException {
+				if (!rs.next())
+					return null;
+				return extract(rs);
+			}
 		}, id);
     }
 
@@ -139,10 +163,5 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 		String sql = "DELETE FROM TBL_COINPAYMENT_PRESALE WHERE SYSDATE-CREATED_AT>?";
 		return jdbcTemplate.update(sql, days);
 	}
-
-	public List<CoinpaymentPresaleTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
-    }
     
 }

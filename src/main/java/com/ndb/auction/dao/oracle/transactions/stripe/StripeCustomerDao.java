@@ -8,6 +8,8 @@ import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import lombok.NoArgsConstructor;

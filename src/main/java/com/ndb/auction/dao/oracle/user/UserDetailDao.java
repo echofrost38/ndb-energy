@@ -8,9 +8,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -24,20 +26,22 @@ public class UserDetailDao extends BaseOracleDao {
         m.setUserId(rs.getInt("USER_ID"));
         m.setFirstName(rs.getString("FIRST_NAME"));
         m.setLastName(rs.getString("LAST_NAME"));
-        m.setDob(rs.getDate("BIRTHDAYck"));
+        m.setDob(rs.getString("BIRTHDAY"));
         m.setAddress(rs.getString("ADDRESS"));
-        m.setIssueDate(rs.getDate("ISSUE_DATE"));
-        m.setExpiryDate(rs.getDate("EXPIRY_DATE"));
+        m.setIssueDate(rs.getString("ISSUE_DATE"));
+        m.setExpiryDate(rs.getString("EXPIRY_DATE"));
         m.setNationality(rs.getString("NATIONALITY"));
         m.setPersonalNumber(rs.getString("PERSONAL_NUMBER"));
         m.setDocumentNumber(rs.getString("DOCUMENT_NUMBER"));
         m.setAge(rs.getInt("AGE"));
+        m.setHeight(rs.getString("HEIGHT"));
         m.setAuthority(rs.getString("AUTHORITY"));
         m.setCountryCode(rs.getString("COUNTRY_CODE"));
         m.setCountry(rs.getString("COUNTRY"));
         m.setDocumentType(rs.getString("DOCUMENT_TYPE"));
         m.setPlaceOfBirth(rs.getString("PLACE_OF_BIRTH"));
         m.setGender(rs.getString("GENDER"));
+        m.setDeleted(rs.getInt("DELETED"));
 
         return m;
     }
@@ -62,17 +66,17 @@ public class UserDetailDao extends BaseOracleDao {
 
     public List<UserDetail> selectAll(String orderby) {
         String sql = "SELECT * FROM TBL_USER_DETAIL";
-        if (orderby == null)
+        if (orderby == null || orderby.equals(""))
             orderby = "ID";
         sql += " ORDER BY " + orderby;
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public UserDetail insert(UserDetail m) {
-        String sql = "INSERT INTO TBL_USER(ID, USER_ID, FIRST_NAME, LAST_NAME, BIRTHDAY, ADDRESS, ISSUE_DATE, EXPIRY_DATE," +
+        String sql = "INSERT INTO TBL_USER_DETAIL(ID, USER_ID, FIRST_NAME, LAST_NAME, BIRTHDAY, ADDRESS, ISSUE_DATE, EXPIRY_DATE," +
                 " NATIONALITY, PERSONAL_NUMBER, DOCUMENT_NUMBER, AGE, AUTHORITY, COUNTRY_CODE, COUNTRY, DOCUMENT_TYPE," +
-                " PLACE_OF_BIRTH, GENDER)"
-                + "VALUES(SEQ_USER_DETAIL.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                " PLACE_OF_BIRTH, GENDER, HEIGHT, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(SEQ_USER_DETAIL.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 connection -> {
@@ -81,10 +85,10 @@ public class UserDetailDao extends BaseOracleDao {
                     ps.setLong(i++, m.getUserId());
                     ps.setString(i++, m.getFirstName());
                     ps.setString(i++, m.getLastName());
-                    ps.setDate(i++, m.getDob());
+                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getDob())));
                     ps.setString(i++, m.getAddress());
-                    ps.setDate(i++, m.getIssueDate());
-                    ps.setDate(i++, m.getExpiryDate());
+                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getIssueDate())));
+                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getExpiryDate())));
                     ps.setString(i++, m.getNationality());
                     ps.setString(i++, m.getPersonalNumber());
                     ps.setString(i++, m.getDocumentNumber());
@@ -94,7 +98,8 @@ public class UserDetailDao extends BaseOracleDao {
                     ps.setString(i++, m.getCountry());
                     ps.setString(i++, m.getDocumentType());
                     ps.setString(i++, m.getPlaceOfBirth());
-                    ps.setString(i, m.getGender());
+                    ps.setString(i++, m.getGender());
+                    ps.setString(i, m.getHeight());
                     return ps;
                 }, keyHolder);
         m.setId(keyHolder.getKey().intValue());

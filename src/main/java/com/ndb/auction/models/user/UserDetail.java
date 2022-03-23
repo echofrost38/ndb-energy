@@ -1,24 +1,22 @@
 package com.ndb.auction.models.user;
 
 import com.ndb.auction.models.BaseModel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
-
-import java.sql.Date;
 
 @Component
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserDetail extends BaseModel {
 
     private long userId;
     private String firstName;
     private String lastName;
-    private Date issueDate;
-    private Date expiryDate;
+    private String issueDate;
+    private String expiryDate;
     private String nationality;
     private String countryCode;
     private String documentType;
@@ -28,7 +26,7 @@ public class UserDetail extends BaseModel {
     private String height;
     private String country;
     private String authority;
-    private Date dob;
+    private String dob;
     private int age;
     private String gender;
     private String address;

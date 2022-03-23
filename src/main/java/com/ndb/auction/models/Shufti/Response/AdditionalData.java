@@ -16,7 +16,3 @@ import lombok.Setter;
 public class AdditionalData {
     private Doc document;
 }
-
-class Doc {
-    private Proof proof;
-}

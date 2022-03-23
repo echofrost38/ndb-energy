@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
 
-import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,6 +17,8 @@ public class Document {
     private Name name;
     private String dob;
     private int age;
+    private String issue_date;
+    private String expiry_date;
     private String gender;
     private String[] selected_type;
     private String[] supported_types;

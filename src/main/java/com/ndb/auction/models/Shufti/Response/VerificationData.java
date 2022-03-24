@@ -11,6 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class VerificationData {
     private KYB kyb;
-    private Document document;
-    private Address address;
 }

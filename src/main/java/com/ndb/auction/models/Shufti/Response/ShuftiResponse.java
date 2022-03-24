@@ -20,6 +20,4 @@ public class ShuftiResponse {
     private String declined_reason;
     private ShuftiError error;
     private VerificationResult verification_result;
-    private VerificationData verification_data;
-    private AdditionalData additional_data;
 }

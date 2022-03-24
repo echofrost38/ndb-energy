@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -15,8 +16,6 @@ import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -89,12 +88,7 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentWalletTransaction>() {
-			@Override
-			public CoinpaymentWalletTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		});
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
@@ -103,24 +97,16 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, new RowMapper<CoinpaymentWalletTransaction>() {
-			@Override
-			public CoinpaymentWalletTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
-			}
-		}, userId);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_WALLET WHERE ID=?";
-		return jdbcTemplate.query(sql, new ResultSetExtractor<CoinpaymentWalletTransaction>() {
-			@Override
-			public CoinpaymentWalletTransaction extractData(ResultSet rs) throws SQLException {
-				if (!rs.next())
-					return null;
-				return extract(rs);
-			}
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
 		}, id);
     }
 
@@ -139,5 +125,10 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 		String sql = "DELETE FROM TBL_COINPAYMENT_PRESALE WHERE SYSDATE-CREATED_AT>?";
 		return jdbcTemplate.update(sql, days);
 	}
+
+    public List<CoinpaymentWalletTransaction> selectRange(int userId, long from, long to) {
+        String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
+    }
 
 }

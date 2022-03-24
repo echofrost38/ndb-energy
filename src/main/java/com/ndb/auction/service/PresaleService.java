@@ -51,14 +51,14 @@ public class PresaleService extends BaseService {
             throw new PreSaleException("countdown_auction", "conflict");
         }
 
-        int result = presaleDao.insert(presale);
+        presale = presaleDao.insert(presale);
         int count = presale.getConditions().size();
         if(count != presaleConditionDao.insertConditionList(presale.getConditions())){
             return 0;
         }
 
         schedule.setPresaleCountdown(presale);
-        return result;
+        return 1;
     }
 
     public int startPresale(int presaleId) {

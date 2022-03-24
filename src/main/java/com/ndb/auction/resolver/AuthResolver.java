@@ -81,7 +81,6 @@ public class AuthResolver extends BaseResolver
 		}
 
 		List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
-		
 		List<String> twoStep = new ArrayList<>();
 		
 		for (UserSecurity userSecurity : userSecurities) {
@@ -122,9 +121,7 @@ public class AuthResolver extends BaseResolver
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-
 		String jwt = jwtUtils.generateJwtToken(authentication);
-
 		return new Credentials("Success", jwt);
 	}
 

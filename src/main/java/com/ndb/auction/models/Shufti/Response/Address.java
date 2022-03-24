@@ -15,6 +15,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {
-    private Name name;
-    private String full_address;
+    private int name;
+    private int full_address;
 }

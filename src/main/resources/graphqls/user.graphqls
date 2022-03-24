@@ -11,6 +11,10 @@ type Query {
   ) : Whitelist
   getWhitelists : [Whitelist]
   checkWhitelist: Whitelist
+  getStatement(
+    from: Float,
+    to: Float
+  ) : Statement
 }
 
 extend type Mutation {

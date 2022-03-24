@@ -2,15 +2,11 @@ package com.ndb.auction.dao.oracle.transactions.stripe;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
-import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import lombok.NoArgsConstructor;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;

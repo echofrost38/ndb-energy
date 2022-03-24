@@ -213,10 +213,10 @@ public class ScheduledTasks {
 			readyPresaleCounter--;
 			System.out.println("Ready counter: " + readyPresaleCounter.toString());
 			if(readyPresaleCounter == 0L) {
-				startedPresale = readyPresale;
 				startedPresaleCounter = (readyPresale.getEndedAt() - readyPresale.getStartedAt()) / 1000;
 				presaleService.startPresale(readyPresale.getId());
 				System.out.println("Started counter: " + startedPresaleCounter.toString());
+				startedPresale = readyPresale;
 				readyPresale = null;
 			}
 		}

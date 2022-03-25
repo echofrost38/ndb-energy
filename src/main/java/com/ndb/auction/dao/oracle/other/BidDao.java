@@ -30,12 +30,12 @@ public class BidDao extends BaseOracleDao {
 		m.setRoundId(rs.getInt("ROUND_ID"));
 		m.setPrefix(rs.getString("PREFIX"));
 		m.setName(rs.getString("NAME"));
-		m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
-		m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
+		m.setTokenAmount(rs.getDouble("TOKEN_AMOUNT"));
+		m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
 		m.setTotalAmount((double) (m.getTokenAmount() * m.getTokenPrice()));
 		m.setPaidAmount(rs.getDouble("PAID_AMOUNT"));
-		m.setTempTokenAmount(rs.getLong("TEMP_TOKEN_AMOUNT"));
-		m.setTempTokenPrice(rs.getLong("TEMP_TOKEN_PRICE"));
+		m.setTempTokenAmount(rs.getDouble("TEMP_TOKEN_AMOUNT"));
+		m.setTempTokenPrice(rs.getDouble("TEMP_TOKEN_PRICE"));
 		m.setDelta(rs.getLong("DELTA"));
 		m.setPendingIncrease(rs.getBoolean("PENDING_INCREASE"));
 		Type type = new TypeToken<Map<String, BidHolding>>() {}.getType();
@@ -112,7 +112,7 @@ public class BidDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, newTokenAmount, newTokenPrice, true, delta, userId, auctionId);
 	}
 
-	public int increaseAmount(int userId, int auctionId, Long amount, Long price) {
+	public int increaseAmount(int userId, int auctionId, double amount, double price) {
 		String sql = "UPDATE TBL_BID SET TOKEN_AMOUNT = ?, TOKEN_PRICE = ?, PENDING_INCREASE = ? WHERE USER_ID = ? AND ROUND_ID = ?";
 		return jdbcTemplate.update(sql, amount, price, false, userId, auctionId);
 	}

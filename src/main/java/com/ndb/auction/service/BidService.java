@@ -94,8 +94,8 @@ public class BidService extends BaseService {
 	public Bid placeNewBid(
 			int userId,
 			int roundId,
-			long tokenAmount,
-			long tokenPrice) {
+			double tokenAmount,
+			double tokenPrice) {
 		// Check existing
 		Bid bid = bidDao.getBid(userId, roundId);
 		if (bid != null && bid.getStatus() != Bid.NOT_CONFIRMED) {
@@ -399,7 +399,7 @@ public class BidService extends BaseService {
 				}
 	
 				// 6) Allocate NDB Token
-				Long ndb = bid.getTokenAmount();
+				double ndb = bid.getTokenAmount();
 				if(roundAvatarWinner) ndb += auction.getToken();
 				int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
 				balanceDao.addFreeBalance(userId, ndbId, ndb);
@@ -480,8 +480,8 @@ public class BidService extends BaseService {
 			originalBid.setPendingIncrease(false);
 		}
 
-		long _tokenAmount = originalBid.getTokenAmount();
-		long _tokenPrice = originalBid.getTokenPrice();
+		double _tokenAmount = originalBid.getTokenAmount();
+		double _tokenPrice = originalBid.getTokenPrice();
 
 		// check amount & price
 		if ((_tokenAmount > tokenAmount) ||
@@ -491,9 +491,9 @@ public class BidService extends BaseService {
 		}
 
 		// previous total amount!
-		long _total = _tokenAmount * _tokenPrice;
+		double _total = _tokenAmount * _tokenPrice;
 		// new total amount!
-		long newTotal = tokenAmount * tokenPrice;		
+		double newTotal = tokenAmount * tokenPrice;		
 		// more paid
 		double delta = newTotal - _total;
 
@@ -502,7 +502,7 @@ public class BidService extends BaseService {
 		return originalBid;
 	}
 
-	public int increaseAmount(int userId, int roundId, long tokenAmount, long tokenPrice) {
+	public int increaseAmount(int userId, int roundId, double tokenAmount, double tokenPrice) {
 		return bidDao.increaseAmount(userId, roundId, tokenAmount, tokenPrice);
 	}
 

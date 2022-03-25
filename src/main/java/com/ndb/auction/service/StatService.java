@@ -41,8 +41,8 @@ public class StatService extends BaseService {
         roundList.toArray(roundArray);
         sortRound.mergeSort(roundArray, 0, roundArray.length - 1);
 
-        long min = Long.MAX_VALUE, max = 0, std = 0;
-        long win = 0, failed = 0, total = 0, winRate = 0, failedRate = 0;
+        double min = Double.MAX_VALUE, max = 0, std = 0;
+        double win = 0, failed = 0, total = 0, winRate = 0, failedRate = 0;
 
         StandardDeviation standardDeviation = new StandardDeviation();
 
@@ -60,7 +60,7 @@ public class StatService extends BaseService {
             double[] priceArr = new double[bidList.size()];
             int cnt = 0;
             for (Bid bid : bidList) {
-                long tokenPrice = bid.getTokenPrice();
+                double tokenPrice = bid.getTokenPrice();
                 if (min > tokenPrice)
                     min = tokenPrice;
                 if (max < tokenPrice)
@@ -76,7 +76,7 @@ public class StatService extends BaseService {
 
                 cnt++;
             }
-            std = (long)standardDeviation.evaluate(priceArr); // TODO: double -> long
+            std = standardDeviation.evaluate(priceArr); // TODO: double -> long
             RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
             roundPerform2List.add(roundPerform2);
 
@@ -105,14 +105,14 @@ public class StatService extends BaseService {
         if (round != null) {
             List<Bid> bidList = bidDao.getBidListByRound(roundId);
 
-            long min = Long.MAX_VALUE, max = 0, std = 0;
+            double min = Double.MAX_VALUE, max = 0, std = 0;
             StandardDeviation standardDeviation = new StandardDeviation();
             double priceArr[] = new double[bidList.size()];
             int cnt = 0;
-            long win = 0, failed = 0, total = 0, winRate = 0, failedRate = 0;
+            double win = 0, failed = 0, total = 0, winRate = 0, failedRate = 0;
             for (Bid bid : bidList) {
 
-                long tokenPrice = bid.getTokenPrice();
+                double tokenPrice = bid.getTokenPrice();
                 if (min > tokenPrice)
                     min = tokenPrice;
                 if (max < tokenPrice)
@@ -136,7 +136,7 @@ public class StatService extends BaseService {
             RoundPerform1 roundPerform1 = new RoundPerform1(round.getRound(), win, round.getSold());
             roundPerform1List.add(roundPerform1);
 
-            std = (long)standardDeviation.evaluate(priceArr); // TODO: double -> long
+            std = standardDeviation.evaluate(priceArr); // TODO: double -> long
             RoundPerform2 roundPerform2 = new RoundPerform2(round.getRound(), min, max, std);
             roundPerform2List.add(roundPerform2);
         }
@@ -160,12 +160,12 @@ public class StatService extends BaseService {
             int roundNumber = startedRound.getRound();
             int roundId = startedRound.getId();
             List<Bid> bidList = bidDao.getBidListByRound(roundId);
-            long min = Long.MAX_VALUE, max = 0, std = 0;
+            double min = Double.MAX_VALUE, max = 0, std = 0;
             StandardDeviation standardDeviation = new StandardDeviation();
             double priceArr[] = new double[bidList.size()];
             int cnt = 0;
             for (Bid bid : bidList) {
-                long tokenPrice = bid.getTokenPrice();
+                double tokenPrice = bid.getTokenPrice();
                 if (min > tokenPrice)
                     min = tokenPrice;
                 if (max < tokenPrice)
@@ -173,7 +173,7 @@ public class StatService extends BaseService {
                 priceArr[cnt] = tokenPrice;
                 cnt++;
             }
-            std = (long)standardDeviation.evaluate(priceArr); // TODO: double -> long
+            std = standardDeviation.evaluate(priceArr); // TODO: double -> long
             std = Double.isNaN(std) ? 0 : std;
             RoundPerform2 roundPerform2 = new RoundPerform2(roundNumber, min, max, std);
             list.add(roundPerform2);

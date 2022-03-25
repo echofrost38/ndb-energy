@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationData {
-    private KYB kyb;
-    private Document document;
-    private Address address;
+public class Doc {
+    private Proof proof;
 }
+

@@ -9,8 +9,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationData {
-    private KYB kyb;
-    private Document document;
-    private Address address;
+public class Name {
+
+    private String first_name;
+    private String middle_name;
+    private String last_name;
+
+    private String getFullName() {
+        return this.first_name + " " + this.last_name;
+    }
 }

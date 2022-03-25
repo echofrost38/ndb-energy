@@ -78,8 +78,8 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 		// update bid
 		bidService.updateHolding(bid);
 		if(bid.isPendingIncrease()) {
-			long newAmount = bid.getTempTokenAmount();
-			long newPrice = bid.getTempTokenPrice();
+			double newAmount = bid.getTempTokenAmount();
+			double newPrice = bid.getTempTokenPrice();
 			bidService.increaseAmount(userId, roundId, newAmount, newPrice);
 	
 			// update bid Ranking

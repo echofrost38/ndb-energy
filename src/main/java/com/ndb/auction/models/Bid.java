@@ -40,14 +40,14 @@ public class Bid {
 
     private int roundId;
     private int round;
-    private Long tokenAmount;
-    private Long tokenPrice;
+    private Double tokenAmount;
+    private Double tokenPrice;
 
     private Double totalAmount;
     private Double paidAmount;
 
-    private Long tempTokenAmount;
-    private Long tempTokenPrice;
+    private Double tempTokenAmount;
+    private Double tempTokenPrice;
     private double delta;
     private boolean pendingIncrease;
 
@@ -61,12 +61,12 @@ public class Bid {
 
     private int ranking;
     
-    public Bid(int userId, int roundId, Long tokenAmount, Long tokenPrice) {
+    public Bid(int userId, int roundId, double tokenAmount, double tokenPrice) {
     	this.userId = userId;
     	this.roundId = roundId;
     	this.tokenAmount = tokenAmount;
     	this.tokenPrice = tokenPrice;
-    	this.totalAmount = (double) (tokenAmount * tokenPrice);
+    	this.totalAmount = tokenAmount * tokenPrice;
         this.paidAmount = 0.0;
     	this.placedAt = new Date().getTime();
     	this.updatedAt = this.placedAt;

@@ -22,22 +22,13 @@ public class UserAvatarDao extends BaseOracleDao {
 		m.setId(rs.getInt("ID"));
 		m.setPurchased(rs.getString("PURCHASED"));
 		m.setSelected(rs.getString("SELECTED"));
-		m.setHairColor(rs.getString("HAIR_COLOR"));
+		m.setHairColor(rs.getString("HAIR_COLOR"));	
 		m.setPrefix(rs.getString("PREFIX"));
 		m.setName(rs.getString("NAME"));
 		m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
 		m.setUpdateDate(rs.getTimestamp("UPDATE_DATE").getTime());
 		return m;
 	}
-
-    public int changeName(int id, String newName) {
-		UserAvatar currentAvatar = selectById(id);
-		String currentPrefix = currentAvatar.getPrefix();
-        String sql = "SELECT COUNT(*) FROM TBL_USER_AVATAR WHERE PREFIX=? AND NAME=?";
-        boolean exists = jdbcTemplate.queryForObject(sql, Integer.class, currentPrefix, newName) > 0;
-        if(exists) return -1;
-        else return jdbcTemplate.update("UPDATE TBL_USER_AVATAR SET NAME=? WHERE ID=?",newName,id);
-    }
 
 	public UserAvatar selectById(int id) {
 		String sql = "SELECT * FROM TBL_USER_AVATAR WHERE ID=?";

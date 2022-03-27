@@ -45,7 +45,9 @@ public class OAuth2RegistrationService {
     }
 
     public String updateOAuth2Client(String clientName, String clientId, String clientSecret) {
-        return oAuth2Dao.updateOAuth2Client(clientName, clientId, clientSecret);
+        String result = oAuth2Dao.updateOAuth2Client(clientName, clientId, clientSecret);
+        init();
+        return result;
     }
 
     public List<OAuth2Setting> getAllOAuth2Settings() {

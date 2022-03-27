@@ -75,7 +75,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		
 		var appContext = new PayPalAppContextDTO();
         
-		appContext.setReturnUrl(WEBSITE_URL + "/");
+		appContext.setReturnUrl(WEBSITE_URL + "/app/payment");
 		appContext.setBrandName("Auction Round");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);

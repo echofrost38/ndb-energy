@@ -4,14 +4,15 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.presale.PreSale;
+
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,13 @@ public class AuctionService extends BaseService {
 		if(presales.size() != 0) {
 			throw new AuctionException("started_presale", String.valueOf(auction.getId()));
 		}
+
 		auction = auctionDao.createNewAuction(auction);
+		// add auction avatar
+		for (AvatarSet avatarSet : auction.getAvatar()) {
+			avatarSet.setId(auction.getId());
+			auctionAvatarDao.insert(avatarSet);
+		}
 		schedule.setNewCountdown(auction);
 		return auction;
 	}

@@ -15,7 +15,7 @@ public class Name {
     private String middle_name;
     private String last_name;
 
-    private String getFullName() {
+    public String getFullName() {
         return this.first_name + " " + this.last_name;
     }
 }

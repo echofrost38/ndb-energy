@@ -23,4 +23,12 @@ public class AvatarSet extends BaseModel {
 		this.compId = compId;
 	}
 
+	public boolean equals(AvatarSet a) {
+		if(a.groupId == this.groupId && a.compId == this.compId) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
@@ -322,7 +323,6 @@ public class BidService extends BaseService {
 
 		Auction auction = auctionDao.getAuctionById(roundId);
 		List<AvatarSet> avatar = auctionAvatarDao.selectById(auction.getId());
-		List<AvatarComponent> avatarComponents = avatarComponentDao.getAvatarComponentsBySet(avatar);
 
 		// processing all bids
 		if(currentBidList == null) fillBidList(roundId);
@@ -377,25 +377,22 @@ public class BidService extends BaseService {
 				// 5) Avatar checking!
 				boolean roundAvatarWinner = true;
 				UserAvatar userAvatar = userAvatarDao.selectById(userId);
-				String purchasedJsonString;
-				if (userAvatar != null && (purchasedJsonString = userAvatar.getPurchased()) != null
-						&& !purchasedJsonString.isEmpty()) {
-					JsonObject purchasedJson = JsonParser.parseString(purchasedJsonString).getAsJsonObject();
-					for (AvatarComponent component : avatarComponents)
-						block_c: {
-							JsonElement el = purchasedJson.get(String.valueOf(component.getGroupId()));
-							if (el == null || el.isJsonNull()) {
-								roundAvatarWinner = false;
-								break;
-							}
-							JsonArray array = el.getAsJsonArray();
-							for (JsonElement e : array) {
-								if (e.getAsString().equals(component.getCompId())) {
-									break block_c;
-								}
-							}
-							roundAvatarWinner = false;
+				
+				List<AvatarSet> selected = gson.fromJson(userAvatar.getSelected(), new TypeToken<List<AvatarSet>>(){}.getType());
+
+				boolean notFound = true;
+				for (AvatarSet roundComp: avatar) {
+					notFound = true;
+					for (AvatarSet userComp : selected) {
+						if(roundComp.equals(userComp)) {
+							notFound = false;
+							break;
 						}
+					}
+					if(notFound) {
+						roundAvatarWinner = false;
+						break;
+					}
 				}
 	
 				// 6) Allocate NDB Token

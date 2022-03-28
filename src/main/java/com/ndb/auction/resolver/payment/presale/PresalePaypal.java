@@ -56,7 +56,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         
         var appContext = new PayPalAppContextDTO();
         
-        appContext.setReturnUrl(WEBSITE_URL + "/app/payment");
+        appContext.setReturnUrl(WEBSITE_URL + "/");
 		appContext.setBrandName("Presale Round");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         order.setApplicationContext(appContext);

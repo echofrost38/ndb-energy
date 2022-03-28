@@ -180,6 +180,7 @@ public class BidService extends BaseService {
 
 		if(auction.getStatus() == Auction.STARTED) {
 			if(currentBidList == null) fillBidList(auction.getId());
+			if((currentBidList.size() != 0) && (currentBidList.get(0).getRound() != round)) fillBidList(auction.getId());
 			return currentBidList;
 		}
 		return bidDao.getBidListByRound(auction.getId());
@@ -194,6 +195,7 @@ public class BidService extends BaseService {
 
 		if(currentRound.getStatus() == Auction.STARTED) {
 			if(currentBidList == null) fillBidList(round);
+			if((currentBidList.size() != 0) && (currentBidList.get(0).getRoundId() != round)) fillBidList(round);
 			return currentBidList;
 		}
 

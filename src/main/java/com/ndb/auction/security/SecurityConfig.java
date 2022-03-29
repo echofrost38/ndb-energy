@@ -110,6 +110,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/crypto/**").permitAll()
 				.antMatchers("/shufti/**").permitAll()
 				.antMatchers("/ipn/**").permitAll()
+				.antMatchers("/location").permitAll()
+				.antMatchers("/favicon.ico").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()

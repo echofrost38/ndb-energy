@@ -4,7 +4,7 @@ type Mutation {
   resendVerifyCode(email: String): String!
   request2FA(email: String!, method: String!, phone: String): String!
   disable2FA(method: String!): String!
-  confirmRequest2FA(email: String!, method: String!, code: String!): String!
+  confirmRequest2FA(email: String!, method: String!, code: String!): Credentials!
   signin(email: String!, password: String!): Credentials!
   confirm2FA(email: String!, token: String!, code: [TwoFAEntry]): Credentials!
   forgotPassword(email: String!): String!

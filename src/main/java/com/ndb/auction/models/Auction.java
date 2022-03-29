@@ -26,7 +26,7 @@ public class Auction extends BaseModel {
     private Long startedAt;
     private Long endedAt;
     private Long totalToken;
-    private Long minPrice;
+    private double minPrice;
     private Long sold;
     private AuctionStats stats;
 
@@ -36,7 +36,7 @@ public class Auction extends BaseModel {
     private int status;
 	private int kind;
     
-    public Auction(int _round, Long _startedAt, Long duration, Long _totalToken, Long _minPrice, List<AvatarSet> avatar, Long token) {
+    public Auction(int _round, Long _startedAt, Long duration, Long _totalToken, double _minPrice, List<AvatarSet> avatar, Long token) {
     	this.round = _round;
     	this.totalToken = _totalToken;
     	this.minPrice = _minPrice;

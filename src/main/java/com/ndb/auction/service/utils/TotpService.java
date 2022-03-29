@@ -134,7 +134,7 @@ public class TotpService {
         QrData data = new QrData.Builder()
                 .label(email)
                 .secret(secret)
-                .issuer("sale.ndb.money")
+                .issuer("NYYU Dev")
                 .algorithm(HashingAlgorithm.SHA1)
                 .digits(6)
                 .period(30)

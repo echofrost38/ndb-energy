@@ -462,7 +462,7 @@ public class BidService extends BaseService {
 		currentBidList = null;
 	}
 
-	public Bid increaseBid(int userId, int roundId, long tokenAmount, long tokenPrice) {
+	public Bid increaseBid(int userId, int roundId, double tokenAmount, double tokenPrice) {
 		
 		Bid originalBid = bidDao.getBid(userId, roundId);
 		if (originalBid == null) {

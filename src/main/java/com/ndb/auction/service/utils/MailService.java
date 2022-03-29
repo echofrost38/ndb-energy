@@ -34,7 +34,7 @@ public class MailService {
 	public void sendVerifyEmail(User user, String code, String template) throws MessagingException, IOException, TemplateException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-        helper.setSubject("NDB Auction");
+        helper.setSubject("Nyyu Account Verification");
         helper.setTo(user.getEmail());
         String emailContent = getEmailContent(user, code, template);
         helper.setText(emailContent, true);

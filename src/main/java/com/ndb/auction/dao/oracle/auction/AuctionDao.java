@@ -34,7 +34,7 @@ public class AuctionDao extends BaseOracleDao {
 		m.setStartedAt(rs.getTimestamp("START_DATE").getTime());
 		m.setEndedAt(rs.getTimestamp("END_DATE").getTime());
 		m.setTotalToken(rs.getLong("TOTAL_TOKEN"));
-		m.setMinPrice(rs.getLong("MIN_PRICE"));
+		m.setMinPrice(rs.getDouble("MIN_PRICE"));
 		m.setSold(rs.getLong("SOLD"));
 		m.setStats(new AuctionStats(
 				rs.getLong("QTY"), rs.getLong("WIN"), rs.getLong("FAIL")));
@@ -72,7 +72,7 @@ public class AuctionDao extends BaseOracleDao {
 					ps.setTimestamp(i++, new Timestamp(m.getStartedAt()));
 					ps.setTimestamp(i++, new Timestamp(m.getEndedAt()));
 					ps.setLong(i++, m.getTotalToken());
-					ps.setLong(i++, m.getMinPrice());
+					ps.setDouble(i++, m.getMinPrice());
 					ps.setLong(i++, m.getSold());
 					ps.setLong(i++, stats.getQty());
 					ps.setLong(i++, stats.getWin());

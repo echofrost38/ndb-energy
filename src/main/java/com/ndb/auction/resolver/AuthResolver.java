@@ -58,8 +58,14 @@ public class AuthResolver extends BaseResolver
 		return userService.disable2FA(id, method);
 	}
 
-	public String confirmRequest2FA(String email, String method, String code) {
-		return userService.confirmRequest2FA(lowerEmail(email), method, code);
+	public Credentials confirmRequest2FA(String email, String method, String code) {
+		String result = userService.confirmRequest2FA(lowerEmail(email), method, code);
+		if(result.equals("Success")) {
+			String jwt = jwtUtils.generateJwtToken(email);
+			return new Credentials("Success", jwt);
+		} else {
+			return new Credentials("Failed", "Cannot generate access token.");
+		}
 	}
 
 	public Credentials signin(String email, String password) {

@@ -107,7 +107,7 @@ public class BidDao extends BaseOracleDao {
 		return jdbcTemplate.update(sql, ranking, userId, auctionId);
 	}
 
-	public int updateTemp(int userId, int auctionId, Long newTokenAmount, Long newTokenPrice, double delta) {
+	public int updateTemp(int userId, int auctionId, double newTokenAmount, double newTokenPrice, double delta) {
 		String sql = "UPDATE TBL_BID SET TEMP_TOKEN_AMOUNT = ?, TEMP_TOKEN_PRICE = ?, PENDING_INCREASE = ?, DELTA=? WHERE USER_ID = ? AND ROUND_ID = ?";
 		return jdbcTemplate.update(sql, newTokenAmount, newTokenPrice, true, delta, userId, auctionId);
 	}

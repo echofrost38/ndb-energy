@@ -136,11 +136,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setPassword(encoded);
 
         // send Random Password to user
-        try {
-            mailService.sendVerifyEmail(user, rPassword, RANDOM_PASSWORD);
-        } catch (Exception e) {
+        // try {
+        //     mailService.sendVerifyEmail(user, rPassword, RANDOM_PASSWORD);
+        // } catch (Exception e) {
 
-        }
+        // }
         // user.setImageUrl(oAuth2UserInfo.getImageUrl());
         user = userDao.insert(user);
         userVerify.setId(user.getId());

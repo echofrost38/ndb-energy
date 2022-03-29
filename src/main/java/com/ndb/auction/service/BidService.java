@@ -6,10 +6,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
@@ -19,7 +15,6 @@ import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.BidHolding;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
-import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;

@@ -47,6 +47,30 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         return userService.changePassword(id, newPassword);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public String requestEmailChange() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
+        return userService.requestEmailChange(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public String confirmEmailChange(String code, String newEmail) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
+        return userService.confirmEmailChange(id,code, newEmail);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public String changeName(String newName) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        int id = userDetails.getId();
+        return userService.changeName(id,newName);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public GeoLocation addDisallowed(String country, String countryCode) {
         return userService.addDisallowed(country, countryCode);
@@ -61,7 +85,8 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     public int makeAllow(int locationId) {
         return userService.makeAllow(locationId);
     }
-// user management by admin
+
+    // user management by admin
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String resetPasswordByAdmin(String email) {
         return userService.resetPasswordByAdmin(email);
@@ -93,15 +118,15 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
             String groupId = component.getGroupId();
             int compId = component.getCompId();
             List<Integer> purchasedList = purchasedMap.get(groupId);
-			if(purchasedList == null) {
-				purchasedList = new ArrayList<>();
-				purchasedList.add(compId);
-				purchasedMap.put(groupId, purchasedList);
-			} else {
-				if(!purchasedList.contains(compId)) {
-					purchasedList.add(compId);
-				}
-			}
+            if (purchasedList == null) {
+                purchasedList = new ArrayList<>();
+                purchasedList.add(compId);
+                purchasedMap.put(groupId, purchasedList);
+            } else {
+                if (!purchasedList.contains(compId)) {
+                    purchasedList.add(compId);
+                }
+            }
         }
         userAvatar.setPurchased(gson.toJson(purchasedMap));
         userAvatar.setSelected(gson.toJson(sets));
@@ -113,7 +138,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         user.setVerify(userVerify);
 
         // check role
-        if(role.equals("ROLE_USER")) {
+        if (role.equals("ROLE_USER")) {
             user.addRole(role);
         } else if (role.equals("ROLE_ADMIN")) {
             user.addRole(role);
@@ -138,14 +163,14 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String deleteAccount() {        
+    public String deleteAccount() {
         return "To delete your account, please withdraw all your assets from NDB Wallet. Please note deleting process is irreversible.";
     }
 
     @PreAuthorize("isAuthenticated()")
     public String confirmDeleteAccount(String text) {
         if (text.equals("delete")) {
-            UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             int id = userDetails.getId();
             return userService.deleteUser(id);
         } else {

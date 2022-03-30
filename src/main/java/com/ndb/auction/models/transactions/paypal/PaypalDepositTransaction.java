@@ -25,7 +25,7 @@ public class PaypalDepositTransaction extends FiatDepositTransaction {
 
     public PaypalDepositTransaction(
         int userId, 
-        Long amount, // pay amount
+        Double amount, // pay amount
         String cryptoType,
         Double cryptoPrice,
         String paypalOrderId,

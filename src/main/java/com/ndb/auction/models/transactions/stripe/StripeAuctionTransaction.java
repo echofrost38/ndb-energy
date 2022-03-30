@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StripeAuctionTransaction extends StripeDepositTransaction {
 
-    public StripeAuctionTransaction(int userId, int auctionId, Long amount, String paymentIntentId, String paymentMethodId) {
+    public StripeAuctionTransaction(int userId, int auctionId, Double amount, String paymentIntentId, String paymentMethodId) {
         this.userId = userId;
         this.auctionId = auctionId;
         this.paymentIntentId = paymentIntentId;
@@ -20,11 +20,11 @@ public class StripeAuctionTransaction extends StripeDepositTransaction {
         this.bidId = 0;
     }
 
-    public StripeAuctionTransaction(int userId, int auctionId, Long amount) {
+    public StripeAuctionTransaction(int userId, int auctionId, Double amount) {
        this(userId, auctionId, amount,null,null);
     }
 
-    public StripeAuctionTransaction(int userId, int auctionId, Long amount, String paymentIntentId ) {
+    public StripeAuctionTransaction(int userId, int auctionId, Double amount, String paymentIntentId ) {
      this(userId, auctionId, amount, paymentIntentId, null);
     }
 

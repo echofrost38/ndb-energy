@@ -14,7 +14,7 @@ public class PaypalAuctionTransaction extends PaypalDepositTransaction {
     public PaypalAuctionTransaction (
         int userId, 
         int auctionId, 
-        Long amount,
+        Double amount,
         String paypalOrderid,
         String payaplOrderStatus
     ) {

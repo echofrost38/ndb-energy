@@ -45,7 +45,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         if(presaleOrder == null) {
             throw new BidException("There is no presale order.", "orderId");
         }
-        Long amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
+        double amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
         
         var checkoutAmount = getPayPalTotalOrder(userId, amount);
         

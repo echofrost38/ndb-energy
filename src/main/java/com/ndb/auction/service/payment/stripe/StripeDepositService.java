@@ -35,11 +35,11 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        long totalAmount = getTotalAmount(userId,m.getAmount());
+        Double totalAmount = getTotalAmount(userId,m.getAmount().doubleValue());
         try {
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(totalAmount)
+                        .setAmount(totalAmount.longValue())
                         .setCurrency("USD")
                         .setConfirm(true)
                         .setPaymentMethod(m.getPaymentMethodId())
@@ -85,12 +85,12 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        long totalAmount = getTotalAmount(userId, m.getAmount());
+        Double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                    .setAmount(totalAmount)
+                    .setAmount(totalAmount.longValue())
                     .setCurrency("USD")
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
@@ -120,7 +120,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
     private void handleDepositSuccess(int userId, PaymentIntent intent, StripeDepositTransaction m) {
 
         double fee = getStripeFee(userId, m.getAmount()) / 100.00;
-        long amount = m.getAmount() / 100;
+        double amount = m.getAmount() / 100;
         double cryptoPrice = 1.0;
         if(!m.getCryptoType().equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());

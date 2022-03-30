@@ -31,7 +31,7 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 		CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getLong("AMOUNT"));
+		m.setAmount(rs.getDouble("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));

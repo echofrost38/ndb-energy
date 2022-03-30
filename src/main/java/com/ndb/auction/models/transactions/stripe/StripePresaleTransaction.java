@@ -11,7 +11,7 @@ public class StripePresaleTransaction extends StripeDepositTransaction {
     private int orderId;
     private int presaleId;
 
-    public StripePresaleTransaction(int userId, int presaleId, int orderId, Long amount, String intentId, String methodId) {
+    public StripePresaleTransaction(int userId, int presaleId, int orderId, Double amount, String intentId, String methodId) {
         this.userId = userId;
         this.presaleId = presaleId;
         this.orderId = orderId;
@@ -23,7 +23,7 @@ public class StripePresaleTransaction extends StripeDepositTransaction {
         this.fiatType = "USD";
     }
 
-    public StripePresaleTransaction(int userId, int presaleId, int orderId, Long amount, String intentId) {
+    public StripePresaleTransaction(int userId, int presaleId, int orderId, Double amount, String intentId) {
         this(userId, presaleId, orderId, amount,intentId,null);
     }
 }

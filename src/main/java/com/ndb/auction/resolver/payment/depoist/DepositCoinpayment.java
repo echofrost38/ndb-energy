@@ -22,7 +22,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
     public CoinpaymentWalletTransaction createChargeForDeposit(String coin, String network, String cryptoType) throws ClientProtocolException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction(userId, 0L, coin, network, 0.0, cryptoType);
+        CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction(userId, 0.0, coin, network, 0.0, cryptoType);
         return (CoinpaymentWalletTransaction) coinpaymentWalletService.createNewTransaction(m);
     }
 

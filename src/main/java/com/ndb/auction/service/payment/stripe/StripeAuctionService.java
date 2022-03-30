@@ -33,7 +33,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency("usd")
-                        .setAmount(m.getAmount())
+                        .setAmount(m.getAmount().longValue())
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
@@ -116,7 +116,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
             // Create new PaymentIntent for the order
             PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                     .setCurrency("usd")
-                    .setAmount(m.getAmount())
+                    .setAmount(m.getAmount().longValue())
                     .setCustomer(customer.getCustomerId())
                     .setPaymentMethod(customer.getPaymentMethod())
                     .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)

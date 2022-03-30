@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StripeWalletTransaction extends StripeDepositTransaction {
     
-    public StripeWalletTransaction(int userId, Long amount, String intentId, String methodId) {
+    public StripeWalletTransaction(int userId, Double amount, String intentId, String methodId) {
         this.userId = userId;
         this.amount = amount;
         this.paymentIntentId = intentId;
@@ -19,7 +19,7 @@ public class StripeWalletTransaction extends StripeDepositTransaction {
         this.fiatType = "USD";
     }
 
-    public StripeWalletTransaction(int userId, Long amount) {
+    public StripeWalletTransaction(int userId, Double amount) {
         this.userId = userId;
         this.amount = amount;
         this.paymentIntentId = null;

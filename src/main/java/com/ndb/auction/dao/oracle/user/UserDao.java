@@ -247,5 +247,4 @@ public class UserDao extends BaseOracleDao {
 		String sql = "UPDATE TBL_USER SET DELETED=1 WHERE ID=?";
 		return jdbcTemplate.update(sql, id);
 	}
-
 }

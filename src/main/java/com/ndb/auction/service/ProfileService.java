@@ -216,4 +216,23 @@ public class ProfileService extends BaseService {
 		return set;
 	}
 
+	public int updateEmail(int userId, String email) {
+		return userDao.updateEmail(userId, email);
+	}
+
+	public int updateBuyName(int userId, String newName) {
+		// get user avatar
+		UserAvatar avatar = userAvatarDao.selectById(userId);
+
+		// get prefix 
+		String prefix = avatar.getPrefix();
+
+		UserAvatar checkAvatar = userAvatarDao.selectByPrefixAndName(prefix, newName);
+		if(checkAvatar != null) {
+			throw new BidException("Already exists", "new name");
+		}
+
+		return userAvatarDao.updateName(userId, newName);
+	}
+
 }

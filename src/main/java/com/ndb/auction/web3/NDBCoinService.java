@@ -52,9 +52,10 @@ public class NDBCoinService {
 
     @PostConstruct
     public void init() throws IOException {
+        Web3j web3j = Web3j.build(new HttpService(bscNetwork));
         ndbCredential = Credentials.create(ndbKey);
-        txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, 56);
-        ndbToken = NDBcoin.load(ndbTokenContract, BEP20NET, txMananger, new DefaultGasProvider());
+        txMananger = new FastRawTransactionManager(web3j, ndbCredential, 56);
+        ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, new DefaultGasProvider());
         ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
             .subscribe(event -> {
                 handleEvent(event);

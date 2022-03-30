@@ -250,7 +250,7 @@ public class BaseService {
 
 		// processing order
 		double ndb = order.getNdbAmount();
-		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
+		Double fiatAmount = ndb * order.getNdbPrice();
 		
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");

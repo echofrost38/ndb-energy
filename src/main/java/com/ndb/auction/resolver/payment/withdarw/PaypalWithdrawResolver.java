@@ -6,6 +6,7 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,17 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 	@Autowired
 	protected PaypalWithdrawService paypalWithdrawService;
 
+    @Autowired
+    protected TotpService totpService;
+
+    @PreAuthorize("isAuthenticated()")
+    public String generateWithdraw() {
+        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = userDetails.getEmail();
+        totpService.getWithdrawCode(email);
+        return "success";
+    }
+
     // Create paypal withdraw request!
     /**
      * 
@@ -32,9 +44,15 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
      * @return
      */
     @PreAuthorize("isAuthenticated()")
-    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken) {
+    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken, String code) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        var userEmail = userDetails.getEmail();
+
+        // check withdraw code
+        if(!totpService.checkWithdrawCode(userEmail, code)) {
+            throw new BalanceException("2FA failed", "code");
+        }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);

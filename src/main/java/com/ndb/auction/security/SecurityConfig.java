@@ -112,6 +112,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/ipn/**").permitAll()
 				.antMatchers("/location").permitAll()
 				.antMatchers("/favicon.ico").permitAll()
+				.antMatchers("/totalsupply/**").permitAll()
+				.antMatchers("/circulatingsupply/**").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()

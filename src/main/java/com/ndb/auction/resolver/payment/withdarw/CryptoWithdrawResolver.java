@@ -6,6 +6,7 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,19 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Autowired
 	protected CryptoWithdrawService cryptoWithdrawService;
 
+    @Autowired
+    private TotpService totpService;
+
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des) {
+    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des, String code) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        var userEmail = userDetails.getEmail();
+
+        // check withdraw code
+        if(!totpService.checkWithdrawCode(userEmail, code)) {
+            throw new BalanceException("2FA failed", "code");
+        }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);

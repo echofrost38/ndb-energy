@@ -34,8 +34,11 @@ public class TotpService {
 	 private LoadingCache<String, String> otpCache;
 	 private LoadingCache<String, String> _2FACache;
 	 private LoadingCache<String, Authentication> tokenCache;
+
+	// for withdraw
+	private LoadingCache<String, String> withdrawCache;
 	 
-	 public TotpService() {
+	public TotpService() {
 		 otpCache = CacheBuilder.newBuilder().
 				 expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, String>() {
 					 public String load(String key) {
@@ -55,9 +58,12 @@ public class TotpService {
 						 return null;
 					 }
 				 });
+		withdrawCache = CacheBuilder.newBuilder().
+				 expireAfterWrite(EXPIRE_MINS, TimeUnit.MINUTES).build(new CacheLoader<String, String>() {
+					public String load(String key) { return ""; }
+				 });
 	 }
 	 
-
 	public void setTokenAuthCache(String token, Authentication auth) {
 		tokenCache.put(token, auth);
 	}
@@ -83,6 +89,27 @@ public class TotpService {
 		 String code = generateOTP(key);
 		 _2FACache.put(key, code);
 		 return code;
+	 }
+
+	 // key is user's email address
+	 public String getWithdrawCode(String key) {
+		 String code = generateOTP(key);
+		 withdrawCache.put(key, code);
+		 return code;
+	 }
+
+	 public boolean checkWithdrawCode(String key, String code) {
+		try{
+			String existing = withdrawCache.get(key);
+			if(existing.equals(code)) {
+				withdrawCache.invalidate(key);
+				return true;
+			} else {
+				return false;
+			}
+		}catch (Exception e){
+			return false; 
+		}
 	 }
 
 	 //This method is used to push the opt number against Key. Rewrite the OTP if it exists

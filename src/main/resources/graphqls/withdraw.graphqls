@@ -1,10 +1,12 @@
 extend type Mutation {
     # PayPal mutation
+    generateWithdraw : String
     paypalWithdrawRequest(
         email: String,
         target: String,
         withdrawAmount: Float,
-        sourceToken: String
+        sourceToken: String,
+        code: String
     ) : PaypalWithdraw
     confirmPaypalWithdraw(
         id: Int,
@@ -17,7 +19,8 @@ extend type Mutation {
         amount: Float,
         sourceToken: String,
         network: String,
-        des: String
+        des: String,
+        code: String
     ) : CryptoWithdraw
     confirmCryptoWithdraw(
         requestId: Int,

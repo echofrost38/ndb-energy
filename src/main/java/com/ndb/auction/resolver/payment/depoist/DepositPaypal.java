@@ -4,7 +4,13 @@ import java.util.List;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.TaskSetting;
+import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
+import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
 import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
 import com.ndb.auction.payload.request.paypal.PurchaseUnit;
@@ -12,9 +18,12 @@ import com.ndb.auction.payload.response.paypal.CaptureOrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.TaskSettingService;
+import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.payment.paypal.PaypalDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
+import com.ndb.auction.utils.ThirdAPIUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +40,15 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
     private PaypalDepositService paypalDepositService;
 
     private final PaypalHttpClient payPalHttpClient;
+
+    @Autowired
+    private ThirdAPIUtils apiUtil;
+
+    @Autowired
+    private TierService tierService;
+
+    @Autowired
+    private TaskSettingService taskSettingService;
 
 	@Autowired
 	public DepositPaypal(PaypalHttpClient payPalHttpClient) {
@@ -80,6 +98,47 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
 
             // add balance to user
             internalBalanceService.addFreeBalance(userId, m.getCryptoType(), m.getDeposited());
+
+            List<BalancePayload> balances = internalBalanceService.getInternalBalances(userId);
+            double totalBalance = 0.0;
+            for (BalancePayload balance : balances) {
+                // get price and total balance
+                double _price = apiUtil.getCryptoPriceBySymbol(balance.getTokenSymbol());
+                double _balance = _price * (balance.getFree() + balance.getHold());
+                totalBalance += _balance;
+            }
+
+            User user = userService.getUserById(userId);
+            List<Tier> tierList = tierService.getUserTiers();
+            TaskSetting taskSetting = taskSettingService.getTaskSetting();
+            TierTask tierTask = tierTaskService.getTierTask(userId);
+    
+            if(tierTask.getWallet() < totalBalance) {
+    
+                tierTask.setWallet(totalBalance);
+                // get point
+                double gainedPoint = 0.0;
+                for (WalletTask task : taskSetting.getWallet()) {
+                    if(tierTask.getWallet() > task.getAmount()) {
+                        continue;
+                    }                    
+                    if(totalBalance < task.getAmount()) {
+                        break;
+                    }
+                    gainedPoint += task.getPoint();
+                }
+    
+                double newPoint = user.getTierPoint() + gainedPoint;
+                int tierLevel = 0;
+                // check change in level
+                for (Tier tier : tierList) {
+                    if(tier.getPoint() <= newPoint) {
+                        tierLevel = tier.getLevel();
+                    }
+                }
+                userService.updateTier(user.getId(), tierLevel, newPoint);
+                tierTaskService.updateTierTask(tierTask);
+            }
 
             // send notification to user for payment result!!
             notificationService.sendNotification(

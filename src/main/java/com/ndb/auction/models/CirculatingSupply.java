@@ -5,7 +5,7 @@ public class CirculatingSupply {
     public CirculatingSupply(String _circulatingSupply) {
         this.circulatingSupply = _circulatingSupply;
     }
-    public String getCirculatingSupply() {
+    public String getTotalSupply() {
         return circulatingSupply;
     }
 }

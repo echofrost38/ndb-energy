@@ -1,14 +1,8 @@
 package com.ndb.auction.hooks;
 
-
-import java.math.BigInteger;
-
-import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.models.CirculatingSupply;
 import com.ndb.auction.models.TotalSupply;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 
 @RestController
 public class NDBcoinController extends BaseController {

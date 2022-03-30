@@ -41,30 +41,25 @@ import java.util.*;
 @Slf4j
 public class LocationController extends BaseController {
 
-    private static final String SESSION_IP_LOCATION = "ip_location";
+    private static final String SESSION_LOCATION = "location";
 
-    private boolean checkLocation(LocationLog log) {
-        if (log == null) return true;
-        if (log.getCountryCode().equals("US") || log.getCountryCode().equals("CA")) return false;
+    private boolean checkLocation(LocationLog location) {
+        if (location == null) return true;
+        if (location.getCountryCode().equals("US") || location.getCountryCode().equals("CA")) return false;
         return true;
     }
 
     @GetMapping("/location")
     public Object getLocation(HttpServletRequest request) {
         String ip = RemoteIpHelper.getRemoteIpFrom(request);
-        LocationLog log;
         HttpSession session = request.getSession(true);
-        Map<String, Object> locationMap = (Map<String, Object>) session.getAttribute(SESSION_IP_LOCATION);
-        if (locationMap == null) {
-            locationMap = new HashMap<>();
-            log = locationLogService.buildLog(ip);
-            locationMap.put(ip, log);
-        } else if ((log = (LocationLog) locationMap.get(ip)) == null) {
-            log = locationLogService.buildLog(ip);
-            locationMap.put(ip, log);
+        LocationLog location = (LocationLog) session.getAttribute(SESSION_LOCATION);
+        if (location == null || !ip.equals(location.getIpAddress())) {
+            location = locationLogService.buildLog(ip);
+            session.setAttribute(SESSION_LOCATION, location);
         }
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("success", checkLocation(log));
+        resultMap.put("success", checkLocation(location));
         return resultMap;
     }
 

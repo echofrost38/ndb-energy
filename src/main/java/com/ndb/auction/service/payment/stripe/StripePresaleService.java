@@ -67,9 +67,9 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
-                if (totalOrder * 100 > paidAmount) {
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
                     throw new UserNotFoundException("no_enough_funds", "amount");
                 }
 
@@ -124,9 +124,9 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
-                if (totalOrder * 100 > paidAmount) {
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
                     throw new UserNotFoundException("no_enough_funds", "amount");
                 }
 

@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.KYCSetting;
@@ -19,11 +19,8 @@ import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
 import com.ndb.auction.service.user.UserDetailsImpl;
-import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.service.utils.TotpService;
 
 import org.apache.http.client.ClientProtocolException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,12 +30,6 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-
-    @Autowired
-    private MailService mailService;
-
-    @Autowired
-    private TotpService totpService;
 
     // select avatar profile
     // prefix means avatar name!!!
@@ -181,50 +172,15 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String changeEmail() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var email = userDetails.getEmail();
-        var code = totpService.getVerifyCode(email);
-        var user = userService.getUserByEmail(email);
-        try {
-            mailService.sendVerifyEmail(user, code, "confirmEmailChange.ftlh"); 
-        } catch (Exception e) {
-        }
-        
-        return "Success";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public int confirmChangeEmail(String newEmail, String code) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var email = userDetails.getEmail();
-        if(!totpService.checkVerifyCode(email, code)) {
-            throw new UnauthorizedException("verify code doesn't match.", "code");
-        }
-        var user = userService.getUserByEmail(newEmail);
-        if(user != null) {
-            throw new UnauthorizedException("That email already exists.", "code");
-        }
-
-        return profileService.updateEmail(userDetails.getId(), newEmail);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changeBuyName(String newName) {
+    public String changeEmail(String newEmail) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        return null;
+    }
 
-        // check user balance 
-        double ndbBalance = internalBalanceService.getFreeBalance(userId, "NDB");
-        if(ndbBalance < 10) {
-            throw new BalanceException("insufficient NDB funds.", "userId");
-        }
+    @PreAuthorize("isAuthenticated()")
+    public int confirmChangeEmail(String email, Map<String,String> codeMap) {
         
-        // change name
-        int result = profileService.updateBuyName(userId, newName);
-        if(result == 1) {
-            return internalBalanceService.deductFree(userId, "NDB", 10.0);
-        }
         return 0;
     }
 

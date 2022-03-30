@@ -49,7 +49,8 @@ public class LocationLogService extends BaseService {
         return location.isAllowed();
     }
 
-    public LocationLog buildLog(String ip) {
+    public LocationLog buildLog(HttpServletRequest request) {
+        String ip = RemoteIpHelper.getRemoteIpFrom(request);
         try {
             VpnAPI response = vpnAPI.get()
                     .uri(uriBuilder -> uriBuilder.path(ip)

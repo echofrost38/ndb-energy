@@ -31,7 +31,7 @@ public class StripeWalletDao extends BaseOracleDao implements ITransactionDao {
 		StripeWalletTransaction m = new StripeWalletTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getLong("AMOUNT"));
+		m.setAmount(rs.getDouble("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));

@@ -29,7 +29,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDeposit(Long amount, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse stripeForDeposit(Double amount, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId, paymentMethodId);
@@ -37,7 +37,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDepositWithSavedCard(Long amount, String cryptoType, int cardId, String paymentIntentId) {
+    public PayResponse stripeForDepositWithSavedCard(Double amount, String cryptoType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);

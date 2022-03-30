@@ -30,7 +30,7 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
 		PaypalDepositTransaction m = new PaypalAuctionTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getLong("AMOUNT"));
+		m.setAmount(rs.getDouble("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));

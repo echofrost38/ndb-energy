@@ -432,7 +432,7 @@ public class BidService extends BaseService {
 				int usdtId = tokenAssetService.getTokenIdBySymbol("USDT");
 				for (PaypalAuctionTransaction paypalTxn : paypalTxns) {
 					// convert into USDT balance!
-					double paypalAmount = paypalTxn.getAmount().doubleValue();
+					double paypalAmount = paypalTxn.getAmount();
 					balanceDao.addFreeBalance(userId, usdtId, paypalAmount);
 				}
 

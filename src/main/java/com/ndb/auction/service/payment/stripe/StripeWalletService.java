@@ -36,7 +36,7 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 		try {
 			if(m.getPaymentIntentId() == null) {
 				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-					.setAmount(m.getAmount())
+					.setAmount(m.getAmount().longValue())
 					.setCurrency("USD")	
 					.setConfirm(true)
 					.setPaymentMethod(m.getPaymentMethodId())
@@ -87,7 +87,7 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 		try {
 			if(m.getPaymentIntentId() == null) {
 				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-						.setAmount(m.getAmount())
+						.setAmount(m.getAmount().longValue())
 						.setCurrency("USD")
 						.setCustomer(customerId)
 						.setConfirm(true)

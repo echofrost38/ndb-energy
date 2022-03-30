@@ -7,9 +7,14 @@ input NamesInput {
 }
 
 extend type Mutation {
-	changeName(
+	changeBuyName(
 		newName: String!
 	): String
+	changeEmail : String
+	confirmChangeEmail(
+		newEmail: String,
+		code: String
+	) : Int
 	setAvatar(
 		prefix: String!,
 		name: String!

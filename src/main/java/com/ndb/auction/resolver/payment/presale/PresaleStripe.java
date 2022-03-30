@@ -51,7 +51,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         return (List<StripePresaleTransaction>) stripePresaleService.selectByUser(userId, orderBy);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")  
     public StripePresaleTransaction getStripePresaleTxById(int id) {
         return (StripePresaleTransaction) stripePresaleService.selectById(id);
     }

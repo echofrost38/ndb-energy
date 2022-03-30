@@ -49,7 +49,7 @@ public class PaypalPresaleService extends PaypalBaseService implements ITransact
 		orderDTO.getPurchaseUnits().add(unit);
         
         var appContext = new PayPalAppContextDTO();
-        appContext.setReturnUrl(WEBSITE_URL + "/capture");
+        appContext.setReturnUrl(WEBSITE_URL + "/");
 		appContext.setBrandName("Auction Round");
         appContext.setLandingPage(PaymentLandingPage.BILLING);
         orderDTO.setApplicationContext(appContext);

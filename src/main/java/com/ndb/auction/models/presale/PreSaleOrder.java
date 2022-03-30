@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PreSaleOrder extends BaseModel {
     
-    public PreSaleOrder(int userId, int presaleId, double ndbAmount, double ndbPrice, int destination, String extAddr) {
+    public PreSaleOrder(int userId, int presaleId, Long ndbAmount, Long ndbPrice, int destination, String extAddr) {
         this.userId = userId;
         this.presaleId = presaleId;
         this.ndbAmount = ndbAmount;
@@ -38,8 +38,8 @@ public class PreSaleOrder extends BaseModel {
     private int destination;
     private String extAddr;
 
-    private double ndbAmount;
-    private double ndbPrice;
+    private Long ndbAmount;
+    private Long ndbPrice;
 
     private int status;
 

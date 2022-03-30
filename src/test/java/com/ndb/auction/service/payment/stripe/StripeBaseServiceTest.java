@@ -47,11 +47,11 @@ public class StripeBaseServiceTest {
 
     @Test
     public void stripeFeeTest() {
-        
+
         Mockito.when(whitelistDao.selectByUserId(userId)).thenReturn(null);
-        
+
         long amount = 100000;
-        double fee = stripeBaseService.getStripeFee(userId, amount);
+        long fee = stripeBaseService.getStripeFee(userId, amount);
         long calculatedFee = (long) (amount * (stripeBaseService.getSTRIPE_FEE() + txnFee) / 100 + 30);
         Assert.assertEquals(calculatedFee, fee);
     }
@@ -62,7 +62,7 @@ public class StripeBaseServiceTest {
         Mockito.when(whitelistDao.selectByUserId(userId)).thenReturn(new Whitelist());
 
         long amount = 100000;
-        double fee = stripeBaseService.getStripeFee(userId, amount);
+        long fee = stripeBaseService.getStripeFee(userId, amount);
         long calculatedFee = (long) (amount * (stripeBaseService.getSTRIPE_FEE() + whitelistFee) / 100 + 30);
         Assert.assertEquals(calculatedFee, fee);
     }
@@ -73,9 +73,9 @@ public class StripeBaseServiceTest {
         Mockito.when(whitelistDao.selectByUserId(userId)).thenReturn(null);
 
         long amount = 100000;
-        double fee = stripeBaseService.getStripeFee(userId, amount);
+        long fee = stripeBaseService.getStripeFee(userId, amount);
 
-        double totalAmount = stripeBaseService.getTotalAmount(userId, amount);
+        long totalAmount = stripeBaseService.getTotalAmount(userId, amount);
         Assert.assertEquals(amount+fee, totalAmount);
     }
 

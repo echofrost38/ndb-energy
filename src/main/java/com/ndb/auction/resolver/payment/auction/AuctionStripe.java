@@ -59,7 +59,7 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForAuction(int roundId, Double amount, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse payStripeForAuction(int roundId, Long amount, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId);
@@ -67,7 +67,7 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Double amount, int cardId, String paymentIntentId) {
+    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Long amount, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);

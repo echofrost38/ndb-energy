@@ -32,7 +32,7 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
 		PaypalPresaleTransaction m = new PaypalPresaleTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getDouble("AMOUNT"));
+		m.setAmount(rs.getLong("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));

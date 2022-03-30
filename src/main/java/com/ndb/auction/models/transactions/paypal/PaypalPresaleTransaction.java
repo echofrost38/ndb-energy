@@ -15,7 +15,7 @@ public class PaypalPresaleTransaction extends PaypalDepositTransaction {
         int userId,
         int presaleId,
         int orderId,
-        double amount,
+        Long amount,
         String paypalOrderId,
         String paypalOrderStatus
     ) {

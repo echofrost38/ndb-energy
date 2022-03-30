@@ -24,7 +24,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     private Double fee;
     private Double deposited;
 
-    public StripeDepositTransaction(int userId, Double amount, String cryptoType, String paymentIntentId, String paymentMethodId) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, String paymentIntentId, String paymentMethodId) {
         this.userId = userId;
         this.amount = amount;
         this.cryptoType = cryptoType;
@@ -33,7 +33,7 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.status = false;
     }
 
-    public StripeDepositTransaction(int userId, Double amount, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
         this.userId = userId;
         this.amount = amount;
         this.fiatAmount = amount;
@@ -47,11 +47,11 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
         this.status = false;
     }
 
-    public StripeDepositTransaction(int userId, Double amount, String cryptoType) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType) {
         this(userId, amount, cryptoType, null, null);
     }
 
-    public StripeDepositTransaction(int userId, Double amount, String cryptoType, String paymentIntentId) {
+    public StripeDepositTransaction(int userId, Long amount, String cryptoType, String paymentIntentId) {
         this(userId, amount, cryptoType, paymentIntentId, null);
 
     }

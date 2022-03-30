@@ -30,7 +30,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         // getting ready 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        Long amount = m.getAmount();
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             throw new UserNotFoundException("no_presale_order", "orderId");
@@ -38,7 +38,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         try {
             if (m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount.longValue()).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
 
                 // check save card
                 if (isSaveCard) {
@@ -67,7 +67,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
+                Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
                 double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
                 if (totalOrder * 100 > paidAmount) {
                     throw new UserNotFoundException("no_enough_funds", "amount");
@@ -93,7 +93,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         // getting ready
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        Long amount = m.getAmount();
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             throw new UserNotFoundException("no_presale_order", "orderId");
@@ -103,7 +103,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(amount.longValue())
+                        .setAmount(amount)
                         .setCurrency("USD")
                         .setCustomer(customer.getCustomerId())
                         .setConfirm(true)
@@ -124,7 +124,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
+                Long orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
                 double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
                 if (totalOrder * 100 > paidAmount) {
                     throw new UserNotFoundException("no_enough_funds", "amount");

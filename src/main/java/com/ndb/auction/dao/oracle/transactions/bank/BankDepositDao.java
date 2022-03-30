@@ -30,7 +30,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
         m.setUid(rs.getString("UNID"));
-		m.setAmount(rs.getDouble("AMOUNT"));
+		m.setAmount(rs.getLong("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
@@ -58,7 +58,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
                         int i = 1;
                         ps.setInt(i++, m.getUserId());
                         ps.setString(i++, m.getUid());
-                        ps.setDouble(i++, m.getAmount());
+                        ps.setLong(i++, m.getAmount());
                         ps.setString(i++, m.getFiatType());
                         ps.setDouble(i++, m.getUsdAmount());
                         ps.setString(i++, m.getCryptoType());

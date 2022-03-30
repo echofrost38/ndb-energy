@@ -31,8 +31,8 @@ public class PreSaleOrderDao extends BaseOracleDao {
         m.setUserId(rs.getInt("USER_ID"));
         m.setDestination(rs.getInt("DESTINATION"));
         m.setExtAddr(rs.getString("EXT_ADDR"));
-        m.setNdbAmount(rs.getDouble("NDB_AMOUNT"));
-        m.setNdbPrice(rs.getDouble("NDB_PRICE"));
+        m.setNdbAmount(rs.getLong("NDB_AMOUNT"));
+        m.setNdbPrice(rs.getLong("NDB_PRICE"));
         m.setStatus(rs.getInt("STATUS"));
         m.setPrefix(rs.getString("PREFIX"));
         m.setName(rs.getString("NAME"));
@@ -55,8 +55,8 @@ public class PreSaleOrderDao extends BaseOracleDao {
                         ps.setInt(i++, m.getUserId());
                         ps.setInt(i++, m.getDestination());
                         ps.setString(i++, m.getExtAddr());
-                        ps.setDouble(i++, m.getNdbAmount());
-                        ps.setDouble(i++, m.getNdbPrice());
+                        ps.setLong(i++, m.getNdbAmount());
+                        ps.setLong(i++, m.getNdbPrice());
                         ps.setInt(i++, m.getStatus());
                         return ps;
                     }

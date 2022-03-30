@@ -15,15 +15,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
-import com.ndb.auction.service.BidService;
-import com.ndb.auction.service.InternalBalanceService;
-import com.ndb.auction.service.NotificationService;
-import com.ndb.auction.service.PresaleOrderService;
-import com.ndb.auction.service.PresaleService;
-import com.ndb.auction.service.TaskSettingService;
-import com.ndb.auction.service.TierService;
-import com.ndb.auction.service.TierTaskService;
-import com.ndb.auction.service.TokenAssetService;
+import com.ndb.auction.service.*;
 import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
@@ -108,6 +100,9 @@ public class BaseController {
 
     @Autowired
     protected PaypalAuctionService paypalAuctionService;
+
+    @Autowired
+    protected LocationLogService locationLogService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 

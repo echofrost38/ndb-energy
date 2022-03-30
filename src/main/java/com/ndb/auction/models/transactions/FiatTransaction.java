@@ -9,5 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FiatTransaction extends Transaction {
     protected String fiatType;
-    protected double fiatAmount;
+    protected Long fiatAmount;
 }

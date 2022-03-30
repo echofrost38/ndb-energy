@@ -64,16 +64,16 @@ public class StripeBaseService extends BaseService {
         return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
     }
 
-    public double getStripeFee(int userId, double amount) {
+    public long getStripeFee(int userId, long amount) {
         User user = userDao.selectById(userId);
         double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         var white = whitelistDao.selectByUserId(userId);
         if(white != null) tierFeeRate = 0.0;
-        return  (amount * (STRIPE_FEE + tierFeeRate) / 100) + 30;
+        return (long) (amount * (STRIPE_FEE + tierFeeRate) / 100) + 30;
     }
 
-    public double getTotalAmount(int userId, double amount) {
-        double fee = getStripeFee(userId, amount);
+    public long getTotalAmount(int userId, long amount) {
+        long fee = getStripeFee(userId, amount);
         return amount + fee;
     }
 

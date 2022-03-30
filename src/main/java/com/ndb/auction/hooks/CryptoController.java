@@ -213,7 +213,7 @@ public class CryptoController extends BaseController {
             User user = userService.getUserById(txn.getUserId());
 
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
-            double totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
+            Long totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
             Double totalOrder = getTotalOrder(txn.getUserId(), totalPrice);
 
             if(totalOrder > fiatAmount) {
@@ -221,7 +221,7 @@ public class CryptoController extends BaseController {
             }
     
             // processing order
-            double ndb = presaleOrder.getNdbAmount();
+            Long ndb = presaleOrder.getNdbAmount();
             if(presaleOrder.getDestination() == PreSaleOrder.INTERNAL) {
                 balanceService.addFreeBalance(user.getId(), "NDB", Double.valueOf(ndb));
             } else if (presaleOrder.getDestination() == PreSaleOrder.EXTERNAL) {

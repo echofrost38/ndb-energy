@@ -38,7 +38,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
 	}
 
     @PreAuthorize("isAuthenticated()")
-    public OrderResponseDTO paypalForDeposit(Double amount, String currencyCode, String cryptoType) throws Exception {
+    public OrderResponseDTO paypalForDeposit(Long amount, String currencyCode, String cryptoType) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         double fee = getPaypalFee(userId, amount);

@@ -93,7 +93,7 @@ public class PresaleService extends BaseService {
         return presaleDao.selectAll();
     }
 
-    public int addSoldAmount(int presaleId, double sold) {
+    public int addSoldAmount(int presaleId, Long sold) {
         return presaleDao.updateSold(presaleId, sold);
     }
 

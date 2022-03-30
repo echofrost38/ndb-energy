@@ -98,6 +98,7 @@ public class TotpService {
 		try{
 			String existing = otpCache.get(key);
 			if(existing.equals(code)) {
+				otpCache.invalidate(key);
 				return true;
 			} else {
 				return false;
@@ -111,6 +112,7 @@ public class TotpService {
 		 try{
 			String existing = _2FACache.get(key);
 			if(existing.equals(code)) {
+				_2FACache.invalidate(key);
 				return true;
 			} else {
 				return false;

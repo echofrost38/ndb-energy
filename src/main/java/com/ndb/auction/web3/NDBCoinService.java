@@ -2,11 +2,9 @@ package com.ndb.auction.web3;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.WithdrawService;
 
@@ -16,14 +14,10 @@ import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.contracts.eip20.generated.ERC20.TransferEventResponse;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 
 @Service
 public class NDBCoinService {
@@ -44,20 +38,20 @@ public class NDBCoinService {
     private ScheduledTasks schedule;
 
     private Credentials ndbCredential;
-    private NDBcoin ndbToken;
-    private FastRawTransactionManager txMananger;
 
     private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
-    private final BigInteger decimals = new BigInteger("1000000000000");
+    private final BigInteger decimals = new BigInteger("100000000");
 
     @PostConstruct
-    public void init() throws IOException {
-        ndbCredential = Credentials.create(ndbKey);
-        txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, 56);
-        ndbToken = NDBcoin.load(ndbTokenContract, BEP20NET, txMananger, new DefaultGasProvider());
+    public void init() {
+        Credentials ndbCredential = Credentials.create(ndbKey); 
+
+        @SuppressWarnings("deprecation")
+        ERC20 ndbToken = ERC20.load(ndbTokenContract, BEP20NET, ndbCredential, gasPrice, gasLimit);
+        
         ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
             .subscribe(event -> {
                 handleEvent(event);
@@ -66,11 +60,16 @@ public class NDBCoinService {
             });
     }
 
-    private void handleEvent(NDBcoin.TransferEventResponse event) throws IOException {
+    public NDBCoinService() {
+
+        
+    }
+
+    private void handleEvent(TransferEventResponse event) throws IOException {
         // create new withdraw transaction record
-        String from = event.from;
-        String to = event.to;
-        long lvalue = event.value.divide(decimals).longValue();
+        String from = event._from;
+        String to = event._to;
+        long lvalue = event._value.divide(decimals).longValue();
         Double value = ((double)lvalue) / 10000.0;
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
@@ -79,21 +78,6 @@ public class NDBCoinService {
         // add to unconfirmed list
         schedule.addPendingTxn(txnHash, blockNumber);
         System.out.println("Pending: " + txnHash);
-    }
-
-    public String getTotalSupply() throws ExecutionException, InterruptedException {
-        BigInteger total =  ndbToken.totalSupply().sendAsync().get();
-        return total.divide(decimals).toString();
-    }
-
-    public String getCirculatingSupply() throws ExecutionException, InterruptedException {
-        BigInteger total =  ndbToken.getCirculatingSupply().sendAsync().get();
-        return total.divide(decimals).toString();
-    }
-
-    public NDBCoinService() {
-
-        
     }
 
     public boolean checkConfirmation(BigInteger targetNumber) {

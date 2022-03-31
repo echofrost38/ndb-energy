@@ -18,6 +18,7 @@ import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
+import com.ndb.auction.service.NamePriceService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
@@ -39,6 +40,9 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
     @Autowired
     private TotpService totpService;
+
+    @Autowired
+    private NamePriceService namePriceService;
 
     // select avatar profile
     // prefix means avatar name!!!
@@ -214,16 +218,28 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
-        // check user balance 
+        // check user balance
+        int chars = newName.length();
+        var namePrice = namePriceService.select(chars);
+
+        if(namePrice == null) {
+            var priceList = namePriceService.selectAll();
+            var len = priceList.size();
+            namePrice = priceList.get(len - 1); // get last one
+        }
+
+        // get ndb with default NDB price : 0.01
+        double ndbOrder = namePrice.getPrice() / 0.01;
+
         double ndbBalance = internalBalanceService.getFreeBalance(userId, "NDB");
-        if(ndbBalance < 10) {
+        if(ndbBalance < ndbOrder) {
             throw new BalanceException("insufficient NDB funds.", "userId");
         }
         
         // change name
         int result = profileService.updateBuyName(userId, newName);
         if(result == 1) {
-            return internalBalanceService.deductFree(userId, "NDB", 10.0);
+            return internalBalanceService.deductFree(userId, "NDB", ndbOrder);
         }
         return 0;
     }

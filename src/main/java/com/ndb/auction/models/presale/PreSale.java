@@ -26,9 +26,9 @@ public class PreSale extends BaseModel {
     private Long startedAt;
     private Long endedAt;
     
-    private Long tokenAmount;
-    private Long tokenPrice;
-    private Long sold;
+    private Double tokenAmount;
+    private Double tokenPrice;
+    private Double sold;
 
     private int status;
     private int kind;
@@ -39,8 +39,8 @@ public class PreSale extends BaseModel {
         int round,
         Long startedAt,
         Long endedAt, 
-        Long tokenAmount, 
-        Long tokenPrice, 
+        Double tokenAmount, 
+        Double tokenPrice, 
         List<PreSaleCondition> conditions
     ) {
         this.round = round;
@@ -49,7 +49,7 @@ public class PreSale extends BaseModel {
         this.tokenAmount = tokenAmount;
         this.tokenPrice = tokenPrice;
         this.conditions = conditions;
-        this.sold = 0l;
+        this.sold = 0.0;
     }
 
 }

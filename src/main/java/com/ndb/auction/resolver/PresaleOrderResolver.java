@@ -33,7 +33,7 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         }
 
         // create new Presale order
-        Long ndbPrice = presale.getTokenPrice();
+        Double ndbPrice = presale.getTokenPrice();
         PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, extAddr);
         return presaleOrderService.placePresaleOrder(presaleOrder);
     }

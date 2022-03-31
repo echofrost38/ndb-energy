@@ -63,7 +63,7 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
     public Transaction insert(Transaction _m) {
         PaypalPresaleTransaction m = (PaypalPresaleTransaction) _m;
         String sql = "INSERT INTO TBL_PAYPAL_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,FEE,ORDER_ID,ORDER_STATUS,PRESALE_ID,P_ORDER_ID)"
-        + " VALUES(SEQ_PAYPAL_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
+        + " VALUES(SEQ_PAYPAL_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {

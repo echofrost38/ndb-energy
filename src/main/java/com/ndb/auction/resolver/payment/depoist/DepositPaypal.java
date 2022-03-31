@@ -112,6 +112,11 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(userId);
+
+            if(tierTask == null) {
+                tierTask = new TierTask(userId);
+                tierTaskService.updateTierTask(tierTask);
+            }
     
             if(tierTask.getWallet() < totalBalance) {
     

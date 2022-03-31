@@ -263,6 +263,12 @@ public class BaseService {
 		List<Tier> tierList = tierService.getUserTiers();
 		TaskSetting taskSetting = taskSettingService.getTaskSetting();
 		TierTask tierTask = tierTaskService.getTierTask(user.getId());
+
+        if(tierTask == null) {
+            tierTask = new TierTask(userId);
+            tierTaskService.updateTierTask(tierTask);
+        }
+
 		double presalePoint = tierTask.getDirect();
 		presalePoint += taskSetting.getDirect() * fiatAmount;
 		tierTask.setDirect(presalePoint);

@@ -127,6 +127,12 @@ public class CryptoController extends BaseController {
                 List<Tier> tierList = tierService.getUserTiers();
                 TaskSetting taskSetting = taskSettingService.getTaskSetting();
                 TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+
+                if(tierTask == null) {
+                    tierTask = new TierTask(bid.getUserId());
+                    tierTaskService.updateTierTask(tierTask);
+                }
+
                 List<Integer> auctionList = tierTask.getAuctions();
                 if(!auctionList.contains(bid.getRoundId())) {
                     auctionList.add(bid.getRoundId());
@@ -238,6 +244,12 @@ public class CryptoController extends BaseController {
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(user.getId());
+            
+            if(tierTask == null) {
+                tierTask = new TierTask(user.getId());
+                tierTaskService.updateTierTask(tierTask);
+            }
+            
             double presalePoint = tierTask.getDirect();
             presalePoint += taskSetting.getDirect() * totalPrice;
             tierTask.setDirect(presalePoint);
@@ -359,6 +371,11 @@ public class CryptoController extends BaseController {
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(userId);
+
+            if(tierTask == null) {
+                tierTask = new TierTask(userId);
+                tierTaskService.updateTierTask(tierTask);
+            }
     
             if(tierTask.getWallet() < totalBalance) {
     

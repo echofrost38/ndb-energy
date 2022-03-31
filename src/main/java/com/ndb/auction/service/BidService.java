@@ -149,7 +149,7 @@ public class BidService extends BaseService {
 		double _point = point;
 		int level = user.getTierLevel();
 		for (Tier tier : tiers) {
-			if (tier.getPoint() >= point && tier.getPoint() > _point) {
+			if (tier.getPoint() <= point && tier.getPoint() <= _point) {
 				_point = tier.getPoint();
 				level = tier.getLevel();
 			}

@@ -22,7 +22,8 @@ public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationR
 	public CoinpaymentAuctionTransaction createCryptoPaymentForAuction(int roundId, Double amount, String cryptoType, String network, String coin) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		CoinpaymentAuctionTransaction _m = new CoinpaymentAuctionTransaction(roundId, userId, amount, cryptoType, network, coin);
+		double total = getTotalCoinpaymentOrder(userId, amount);
+		CoinpaymentAuctionTransaction _m = new CoinpaymentAuctionTransaction(roundId, userId, amount, total - amount, cryptoType, network, coin);
 		return (CoinpaymentAuctionTransaction) coinpaymentAuctionService.createNewTransaction(_m);
 	}
 

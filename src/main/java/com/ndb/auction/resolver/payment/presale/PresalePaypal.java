@@ -62,7 +62,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, amount, 
+        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, amount, checkoutAmount - amount,
             orderResponse.getId(), orderResponse.getStatus().toString());
         return paypalPresaleService.insert(m);
     }

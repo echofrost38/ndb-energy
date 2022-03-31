@@ -2,6 +2,7 @@ type CoinpaymentAuctionTransaction {
     id: Int,
     userId: Int,
     amount: Float,
+    fee: Float,
     createdAt: Float,
     status: Boolean, 
     cryptoType: String,

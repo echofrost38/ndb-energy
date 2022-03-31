@@ -116,8 +116,8 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 		return jdbcTemplate.update(sql, status, id);
     }
 
-    public int updateStatus(int id, int status, Double _amount, String _type) {
-		String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATE_AT=SYSDATE, CRYPTO_AMOUNT = ?, CRYPTO_TYPE = ? WHERE ID=?";
+    public int updateStatus(int id, int status, Double _amount, double fee, String _type) {
+		String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATE_AT=SYSDATE, CRYPTO_AMOUNT = ?, FEE=?, CRYPTO_TYPE = ? WHERE ID=?";
 		return jdbcTemplate.update(sql, status, _amount, _type,  id);
 	}
 

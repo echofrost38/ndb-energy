@@ -51,6 +51,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 
 public class BaseResolver {
 
+	private final double COINPAYMENT_FEE = 0.5;
+
     @Value("${website.url}")
 	protected String WEBSITE_URL;
 	protected final double PAYPAL_FEE = 5;
@@ -222,4 +224,14 @@ public class BaseResolver {
 		int number = rnd.nextInt(999999999);
 		return String.format("%06d", number);
 	}
+
+	public Double getTotalCoinpaymentOrder(int userId, double totalPrice) {
+        User user = userService.getUserById(userId);
+        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
+
+        return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
+    }
 }

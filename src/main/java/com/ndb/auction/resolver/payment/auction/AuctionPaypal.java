@@ -83,7 +83,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
 		// Create not confirmed transaction
-        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, amount, null, null);
+        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, amount, checkoutAmount - amount, null, null);
 
 		// set order id and status
         entity.setPaypalOrderId(orderResponse.getId());

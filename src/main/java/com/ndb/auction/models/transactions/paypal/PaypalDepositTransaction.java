@@ -20,7 +20,7 @@ public class PaypalDepositTransaction extends FiatDepositTransaction {
 
     private String cryptoType;
     private Double cryptoPrice;
-    private Double fee;
+    protected Double fee;
     private Double deposited; // crypto amount!
 
     public PaypalDepositTransaction(

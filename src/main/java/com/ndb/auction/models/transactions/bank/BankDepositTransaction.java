@@ -19,7 +19,6 @@ public class BankDepositTransaction extends FiatDepositTransaction{
     private double cryptoPrice;
 
     private double usdAmount;
-
     private double fee;
     private double deposited;
 

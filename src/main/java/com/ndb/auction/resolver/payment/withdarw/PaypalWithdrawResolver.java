@@ -40,7 +40,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         // send email
         try {
-            mailService.sendVerifyEmail(user, code, "verify.ftlh");
+            mailService.sendVerifyEmail(user, code, "2faEmail.ftlh");
         } catch (Exception e) {
         }
 

@@ -6,7 +6,7 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Welcome to NDB</title>
+    <title>Welcome to Nyyu UAB</title>
 </head>
 <style>
     * {
@@ -71,9 +71,9 @@
         </svg>
     </header>
     <div class="container">
-        <div class="text">Welcome to signup NDB Auction</div>
+        <div class="text">Welcome to signup NYYU Auction</div>
         <br />
-        <div class="text">Your NDB Auction password is:</div>
+        <div class="text">Your NYYU Auction password is:</div>
         <div class="number">${code}</div>
         <div>If this wasn’t you, please Ignore this message. </div>
     </div>

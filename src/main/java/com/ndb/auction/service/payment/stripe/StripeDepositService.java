@@ -161,6 +161,11 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         TaskSetting taskSetting = taskSettingService.getTaskSetting();
         TierTask tierTask = tierTaskService.getTierTask(userId);
 
+		if(tierTask == null) {
+			tierTask = new TierTask(userId);
+			tierTaskService.updateTierTask(tierTask);
+		}
+
         if(tierTask.getWallet() < totalBalance) {
 
             tierTask.setWallet(totalBalance);

@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat|Arial|Raleway"
       rel="stylesheet"
     />
-    <title>NDB Money</title>
+    <title>Nyyu UAB</title>
   </head>
   <body>
     <div

@@ -27,10 +27,10 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
-        // getting ready 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        double totalAmount = getTotalAmount(userId, m.getAmount());
+        m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             throw new UserNotFoundException("no_presale_order", "orderId");
@@ -38,7 +38,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         try {
             if (m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount.longValue()).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount((long) totalAmount).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
 
                 // check save card
                 if (isSaveCard) {
@@ -56,11 +56,11 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                 }
 
                 intent = PaymentIntent.create(createParams.build());
-
+                stripePresaleDao.insert(m);
             } else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
@@ -90,10 +90,10 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
-        // getting ready
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        double totalAmount = getTotalAmount(userId, m.getAmount());
+        m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             throw new UserNotFoundException("no_presale_order", "orderId");
@@ -103,7 +103,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(amount.longValue())
+                        .setAmount((long) totalAmount)
                         .setCurrency("USD")
                         .setCustomer(customer.getCustomerId())
                         .setConfirm(true)
@@ -113,11 +113,12 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                         .setConfirm(true);
 
                 intent = PaymentIntent.create(createParams.build());
+                stripePresaleDao.insert(m);
             }
             else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {

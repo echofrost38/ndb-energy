@@ -56,7 +56,7 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
     public Transaction insert(Transaction _m) {
         CoinpaymentPresaleTransaction m = (CoinpaymentPresaleTransaction)_m;
         String sql = "INSERT INTO TBL_COINPAYMENT_PRESALE(ID,USER_ID,AMOUNT,FEE,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN,PRESALE_ID,ORDER_ID)"
-				+ " VALUES(SEQ_COINPAY_PRESALE.NEXTVAL,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
+				+ " VALUES(SEQ_COINPAY_PRESALE.NEXTVAL,?,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 			new PreparedStatementCreator() {

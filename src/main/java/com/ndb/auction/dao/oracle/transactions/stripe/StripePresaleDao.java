@@ -1,6 +1,5 @@
 package com.ndb.auction.dao.oracle.transactions.stripe;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,9 +12,6 @@ import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
 
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;

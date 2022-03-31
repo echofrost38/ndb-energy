@@ -50,7 +50,7 @@ public class CoinpaymentAuctionDao extends BaseOracleDao implements ITransaction
     public Transaction insert(Transaction _m) {
         CoinpaymentAuctionTransaction m = (CoinpaymentAuctionTransaction)_m;
         String sql = "INSERT INTO TBL_COINPAYMENT_AUCTION(ID,USER_ID,AMOUNT,FEE,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN,AUCTION_ID,BID_ID)"
-				+ " VALUES(SEQ_COINPAY_AUCTION.NEXTVAL,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
+				+ " VALUES(SEQ_COINPAY_AUCTION.NEXTVAL,?,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 				new PreparedStatementCreator() {

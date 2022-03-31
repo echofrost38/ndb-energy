@@ -2,6 +2,12 @@ package com.ndb.auction.web3;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -10,6 +16,8 @@ import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.WithdrawService;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +29,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
-
+import java.text.DecimalFormat;
 @Service
 public class NDBCoinService {
     
@@ -33,6 +41,9 @@ public class NDBCoinService {
 
     @Value("${ndb.token.addr}")
     private String ndbTokenContract;
+
+    @Value("${pancakev2.rpc}")
+    private String pancakev2RPC;
 
     @Autowired
     private WithdrawService withdrawService;
@@ -49,7 +60,7 @@ public class NDBCoinService {
     private final BigInteger gasPrice = new BigInteger("10000000000");
     private final BigInteger gasLimit = new BigInteger("300000");  
     private final BigInteger decimals = new BigInteger("1000000000000");
-
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     @PostConstruct
     public void init() throws IOException {
         Web3j web3j = Web3j.build(new HttpService(bscNetwork));
@@ -84,6 +95,22 @@ public class NDBCoinService {
         return total.divide(decimals).toString();
     }
 
+    public String getMarketCap() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
+        BigInteger total =  ndbToken.getCirculatingSupply().sendAsync().get();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .uri(URI.create(pancakev2RPC+ndbTokenContract))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        String responseBody = response.body();
+        int responseStatusCode = response.statusCode();
+        JSONObject json = new JSONObject(responseBody);
+        String price = json.getJSONObject("data").getString("price");
+        Double marketcap = total.divide(decimals).doubleValue()*Double.parseDouble(price);
+        return df.format(marketcap).toString();
+    }
     public String getCirculatingSupply() throws ExecutionException, InterruptedException {
         BigInteger total =  ndbToken.getCirculatingSupply().sendAsync().get();
         return total.divide(decimals).toString();

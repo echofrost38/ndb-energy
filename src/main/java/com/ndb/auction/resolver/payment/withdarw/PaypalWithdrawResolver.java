@@ -6,6 +6,7 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 
@@ -26,12 +27,24 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Autowired
     protected TotpService totpService;
 
+    @Autowired
+    private MailService mailService;
+
+
     @PreAuthorize("isAuthenticated()")
     public String generateWithdraw() {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userDetails.getEmail();
-        totpService.getWithdrawCode(email);
-        return "success";
+        var user = userService.getUserByEmail(email);
+        var code = totpService.getWithdrawCode(email);
+
+        // send email
+        try {
+            mailService.sendVerifyEmail(user, code, "verify.thlh");
+        } catch (Exception e) {
+        }
+
+        return "Success";
     }
 
     // Create paypal withdraw request!

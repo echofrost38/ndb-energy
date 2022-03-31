@@ -17,10 +17,4 @@ public class NDBcoinController extends BaseController {
         String circulatingSupply = ndbCoinService.getCirculatingSupply();
         return new CirculatingSupply(circulatingSupply);
     }
-
-    @RequestMapping(value = "/marketcap", method = RequestMethod.GET)
-    public Marketcap marketcap() throws Exception {
-        String marketcap = ndbCoinService.getMarketCap();
-        return new Marketcap(marketcap);
-    }
 }

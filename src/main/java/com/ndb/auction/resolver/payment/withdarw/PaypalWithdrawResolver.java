@@ -3,6 +3,7 @@ package com.ndb.auction.resolver.payment.withdarw;
 import java.util.List;
 
 import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -73,13 +74,10 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
             throw new BalanceException("insufficient_balance", "withdrawAmount");
         }
 
-        // KYC withdraw limit
-        var kycSetting = baseVerifyService.getKYCSetting("KYC");
-
         // KYC check
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            // throw new UnauthorizedException("no_kyc", "userId");
+            throw new UnauthorizedException("Please verify your identity.", "userId");
         }
         
         // get crypto price

@@ -32,6 +32,12 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     public PayResponse stripeForDeposit(Double amount, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
+
         StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId, paymentMethodId);
         return stripeDepositService.createDeposit(m, isSaveCard);
     }
@@ -40,6 +46,12 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     public PayResponse stripeForDepositWithSavedCard(Double amount, String cryptoType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
+
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if(userId != customer.getUserId()){
             throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");

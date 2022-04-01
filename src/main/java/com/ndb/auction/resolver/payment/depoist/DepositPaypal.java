@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
@@ -59,6 +60,12 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
     public OrderResponseDTO paypalForDeposit(Double amount, String currencyCode, String cryptoType) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
+
         double fee = getPaypalFee(userId, amount);
         double cryptoPrice = 1.0;
         if(!cryptoType.equals("USDT")) {

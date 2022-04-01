@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.payment.bank.BankDepositService;
@@ -26,6 +27,11 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
+        
         // get fiat price, and calculate USD equivalent balance
         double usdAmount = 0.0;
         if(currencyCode.equals("USD")) {

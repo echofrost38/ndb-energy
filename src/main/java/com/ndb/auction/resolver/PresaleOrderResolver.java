@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 
 import com.ndb.auction.exceptions.PreSaleException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -21,6 +22,11 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
     public PreSaleOrder placePreSaleOrder(int presaleId, Long ndbAmount, int destination, String extAddr) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
 
         // check presale status
         PreSale presale = presaleService.getPresaleById(presaleId);

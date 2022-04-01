@@ -64,12 +64,12 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         KYCSetting kyc = baseVerifyService.getKYCSetting("KYC");
         
         if(kyc == null) {
-            throw new BalanceException("no_kyc", "kind");
+            throw new BalanceException("Please verify your identity.", "kind");
         }
 
         if(kyc.getWithdraw() <= amount) {
             if(!shuftiService.kycStatusCkeck(userId)) {
-                throw new BalanceException("no_kyc_verified", "kind");
+                throw new BalanceException("Please verify your identity._verified", "kind");
             }
         }
 

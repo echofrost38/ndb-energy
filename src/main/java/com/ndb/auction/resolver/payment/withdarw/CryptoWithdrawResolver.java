@@ -3,6 +3,7 @@ package com.ndb.auction.resolver.payment.withdarw;
 import java.util.List;
 
 import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -31,6 +32,11 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
+
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
 
         // check withdraw code
         if(!totpService.checkWithdrawCode(userEmail, code)) {

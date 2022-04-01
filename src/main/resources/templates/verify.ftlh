@@ -21,7 +21,7 @@
       "
     >
       <img
-        src="https://ndb-sale.s3.eu-west-1.amazonaws.com/email/ndb_logo.png"
+        src="https://ndb-sale.s3.eu-west-1.amazonaws.com/email/nyyu-logo-01.svg"
         style="width: 82px; height: 31px; padding-top: 35px"
         alt="Logo"
       />

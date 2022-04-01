@@ -3,6 +3,7 @@ package com.ndb.auction.resolver.payment.depoist;
 import java.io.IOException;
 import java.util.List;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -22,6 +23,12 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
     public CoinpaymentWalletTransaction createChargeForDeposit(String coin, String network, String cryptoType) throws ClientProtocolException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            throw new UnauthorizedException("Please verify your identity.", "userId");
+        }
+
         CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction(userId, 0.0, 0.0, coin, network, 0.0, cryptoType);
         return (CoinpaymentWalletTransaction) coinpaymentWalletService.createNewTransaction(m);
     }

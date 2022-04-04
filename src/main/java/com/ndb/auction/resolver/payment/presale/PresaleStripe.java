@@ -1,7 +1,6 @@
 package com.ndb.auction.resolver.payment.presale;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
@@ -34,8 +33,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if(userId != customer.getUserId()){
-            String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg,"USER_ID");
+            throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");
         }
         StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
@@ -53,7 +51,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         return (List<StripePresaleTransaction>) stripePresaleService.selectByUser(userId, orderBy);
     }
 
-    @PreAuthorize("isAuthenticated()")  
+    @PreAuthorize("isAuthenticated()")
     public StripePresaleTransaction getStripePresaleTxById(int id) {
         return (StripePresaleTransaction) stripePresaleService.selectById(id);
     }

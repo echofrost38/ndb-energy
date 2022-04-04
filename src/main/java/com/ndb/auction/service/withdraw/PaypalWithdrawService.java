@@ -2,7 +2,6 @@ package com.ndb.auction.service.withdraw;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.withdraw.BaseWithdraw;
@@ -42,8 +41,7 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var m = (PaypalWithdraw)paypalWithdrawDao.selectById(requestId);
             
             if(m == null) {
-                String msg = messageSource.getMessage("no_withdrawal_request", null, Locale.ENGLISH);
-			    throw new UserNotFoundException(msg, "withdrawal request");
+                throw new UserNotFoundException("There is no such withdraw request", "requestId");
             }
 
             // create payouts request body

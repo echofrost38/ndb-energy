@@ -4,7 +4,6 @@ type StripePresaleTransaction {
     orderId: Int!,
     userId: Int!,
     amount: Float,
-    fee: Float,
     createdAt: Float,
     confirmedAt: Float,
     status: Boolean,

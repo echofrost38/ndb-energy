@@ -32,7 +32,6 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setAmount(rs.getDouble("AMOUNT"));
-		m.setFee(rs.getDouble("FEE"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));
@@ -55,8 +54,8 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
     @Override
     public Transaction insert(Transaction _m) {
         CoinpaymentPresaleTransaction m = (CoinpaymentPresaleTransaction)_m;
-        String sql = "INSERT INTO TBL_COINPAYMENT_PRESALE(ID,USER_ID,AMOUNT,FEE,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN,PRESALE_ID,ORDER_ID)"
-				+ " VALUES(SEQ_COINPAY_PRESALE.NEXTVAL,?,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
+        String sql = "INSERT INTO TBL_COINPAYMENT_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN,PRESALE_ID,ORDER_ID)"
+				+ " VALUES(SEQ_COINPAY_PRESALE.NEXTVAL,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 			new PreparedStatementCreator() {
@@ -67,7 +66,6 @@ public class CoinpaymentPresaleDao extends BaseOracleDao implements ITransaction
 					int i = 1;
 					ps.setInt(i++, m.getUserId());
 					ps.setDouble(i++, m.getAmount());
-					ps.setDouble(i++, m.getFee());
 					ps.setString(i++, m.getCryptoType());
 					ps.setString(i++, m.getNetwork());
 					ps.setDouble(i++, m.getCryptoAmount());

@@ -1,7 +1,6 @@
 package com.ndb.auction.resolver.payment.auction;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
@@ -73,8 +72,7 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if (userId != customer.getUserId()) {
-            String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "USER_ID");
+            throw new UnauthorizedException("The user is not authorized to use this card.", "USER_ID");
         }
         StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId);
         return stripeAuctionService.createNewTransactionWithSavedCard(m, customer);

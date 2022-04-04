@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CoinpaymentWalletTransaction extends CoinpaymentTransaction {
     
-    public CoinpaymentWalletTransaction(int userId, Double amount, Double fee, String coin, String network, Double cryptoAmount, String cryptoType) {
+    public CoinpaymentWalletTransaction(int userId, Double amount, String coin, String network, Double cryptoAmount, String cryptoType) {
         this.userId = userId;
         this.network = network;
         this.amount = 0.0;
@@ -18,7 +18,6 @@ public class CoinpaymentWalletTransaction extends CoinpaymentTransaction {
         this.coin = coin;
         this.status = false;
         this.depositAddress = "";
-        this.fee = fee;
     }
 
 }

@@ -3,7 +3,6 @@ package com.ndb.auction.resolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +27,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class AuthResolver extends BaseResolver
 		implements GraphQLMutationResolver, GraphQLQueryResolver {
-
+		
 	private String lowerEmail(String email) {
 		return email.toLowerCase();
 	}
@@ -74,20 +73,17 @@ public class AuthResolver extends BaseResolver
 		// get user ( Not found exception is threw in service)
 		User user = userService.getUserByEmail(email);
 		if (user == null) {
-			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Unregistered email.");
 		}
 
 		if (!userService.checkMatchPassword(password, user.getPassword())) {
-			String msg = messageSource.getMessage("wrong_password", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Email or password is invalid.");
 		}
 		UserVerify userVerify = userVerifyService.selectById(user.getId());
 		if (userVerify == null || !userVerify.isEmailVerified()) {
 			// send verify code again
 			resendVerifyCode(email);
-			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Please verify your email.");
 		}
 
 		List<UserSecurity> userSecurities = userSecurityService.selectByUserId(user.getId());
@@ -99,14 +95,12 @@ public class AuthResolver extends BaseResolver
 			} 
 		}
 		if (twoStep.isEmpty()) {
-			String msg = messageSource.getMessage("no_2fa", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Please set 2FA.");
 		}
 		
 		String token = userService.signin2FA(user);
 		if (token.equals("error")) {
-			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "2FA failed.");
 		}
 
 		Authentication authentication = authenticationManager.authenticate(
@@ -125,13 +119,11 @@ public class AuthResolver extends BaseResolver
 		}
 		Authentication authentication = totpService.getAuthfromToken(token);
 		if (authentication == null) {
-			String msg = messageSource.getMessage("expired_2fa", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Password expired.");
 		}
 
 		if (!userService.verify2FACode(email, codeMap)) {
-			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-			return new Credentials("Failed", msg);
+			return new Credentials("Failed", "Wrong 2FA code.");
 		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);

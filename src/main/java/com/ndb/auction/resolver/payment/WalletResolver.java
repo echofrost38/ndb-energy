@@ -2,17 +2,17 @@ package com.ndb.auction.resolver.payment;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.KYCSetting;
 import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.ndb.auction.service.user.UserDetailsImpl;
+
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -57,22 +57,19 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         // 1) check balance 
         CryptoBalance balance = internalBalanceService.getBalance(userId, tokenSymbol);
         if(balance.getFree() < amount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "amount");
+            throw new BalanceException("no_enough_fund", "amount");
         }
 
         // 2) check KYC level
         KYCSetting kyc = baseVerifyService.getKYCSetting("KYC");
         
         if(kyc == null) {
-            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            new BalanceException(msg, "kind");
+            throw new BalanceException("no_kyc", "kind");
         }
 
         if(kyc.getWithdraw() <= amount) {
             if(!shuftiService.kycStatusCkeck(userId)) {
-                String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-                throw new BalanceException(msg, "kind");
+                throw new BalanceException("no_kyc_verified", "kind");
             }
         }
 

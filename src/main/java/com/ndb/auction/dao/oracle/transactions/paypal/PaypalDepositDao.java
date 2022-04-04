@@ -35,7 +35,7 @@ public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, 
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
         m.setPaypalOrderId(rs.getString("ORDER_ID"));
         m.setPaypalOrderStatus(rs.getString("ORDER_STATUS"));
 		m.setCryptoType(rs.getString("CRYPTO_TYPE"));

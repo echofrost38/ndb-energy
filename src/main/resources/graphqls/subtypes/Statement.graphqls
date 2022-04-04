@@ -1,21 +1,12 @@
 type Statement {
-    # withdarw
     cryptoWithdraws: [CryptoWithdraw],
     paypalWithdraws: [PaypalWithdraw],
-    
-    # bid
     stripeAuctionTxns: [StripeAuctionTransaction],
     paypalAuctionTxns: [PaypalAuctionTransaction],
     coinpaymentAuctionTxns: [CoinpaymentAuctionTransaction],
-    
-    # presale
     stripePresaleTxns: [StripePresaleTransaction],
     paypalPresaleTxns: [PaypalPresaleTransaction],
     coinpaymentPresaleTxns: [CoinpaymentPresaleTransaction],
-    
-    # deposit
     paypalDepositTxns: [PaypalDepositTransaction],
     coinpaymentWalletTxns: [CoinpaymentWalletTransaction],
-    stripeDepositTxns: [StripeDepositTransaction],
-    bankDepositTxns: [BankDepositTransaction]
 }

@@ -146,8 +146,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             totpService.setTokenAuthCache(dataType, authentication);
             
             for (UserSecurity security : userSecurities) {
-                if(security.isTfaEnabled())
-                    data += "*" + security.getAuthType();
+                data += "*" + security.getAuthType();
             }
         }
 

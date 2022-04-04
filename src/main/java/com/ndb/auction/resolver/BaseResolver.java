@@ -47,12 +47,9 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 
 public class BaseResolver {
-
-	private final double COINPAYMENT_FEE = 0.5;
 
     @Value("${website.url}")
 	protected String WEBSITE_URL;
@@ -188,9 +185,6 @@ public class BaseResolver {
 	@Autowired
 	protected WhitelistService whitelistService;
 
-	@Autowired
-	protected MessageSource messageSource;
-
 	protected double getPayPalTotalOrder(int userId, double amount) {
 		User user = userService.getUserById(userId);
 		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
@@ -228,14 +222,4 @@ public class BaseResolver {
 		int number = rnd.nextInt(999999999);
 		return String.format("%06d", number);
 	}
-
-	public Double getTotalCoinpaymentOrder(int userId, double totalPrice) {
-        User user = userService.getUserById(userId);
-        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-
-		var white = whitelistService.selectByUser(userId);
-		if(white != null) tierFeeRate = 0.0;
-
-        return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
-    }
 }

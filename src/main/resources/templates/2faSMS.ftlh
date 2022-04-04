@@ -1,1 +1,1 @@
-${code} is your Nyyu verification code.
+2FA Code: ${code}

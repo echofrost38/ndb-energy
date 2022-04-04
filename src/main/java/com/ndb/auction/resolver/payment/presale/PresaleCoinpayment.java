@@ -19,11 +19,10 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     // create crypto payment
     @PreAuthorize("isAuthenticated()")
-    public CoinpaymentPresaleTransaction createChargeForPresale(int presaleId, int orderId, double amount, String coin, String network, String cryptoType, Double cryptoAmount) throws ParseException, IOException {
+    public CoinpaymentPresaleTransaction createChargeForPresale(int presaleId, int orderId, Long amount, String coin, String network, String cryptoType, Double cryptoAmount) throws ParseException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        double total = getTotalCoinpaymentOrder(userId, amount);
-        CoinpaymentPresaleTransaction m = new CoinpaymentPresaleTransaction(userId, presaleId, orderId, amount, total-amount, coin, network, cryptoAmount, cryptoType);
+        CoinpaymentPresaleTransaction m = new CoinpaymentPresaleTransaction(userId, presaleId, orderId, amount, coin, network, cryptoAmount, cryptoType);
         return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.createNewTransaction(m);
     }
 

@@ -1,11 +1,10 @@
 package com.ndb.auction.service;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.avatar.AvatarSet;
@@ -29,39 +28,33 @@ public class AuctionService extends BaseService {
 		// Started at checking
 		if (System.currentTimeMillis() > auction.getStartedAt()) {
 			System.out.println(System.currentTimeMillis());
-			String msg = messageSource.getMessage("invalid_time", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "startedAt");
+			throw new AuctionException("Round start time is invalid.", String.valueOf(auction.getId()));
 		}
 
 		// check conflict auction round
 		Auction _auction = auctionDao.getAuctionByRound(auction.getRound());
 		if (_auction != null) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("Round already exist.", String.valueOf(auction.getId()));
 		}
 
 		// started round
 		List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
 		if(auctions.size() != 0) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("countdown_auction", String.valueOf(auction.getId()));
 		}		
 		auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if(auctions.size() != 0) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("started_auction", String.valueOf(auction.getId()));
 		}		
 
 		// check presale
 		List<PreSale> presales = presaleDao.selectByStatus(PreSale.COUNTDOWN);
 		if(presales.size() != 0) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("countdown_presale", String.valueOf(auction.getId()));
 		}
 		presales = presaleDao.selectByStatus(PreSale.STARTED);
 		if(presales.size() != 0) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("started_presale", String.valueOf(auction.getId()));
 		}
 
 		auction = auctionDao.createNewAuction(auction);
@@ -103,10 +96,7 @@ public class AuctionService extends BaseService {
 		if (_auction == null)
 			return null;
 		if (_auction.getStatus() != Auction.PENDING)
-		{
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
-		}
+			throw new AuctionException("Round is not pending status.", String.valueOf(auction.getId()));
 
 		auctionDao.updateAuctionByAdmin(auction);
 		auctionAvatarDao.update(auction.getId(), auction.getAvatar());
@@ -118,15 +108,13 @@ public class AuctionService extends BaseService {
 		// check already opened Round
 		List<Auction> list = auctionDao.getAuctionByStatus(Auction.STARTED);
 		if (list.size() != 0) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("There is already opened round.", "id");
 		}
 
 		// check current auction is pending
 		Auction target = auctionDao.getAuctionById(id);
 		if (target.getStatus() != Auction.COUNTDOWN) {
-			String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "roundId");
+			throw new AuctionException("It is not a pending round.", "id");
 		}
 
 		auctionDao.startAuction(target);

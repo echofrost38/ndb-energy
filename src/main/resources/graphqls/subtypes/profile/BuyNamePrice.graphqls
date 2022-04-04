@@ -1,5 +1,0 @@
-type BuyNamePrice {
-    id: Int,
-    numOfChars: Int,
-    price: Float
-}

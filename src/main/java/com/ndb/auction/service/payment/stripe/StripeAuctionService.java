@@ -1,7 +1,6 @@
 package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Bid;
@@ -28,15 +27,13 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
         StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(m.getUserId(),m.getAmount());
-        m.setFee(getStripeFee(m.getUserId(), m.getAmount()));
         try {
             if (m.getPaymentIntentId() == null) {
 
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency("usd")
-                        .setAmount((long) totalAmount)
+                        .setAmount(m.getAmount().longValue())
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
@@ -73,8 +70,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
                 Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
-                    String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
-                    throw new BidException(msg, "bid");
+                    throw new BidException("no_bid", "auctionId");
                 }
 
                 // double paidAmount = intent.getAmount().doubleValue();
@@ -114,24 +110,22 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
     public PayResponse createNewTransactionWithSavedCard(StripeAuctionTransaction m, StripeCustomer customer) {
         PaymentIntent intent;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(m.getUserId(),m.getAmount());
-        m.setFee(getStripeFee(m.getUserId(), m.getAmount()));
         try {
 
             if(m.getPaymentIntentId() == null) {
-                // Create new PaymentIntent for the order
-                PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
-                        .setCurrency("usd")
-                        .setAmount((long) totalAmount)
-                        .setCustomer(customer.getCustomerId())
-                        .setPaymentMethod(customer.getPaymentMethod())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
-                        .setConfirm(true);
+            // Create new PaymentIntent for the order
+            PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
+                    .setCurrency("usd")
+                    .setAmount(m.getAmount().longValue())
+                    .setCustomer(customer.getCustomerId())
+                    .setPaymentMethod(customer.getPaymentMethod())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                    .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
+                    .setConfirm(true);
 
-                // Create a PaymentIntent with the order amount and currency
-                intent = PaymentIntent.create(createParams.build());
-                stripeAuctionDao.insert(m);
+            // Create a PaymentIntent with the order amount and currency
+            intent = PaymentIntent.create(createParams.build());
+            stripeAuctionDao.insert(m);
             } else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
@@ -142,8 +136,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
                 Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
-                    String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
-                    throw new BidException(msg, "bid");
+                    throw new BidException("no_bid", "auctionId");
                 }
 
                 // double paidAmount = intent.getAmount().doubleValue();

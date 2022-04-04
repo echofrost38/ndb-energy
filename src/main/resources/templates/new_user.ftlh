@@ -7,11 +7,11 @@
     <title>New User Created</title>
 </head>
 <body>
-	<div style="margin-top: 10px">Greetings,</div>
+	<div style="margin-top: 10px">Greetings</div>
 	<br/>
-	<div>Your account is created. You can use your password to sign in to your account.</div>
+	<div> Your account have been created. You can use this password from now.</div>
 	<div>
-		<h4>Password: <span style="font-weight: bold;">${code}</span></h4>
+		<h4>New Password : <span style="font-weight: bold;">${code}</span></h4>
 	</div>
 </body>
 </html>

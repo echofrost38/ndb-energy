@@ -84,10 +84,6 @@ public class CoinpaymentWalletService extends CoinpaymentBaseService implements 
         return coinpaymentWalletDao.update(id, status);
     }
 
-    public int updateStatus(int id, int status, double amount, double fee, String type) {
-        return coinpaymentWalletDao.updateStatus(id, status, amount, fee, type);
-    }
-
     public int deleteExpired(double days) {
         return coinpaymentWalletDao.deleteExpired(days);
     }

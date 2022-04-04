@@ -32,9 +32,9 @@ public class PreSaleDao extends BaseOracleDao {
         m.setRound(rs.getInt("ROUND"));
         m.setStartedAt(rs.getTimestamp("STARTED_AT").getTime());
         m.setEndedAt(rs.getTimestamp("ENDED_AT").getTime());
-        m.setTokenAmount(rs.getDouble("TOKEN_AMOUNT"));
-        m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
-        m.setSold(rs.getDouble("SOLD"));
+        m.setTokenAmount(rs.getLong("TOKEN_AMOUNT"));
+        m.setTokenPrice(rs.getLong("TOKEN_PRICE"));
+        m.setSold(rs.getLong("SOLD"));
         m.setStatus(rs.getInt("STATUS"));
 		m.setKind(2);
 		return m;
@@ -66,9 +66,9 @@ public class PreSaleDao extends BaseOracleDao {
 						ps.setInt(i++, m.getRound());
 						ps.setTimestamp(i++, new Timestamp(m.getStartedAt()));
 						ps.setTimestamp(i++, new Timestamp(m.getEndedAt()));
-						ps.setDouble(i++, m.getTokenAmount());
-						ps.setDouble(i++, m.getTokenPrice());
-						ps.setDouble(i++, m.getSold());
+						ps.setLong(i++, m.getTokenAmount());
+						ps.setLong(i++, m.getTokenPrice());
+						ps.setLong(i++, m.getSold());
 						ps.setInt(i++, m.getStatus());
 						return ps;
 					}

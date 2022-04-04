@@ -1,14 +1,12 @@
 package com.ndb.auction.service;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.PreSaleException;
-import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.Auction;
-import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleCondition;
+import com.ndb.auction.models.Auction;
+import com.ndb.auction.models.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -25,38 +23,32 @@ public class PresaleService extends BaseService {
 
         List<PreSale> presales = presaleDao.selectByStatus(PreSale.STARTED);
         if(presales.size() != 0) {
-            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "presale");
+            throw new PreSaleException("opened_presale", "conflict");
         }
 
         presales = presaleDao.selectByStatus(PreSale.COUNTDOWN);
         if(presales.size() != 0) {
-            String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "presale");
+            throw new PreSaleException("countdown_presale", "conflict");
         }
 
         // check date
         Long currentTime = System.currentTimeMillis();
         if(currentTime > presale.getStartedAt()) {
-            String msg = messageSource.getMessage("invalid_time", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "presale");
+            throw new PreSaleException("Presale start time invalid", "started at");
         }
 
         if(presale.getStartedAt() > presale.getEndedAt()) {
-            String msg = messageSource.getMessage("invalid_time", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "presale");
+            throw new PreSaleException("Presale end time invalid", "ended at");
         }
 
         // check auction round
         List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
         if(auctions.size() != 0) {
-            String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "auction");
+            throw new PreSaleException("opened_auction", "conflict");
         }
         auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
         if(auctions.size() != 0) {
-            String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "auction");
+            throw new PreSaleException("countdown_auction", "conflict");
         }
 
         presale = presaleDao.insert(presale);

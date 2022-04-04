@@ -10,8 +10,8 @@ import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalPresaleTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
-import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripePresaleTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeWalletTransaction;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 
@@ -41,6 +41,6 @@ public class Statement {
     // 3) Wallet
     private List<PaypalDepositTransaction> paypalDepositTxns;
     private List<CoinpaymentWalletTransaction> coinpaymentWalletTxns;
-    private List<StripeDepositTransaction> stripeDepositTxns;
+    private List<StripeWalletTransaction> stripeDepositTxns;
     private List<BankDepositTransaction> bankDepositTxns;
 }

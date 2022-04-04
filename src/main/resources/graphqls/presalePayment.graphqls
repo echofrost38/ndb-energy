@@ -33,12 +33,6 @@ extend type Mutation {
     captureOrderForPresale(
         orderId: String
     ) : Boolean
-    # for wallet
-    payWalletForPresale(
-        presaleId: Int,
-        orderId: Int,
-        cryptoType: String
-    ) : String
 }
 
 extend type Query {

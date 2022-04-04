@@ -1,15 +1,11 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
-import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
-import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.PaypalWithdrawService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,29 +22,6 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 	@Autowired
 	protected PaypalWithdrawService paypalWithdrawService;
 
-    @Autowired
-    protected TotpService totpService;
-
-    @Autowired
-    private MailService mailService;
-
-
-    @PreAuthorize("isAuthenticated()")
-    public String generateWithdraw() {
-        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetails.getEmail();
-        var user = userService.getUserByEmail(email);
-        var code = totpService.getWithdrawCode(email);
-
-        // send email
-        try {
-            mailService.sendVerifyEmail(user, code, "2faEmail.ftlh");
-        } catch (Exception e) {
-        }
-
-        return "Success";
-    }
-
     // Create paypal withdraw request!
     /**
      * 
@@ -59,29 +32,23 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
      * @return
      */
     @PreAuthorize("isAuthenticated()")
-    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken, String code) {
+    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var userEmail = userDetails.getEmail();
-
-        // check withdraw code
-        if(!totpService.checkWithdrawCode(userEmail, code)) {
-            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "code");
-        }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);
         if(sourceBalance < amount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "amount");
+            throw new BalanceException("insufficient_balance", "withdrawAmount");
         }
+
+        // KYC withdraw limit
+        var kycSetting = baseVerifyService.getKYCSetting("KYC");
 
         // KYC check
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "userId");
+            // throw new UnauthorizedException("no_kyc", "userId");
         }
         
         // get crypto price

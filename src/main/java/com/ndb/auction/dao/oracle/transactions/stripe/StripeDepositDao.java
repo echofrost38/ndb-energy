@@ -1,18 +1,15 @@
 package com.ndb.auction.dao.oracle.transactions.stripe;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
-
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
-
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import lombok.NoArgsConstructor;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 @Repository
 @NoArgsConstructor
@@ -84,10 +81,4 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
     public int update(int id, int status) {
         return 0;
     }
-
-    public List<StripeDepositTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
-    }
-
 }

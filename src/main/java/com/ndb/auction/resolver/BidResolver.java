@@ -1,15 +1,13 @@
 package com.ndb.auction.resolver;
 
 import java.util.List;
-import java.util.Locale;
-
-import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.Bid;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.ndb.auction.models.Bid;
+import com.ndb.auction.service.user.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -25,14 +23,6 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 	) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int userId = userDetails.getId();
-
-		// check KYC status!
-		var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if(!kycStatus) {
-			String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "userId");
-        }
-
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice);
 	}
 	

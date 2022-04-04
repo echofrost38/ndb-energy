@@ -1,6 +1,5 @@
 package com.ndb.auction.resolver.payment.auction;
 
-import java.util.Locale;
 import java.util.Map;
 
 import com.ndb.auction.exceptions.AuctionException;
@@ -26,12 +25,10 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 	public String payWalletForAuction(int roundId, String cryptoType) {
 		Auction auction = auctionService.getAuctionById(roundId);
 		if(auction == null) {
-            String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
-			throw new AuctionException(msg, "roundId");
+			throw new AuctionException("no_auction", "roundId");
 		}
 		if(auction.getStatus() != Auction.STARTED) {
-            String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
-			throw new AuctionException(msg, "roundId");
+			throw new AuctionException("not_started", "roundId");
 		}
 
 		// Get Bid
@@ -40,10 +37,7 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 		
 		Bid bid = bidService.getBid(roundId, userId);
 		User user = userService.getUserById(userId);
-		if(bid == null) {
-            String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
-			throw new BidException(msg, "roundId");
-		} 
+		if(bid == null) throw new BidException("no_bid", "roundId");
 
 		// Get total order in USD
 		double totalOrder = 0.0;
@@ -64,11 +58,7 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 		double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
 		double cryptoAmount = totalOrder / cryptoPrice; // required amount!
 		double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
-		if(freeBalance < cryptoAmount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-			throw new BidException(msg, "amount");
-		} 
-			
+		if(freeBalance < cryptoAmount) throw new BidException("insufficient", "amount");
 
 		// make hold
 		internalBalanceService.makeHoldBalance(userId, cryptoType, cryptoAmount);

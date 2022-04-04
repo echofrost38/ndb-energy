@@ -78,9 +78,4 @@ public class UserAvatarDao extends BaseOracleDao {
 				m.getPurchased(),m.getHairColor(), m.getSelected(), m.getPrefix(), m.getName());
 	}
 
-	public int updateName(int userId, String newName) {
-		String sql = "UPDATE TBL_USER_AVATAR SET NAME=? WHERE ID=?";
-		return jdbcTemplate.update(sql, newName, userId);
-	}
-
 }

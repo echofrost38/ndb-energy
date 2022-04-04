@@ -1,14 +1,11 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
 import java.util.List;
-import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
-import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
-import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,32 +22,15 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Autowired
 	protected CryptoWithdrawService cryptoWithdrawService;
 
-    @Autowired
-    private TotpService totpService;
-
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des, String code) {
+    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var userEmail = userDetails.getEmail();
-
-        var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if(!kycStatus) {
-            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "userId");
-        }
-
-        // check withdraw code
-        if(!totpService.checkWithdrawCode(userEmail, code)) {
-            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "code");
-        }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);
         if(sourceBalance < amount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "amount");
+            throw new BalanceException("insufficient_balance", "withdrawAmount");
         }
 
         // get crypto price

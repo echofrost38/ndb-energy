@@ -2,10 +2,13 @@ package com.ndb.auction.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.ndb.auction.dao.oracle.other.LocationLogDao;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.LocationLog;
 import com.ndb.auction.payload.VpnAPI;
+import com.ndb.auction.utils.RemoteIpHelper;
 
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;

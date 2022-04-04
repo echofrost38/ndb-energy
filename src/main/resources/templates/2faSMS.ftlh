@@ -1,1 +1,1 @@
-2FA Code: ${code}
+${code} is your Nyyu verification code.

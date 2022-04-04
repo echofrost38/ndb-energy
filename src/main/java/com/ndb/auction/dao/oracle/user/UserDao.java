@@ -147,7 +147,7 @@ public class UserDao extends BaseOracleDao {
 		sql += " ORDER BY " + orderby;
 		if (offset != null)
 			sql += " OFFSET ? ROWS";
-		if (limit != null)
+		if (limit != null && limit>0)
 			sql += " FETCH NEXT ? ROWS ONLY";
 		return jdbcTemplate.query(sql, new PreparedStatementSetter() {
 			@Override
@@ -161,7 +161,7 @@ public class UserDao extends BaseOracleDao {
 				}
 				if (offset != null)
 					ps.setInt(i++, offset);
-				if (limit != null)
+				if (limit != null && limit>0)
 					ps.setInt(i++, limit);
 			}
 		}, new RowMapper<User>() {

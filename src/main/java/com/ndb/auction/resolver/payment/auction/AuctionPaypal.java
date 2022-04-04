@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.auction;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.BidException;
@@ -47,14 +48,17 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		// check bid status
 		Auction round = auctionService.getAuctionById(roundId);
 		if(round == null) {
-			throw new AuctionException("no_auction", "roundId");
+			String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "roundId");
 		}
 		if(round.getStatus() != Auction.STARTED) {
-			throw new AuctionException("not_started_auction", "roundId");
+			String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "roundId");
 		}
 		Bid bid = bidService.getBid(roundId, userId);
 		if(bid == null) {
-			throw new BidException("not_bid", "roundId");
+			String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+			throw new BidException(msg, "roundId");
 		}
 		
 		Double checkoutAmount = 0.0;
@@ -105,16 +109,25 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {
 			// fetch transaction
 			PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByPaypalOrderId(orderId);
-			if(m == null) throw new BidException("There is no transaction", "orderId");
+			if(m == null) {
+                String msg = messageSource.getMessage("no_transaction", null, Locale.ENGLISH);
+				throw new BidException(msg, "orderId");
+			}
 			if(m.getUserId() != userId) {
-				throw new UserNotFoundException("User doesn't match.", "user");
+                String msg = messageSource.getMessage("no_match_user", null, Locale.ENGLISH);
+				throw new UserNotFoundException(msg, "user");
 			}
 
 			// check Bid
 			Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
-			if(bid == null) throw new BidException("There is no bid.", "orderId");
-			if(bid.getStatus() != Bid.NOT_CONFIRMED && !bid.isPendingIncrease()) 
-				throw new BidException("Cannot capture.", "orderId");
+			if(bid == null) {
+                String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+				throw new BidException(msg, "orderId");
+			} 
+			if(bid.getStatus() != Bid.NOT_CONFIRMED && !bid.isPendingIncrease()) {
+                String msg = messageSource.getMessage("cannot_capture", null, Locale.ENGLISH);
+				throw new BidException(msg, "orderId");
+			}
 
 			// update transaction status
 			paypalAuctionService.updateOrderStatus(m.getId(), OrderStatus.COMPLETED.toString());

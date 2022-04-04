@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
@@ -29,7 +30,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            new UnauthorizedException(msg, "userId");
         }
         
         // get fiat price, and calculate USD equivalent balance

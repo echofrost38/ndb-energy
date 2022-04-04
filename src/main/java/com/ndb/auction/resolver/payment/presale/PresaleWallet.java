@@ -1,5 +1,7 @@
 package com.ndb.auction.resolver.payment.presale;
 
+import java.util.Locale;
+
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
@@ -26,17 +28,20 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         // getting presale 
         PreSale presale = presaleService.getPresaleById(presaleId);
         if(presale == null) {
-            throw new AuctionException("There is no presale.", "presaleId");
+            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
         }
 
         if(presale.getStatus() != PreSale.STARTED) {
-            throw new AuctionException("Presale is not started.", "presaleId");
+            String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
         }
 
         // get presale order
         PreSaleOrder order = presaleOrderService.getPresaleById(orderId);
         if(order == null) {
-            throw new AuctionException("There is no presale order.", "presaleId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
         }
 
         // get amount 
@@ -53,7 +58,10 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
         double cryptoAmount = totalOrder / cryptoPrice; // required amount!
         double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
-        if(freeBalance < cryptoAmount) throw new AuctionException("insufficient", "amount");
+        if(freeBalance < cryptoAmount) {
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "amount");
+        }
 
         // deduct free balance
         internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);

@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
@@ -97,7 +98,8 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         User user = userService.getUserByEmail(email);
         if (user != null) {
-            throw new UserNotFoundException("already_exists", "email");
+            String msg = messageSource.getMessage("email_exists", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "email");
         }
 
         String rPassword = userService.getRandomPassword(10);

@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.depoist;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
@@ -26,7 +27,8 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
 
         CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction(userId, 0.0, 0.0, coin, network, 0.0, cryptoType);

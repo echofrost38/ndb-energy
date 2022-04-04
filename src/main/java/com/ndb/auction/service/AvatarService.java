@@ -1,8 +1,9 @@
 package com.ndb.auction.service;
 
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.AvatarNotFoundException;
+import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.SkillSet;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarFacts;
@@ -36,7 +37,8 @@ public class AvatarService extends BaseService {
 	public AvatarComponent updateAvatarComponent(String groupId, int compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
 		AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 		if (component == null) {
-			throw new AvatarNotFoundException("Cannot find avatar component.", "compId", 0);
+			String msg = messageSource.getMessage("no_avatar_component", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "avatar");
 		}
 		tierLevel = tierLevel == null ? 0 : tierLevel;
 		limited = limited == null ? 0 : limited;
@@ -57,7 +59,8 @@ public class AvatarService extends BaseService {
 		// check condition
 		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(surname);
 		if (profile != null) {
-			throw new AvatarNotFoundException("Already exists with " + surname, "surname", 0);
+			String msg = messageSource.getMessage("no_avatar", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "avatar");
 		}
 		
 		profile = new AvatarProfile(name, surname, skillSet, avatarSet, hairColor, factsSet, details);
@@ -96,7 +99,8 @@ public class AvatarService extends BaseService {
 	{
 		AvatarProfile profile = avatarProfileDao.getAvatarProfile(id);
 		if (profile == null) {
-			throw new AvatarNotFoundException("Cannot find avatar profile.", "id", 0);
+			String msg = messageSource.getMessage("no_avatar", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "avatar");
 		}
 		if(fname != null) profile.setFname(fname);
 		if(surname != null) profile.setSurname(surname);

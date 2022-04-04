@@ -2,6 +2,7 @@ package com.ndb.auction.resolver.payment.presale;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
@@ -43,7 +44,8 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         
         PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(orderId);
         if(presaleOrder == null) {
-            throw new BidException("There is no presale order.", "orderId");
+            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+            throw new BidException(msg, "orderId");
         }
         double amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
         
@@ -77,14 +79,19 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {
 			// fetch transaction
             PaypalPresaleTransaction m = (PaypalPresaleTransaction) paypalPresaleService.selectByPaypalOrderId(orderId);
-			if(m == null) throw new BidException("There is no transaction", "orderId");
+			if(m == null) {
+                String msg = messageSource.getMessage("no_transaction", null, Locale.ENGLISH);
+                throw new BidException(msg, "orderId");
+            }
 			if(m.getUserId() != userId) {
-				throw new UserNotFoundException("User doesn't match.", "user");
+                String msg = messageSource.getMessage("no_match_user", null, Locale.ENGLISH);
+				throw new UserNotFoundException(msg, "user");
             }
 
 			PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(m.getOrderId());
             if(presaleOrder == null) {
-                throw new BidException("There is no presale order", "orderId");
+                String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+                throw new BidException(msg, "orderId");
             }
 
             // process order

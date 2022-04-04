@@ -2,8 +2,9 @@ package com.ndb.auction.service.payment.paypal;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
@@ -36,7 +37,8 @@ public class PaypalPresaleService extends PaypalBaseService implements ITransact
         int presaleId = m.getPresaleId();
         PreSale presale = presaleDao.selectById(presaleId);
         if(presale == null || presale.getStatus() != PreSale.STARTED) {
-            throw new AuctionException("There is a problem in Presale Round.", "presaleId");
+            String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "presale");
         }
 
         // create paypal checkout order

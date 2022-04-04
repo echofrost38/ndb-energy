@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.http.Part;
@@ -79,7 +80,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj != null) {
             status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
-                throw new UnauthorizedException("already_verified", "userId");
+                String msg = messageSource.getMessage("already_verified", null, Locale.ENGLISH);
+                throw new UnauthorizedException(msg, "userId");
             }
         }
         String ref = "";
@@ -105,7 +107,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
         ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
         if(referenceObj == null) {
-            throw new UserNotFoundException("not_found_reference", "user");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "user");
         }
         return shuftiService.kycStatusRequestAsync(referenceObj.getReference());
     }
@@ -147,7 +150,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj != null) {
             status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
-                throw new UnauthorizedException("already_verified", "userId");
+                String msg = messageSource.getMessage("already_verified", null, Locale.ENGLISH);
+                throw new UnauthorizedException(msg, "userId");
             }
         }
         if(status == 1) {
@@ -203,11 +207,13 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var email = userDetails.getEmail();
         if(!totpService.checkVerifyCode(email, code)) {
-            throw new UnauthorizedException("verify code doesn't match.", "code");
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "code");
         }
         var user = userService.getUserByEmail(newEmail);
         if(user != null) {
-            throw new UnauthorizedException("That email already exists.", "code");
+            String msg = messageSource.getMessage("email_exists", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "code");
         }
 
         return profileService.updateEmail(userDetails.getId(), newEmail);
@@ -233,7 +239,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
         double ndbBalance = internalBalanceService.getFreeBalance(userId, "NDB");
         if(ndbBalance < ndbOrder) {
-            throw new BalanceException("insufficient NDB funds.", "userId");
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "userId");
         }
         
         // change name

@@ -1,8 +1,10 @@
 package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
@@ -33,7 +35,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
-            throw new UserNotFoundException("no_presale_order", "orderId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
         }
 
         try {
@@ -70,7 +73,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                 double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
                 double totalOrder = getTotalAmount(userId, orderAmount);
                 if (totalOrder > paidAmount) {
-                    throw new UserNotFoundException("no_enough_funds", "amount");
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
                 }
 
                 handlePresaleOrder(userId, presaleOrder);
@@ -96,7 +100,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
-            throw new UserNotFoundException("no_presale_order", "orderId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
         }
 
         try {
@@ -128,7 +133,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                 double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
                 double totalOrder = getTotalAmount(userId, orderAmount);
                 if (totalOrder > paidAmount) {
-                    throw new UserNotFoundException("no_enough_funds", "amount");
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
                 }
 
                 handlePresaleOrder(userId, presaleOrder);

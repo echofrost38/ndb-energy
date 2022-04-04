@@ -1,6 +1,7 @@
 package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Bid;
@@ -72,7 +73,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
                 Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
-                    throw new BidException("no_bid", "auctionId");
+                    String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+                    throw new BidException(msg, "bid");
                 }
 
                 // double paidAmount = intent.getAmount().doubleValue();
@@ -140,7 +142,8 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
                 Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
-                    throw new BidException("no_bid", "auctionId");
+                    String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+                    throw new BidException(msg, "bid");
                 }
 
                 // double paidAmount = intent.getAmount().doubleValue();

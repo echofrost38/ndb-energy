@@ -3,8 +3,9 @@ package com.ndb.auction.service.payment.coinpayment;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.transactions.CryptoDepositTransaction;
@@ -33,13 +34,15 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService implements
         // round existing
         PreSale presale = presaleDao.selectById(m.getPresaleId());
         if (presale == null) {
-            throw new AuctionException("Round doesn't exist.", "roundId");
+            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "presale");
         }
 
         // check bid
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(m.getOrderId());
         if(presaleOrder == null || presaleOrder.getStatus() == 1) {
-            throw new AuctionException("Order doesn't exist.", "roundId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
         }
 
         HttpPost post = new HttpPost(COINS_API_URL);

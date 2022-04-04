@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
@@ -9,6 +10,7 @@ import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.payment.stripe.StripeDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +37,8 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
 
         StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId, paymentMethodId);
@@ -49,12 +52,14 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
 
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
         if(userId != customer.getUserId()){
-            throw new UnauthorizedException("The user is not authorized to use this card.","USER_ID");
+            String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg,"USER_ID");
         }
         StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId);
         return stripeDepositService.createDepositWithSavedCard(m, customer);

@@ -3,11 +3,10 @@ package com.ndb.auction.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import com.ndb.auction.exceptions.AvatarNotFoundException;
-import com.ndb.auction.exceptions.BidException;
-import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.avatar.AvatarComponent;
@@ -43,7 +42,8 @@ public class ProfileService extends BaseService {
 	public Integer getNotifySetting(int userId) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
-			throw new UserNotFoundException("We were unable to find a user id", "userId");
+			String msg = messageSource.getMessage("no_user", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "user");
 		}
 
 		return user.getNotifySetting();
@@ -51,7 +51,10 @@ public class ProfileService extends BaseService {
 
 	public int updateNotifySetting(int userId, int setting) {
 		if (userDao.updateNotifySetting(userId, setting) < 1)
-			throw new UserNotFoundException("We were unable to find a user id", "userId");
+		{
+			String msg = messageSource.getMessage("no_user", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "user");
+		}
 		return setting;
 	}
 
@@ -73,12 +76,14 @@ public class ProfileService extends BaseService {
 		// check user exists
 		UserAvatar userAvatar = userAvatarDao.selectByPrefixAndName(prefix, name);
 		if (userAvatar != null) {
-			return "Already exists";
+			String msg = messageSource.getMessage("no_avatar", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "avatar");
 		}
 
 		User user = userDao.selectById(id);
 		if (user == null) {
-			throw new UserNotFoundException("We were unable to find a user with avatar", "name");
+			String msg = messageSource.getMessage("no_user", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "user");
 		}
 
 		userAvatar = userAvatarDao.selectById(id);
@@ -91,7 +96,8 @@ public class ProfileService extends BaseService {
 		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(prefix);
 
 		if (profile == null) {
-			throw new AvatarNotFoundException("There is not avatar: [" + prefix + "]", "prefix", 0);
+			String msg = messageSource.getMessage("no_avatar", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "avatar");
 		}
 
 		List<AvatarSet> sets = avatarSetDao.selectById(profile.getId());
@@ -132,7 +138,8 @@ public class ProfileService extends BaseService {
 	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set, String hairColor) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
-			throw new UserNotFoundException("We were unable to find a user id", "userId");
+			String msg = messageSource.getMessage("no_user", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "user");
 		}
 
 		UserAvatar userAvatar = userAvatarDao.selectById(userId);
@@ -154,7 +161,8 @@ public class ProfileService extends BaseService {
 			compId = avatarSet.getCompId();
 			AvatarComponent component = avatarComponentDao.getAvatarComponent(groupId, compId);
 			if (component == null) {
-				throw new AvatarNotFoundException("Cannot find avatar component.", "compId", 0);
+				String msg = messageSource.getMessage("no_avatar_component", null, Locale.ENGLISH);
+            	throw new UnauthorizedException(msg, "avatar");
 			}
 
 			// check purchased
@@ -170,7 +178,8 @@ public class ProfileService extends BaseService {
 
 			// check remained
 			if (component.getLimited() != 0 && component.getLimited() <= component.getPurchased()) {
-				throw new BidException("Avatar Components are sold out.","set");
+				String msg = messageSource.getMessage("no_component_left", null, Locale.ENGLISH);
+            	throw new UnauthorizedException(msg, "avatar");
 			}
 
 			// check free
@@ -196,7 +205,8 @@ public class ProfileService extends BaseService {
 
 		double balance = ndbBalance.getFree();
 		if (balance < totalPrice) {
-			throw new BidException("You don't have enough balance in wallet.", "set");
+			String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+			throw new UnauthorizedException(msg, "balance");
 		}
 
 		// update internal NDB balance
@@ -229,7 +239,8 @@ public class ProfileService extends BaseService {
 
 		UserAvatar checkAvatar = userAvatarDao.selectByPrefixAndName(prefix, newName);
 		if(checkAvatar != null) {
-			throw new BidException("Already exists", "new name");
+			String msg = messageSource.getMessage("avatar_name_conflict", null, Locale.ENGLISH);
+			throw new UnauthorizedException(msg, "name");
 		}
 
 		return userAvatarDao.updateName(userId, newName);

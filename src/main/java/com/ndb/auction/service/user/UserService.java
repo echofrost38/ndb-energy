@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -22,6 +23,7 @@ import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.BaseService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,9 @@ import freemarker.template.TemplateException;
 
 @Service
 public class UserService extends BaseService {
+
+	@Autowired
+	MessageSource messageSource;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -65,11 +70,13 @@ public class UserService extends BaseService {
 	public boolean verifyAccount(String email, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		if (!totpService.checkVerifyCode(email, code)) {
-			throw new UnauthorizedException("Your account is not verified", "email");
+			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		if (userVerifyDao.updateEmailVerified(user.getId(), true) < 1) {
@@ -92,7 +99,8 @@ public class UserService extends BaseService {
 	public String resendVerifyCode(String email) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
@@ -109,7 +117,8 @@ public class UserService extends BaseService {
 	public String request2FA(String email, String method, String phone) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
@@ -163,7 +172,8 @@ public class UserService extends BaseService {
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
 		if (userVerify == null || !userVerify.isEmailVerified()) {
-			throw new UnauthorizedException("Your account is not verified", "email");
+			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		// Generate proper TOTP code
@@ -206,17 +216,20 @@ public class UserService extends BaseService {
 	public String confirmRequest2FA(String email, String method, String code) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 		UserVerify userVerify = userVerifyDao.selectById(user.getId());
 
 		if (userVerify == null || !userVerify.isEmailVerified()) {
-			throw new UnauthorizedException("Your account is not verified", "email");
+			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
+			throw new UnauthorizedException(msg, "email");
 		}
 
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
 		if (userSecurities.size() == 0) {
-			throw new UnauthorizedException("There is no proper 2FA setting.", "code");
+			String msg = messageSource.getMessage("no_two_step", null, Locale.ENGLISH);
+			throw new UnauthorizedException(msg, "code");
 		}
 
 		boolean status = false;
@@ -298,7 +311,8 @@ public class UserService extends BaseService {
 		boolean result = false;
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 		List<UserSecurity> userSecurities = userSecurityDao.selectByUserId(user.getId());
 		for (UserSecurity userSecurity : userSecurities) {
@@ -321,7 +335,8 @@ public class UserService extends BaseService {
 	public boolean sendResetToken(String email) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 		String code = totpService.get2FACode(email);
 		try {
@@ -337,7 +352,8 @@ public class UserService extends BaseService {
 		if (totpService.check2FACode(email, code)) {
 			User user = userDao.selectByEmail(email);
 			if (user == null) {
-				throw new UserNotFoundException("Cannot find user by " + email, "email");
+				String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+				throw new UserNotFoundException(msg, "email");
 			}
 			userDao.updatePassword(user.getId(), encoder.encode(newPass));
 		} else {
@@ -484,7 +500,8 @@ public class UserService extends BaseService {
 
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 		String rPassword = getRandomPassword(10);
 		String encoded = encodePassword(rPassword);
@@ -514,8 +531,6 @@ public class UserService extends BaseService {
 		try {
 			mailService.sendVerifyEmail(user, rPassword, "new_user.ftlh");
 		} catch (Exception e) {
-			// e.printStackTrace();
-			// throw new UserNotFoundException("cannot create new user.", "email");
 		}
 		return "Success";
 	}
@@ -523,7 +538,8 @@ public class UserService extends BaseService {
 	public String changeRole(String email, String role) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user by " + email, "email");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		if (role.equals("admin")) {
@@ -543,7 +559,8 @@ public class UserService extends BaseService {
 	public int changeNotifySetting(int userId, int nType, boolean status) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
-			throw new UserNotFoundException("Cannot find user", "userId");
+			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "email");
 		}
 
 		int notifySetting = user.getNotifySetting();

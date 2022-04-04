@@ -1,5 +1,8 @@
 package com.ndb.auction.service;
 
+// import java.util.Locale;
+
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.InternalWallet;
 
@@ -13,7 +16,8 @@ public class InternalWalletService extends BaseService {
     public int addFavouriteToken(int userId, String token) {
         InternalWallet wallet = walletDao.selectByUserId(userId);
         if(wallet == null) {
-            throw new UserNotFoundException("Cannot Find Token Object", "userId");
+            // String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException("Cannot Find Token Object", "userId");
         }
         String favourites = wallet.getFavouriteTokens();
         favourites += token + ",";

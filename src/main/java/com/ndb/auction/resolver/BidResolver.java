@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Bid;
@@ -28,7 +29,8 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		// check KYC status!
 		var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+			String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
 
 		return bidService.placeNewBid(userId, roundId, tokenAmount, tokenPrice);

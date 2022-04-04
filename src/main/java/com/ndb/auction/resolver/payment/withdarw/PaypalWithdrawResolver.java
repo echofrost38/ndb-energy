@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -65,19 +66,22 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         // check withdraw code
         if(!totpService.checkWithdrawCode(userEmail, code)) {
-            throw new BalanceException("2FA failed", "code");
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "code");
         }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);
         if(sourceBalance < amount) {
-            throw new BalanceException("insufficient_balance", "withdrawAmount");
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "amount");
         }
 
         // KYC check
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
         
         // get crypto price

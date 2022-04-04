@@ -1,6 +1,7 @@
 package com.ndb.auction.resolver.payment.depoist;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
@@ -63,7 +64,8 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
-            throw new UnauthorizedException("Please verify your identity.", "userId");
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
 
         double fee = getPaypalFee(userId, amount);
@@ -96,7 +98,10 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         int userId = userDetails.getId();
 
         var m = paypalDepositService.selectByPaypalOrderId(orderId);
-        if(m == null || m.getUserId() != userId) throw new UserNotFoundException("There is no transaction.", "orderId");
+        if(m == null || m.getUserId() != userId) {
+            String msg = messageSource.getMessage("no_transaction", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "orderId");
+        }
 
         CaptureOrderResponseDTO responseDTO = payPalHttpClient.captureOrder(orderId);
         if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {

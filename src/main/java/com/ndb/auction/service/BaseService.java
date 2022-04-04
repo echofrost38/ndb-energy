@@ -58,6 +58,7 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
@@ -225,6 +226,9 @@ public class BaseService {
 
     @Autowired
     protected TierDao tierDao;
+
+    @Autowired
+    protected MessageSource messageSource;
 
     public String buildHmacSignature(String value, String secret) {
         String result;

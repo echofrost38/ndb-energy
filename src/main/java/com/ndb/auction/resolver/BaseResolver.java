@@ -47,6 +47,7 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 
 public class BaseResolver {
@@ -186,6 +187,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected WhitelistService whitelistService;
+
+	@Autowired
+	protected MessageSource messageSource;
 
 	protected double getPayPalTotalOrder(int userId, double amount) {
 		User user = userService.getUserById(userId);

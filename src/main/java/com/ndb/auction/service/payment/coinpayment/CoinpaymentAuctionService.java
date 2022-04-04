@@ -2,8 +2,9 @@ package com.ndb.auction.service.payment.coinpayment;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Bid;
 import com.ndb.auction.models.transactions.CryptoDepositTransaction;
@@ -37,13 +38,15 @@ public class CoinpaymentAuctionService extends CoinpaymentBaseService implements
         // round existing
         Auction round = auctionDao.getAuctionById(m.getAuctionId());
         if (round == null) {
-            throw new AuctionException("Round doesn't exist.", "roundId");
+            String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "auction");
         }
 
         // check bid
         Bid bid = bidDao.getBid(m.getUserId(), m.getAuctionId());
         if (bid == null) {
-            throw new AuctionException("No bid.", "roundId");
+            String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "bid");
         }
 
         HttpPost post = new HttpPost(COINS_API_URL);

@@ -6,8 +6,8 @@ import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentWalletDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalDepositDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
 import com.ndb.auction.dao.oracle.withdraw.CryptoWithdrawDao;
 import com.ndb.auction.models.transactions.Statement;
 
@@ -39,7 +39,7 @@ public class FinancialService extends BaseService {
     private CoinpaymentWalletDao coinpaymentWalletDao;
 
     @Autowired
-    private StripeWalletDao stripeWalletDao;
+    private StripeDepositDao stripeDepositDao;
 
     @Autowired
     private BankDepositDao bankDepositDao;
@@ -62,7 +62,7 @@ public class FinancialService extends BaseService {
         
         statement.setPaypalDepositTxns(paypalDepositDao.selectRange(userId, from, to));
         statement.setCoinpaymentWalletTxns(coinpaymentWalletDao.selectRange(userId, from, to));
-        statement.setStripeDepositTxns(stripeWalletDao.selectRange(userId, from, to));
+        statement.setStripeDepositTxns(stripeDepositDao.selectRange(userId, from, to));
         statement.setBankDepositTxns(bankDepositDao.selectRange(userId, from, to));
         return statement;
     }

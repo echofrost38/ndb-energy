@@ -7,19 +7,21 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.exceptions.IPNExceptions;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.transactions.CryptoTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
+import com.ndb.auction.models.transactions.CryptoTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
+import com.ndb.auction.service.user.WhitelistService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/")
 @Slf4j
 public class CryptoController extends BaseController {
+
+    @Autowired
+    private WhitelistService whitelistService;
 
     private final double COINPAYMENT_FEE = 0.5;
 
@@ -122,6 +127,12 @@ public class CryptoController extends BaseController {
                 List<Tier> tierList = tierService.getUserTiers();
                 TaskSetting taskSetting = taskSettingService.getTaskSetting();
                 TierTask tierTask = tierTaskService.getTierTask(bid.getUserId());
+
+                if(tierTask == null) {
+                    tierTask = new TierTask(bid.getUserId());
+                    tierTaskService.updateTierTask(tierTask);
+                }
+
                 List<Integer> auctionList = tierTask.getAuctions();
                 if(!auctionList.contains(bid.getRoundId())) {
                     auctionList.add(bid.getRoundId());
@@ -233,6 +244,12 @@ public class CryptoController extends BaseController {
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(user.getId());
+            
+            if(tierTask == null) {
+                tierTask = new TierTask(user.getId());
+                tierTaskService.updateTierTask(tierTask);
+            }
+            
             double presalePoint = tierTask.getDirect();
             presalePoint += taskSetting.getDirect() * totalPrice;
             tierTask.setDirect(presalePoint);
@@ -331,7 +348,14 @@ public class CryptoController extends BaseController {
             }
 
             int userId = txn.getUserId();
-            balanceService.addFreeBalance(userId, cryptoType, amount);
+
+            // account for fee
+            double fee = getCoinpaymentFee(userId, amount);
+            double deposited = amount - fee;
+            // update coinpayment deposit transaction
+            coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
+
+            balanceService.addFreeBalance(userId, cryptoType, deposited);
             List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
             double totalBalance = 0.0;
@@ -347,6 +371,11 @@ public class CryptoController extends BaseController {
             List<Tier> tierList = tierService.getUserTiers();
             TaskSetting taskSetting = taskSettingService.getTaskSetting();
             TierTask tierTask = tierTaskService.getTierTask(userId);
+
+            if(tierTask == null) {
+                tierTask = new TierTask(userId);
+                tierTaskService.updateTierTask(tierTask);
+            }
     
             if(tierTask.getWallet() < totalBalance) {
     
@@ -393,7 +422,20 @@ public class CryptoController extends BaseController {
     private Double getTotalOrder(int userId, double totalPrice) {
         User user = userService.getUserById(userId);
         Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+
+        var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
+        
         return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
+    }
+
+    private double getCoinpaymentFee(int userId, double totalPrice) {
+        User user = userService.getUserById(userId);
+        Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+
+        var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
+        return totalPrice * (COINPAYMENT_FEE + tierFeeRate) / 100.0;
     }
 
 }

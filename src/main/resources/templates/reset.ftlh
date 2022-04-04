@@ -8,7 +8,7 @@
             href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
             rel="stylesheet"
         />
-        <title>NDB Money</title>
+        <title>Nyyu UAB</title>
     </head>
     <body>
         <div
@@ -21,7 +21,7 @@
             "
         >
             <img
-                src="https://ndb-sale.s3.eu-west-1.amazonaws.com/email/ndb_logo.png"
+                src="https://ndb-sale.s3.eu-west-1.amazonaws.com/email/nyyu-logo-01.png"
                 style="width: 82px; height: 31px; padding-top: 35px"
                 alt="Logo"
             />

@@ -19,8 +19,8 @@ public class PresaleResolver extends BaseResolver implements GraphQLQueryResolve
     public int createNewPresale(
         Long startedAt,
         Long endedAt,
-        Long tokenAmount,
-        Long tokenPrice,
+        Double tokenAmount,
+        Double tokenPrice,
         List<PreSaleCondition> conditions
     ) {
         int lastAuctionRound = auctionService.getNewRound();

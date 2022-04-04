@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.KYCSetting;
@@ -18,9 +19,13 @@ import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
+import com.ndb.auction.service.NamePriceService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.MailService;
+import com.ndb.auction.service.utils.TotpService;
 
 import org.apache.http.client.ClientProtocolException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -30,6 +35,15 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
+
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private TotpService totpService;
+
+    @Autowired
+    private NamePriceService namePriceService;
 
     // select avatar profile
     // prefix means avatar name!!!
@@ -66,7 +80,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj != null) {
             status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
-                throw new UnauthorizedException("already_verified", "userId");
+                String msg = messageSource.getMessage("already_verified", null, Locale.ENGLISH);
+                throw new UnauthorizedException(msg, "userId");
             }
         }
         String ref = "";
@@ -92,7 +107,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
 
         ShuftiReference referenceObj = shuftiService.getShuftiReference(userId);
         if(referenceObj == null) {
-            throw new UserNotFoundException("not_found_reference", "user");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "user");
         }
         return shuftiService.kycStatusRequestAsync(referenceObj.getReference());
     }
@@ -134,7 +150,8 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
         if(referenceObj != null) {
             status = shuftiService.kycStatusRequestAsync(referenceObj.getReference());
             if(status == 1) {
-                throw new UnauthorizedException("already_verified", "userId");
+                String msg = messageSource.getMessage("already_verified", null, Locale.ENGLISH);
+                throw new UnauthorizedException(msg, "userId");
             }
         }
         if(status == 1) {
@@ -172,15 +189,65 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String changeEmail(String newEmail) {
+    public String changeEmail() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return null;
+        var email = userDetails.getEmail();
+        var code = totpService.getVerifyCode(email);
+        var user = userService.getUserByEmail(email);
+        try {
+            mailService.sendVerifyEmail(user, code, "confirmEmailChange.ftlh"); 
+        } catch (Exception e) {
+        }
+        
+        return "Success";
     }
 
     @PreAuthorize("isAuthenticated()")
-    public int confirmChangeEmail(String email, Map<String,String> codeMap) {
+    public int confirmChangeEmail(String newEmail, String code) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var email = userDetails.getEmail();
+        if(!totpService.checkVerifyCode(email, code)) {
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "code");
+        }
+        var user = userService.getUserByEmail(newEmail);
+        if(user != null) {
+            String msg = messageSource.getMessage("email_exists", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "code");
+        }
+
+        return profileService.updateEmail(userDetails.getId(), newEmail);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public int changeBuyName(String newName) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+
+        // check user balance
+        int chars = newName.length();
+        var namePrice = namePriceService.select(chars);
+
+        if(namePrice == null) {
+            var priceList = namePriceService.selectAll();
+            var len = priceList.size();
+            namePrice = priceList.get(len - 1); // get last one
+        }
+
+        // get ndb with default NDB price : 0.01
+        double ndbOrder = namePrice.getPrice() / 0.01;
+
+        double ndbBalance = internalBalanceService.getFreeBalance(userId, "NDB");
+        if(ndbBalance < ndbOrder) {
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "userId");
+        }
         
+        // change name
+        int result = profileService.updateBuyName(userId, newName);
+        if(result == 1) {
+            return internalBalanceService.deductFree(userId, "NDB", ndbOrder);
+        }
         return 0;
     }
 

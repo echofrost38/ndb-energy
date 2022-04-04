@@ -37,7 +37,8 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
+        m.setFee(rs.getDouble("FEE"));
         m.setPaypalOrderId(rs.getString("ORDER_ID"));
         m.setPaypalOrderStatus(rs.getString("ORDER_STATUS"));
 		m.setPresaleId(rs.getInt("PRESALE_ID"));
@@ -61,8 +62,8 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
     @Override
     public Transaction insert(Transaction _m) {
         PaypalPresaleTransaction m = (PaypalPresaleTransaction) _m;
-        String sql = "INSERT INTO TBL_PAYPAL_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,PRESALE_ID,P_ORDER_ID)"
-        + " VALUES(SEQ_PAYPAL_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?)";
+        String sql = "INSERT INTO TBL_PAYPAL_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,FEE,ORDER_ID,ORDER_STATUS,PRESALE_ID,P_ORDER_ID)"
+        + " VALUES(SEQ_PAYPAL_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -75,6 +76,7 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
                         ps.setDouble(i++, m.getAmount());
                         ps.setString(i++, m.getFiatType());
                         ps.setDouble(i++, m.getFiatAmount());
+                        ps.setDouble(i++, m.getFee());
                         ps.setString(i++, m.getPaypalOrderId());
                         ps.setString(i++, m.getPaypalOrderStatus());
                         ps.setInt(i++, m.getPresaleId());

@@ -1,8 +1,10 @@
 package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
+import java.util.Locale;
 
-import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
@@ -27,18 +29,19 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
-        // getting ready 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        double totalAmount = getTotalAmount(userId, m.getAmount());
+        m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
-            throw new UserNotFoundException("no_presale_order", "orderId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
         }
 
         try {
             if (m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount(amount.longValue()).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount((long) totalAmount).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
 
                 // check save card
                 if (isSaveCard) {
@@ -56,21 +59,22 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                 }
 
                 intent = PaymentIntent.create(createParams.build());
-
+                stripePresaleDao.insert(m);
             } else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
-                if (totalOrder * 100 > paidAmount) {
-                    throw new UserNotFoundException("no_enough_funds", "amount");
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
                 }
 
                 handlePresaleOrder(userId, presaleOrder);
@@ -90,20 +94,21 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         PaymentIntent intent;
         PayResponse response = new PayResponse();
 
-        // getting ready
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        Double amount = m.getAmount();
+        double totalAmount = getTotalAmount(userId, m.getAmount());
+        m.setFee(getStripeFee(userId, m.getAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
-            throw new UserNotFoundException("no_presale_order", "orderId");
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
         }
 
         try {
 
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(amount.longValue())
+                        .setAmount((long) totalAmount)
                         .setCurrency("USD")
                         .setCustomer(customer.getCustomerId())
                         .setConfirm(true)
@@ -113,21 +118,23 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                         .setConfirm(true);
 
                 intent = PaymentIntent.create(createParams.build());
+                stripePresaleDao.insert(m);
             }
             else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 
                 // check amount
                 long paidAmount = intent.getAmount();
-                Double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount();
-                double totalOrder = getTotalOrder(userId, orderAmount.doubleValue());
-                if (totalOrder * 100 > paidAmount) {
-                    throw new UserNotFoundException("no_enough_funds", "amount");
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
                 }
 
                 handlePresaleOrder(userId, presaleOrder);

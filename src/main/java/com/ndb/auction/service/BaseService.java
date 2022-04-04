@@ -58,6 +58,7 @@ import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
@@ -226,6 +227,9 @@ public class BaseService {
     @Autowired
     protected TierDao tierDao;
 
+    @Autowired
+    protected MessageSource messageSource;
+
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {
@@ -250,7 +254,7 @@ public class BaseService {
 
 		// processing order
 		double ndb = order.getNdbAmount();
-		Double fiatAmount = Double.valueOf(ndb * order.getNdbPrice());
+		Double fiatAmount = ndb * order.getNdbPrice();
 		
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
@@ -263,6 +267,12 @@ public class BaseService {
 		List<Tier> tierList = tierService.getUserTiers();
 		TaskSetting taskSetting = taskSettingService.getTaskSetting();
 		TierTask tierTask = tierTaskService.getTierTask(user.getId());
+
+        if(tierTask == null) {
+            tierTask = new TierTask(userId);
+            tierTaskService.updateTierTask(tierTask);
+        }
+
 		double presalePoint = tierTask.getDirect();
 		presalePoint += taskSetting.getDirect() * fiatAmount;
 		tierTask.setDirect(presalePoint);

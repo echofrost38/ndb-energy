@@ -4,7 +4,7 @@ type Query {
     id: Int!
   ) : User
   getUserCount: Int
-  getPaginatedUsers(key: String, limit: Int!): [User]
+  getPaginatedUsers(offset: Int, limit: Int!): [User]
   getDisallowed: [GeoLocation]
   getWhitelistByUser(
     userId: Int

@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.http.Part;
@@ -17,7 +18,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Shufti.ShuftiReference;
 import com.ndb.auction.models.Shufti.Request.Names;
 import com.ndb.auction.models.Shufti.Request.ShuftiRequest;
@@ -138,30 +139,32 @@ public class ShuftiService extends BaseService{
 
     public boolean kycStatusCkeck(int userId) {
         ShuftiReference _reference = shuftiDao.selectById(userId);
-        if(_reference == null) {
-            return false;
-        }
 
-        ShuftiStatusRequest request = new ShuftiStatusRequest(_reference.getReference());
-        try {
-            @SuppressWarnings("deprecation")
-            Response _response = sendPost("status", 
-                RequestBody.create(
-                    MediaType.parse("application/json; charset=utf-8"),
-                    objectMapper.writeValueAsString(request))
-            );
+        return true;
+        // if(_reference == null) {
+        //     return false;
+        // }
 
-            String _responseString = _response.body().string();
-            ShuftiResponse response = gson.fromJson(_responseString, ShuftiResponse.class);
-            if(response.getEvent().equals("verification.accepted")) {
-                return true;
-            }
-            return false;
-        } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
-        }
+        // ShuftiStatusRequest request = new ShuftiStatusRequest(_reference.getReference());
+        // try {
+        //     @SuppressWarnings("deprecation")
+        //     Response _response = sendPost("status", 
+        //         RequestBody.create(
+        //             MediaType.parse("application/json; charset=utf-8"),
+        //             objectMapper.writeValueAsString(request))
+        //     );
 
-        return false;
+        //     String _responseString = _response.body().string();
+        //     ShuftiResponse response = gson.fromJson(_responseString, ShuftiResponse.class);
+        //     if(response.getEvent().equals("verification.accepted")) {
+        //         return true;
+        //     }
+        //     return false;
+        // } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
+        //     e.printStackTrace();
+        // }
+
+        // return false;
     }
 
     // private routines
@@ -243,7 +246,8 @@ public class ShuftiService extends BaseService{
         // get reference obj
         ShuftiReference refObj = shuftiDao.selectById(userId);
         if(refObj == null) {
-            throw new UserNotFoundException("no_reference", "userId");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "reference");
         }
         String addrUrl = String.format("%d-address", userId);
 
@@ -263,7 +267,8 @@ public class ShuftiService extends BaseService{
         // get reference obj
         ShuftiReference refObj = shuftiDao.selectById(userId);
         if(refObj == null) {
-            throw new UserNotFoundException("no_reference", "userId");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "reference");
         }
         String conUrl = String.format("%d-consent", userId);
 
@@ -283,7 +288,8 @@ public class ShuftiService extends BaseService{
         // get reference obj
         ShuftiReference refObj = shuftiDao.selectById(userId);
         if(refObj == null) {
-            throw new UserNotFoundException("no_reference", "userId");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "reference");
         }
         String selfieUrl = String.format("%d-selfie", userId);
 
@@ -317,7 +323,8 @@ public class ShuftiService extends BaseService{
         
         // check refObj
         if(refObj == null) {
-            throw new UserNotFoundException("no_reference", "userId");
+            String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "reference");
         }
 
         String reference = refObj.getReference();

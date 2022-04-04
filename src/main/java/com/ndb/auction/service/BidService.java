@@ -3,6 +3,7 @@ package com.ndb.auction.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,7 +96,8 @@ public class BidService extends BaseService {
 		// Check existing
 		Bid bid = bidDao.getBid(userId, roundId);
 		if (bid != null && bid.getStatus() != Bid.NOT_CONFIRMED) {
-			throw new BidException("Already place a bid to this round.", "roundId");
+			String msg = messageSource.getMessage("already_placed", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "bid");
 		}
 
 		// create new pending bid
@@ -113,15 +115,18 @@ public class BidService extends BaseService {
 		Auction auction = auctionDao.getAuctionById(roundId);
 
 		if(auction == null) {
-			throw new AuctionException("There is not that round.", "roundId");
+			String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "auction");
 		}
 
 		if (auction.getStatus() != Auction.STARTED) {
-			throw new BidException("Round is not yet started.", "roundId");
+			String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "auction");
 		}
 
 		if (auction.getMinPrice() > tokenPrice) {
-			throw new BidException("Token price must be larget than min price.", "tokenPrice");
+			String msg = messageSource.getMessage("invalid_bid_price", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "auction");
 		}
 
 		// save with pending status
@@ -149,7 +154,7 @@ public class BidService extends BaseService {
 		double _point = point;
 		int level = user.getTierLevel();
 		for (Tier tier : tiers) {
-			if (tier.getPoint() >= point && tier.getPoint() > _point) {
+			if (tier.getPoint() <= point && tier.getPoint() <= _point) {
 				_point = tier.getPoint();
 				level = tier.getLevel();
 			}
@@ -170,7 +175,8 @@ public class BidService extends BaseService {
 		// PaginatedScanList<> how to sort?
 		Auction auction = auctionDao.getAuctionByRound(round);
 		if(auction == null) {
-			throw new AuctionException("There is no round.", "round");
+			String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "auction");
 		}
 
 		if(auction.getStatus() == Auction.STARTED) {
@@ -185,7 +191,8 @@ public class BidService extends BaseService {
 		// check round status
 		Auction currentRound = auctionDao.getAuctionById(round);
 		if(currentRound == null) {
-			throw new AuctionException("There is no round.", "round");
+			String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "auction");
 		}
 
 		if(currentRound.getStatus() == Auction.STARTED) {
@@ -466,11 +473,11 @@ public class BidService extends BaseService {
 		
 		Bid originalBid = bidDao.getBid(userId, roundId);
 		if (originalBid == null) {
-			throw new BidException("Bid is not yet placed.", "roundId");
+			String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "bid");
 		}
 
 		if (originalBid.isPendingIncrease()) {
-			// throw new BidException("", "roundId");
 			originalBid.setPendingIncrease(false);
 		}
 
@@ -481,7 +488,8 @@ public class BidService extends BaseService {
 		if ((_tokenAmount > tokenAmount) ||
 				(_tokenPrice > tokenPrice) ||
 				(_tokenPrice == tokenPrice && _tokenAmount == tokenAmount)) {
-			throw new BidException("New price must be larger than original price.", "tokenPrice");
+					String msg = messageSource.getMessage("invalid_increase", null, Locale.ENGLISH);
+					throw new AuctionException(msg, "tokenPrice");
 		}
 
 		// previous total amount!

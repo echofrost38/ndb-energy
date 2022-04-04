@@ -1,8 +1,10 @@
 package com.ndb.auction.resolver;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.exceptions.PreSaleException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -22,18 +24,26 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+        if(!kycStatus) {
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
+        }
+
         // check presale status
         PreSale presale = presaleService.getPresaleById(presaleId);
         if(presale == null) {
-            throw new PreSaleException("no_presale", "presaleId");
+            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+            throw new PreSaleException(msg, "presaleId");
         }
 
         if(presale.getStatus() != PreSale.STARTED) {
-            throw new PreSaleException("not_started", "presaleId");
+            String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+            throw new PreSaleException(msg, "presaleId");
         }
 
         // create new Presale order
-        Long ndbPrice = presale.getTokenPrice();
+        Double ndbPrice = presale.getTokenPrice();
         PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, extAddr);
         return presaleOrderService.placePresaleOrder(presaleOrder);
     }

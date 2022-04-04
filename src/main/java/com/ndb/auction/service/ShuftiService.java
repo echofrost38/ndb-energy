@@ -243,7 +243,7 @@ public class ShuftiService extends BaseService{
     }  
 
     public Boolean uploadAddress(int userId, Part addr) {
-        // get reference obj
+        // get reference obj from database
         ShuftiReference refObj = shuftiDao.selectById(userId);
         if(refObj == null) {
             String msg = messageSource.getMessage("no_ref", null, Locale.ENGLISH);

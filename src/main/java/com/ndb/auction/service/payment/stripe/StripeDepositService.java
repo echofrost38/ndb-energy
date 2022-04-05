@@ -196,8 +196,8 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
-                "DEPOSIT SUCCESS",
-                String.format("Your deposit of %f %s was successful.", deposited , m.getCryptoType())
+                "Deposit Successful",
+                String.format("You have successfully deposited %f %s", deposited , m.getCryptoType())
         );
     }
 

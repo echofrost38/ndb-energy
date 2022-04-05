@@ -73,7 +73,7 @@ public class PresaleService extends BaseService {
         notificationService.broadcastNotification(
             Notification.NEW_ROUND_STARTED, 
             "NEW ROUND STARTED", 
-            "A presale round just started.");
+            "PreSale Round has been started.");
         return presaleDao.updateStatus(presaleId, PreSale.STARTED);
     }
 
@@ -85,7 +85,7 @@ public class PresaleService extends BaseService {
         notificationService.broadcastNotification(
             Notification.ROUND_FINISHED, 
             "ROUND CLOSED", 
-            "A presale round just finished.");
+            "PreSale Round has been closed.");
         return presaleDao.updateStatus(presaleId, PreSale.ENDED);
     }
 

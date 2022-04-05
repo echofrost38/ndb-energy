@@ -423,11 +423,7 @@ public class UserService extends BaseService {
 	}
 
 	public List<User> getPaginatedUser(int offset, int limit) {
-		var users = userDao.selectList(null, offset, limit, null);
-		for (User user : users) {
-			user.setVerify(userVerifyDao.selectById(user.getId()));
-		}
-		return users;
+		return userDao.selectList(null, offset, limit, null);
 	}
 
 	public String deleteUser(int id) {

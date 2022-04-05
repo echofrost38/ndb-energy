@@ -306,6 +306,6 @@ public class BaseService {
 			userId,
 			Notification.PAYMENT_RESULT,
 			"PAYMENT CONFIRMED",
-			"Your purchase of " + ndb + "NDB" + " in the presale round was successful.");
+			"You have successfully purchased " + ndb + "NDB" + " in Presale Round.");
 	}
 }

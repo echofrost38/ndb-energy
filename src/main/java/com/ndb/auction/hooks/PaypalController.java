@@ -65,7 +65,7 @@ public class PaypalController extends BaseController {
                         m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,
                         "WITHDRAW SUCCESS",
-                        "Your withdrawal request was successful."
+                        "Your withdraw request has been done successfully."
                     );
                     break;
                 case "PAYMENT.PAYOUTSBATCH.DENIED":
@@ -79,7 +79,7 @@ public class PaypalController extends BaseController {
                         _m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,
                         "WITHDRAW FAILED",
-                        "Your withdrawal request failedKYC VERIFIED."
+                        "Your withdraw request has been failed."
                     );
                     break;
             }

@@ -4,14 +4,14 @@ import com.google.gson.Gson;
 import com.ndb.auction.security.oauth2.user.AppleOAuth2UserInfo;
 import com.ndb.auction.service.AppleLoginService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.social.oauth1.AuthorizedRequestToken;
-import org.springframework.social.oauth1.OAuth1Operations;
-import org.springframework.social.oauth1.OAuth1Parameters;
-import org.springframework.social.oauth1.OAuthToken;
-import org.springframework.social.twitter.api.Twitter;
-import org.springframework.social.twitter.api.TwitterProfile;
-import org.springframework.social.twitter.api.impl.TwitterTemplate;
-import org.springframework.social.twitter.connect.TwitterConnectionFactory;
+// import org.springframework.social.oauth1.AuthorizedRequestToken;
+// import org.springframework.social.oauth1.OAuth1Operations;
+// import org.springframework.social.oauth1.OAuth1Parameters;
+// import org.springframework.social.oauth1.OAuthToken;
+// import org.springframework.social.twitter.api.Twitter;
+// import org.springframework.social.twitter.api.TwitterProfile;
+// import org.springframework.social.twitter.api.impl.TwitterTemplate;
+// import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,32 +32,32 @@ public class OAuthController {
     @GetMapping("/oauth2/authorize/manual/twitter")
     public void twitterOauthLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        TwitterConnectionFactory connectionFactory = new TwitterConnectionFactory(twitterClientId, twitterClientSecret);
-        OAuth1Operations oauthOperations = connectionFactory.getOAuthOperations();
+        // TwitterConnectionFactory connectionFactory = new TwitterConnectionFactory(twitterClientId, twitterClientSecret);
+        // OAuth1Operations oauthOperations = connectionFactory.getOAuthOperations();
 
-        OAuthToken requestToken = oauthOperations.fetchRequestToken(twitterCallbackUrl, null);
-        String authorizeUrl = oauthOperations.buildAuthorizeUrl(String.valueOf(requestToken), OAuth1Parameters.NONE);
-        response.sendRedirect(authorizeUrl);
+        // OAuthToken requestToken = oauthOperations.fetchRequestToken(twitterCallbackUrl, null);
+        // String authorizeUrl = oauthOperations.buildAuthorizeUrl(String.valueOf(requestToken), OAuth1Parameters.NONE);
+        // response.sendRedirect(authorizeUrl);
     }
 
     @GetMapping("/oauth2/callback/twitter")
     public void getTwitter() {
 
-        TwitterConnectionFactory connectionFactory =
-                new TwitterConnectionFactory(twitterClientId, twitterClientSecret);
-        OAuth1Operations oauthOperations = connectionFactory.getOAuthOperations();
-        OAuthToken requestToken = oauthOperations.fetchRequestToken("https://api.twitter.com/oauth/request_token", null);
+        // TwitterConnectionFactory connectionFactory =
+        //         new TwitterConnectionFactory(twitterClientId, twitterClientSecret);
+        // OAuth1Operations oauthOperations = connectionFactory.getOAuthOperations();
+        // OAuthToken requestToken = oauthOperations.fetchRequestToken("https://api.twitter.com/oauth/request_token", null);
 
-        OAuthToken accessToken = oauthOperations.exchangeForAccessToken(
-                new AuthorizedRequestToken(requestToken, ""), null);
+        // OAuthToken accessToken = oauthOperations.exchangeForAccessToken(
+        //         new AuthorizedRequestToken(requestToken, ""), null);
 
-        Twitter twitter = new TwitterTemplate(twitterClientId,
-                twitterClientSecret,
-                accessToken.getValue(),
-                accessToken.getSecret());
-        TwitterProfile profile = twitter.userOperations().getUserProfile();
-        log.info("Twitter profile callback");
-        log.info("profile" + profile.getName());
+        // Twitter twitter = new TwitterTemplate(twitterClientId,
+        //         twitterClientSecret,
+        //         accessToken.getValue(),
+        //         accessToken.getSecret());
+        // TwitterProfile profile = twitter.userOperations().getUserProfile();
+        // log.info("Twitter profile callback");
+        // log.info("profile" + profile.getName());
 
     }
 

@@ -134,7 +134,7 @@ public class AuctionService extends BaseService {
 		notificationService.broadcastNotification(
 			Notification.NEW_ROUND_STARTED, 
 			"NEW ROUND STARTED", 
-			"Auction Round " + target.getRound() + " has been started.");
+			"Auction round number " + target.getRound() + " just started.");
 
 	}
 
@@ -146,7 +146,7 @@ public class AuctionService extends BaseService {
 		}
 		auctionDao.endAuction(target);
 
-		String msg = String.format("ROUND %d FINISHED.", target.getRound());
+		String msg = String.format("Auction round number %d just finished.", target.getRound());
 		String title = "ROUND FINISHED";
 		notificationService.broadcastNotification(Notification.ROUND_FINISHED, title, msg);
 

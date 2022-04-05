@@ -52,7 +52,6 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var itemId = generateItemId(m);
 
             var df = new DecimalFormat("#.00");
-
             var amount = new Amount("USD", df.format(m.getWithdrawAmount()));
             var item = new Item(amount, itemId, m.getReceiver());   
             var payoutsDTO = new PayoutsDTO(batchHeader, item);

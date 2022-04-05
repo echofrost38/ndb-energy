@@ -203,8 +203,8 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 		notificationService.sendNotification(
 			userId,
 			Notification.DEPOSIT_SUCCESS, 
-			"Deposit Successful", 
-			String.format("You have successfully deposited %f %s", Double.valueOf(amount) / 100, currency)
+			"DEPOSIT SUCCESS", 
+			String.format("Your deposit of 20 %f %s was successful.", Double.valueOf(amount) / 100, currency)
 		);
 
 

@@ -163,7 +163,7 @@ public class CryptoController extends BaseController {
                     txn.getUserId(),
                     Notification.PAYMENT_RESULT,
                     "PAYMENT CONFIRMED",
-                    "You have successfully deposited " + amount + cryptoType + " for Auction Round.");
+                    "Your deposit of " + amount + cryptoType + " for the auction round was successful.");
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -275,8 +275,7 @@ public class CryptoController extends BaseController {
                     txn.getUserId(),
                     Notification.PAYMENT_RESULT,
                     "PAYMENT CONFIRMED",
-                    "You have successfully deposited " + amount + cryptoType + " for Presale Round.\n" 
-                    + "You've got " + ndb + "NDB.");
+                    "Your deposit of " + amount + cryptoType + " for the presale round was successful.");
         }
 
 
@@ -407,8 +406,8 @@ public class CryptoController extends BaseController {
             notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS, 
-                "Deposit Successful", 
-                String.format("You have successfully deposited %f %s", amount, cryptoType));
+                "PAYMENT CONFIRMED", 
+                String.format("Your deposit of %f %s was successful.", amount, cryptoType));
     
 	    } else if (status < 0) {
 	        //payment error, this is usually final but payments will sometimes be reopened if there was no exchange rate conversion or with seller consent

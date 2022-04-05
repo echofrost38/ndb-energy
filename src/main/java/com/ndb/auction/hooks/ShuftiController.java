@@ -128,7 +128,7 @@ public class ShuftiController extends BaseController {
                         userId,
                         Notification.KYC_VERIFIED,
                         "KYC VERIFICATION PENDING",
-                        "KYC Verification is pending."
+                        "Identity verification is pending."
                 );
                 break;
             case "request.invalid":
@@ -138,7 +138,7 @@ public class ShuftiController extends BaseController {
                         Notification.KYC_VERIFIED,
                         "KYC VERIFICATION FAILED",
                         String.format(
-                                "KYC Verification failed.\n%s \nPlease try again.",
+                                "Identity verification failed.\n%s \nPlease try again.",
                                 response.getError().getMessage())
                 );
                 break;
@@ -157,7 +157,7 @@ public class ShuftiController extends BaseController {
                         userId,
                         Notification.KYC_VERIFIED,
                         "KYC VERIFICATION FAILED",
-                        String.format("KYC Verification failed.\n%s. \nPlease try again.",
+                        String.format("Identity verification failed.\n%s. \nPlease try again.",
                                 response.getDeclined_reason()));
                 System.out.println("Verification failed");
                 System.out.println(response.getEvent());

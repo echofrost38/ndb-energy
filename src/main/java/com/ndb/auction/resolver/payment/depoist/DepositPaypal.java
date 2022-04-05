@@ -162,7 +162,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
                 userId,
                 Notification.PAYMENT_RESULT,
                 "PAYMENT CONFIRMED",
-                "You have successfully deposited " + m.getDeposited() + m.getCryptoType() + ".");
+                "Your deposit of " + m.getDeposited() + m.getCryptoType() + " was successful.");
             return true;
         }
         return false;

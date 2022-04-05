@@ -305,8 +305,8 @@ public class BidService extends BaseService {
 					tempBid.getUserId(),
 					Notification.BID_RANKING_UPDATED,
 					"BID RANKING UPDATED",
-					String.format("Bid ranking is updated into %d, your bid is %s.", 
-						i + 1, tempBid.getStatus() == Bid.WINNER ? "WINNER" : "FAILED")
+					String.format("Your bid's ranking is changed to %d, You have a %s bid.", 
+						i + 1, tempBid.getStatus() == Bid.WINNER ? "winning" : "lost")
 				);
 			}
 		}
@@ -461,7 +461,7 @@ public class BidService extends BaseService {
 				bid.getUserId(), 
 				Notification.BID_CLOSED, 
 				"BID CLOSED", 
-				String.format("Your Bid closed. You %s", bid.getStatus() == Bid.WINNER ? "won!" : "failed")
+				String.format("Your bid's status is final. You %s.", bid.getStatus() == Bid.WINNER ? "won" : "lost")
 			);
 		}
 

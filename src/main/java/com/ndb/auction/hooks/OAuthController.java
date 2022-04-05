@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-@RestController
 @Slf4j
+@RestController
 public class OAuthController {
 
     private static final String twitterClientId = "RS14MW9FbWx1YjI4WDRYTDJkOW46MTpjaQ";
@@ -30,7 +30,7 @@ public class OAuthController {
     private static final String twitterCallbackUrl = "https://api.dev.nyyu.io/oauth2/callback/twitter";
 
     @GetMapping("/oauth2/authorize/manual/twitter")
-    public void twitterOauthLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void twitterOauthLogin(HttpServletRequest request, HttpServletResponse response) {
 
         // TwitterConnectionFactory connectionFactory = new TwitterConnectionFactory(twitterClientId, twitterClientSecret);
         // OAuth1Operations oauthOperations = connectionFactory.getOAuthOperations();

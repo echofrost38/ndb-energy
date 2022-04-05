@@ -546,9 +546,12 @@ public class UserService extends BaseService {
 			throw new UserNotFoundException(msg, "email");
 		}
 
-		if (role.equals("admin")) {
-			user.addRole("ROLE_ADMIN");
-		} else if (role.equals("user")) {
+		if (role.equals("ROLE_ADMIN")) {
+			Set<String> roles = new HashSet<>();
+			roles.add("ROLE_USER");
+			roles.add("ROLE_ADMIN");
+			user.setRole(roles);
+		} else if (role.equals("ROLE_USER")) {
 			Set<String> roles = new HashSet<>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);

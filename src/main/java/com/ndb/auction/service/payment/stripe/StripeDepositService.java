@@ -1,5 +1,6 @@
 package com.ndb.auction.service.payment.stripe;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
@@ -192,12 +193,19 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             userDao.updateTier(user.getId(), tierLevel, newPoint);
             tierTaskService.updateTierTask(tierTask);
         }
-
+        var _formatedDeposit = "";
+        if(m.getCryptoType().equals("USDT") || m.getCryptoType().equals("USDC")) {
+            var df = new DecimalFormat("#.00");
+            _formatedDeposit = df.format(deposited);
+        } else {
+            var df = new DecimalFormat("#.00000000");
+            _formatedDeposit = df.format(deposited);
+        }
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "DEPOSIT SUCCESS",
-                String.format("Your deposit of %f %s was successful.", deposited , m.getCryptoType())
+                String.format("Your deposit of %f %s was successful.", _formatedDeposit , m.getCryptoType())
         );
     }
 

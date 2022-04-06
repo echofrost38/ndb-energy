@@ -1,5 +1,6 @@
 package com.ndb.auction.service.payment.stripe;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.ndb.auction.models.Notification;
@@ -200,11 +201,19 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 			tierTaskService.updateTierTask(tierTask);
 		}
 
+		var _formatedDeposit = "";
+        if(currency.equals("USDT") || currency.equals("USDC")) {
+            var df = new DecimalFormat("#.00");
+            _formatedDeposit = df.format(Double.valueOf(amount) / 100);
+        } else {
+            var df = new DecimalFormat("#.00000000");
+            _formatedDeposit = df.format(Double.valueOf(amount) / 100);
+        }
 		notificationService.sendNotification(
 			userId,
 			Notification.DEPOSIT_SUCCESS, 
 			"DEPOSIT SUCCESS", 
-			String.format("Your deposit of 20 %f %s was successful.", Double.valueOf(amount) / 100, currency)
+			String.format("Your deposit of 20 %f %s was successful.", _formatedDeposit, currency)
 		);
 
 

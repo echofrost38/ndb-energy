@@ -1,5 +1,6 @@
 package com.ndb.auction.hooks;
 
+import java.text.DecimalFormat;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -159,11 +160,19 @@ public class CryptoController extends BaseController {
             coinpaymentAuctionService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
     
             // send notification to user for payment result!!
+            var msg = "";
+            if(cryptoType.equals("USDT") || cryptoType.equals("USDC")) {
+                var df = new DecimalFormat("#.00");
+                msg = "Your deposit of " + df.format(amount) + cryptoType + " for the auction round was successful.";
+            } else {
+                var df = new DecimalFormat("#.00000000");
+                msg = "Your deposit of " + df.format(amount) + cryptoType + " for the auction round was successful.";
+            }
             notificationService.sendNotification(
                     txn.getUserId(),
                     Notification.PAYMENT_RESULT,
                     "PAYMENT CONFIRMED",
-                    "Your deposit of " + amount + cryptoType + " for the auction round was successful.");
+                    msg);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

@@ -1,5 +1,6 @@
 package com.ndb.auction.resolver.payment.depoist;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -158,6 +159,14 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             }
 
             // send notification to user for payment result!!
+            var msg = "";
+            if(m.getCryptoType().equals("USDT") || m.getCryptoType().equals("USDC")) {
+                var df = new DecimalFormat("#.00");
+                msg = "Your deposit of " + df.format(m.getDeposited()) + m.getCryptoType() + " was successful.";
+            } else {
+                var df = new DecimalFormat("#.00000000");
+                msg = "Your deposit of " + df.format(m.getDeposited()) + m.getCryptoType() + " was successful.";
+            }
             notificationService.sendNotification(
                 userId,
                 Notification.PAYMENT_RESULT,

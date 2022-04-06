@@ -38,6 +38,11 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		return avatarService.updateAvatarComponent(groupId, compId, tierLevel, price, limited, svg, width, top, left);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public int deleteAvatarComponent(String groupId, int compId) {
+		return avatarService.deleteAvatarComponent(groupId, compId);
+	}
+
 	// create new avatar
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public AvatarProfile createNewAvatar(
@@ -96,11 +101,6 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		return avatarService.getAvatarComponentsBySet(set);
 	}
 
-	// select avatar by user
-	
 
-	// purchase by user
-	
-	
-	// 
+
 }

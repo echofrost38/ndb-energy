@@ -155,4 +155,8 @@ public class AvatarService extends BaseService {
 		return avatarSetDao.selectById(profileId);
 	}
 
+	public int deleteAvatarComponent(String groupId, int compId) {
+		return avatarComponentDao.deleteById(groupId, compId);
+	}
+
 }

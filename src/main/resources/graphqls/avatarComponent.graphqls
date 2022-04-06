@@ -34,6 +34,10 @@ extend type Mutation {
         top: Int,
         left: Int
     ) : AvatarComponent
+    deleteAvatarComponent(
+        groupId: String,
+        compId: Int
+    ) : Int
 }
 
 schema {

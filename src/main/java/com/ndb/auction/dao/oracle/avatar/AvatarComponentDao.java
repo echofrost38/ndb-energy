@@ -120,4 +120,9 @@ public class AvatarComponentDao extends BaseOracleDao {
 		return list;
 	}
 
+	public int deleteById(String groupId, int compId) {
+		String sql = "DELETE FROM TBL_AVATAR_COMPONENT WHERE GROUP_ID=? AND COMP_ID=?";
+		return jdbcTemplate.update(sql, groupId, compId);
+	}
+
 }

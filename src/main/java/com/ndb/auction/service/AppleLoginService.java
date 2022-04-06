@@ -13,10 +13,8 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.FileReader;
 import java.security.PrivateKey;
 import java.util.Date;
 
@@ -31,11 +29,9 @@ public class AppleLoginService {
     private static PrivateKey pKey;
 
     private static PrivateKey getPrivateKey() throws Exception {
+        String path = new ClassPathResource("apple/AuthKey_BV8SML3NAY.p8").getFile().getAbsolutePath();
 
-        Resource privateKeyFile = new ClassPathResource("apple/AuthKey_BV8SML3NAY.p8");
-        Reader targetReader = new InputStreamReader(privateKeyFile.getInputStream());
-
-        final PEMParser pemParser = new PEMParser(targetReader);
+        final PEMParser pemParser = new PEMParser(new FileReader(path));
         final JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         final PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
 

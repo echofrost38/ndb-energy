@@ -101,6 +101,4 @@ public class AvatarResolver extends BaseResolver implements GraphQLQueryResolver
 		return avatarService.getAvatarComponentsBySet(set);
 	}
 
-
-
 }

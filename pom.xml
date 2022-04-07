@@ -284,6 +284,13 @@
             <artifactId>json</artifactId>
             <version>20140107</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.21</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <!-- <dependency>
             <groupId>org.junit.jupiter</groupId>

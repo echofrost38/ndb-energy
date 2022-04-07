@@ -20,7 +20,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -28,7 +27,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class AuthResolver extends BaseResolver
 		implements GraphQLMutationResolver, GraphQLQueryResolver {
-
+	
 	private String lowerEmail(String email) {
 		return email.toLowerCase();
 	}
@@ -193,14 +192,29 @@ public class AuthResolver extends BaseResolver
 		return oAuth2RegistrationService.createRegistration(registration);
 	}
 
-	public String addNewUser(int id, String email, String name) {
-		TransactionReceipt receipt = userWalletService.addNewUser(id, lowerEmail(email), name);
-		return receipt.getLogs().get(0).getData();
-	}
+	// public String addNewUser(int id, String email, String name) {
+	// 	TransactionReceipt receipt = userWalletService.addNewUser(id, lowerEmail(email), name);
+	// 	return receipt.getLogs().get(0).getData();
+	// }
 
-	public String addHoldAmount(int id, String crypto, Long amount) {
-		TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
-		return receipt.getLogs().get(0).getData();
+	// public String addHoldAmount(int id, String crypto, Long amount) {
+	// 	TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
+	// 	return receipt.getLogs().get(0).getData();
+	// }
+
+	// For Zendesk SSO
+	@PreAuthorize("isAuthenticated()")
+	public Credentials getZendeskJwt() {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int id = userDetails.getId();
+
+		// get user 
+		User user = userService.getUserById(id);
+
+		// Generate jwt token
+		String token = jwtUtils.generateZendeskJwtToken(user);
+
+		return new Credentials("success", token);
 	}
 
 }

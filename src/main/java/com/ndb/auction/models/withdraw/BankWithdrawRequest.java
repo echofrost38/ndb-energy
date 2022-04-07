@@ -1,7 +1,5 @@
 package com.ndb.auction.models.withdraw;
 
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,9 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BaseBankWithdraw extends BaseWithdraw {
+public class BankWithdrawRequest extends BaseWithdraw {
+    private int mode; // international/domestic
+    private String country; // 2 letter code / null
     private String nameOfHolder;
     private String bankName;
     private String accountNumber;
-    private Map<String, String> metadata;
+    
+    // json string
+    private String metadata;
 }

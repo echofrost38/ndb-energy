@@ -108,7 +108,14 @@ public class ShuftiController extends BaseController {
                 if(statusResponse.getEvent().equals("verification.accepted")) {
                     System.out.println("accepted case: ");
                     System.out.println(reqQuery);
-                    handleAccepted(userId, statusResponse);
+                    
+                    // in some cases, we may not get user details from shufti pro
+                    try {
+                        handleAccepted(userId, statusResponse);
+                    } catch (Exception e) {
+                        System.out.println("Cannot get user details from shufti: " + reference);
+                    }
+                    
                 } else if(statusResponse.getEvent().equals("verification.declined")) {
                     System.out.println("declined case: ");
                     System.out.println(reqQuery);
@@ -148,10 +155,7 @@ public class ShuftiController extends BaseController {
 
     private void handleAccepted(int userId, ShuftiResponse response) {
         shuftiDao.passed(userId);
-        //Insert user details after verification
-        UserDetail userDetail = generateUserDetailEntity(response);
-        userDetail.setUserId(userId);
-        userDetailDao.insert(userDetail);
+       
         // update user tier!
         List<Tier> tierList = tierService.getUserTiers();
         TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -186,6 +190,11 @@ public class ShuftiController extends BaseController {
                 "Your identity has been successfully verified.");
         System.out.println("Verification success.");
         System.out.println(response.getEvent());
+
+         //Insert user details after verification
+         UserDetail userDetail = generateUserDetailEntity(response);
+         userDetail.setUserId(userId);
+         userDetailDao.insert(userDetail);
     }
 
     private UserDetail generateUserDetailEntity(ShuftiResponse response) {

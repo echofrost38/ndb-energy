@@ -167,6 +167,25 @@ public class ShuftiService extends BaseService{
         // return false;
     }
 
+    public ShuftiResponse checkShuftiStatus(String reference) {
+        ShuftiStatusRequest request = new ShuftiStatusRequest(reference);
+        try {
+            @SuppressWarnings("deprecation")
+            Response _response = sendPost("status", 
+                RequestBody.create(
+                    MediaType.parse("application/json; charset=utf-8"),
+                    objectMapper.writeValueAsString(request))
+            );
+
+            String _responseString = _response.body().string();
+            ShuftiResponse response = gson.fromJson(_responseString, ShuftiResponse.class);
+            return response;
+        } catch (InvalidKeyException | NoSuchAlgorithmException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // private routines
     private String generateToken() {
         String combination = CLIENT_ID + ":" + SECRET_KEY;

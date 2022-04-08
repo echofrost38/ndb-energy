@@ -10,14 +10,19 @@ import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Shufti.Response.*;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.Shufti.Response.Address;
+import com.ndb.auction.models.Shufti.Response.Document;
+import com.ndb.auction.models.Shufti.Response.Proof;
+import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
+import com.ndb.auction.models.Shufti.Response.VerificationResult;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
-
 import com.ndb.auction.models.user.UserDetail;
+import com.ndb.auction.service.ShuftiService;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,15 +43,18 @@ public class ShuftiController extends BaseController {
     UserVerifyDao userVerifyDao;
     UserDetailDao userDetailDao;
     ShuftiDao shuftiDao;
+    ShuftiService shuftiService;
     UserDao userDao;
 
     @Autowired
-    public ShuftiController(ShuftiDao shuftiDao,
+    public ShuftiController(ShuftiService shuftiService,
+                            ShuftiDao shuftiDao,
                             UserDao userDao,
                             UserVerifyDao userVerifyDao,
                             UserDetailDao userDetailDao) {
         this.userVerifyDao = userVerifyDao;
         this.userDetailDao = userDetailDao;
+        this.shuftiService = shuftiService;
         this.shuftiDao = shuftiDao;
         this.userDao = userDao;
     }
@@ -81,49 +89,7 @@ public class ShuftiController extends BaseController {
         shuftiDao.updatePendingStatus(userId, false);
 
         switch (response.getEvent()) {
-            case "verification.accepted":
-
-                shuftiDao.passed(userId);
-                //Insert user details after verification
-                UserDetail userDetail = generateUserDetailEntity(response);
-                userDetail.setUserId(userId);
-                userDetailDao.insert(userDetail);
-                // update user tier!
-                List<Tier> tierList = tierService.getUserTiers();
-                TaskSetting taskSetting = taskSettingService.getTaskSetting();
-                TierTask tierTask = tierTaskService.getTierTask(userId);
-
-                if(tierTask == null) {
-                    tierTask = new TierTask(userId);
-                    tierTaskService.updateTierTask(tierTask);
-                }
-
-                tierTask.setVerification(true);
-
-                User user = userDao.selectById(userId);
-                double tierPoint = user.getTierPoint();
-                tierPoint += taskSetting.getVerification();
-                int tierLevel = 0;
-                for (Tier tier : tierList) {
-                    if (tier.getPoint() <= tierPoint) {
-                        tierLevel = tier.getLevel();
-                    }
-                }
-                userDao.updateTier(userId, tierLevel, tierPoint);
-                tierTaskService.updateTierTask(tierTask);
-
-                userVerifyDao.updateKYCVerified(userId, true);
-
-                // send notification
-                notificationService.sendNotification(
-                        userId,
-                        Notification.KYC_VERIFIED,
-                        "KYC VERIFIED",
-                        "Your identity has been successfully verified.");
-                System.out.println("Verification success.");
-                System.out.println(response.getEvent());
-                break;
-            case "request.pending":
+            case "review.pending":
                 // invalid
                 notificationService.sendNotification(
                         userId,
@@ -132,39 +98,94 @@ public class ShuftiController extends BaseController {
                         "Identity verification is pending."
                 );
                 break;
-            case "request.invalid":
-                // invalid
-                notificationService.sendNotification(
+            case "verification.status.changed": 
+                // verification status!
+                ShuftiResponse statusResponse = shuftiService.checkShuftiStatus(reference);
+                if(statusResponse == null) {
+                    System.out.println("Error for getting status: " + reference);
+                }
+
+                if(statusResponse.getEvent().equals("verification.accepted")) {
+                    System.out.println("accepted case: ");
+                    System.out.println(reqQuery);
+                    handleAccepted(userId, statusResponse);
+                } else if(statusResponse.getEvent().equals("verification.declined")) {
+                    System.out.println("declined case: ");
+                    System.out.println(reqQuery);
+                    handleDeclined(userId, statusResponse);
+                } else {
+                    notificationService.sendNotification(
                         userId,
                         Notification.KYC_VERIFIED,
-                        "KYC VERIFICATION FAILED",
-                        String.format(
-                                "Identity verification failed.\n%s \nPlease try again.",
-                                response.getError().getMessage())
-                );
-                break;
-            case "verification.declined":
-                // check declined reason
-                VerificationResult result = response.getVerification_result();
-
-                // check one by one
-                shuftiDao.updateDocStatus(userId, result.getDocument().getDocument() == 1);
-                shuftiDao.updateAddrStatus(userId, result.getAddress().getAddress_document() == 1);
-                shuftiDao.updateConStatus(userId, result.getConsent().getConsent() == 1);
-                shuftiDao.updateSelfieStatus(userId, result.getFace() == 1);
-
-                // send notification
-                notificationService.sendNotification(
-                        userId,
-                        Notification.KYC_VERIFIED,
-                        "KYC VERIFICATION FAILED",
-                        String.format("Identity verification failed.\n%s. \nPlease try again.",
-                                response.getDeclined_reason()));
-                System.out.println("Verification failed");
-                System.out.println(response.getEvent());
+                        "KYC VERIFICATION INVALID",
+                        "Identity verification is invalid."
+                    );
+                }
                 break;
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private void handleDeclined(int userId, ShuftiResponse response) {
+        VerificationResult result = response.getVerification_result();
+
+        // check one by one
+        shuftiDao.updateDocStatus(userId, result.getDocument().getDocument() == 1);
+        shuftiDao.updateAddrStatus(userId, result.getAddress().getAddress_document() == 1);
+        shuftiDao.updateConStatus(userId, result.getConsent().getConsent() == 1);
+        shuftiDao.updateSelfieStatus(userId, result.getFace() == 1);
+
+        // send notification
+        notificationService.sendNotification(
+                userId,
+                Notification.KYC_VERIFIED,
+                "KYC VERIFICATION FAILED",
+                String.format("Identity verification failed.\n%s. \nPlease try again.",
+                        response.getDeclined_reason()));
+        System.out.println("Verification failed");
+        System.out.println(response.getEvent());
+    }
+
+    private void handleAccepted(int userId, ShuftiResponse response) {
+        shuftiDao.passed(userId);
+        //Insert user details after verification
+        UserDetail userDetail = generateUserDetailEntity(response);
+        userDetail.setUserId(userId);
+        userDetailDao.insert(userDetail);
+        // update user tier!
+        List<Tier> tierList = tierService.getUserTiers();
+        TaskSetting taskSetting = taskSettingService.getTaskSetting();
+        TierTask tierTask = tierTaskService.getTierTask(userId);
+
+        if(tierTask == null) {
+            tierTask = new TierTask(userId);
+            tierTaskService.updateTierTask(tierTask);
+        }
+
+        tierTask.setVerification(true);
+
+        User user = userDao.selectById(userId);
+        double tierPoint = user.getTierPoint();
+        tierPoint += taskSetting.getVerification();
+        int tierLevel = 0;
+        for (Tier tier : tierList) {
+            if (tier.getPoint() <= tierPoint) {
+                tierLevel = tier.getLevel();
+            }
+        }
+        userDao.updateTier(userId, tierLevel, tierPoint);
+        tierTaskService.updateTierTask(tierTask);
+
+        userVerifyDao.updateKYCVerified(userId, true);
+
+        // send notification
+        notificationService.sendNotification(
+                userId,
+                Notification.KYC_VERIFIED,
+                "KYC VERIFIED",
+                "Your identity has been successfully verified.");
+        System.out.println("Verification success.");
+        System.out.println(response.getEvent());
     }
 
     private UserDetail generateUserDetailEntity(ShuftiResponse response) {

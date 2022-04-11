@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -15,9 +14,7 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
-import com.ndb.auction.service.payment.WithdrawService;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +23,6 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.FastRawTransactionManager;
@@ -49,9 +44,6 @@ public class NDBCoinService {
 
     @Value("${pancakev2.rpc}")
     private String pancakev2RPC;
-
-    @Autowired
-    private WithdrawService withdrawService;
 
     @Autowired
     private ScheduledTasks schedule;

@@ -54,12 +54,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         }
 
         // get crypto price
-        double cryptoPrice = 0.0;
-        if(sourceToken.equals("USDT")) {
-            cryptoPrice = 1.0;
-        } else {
-            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
-        }
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);;
 
         // double totalUSD = amount * cryptoPrice;
         double fee = getTierFee(userId, amount);

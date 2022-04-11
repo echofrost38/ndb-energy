@@ -1,0 +1,5 @@
+type BankWithdrawRequest {
+    id: Int,
+    userId: Int,
+    target
+}

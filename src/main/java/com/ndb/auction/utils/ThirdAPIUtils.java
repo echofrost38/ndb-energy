@@ -37,7 +37,7 @@ public class ThirdAPIUtils {
 
     public double getCryptoPriceBySymbol(String symbol) {
         try {
-            if(symbol.equals("USDT")) {
+            if(symbol.equals("USDT") || symbol.equals("USDC")) {
                 return 1.0;
             }
 

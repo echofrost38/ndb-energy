@@ -2,6 +2,7 @@ package com.ndb.auction.dao.oracle.withdraw;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
@@ -43,8 +44,51 @@ public class BankWithdrawDao extends BaseOracleDao {
 	}
 
     public int insert(BankWithdrawRequest m) {
-        String sql = "INSERT INTO TBL_BANK_WITHDRAW()VALUES()";
-        return 0;
+        String sql = "INSERT INTO TBL_BANK_WITHDRAW(ID,USER_ID,TAR_CURRENCY,WITHDRAW,FEE,SRC_TOKEN,TKN_PRICE,TKN_AMT," + 
+            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA)" + 
+            "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?)";
+        return jdbcTemplate.update(sql, m.getUserId(), m.getTargetCurrency(), m.getWithdrawAmount(), m.getFee(), 
+            m.getSourceToken(), m.getTokenPrice(), m.getTokenAmount(), m.getDeniedReason(), m.getMode(), m.getCountry(),
+            m.getNameOfHolder(), m.getBankName(), m.getAccountNumber(), m.getMetadata());
+    }
+
+    public List<BankWithdrawRequest> selectPending() {
+        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 0";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
+    public List<BankWithdrawRequest> selectApproved() {
+        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 1";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
+    public List<BankWithdrawRequest> selectDenied() {
+        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 2";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
+    public List<BankWithdrawRequest> selectByUser(int userId) {
+        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE USER_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
+    public BankWithdrawRequest selectById(int id) {
+        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE ID = ?";
+        return jdbcTemplate.query(sql, rs -> {
+            if (!rs.next())
+                return null;
+            return extract(rs);
+        }, id);
+    }
+
+    public int approveRequest(int id) {
+        String sql = "UPDATE TBL_BANK_WITHDRAW SET STATUS = 1 WHERE ID = ?";
+        return jdbcTemplate.update(sql, id);
+    }
+
+    public int denyRequest(int id, String reason) {
+        String sql = "UPDATE TBL_BANK_WITHDRAW SET STATUS = 2, DENIED_REASON = ? WHERE ID = ?";
+        return jdbcTemplate.update(sql, reason, id);
     }
 
 }

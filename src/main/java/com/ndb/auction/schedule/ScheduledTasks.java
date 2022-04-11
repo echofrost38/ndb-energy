@@ -16,7 +16,6 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.PresaleService;
 import com.ndb.auction.service.StatService;
-import com.ndb.auction.service.payment.WithdrawService;
 import com.ndb.auction.web3.NDBCoinService;
 
 @Component
@@ -33,9 +32,6 @@ public class ScheduledTasks {
 
 	@Autowired
 	PresaleService presaleService;
-
-	@Autowired
-	WithdrawService withdrawService;
 
 	@Autowired
 	NDBCoinService ndbCoinService;

@@ -101,6 +101,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         location.setFinalResult(message);
                         errorObject = new JsonObject();
                         errorObject.addProperty("isBannedCountry", true);
+                        errorObject.addProperty("country", location.getCountry());
+                        errorObject.addProperty("countryCode", location.getCountryCode());
                         errorObject.addProperty("message", message);
                     } else {
                         break block_ipcheck;

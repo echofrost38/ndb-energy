@@ -30,13 +30,14 @@ public class AvatarProfileDao extends BaseOracleDao {
 		m.setFname(rs.getString("FNAME"));
 		m.setSurname(rs.getString("SURNAME"));
 		m.setHairColor(rs.getString("HAIR_COLOR"));
+		m.setSkinColor(rs.getString("SKIN_COLOR"));
 		m.setDetails(rs.getString("DETAILS"));
 		return m;
 	}
 
 	public AvatarProfile createAvatarProfile(AvatarProfile m) {
-		String sql = "INSERT INTO TBL_AVATAR_PROFILE(ID, FNAME, SURNAME, HAIR_COLOR, DETAILS)"
-				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?)";
+		String sql = "INSERT INTO TBL_AVATAR_PROFILE(ID, FNAME, SURNAME, HAIR_COLOR, SKIN_COLOR, DETAILS)"
+				+ "VALUES(SEQ_AVATAR_PROFILE.NEXTVAL,?,?,?,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
 				new PreparedStatementCreator() {
@@ -48,6 +49,7 @@ public class AvatarProfileDao extends BaseOracleDao {
 						ps.setString(i++, m.getFname());
 						ps.setString(i++, m.getSurname());
 						ps.setString(i++, m.getHairColor());
+						ps.setString(i++, m.getSkinColor());
 						ps.setString(i++, m.getDetails());
 						return ps;
 					}
@@ -57,8 +59,8 @@ public class AvatarProfileDao extends BaseOracleDao {
 	}
 
 	public AvatarProfile updateAvatarProfile(AvatarProfile m) {
-		String sql = "UPDATE TBL_AVATAR_PROFILE SET FNAME=?, SURNAME=?, HAIR_COLOR=?, DETAILS=? WHERE ID=?";
-		jdbcTemplate.update(sql, m.getFname(), m.getSurname(), m.getHairColor(), m.getDetails(), m.getId());
+		String sql = "UPDATE TBL_AVATAR_PROFILE SET FNAME=?, SURNAME=?, HAIR_COLOR=?, SKIN_COLOR = ?, DETAILS=? WHERE ID=?";
+		jdbcTemplate.update(sql, m.getFname(), m.getSurname(), m.getHairColor(), m.getSkinColor(), m.getDetails(), m.getId());
 		return m;
 	}
 

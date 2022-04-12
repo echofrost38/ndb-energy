@@ -130,6 +130,7 @@ public class ProfileService extends BaseService {
 		userAvatar.setPrefix(prefix);
 		userAvatar.setName(name);
 		userAvatar.setHairColor(profile.getHairColor());
+		userAvatar.setSkinColor(profile.getSkinColor());
 		userAvatarDao.insertOrUpdate(userAvatar);
 		return "Success";
 	}

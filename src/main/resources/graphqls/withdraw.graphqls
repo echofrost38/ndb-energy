@@ -27,6 +27,27 @@ extend type Mutation {
         status: Int,
         reason: String
     ) : Int
+
+    # Bank withdraw
+    bankWithdrawRequest(
+        targetCurrency: String,
+        amount: Float,
+        sourceToken: String,
+        mode: Int,
+        country: String,
+        holderName: String,
+        bankName: String,
+        accNumber: String,
+        metadata: String,
+        code: String
+    ) : BankWithdrawRequest
+    approveBankWithdrawRequest(
+        id: Int
+    ) : Int
+    denyBankWithdrawRequest(
+        id: Int,
+        reason: String
+    ) : Int
 }
 
 extend type Query {
@@ -60,6 +81,15 @@ extend type Query {
     getCryptoWithdrawById(
         id: Int
     ) : CryptoWithdraw
+
+    # Bank withdraw
+    getPendingBankWithdrawRequests : [BankWithdrawRequest]
+    getAllApprovedBankWithdrawRequests : [BankWithdrawRequest]
+    getAllDeniedBankWithdrawRequests : [BankWithdrawRequest]
+    getBankWithdrawRequests : [BankWithdrawRequest]
+    getBankWithdrawRequest(
+        id: Int
+    ) : BankWithdrawRequest
 }
 
 schema {

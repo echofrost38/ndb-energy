@@ -30,7 +30,7 @@ public class BankWithdrawDao extends BaseOracleDao {
         m.setStatus(rs.getInt("STATUS"));
         m.setDeniedReason(rs.getString("DENIED_REASON"));
         m.setRequestedAt(rs.getTimestamp("REQUESTED_AT").getTime());
-        m.setConfirmedAt(rs.getTimestamp("CONFIRMED_AT").getTime());
+        m.setConfirmedAt(   rs.getTimestamp("CONFIRMED_AT").getTime());
 
         m.setMode(rs.getInt("MODE"));
         m.setCountry(rs.getString("COUNTRY"));

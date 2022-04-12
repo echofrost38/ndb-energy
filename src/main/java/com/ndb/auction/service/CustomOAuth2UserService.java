@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.exceptions.OAuth2AuthenticationProcessingException;
@@ -32,6 +33,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -58,6 +60,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
     public MailService mailService;
+
+    @Autowired
+    private CryptoBalanceDao balanceDao;
+
+    @Autowired
+    private TokenAssetService tokenAssetService;
 
     @Value("${linkedin.email-address-uri}")
     private String linkedInEmailEndpointUri;
@@ -118,6 +126,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return UserDetailsImpl.build(user, attributes);
     }
 
+    @Transactional
     private User registerNewUser(String provider, OAuth2UserInfo oAuth2UserInfo) {
         User user = new User();
         UserVerify userVerify = new UserVerify();
@@ -145,6 +154,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user = userDao.insert(user);
         userVerify.setId(user.getId());
         userVerifyDao.insertOrUpdate(userVerify);
+
+        // add internal balance
+        int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+        balanceDao.addFreeBalance(user.getId(), ndbId, 0);
+
+        int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
+        balanceDao.addFreeBalance(user.getId(), voltId, 0);
         return user;
     }
 

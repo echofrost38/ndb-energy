@@ -531,6 +531,13 @@ public class UserService extends BaseService {
 		userAvatarDao.insertOrUpdate(user.getAvatar());
 		userVerifyDao.insertOrUpdate(user.getVerify());
 
+		// add internal balance
+		int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
+		balanceDao.addFreeBalance(user.getId(), ndbId, 0);
+
+		int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
+		balanceDao.addFreeBalance(user.getId(), voltId, 0);
+
 		// send email!
 		try {
 			mailService.sendVerifyEmail(user, rPassword, "new_user.ftlh");

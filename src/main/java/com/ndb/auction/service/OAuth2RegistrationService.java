@@ -20,13 +20,15 @@ public class OAuth2RegistrationService {
     
     private Map<String, OAuth2Setting> oAuth2Registrations;
 
+    private List<OAuth2Setting> _registration;
+
     @PostConstruct
     public void init() {
         try{
             oAuth2Registrations = new HashMap<>();
     
-            List<OAuth2Setting> registrations = oAuth2Dao.getAllRegistrations();
-            for(OAuth2Setting registration : registrations) {
+            List<OAuth2Setting> _registration = oAuth2Dao.getAllRegistrations();
+            for(OAuth2Setting registration : _registration) {
                 oAuth2Registrations.put(registration.getClientName().toLowerCase(), registration);
             }
         }catch(Exception e) {
@@ -51,7 +53,12 @@ public class OAuth2RegistrationService {
     }
 
     public List<OAuth2Setting> getAllOAuth2Settings() {
-        return oAuth2Dao.getAllRegistrations();
+        return _registration;
+    }
+
+    public List<OAuth2Setting> getAllOAuth2Settings(boolean refresh) {
+        init();
+        return _registration;
     }
 
 }

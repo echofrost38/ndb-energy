@@ -287,12 +287,6 @@ public class BaseService {
 			}
 		}
 
-        // tierList
-        //     .stream()
-        //     .filter(t -> t.getPoint() <= newPoint)
-        //     .
-
-
         var tier = tierDao.selectByLevel(tierLevel);
 		if(tier.getName().equals("Diamond")) {
             var m = whitelistDao.selectByUserId(userId);

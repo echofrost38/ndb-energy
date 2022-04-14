@@ -8,6 +8,7 @@ type UserAvatar {
     # json string
     selected: String,
     hairColor: String,
+    skinColor: String,
     prefix: String,
     name: String
 }

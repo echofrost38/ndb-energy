@@ -22,11 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class AuthResolver extends BaseResolver
-		implements GraphQLMutationResolver, GraphQLQueryResolver {
+		implements GraphQLMutationResolver {
 	
 	private String lowerEmail(String email) {
 		return email.toLowerCase();

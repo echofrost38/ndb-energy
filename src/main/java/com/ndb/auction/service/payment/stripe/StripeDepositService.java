@@ -47,7 +47,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        Double totalAmount = getTotalAmount(userId,m.getAmount().doubleValue());
+        Double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
@@ -193,19 +193,19 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             userDao.updateTier(user.getId(), tierLevel, newPoint);
             tierTaskService.updateTierTask(tierTask);
         }
-        var _formatedDeposit = "";
+        String formattedDeposit;
         if(m.getCryptoType().equals("USDT") || m.getCryptoType().equals("USDC")) {
             var df = new DecimalFormat("#.00");
-            _formatedDeposit = df.format(deposited);
+            formattedDeposit = df.format(deposited);
         } else {
             var df = new DecimalFormat("#.00000000");
-            _formatedDeposit = df.format(deposited);
+            formattedDeposit = df.format(deposited);
         }
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,
                 "DEPOSIT SUCCESS",
-                String.format("Your deposit of %f %s was successful.", _formatedDeposit , m.getCryptoType())
+                String.format("Your deposit of %s %s was successful.", formattedDeposit, m.getCryptoType())
         );
     }
 

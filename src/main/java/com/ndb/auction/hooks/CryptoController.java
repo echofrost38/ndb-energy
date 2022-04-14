@@ -326,8 +326,6 @@ public class CryptoController extends BaseController {
 		log.info("IPN reqQuery : {}", reqQuery);
 		
 		String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
-        log.info("_hmac calculated: {}", _hmac);
-        log.info("hmac in header: {}", hmac);
 		if(!_hmac.equals(hmac)) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
@@ -336,7 +334,7 @@ public class CryptoController extends BaseController {
         String currency = getString(request, "currency", true);
         String cryptoType = "";
         if(currency.contains(".")) {
-            cryptoType = currency.split("\\.")[0];
+            cryptoType = currency.split(".")[0];
         } else {
             cryptoType = currency;
         }
@@ -350,28 +348,22 @@ public class CryptoController extends BaseController {
             
             CoinpaymentWalletTransaction txn = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
             if(txn == null) {
-                log.error("txn is null");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             }
 
-            if(txn.getStatus()) {
-                log.error("txn {} is already confirmed.", txn.getId());
+            if(!txn.getStatus()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }
 
             int userId = txn.getUserId();
-            log.info("User ID: {}", userId);
 
             // account for fee
             double fee = getCoinpaymentFee(userId, amount);
             double deposited = amount - fee;
             // update coinpayment deposit transaction
-            int result = coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
-            log.info("num of updated: {}", result);
+            coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
 
-            result = balanceService.addFreeBalance(userId, cryptoType, deposited);
-            log.info("num of balance: {}", result);
-
+            balanceService.addFreeBalance(userId, cryptoType, deposited);
             List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
             double totalBalance = 0.0;

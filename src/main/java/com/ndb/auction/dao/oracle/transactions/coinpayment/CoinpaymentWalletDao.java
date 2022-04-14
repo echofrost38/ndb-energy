@@ -114,22 +114,22 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionD
 
     @Override
     public int update(int id, int status) {
-        String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATED_AT=SYSDATE WHERE ID=?";
+        String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATE_AT=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, status, id);
     }
 
     public int updateStatus(int id, int status, Double _amount, double fee, String _type) {
-		String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATED_AT=SYSDATE, CRYPTO_AMOUNT = ?, FEE=?, CRYPTO_TYPE = ? WHERE ID=?";
-		return jdbcTemplate.update(sql, status, _amount, fee, _type,  id);
+		String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATE_AT=SYSDATE, CRYPTO_AMOUNT = ?, FEE=?, CRYPTO_TYPE = ? WHERE ID=?";
+		return jdbcTemplate.update(sql, status, _amount, _type,  id);
 	}
 
     public int deleteExpired(double days) {
-		String sql = "DELETE FROM TBL_COINPAYMENT_WALLET WHERE SYSDATE-CREATED_AT>?";
+		String sql = "DELETE FROM TBL_COINPAYMENT_PRESALE WHERE SYSDATE-CREATED_AT>?";
 		return jdbcTemplate.update(sql, days);
 	}
 
     public List<CoinpaymentWalletTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_COINPAYMENT_WALLET WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+        String sql = "SELECT * FROM TBL_COINPAYMENT_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
 

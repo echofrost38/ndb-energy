@@ -106,7 +106,7 @@ public class BaseController {
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 
-    private static final String HMAC_SHA_512 = "HmacSHA512";
+    private static final String HMAC_SHA_256 = "HmacSHA256";
     private static final String HMAC_SHA_1 = "HmacSHA1";
 
     @Value("${coinspayment.merchant.id}")
@@ -161,8 +161,8 @@ public class BaseController {
     public String buildHmacSignature(String value, String secret) {
         String result;
         try {
-            Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_512);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_512);
+            Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_256);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), HMAC_SHA_256);
             hmacSHA512.init(secretKeySpec);
 
             byte[] digest = hmacSHA512.doFinal(value.getBytes());

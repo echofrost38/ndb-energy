@@ -1,5 +1,0 @@
-type CoinpaymentFee {
-    id: Int,
-    tierLevel: Int,
-    fee: Double
-}

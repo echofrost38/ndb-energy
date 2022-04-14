@@ -350,22 +350,28 @@ public class CryptoController extends BaseController {
             
             CoinpaymentWalletTransaction txn = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
             if(txn == null) {
+                log.error("txn is null");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             }
 
             if(!txn.getStatus()) {
+                log.error("txn {} is already confirmed.", txn.getId());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }
 
             int userId = txn.getUserId();
+            log.info("User ID: {}", userId);
 
             // account for fee
             double fee = getCoinpaymentFee(userId, amount);
             double deposited = amount - fee;
             // update coinpayment deposit transaction
-            coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
+            int result = coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
+            log.info("num of updated: {}", result);
 
-            balanceService.addFreeBalance(userId, cryptoType, deposited);
+            result = balanceService.addFreeBalance(userId, cryptoType, deposited);
+            log.info("num of balance: {}", result);
+
             List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
             double totalBalance = 0.0;

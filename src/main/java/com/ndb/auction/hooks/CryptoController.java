@@ -328,15 +328,15 @@ public class CryptoController extends BaseController {
 		String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
         log.info("_hmac calculated: {}", _hmac);
         log.info("hmac in header: {}", hmac);
-		// if(!_hmac.equals(hmac)) {
-		// 	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		// }
+		if(!_hmac.equals(hmac)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
         
 		// get currency and amount
         String currency = getString(request, "currency", true);
         String cryptoType = "";
         if(currency.contains(".")) {
-            cryptoType = currency.split(".")[0];
+            cryptoType = currency.split("\\.")[0];
         } else {
             cryptoType = currency;
         }

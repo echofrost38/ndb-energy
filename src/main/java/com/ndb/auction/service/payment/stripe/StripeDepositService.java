@@ -18,10 +18,7 @@ import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.payment.ITransactionService;
 import com.ndb.auction.utils.ThirdAPIUtils;
-import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
-import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,31 +44,18 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        Double totalAmount = getTotalAmount(userId, m.getAmount());
+        double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount(totalAmount.longValue())
+                        .setAmount((long) totalAmount)
                         .setCurrency("USD")
                         .setConfirm(true)
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
                 if(isSaveCard) {
-                    var customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
-                    createParams.setCustomer(customer.getId());
-                    createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
-
-                    // save customer
-                    var method = PaymentMethod.retrieve(m.getPaymentMethodId());
-
-                    var card = method.getCard();
-                    var stripeCustomer = new StripeCustomer(
-                            m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(),
-                            card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
-                    );
-
-                    stripeCustomerDao.insert(stripeCustomer);
+                    createParams = saveStripeCustomer(createParams, m);
                 }
 
                 intent = PaymentIntent.create(createParams.build());
@@ -82,7 +66,6 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
-
                 // get real payment!
                 handleDepositSuccess(userId, intent, m);
             }
@@ -97,12 +80,12 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        Double totalAmount = getTotalAmount(userId, m.getAmount());
+        double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                    .setAmount(totalAmount.longValue())
+                    .setAmount((long) totalAmount)
                     .setCurrency("USD")
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
@@ -194,13 +177,13 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             tierTaskService.updateTierTask(tierTask);
         }
         String formattedDeposit;
+        DecimalFormat df;
         if(m.getCryptoType().equals("USDT") || m.getCryptoType().equals("USDC")) {
-            var df = new DecimalFormat("#.00");
-            formattedDeposit = df.format(deposited);
+            df = new DecimalFormat("#.00");
         } else {
-            var df = new DecimalFormat("#.00000000");
-            formattedDeposit = df.format(deposited);
+            df = new DecimalFormat("#.00000000");
         }
+        formattedDeposit = df.format(deposited);
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,

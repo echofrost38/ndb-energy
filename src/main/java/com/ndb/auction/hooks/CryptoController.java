@@ -354,7 +354,7 @@ public class CryptoController extends BaseController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             }
 
-            if(!txn.getStatus()) {
+            if(txn.getStatus()) {
                 log.error("txn {} is already confirmed.", txn.getId());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }

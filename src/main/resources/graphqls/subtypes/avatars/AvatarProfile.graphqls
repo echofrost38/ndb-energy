@@ -8,7 +8,6 @@ type AvatarProfile {
     skillSet: [SkillSet],
     avatarSet: [AvatarSet],
     hairColor: String,
-    skinColor: String,
     factsSet: [AvatarFacts],
     details: String
 }

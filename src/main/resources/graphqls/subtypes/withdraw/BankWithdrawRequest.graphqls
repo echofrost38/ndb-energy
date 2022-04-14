@@ -1,20 +1,5 @@
 type BankWithdrawRequest {
     id: Int,
     userId: Int,
-    targetCurrency: String,
-    withdrawAmount: Float,
-    fee: Float,
-    sourceToken: String,
-    tokenPrice: Float,
-    tokenAmount: Float,
-    status: Int,
-    deniedReason: String,
-    requestedAt: Float,
-    confirmedAt: Float,
-    mode: Int,
-    country: String,
-    nameOfHolder: String,
-    bankName: String,
-    accountNumber: String,
-    metadata: String
+    target
 }

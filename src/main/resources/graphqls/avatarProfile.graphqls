@@ -21,7 +21,6 @@ extend type Mutation {
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],
         hairColor: String,
-        skinColor: String,
         details: String
     ) : AvatarProfile
     updateAvatarProfile (
@@ -32,7 +31,6 @@ extend type Mutation {
         avatarSet: [AvatarSetInput],
         factsSet: [FactsInput],
         hairColor: String,
-        skinColor: String,
         details: String
     ) : Boolean
 }

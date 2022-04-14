@@ -2,6 +2,7 @@ package com.ndb.auction.hooks;
 
 import com.ndb.auction.models.LocationLog;
 import com.ndb.auction.utils.RemoteIpHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

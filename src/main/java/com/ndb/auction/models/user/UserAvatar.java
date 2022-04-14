@@ -18,5 +18,5 @@ public class UserAvatar extends BaseModel {
 	private String selected;
 	private String prefix;
 	private String name;
-	private String skinColor;
+
 }

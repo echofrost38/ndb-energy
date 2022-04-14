@@ -22,7 +22,6 @@ public class AvatarProfile extends BaseModel {
 	private List<SkillSet> skillSet;
 	private List<AvatarSet> avatarSet;
 	private String hairColor;
-	private String skinColor;
 	private List<AvatarFacts> factsSet;
 	private String details;
 
@@ -32,7 +31,6 @@ public class AvatarProfile extends BaseModel {
 			List<SkillSet> skillSet,
 			List<AvatarSet> avatarSet,
 			String hairColor,
-			String skinColor,
 			List<AvatarFacts> factsSet,
 			String details) {
 		this.fname = fname;
@@ -40,7 +38,6 @@ public class AvatarProfile extends BaseModel {
 		this.skillSet = skillSet;
 		this.avatarSet = avatarSet;
 		this.hairColor = hairColor;
-		this.skinColor = skinColor;
 		this.factsSet = factsSet;
 		this.details = details;
 	}

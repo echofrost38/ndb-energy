@@ -54,7 +54,7 @@ public class AvatarService extends BaseService {
 		return avatarComponentDao.updateAvatarComponent(component);
 	}
 
-	public AvatarProfile createAvatarProfile(String name, String surname, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factsSet, String hairColor, String skinColor, String details) {
+	public AvatarProfile createAvatarProfile(String name, String surname, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factsSet, String hairColor, String details) {
 		
 		// check condition
 		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(surname);
@@ -63,7 +63,7 @@ public class AvatarService extends BaseService {
             throw new AuctionException(msg, "avatar");
 		}
 		
-		profile = new AvatarProfile(name, surname, skillSet, avatarSet, hairColor, skinColor, factsSet, details);
+		profile = new AvatarProfile(name, surname, skillSet, avatarSet, hairColor, factsSet, details);
 		profile = avatarProfileDao.createAvatarProfile(profile);
 		int profileId = profile.getId();
 
@@ -95,7 +95,6 @@ public class AvatarService extends BaseService {
 			List<AvatarSet> avatarSet, 
 			List<AvatarFacts> factSet,
 			String hairColor,
-			String skinColor,
 			String details) 
 	{
 		AvatarProfile profile = avatarProfileDao.getAvatarProfile(id);
@@ -107,7 +106,6 @@ public class AvatarService extends BaseService {
 		if(surname != null) profile.setSurname(surname);
 		if(details != null) profile.setDetails(details);
 		if(hairColor != null) profile.setHairColor(hairColor);
-		if(skinColor != null) profile.setSkinColor(skinColor);
 		
 		avatarProfileDao.updateAvatarProfile(profile);
 		if((skillSet != null) && (skillSet.size() != 0)) avatarSkillDao.update(id, skillSet);

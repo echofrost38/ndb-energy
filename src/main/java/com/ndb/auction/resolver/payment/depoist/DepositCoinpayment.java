@@ -35,7 +35,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         return (CoinpaymentWalletTransaction) coinpaymentWalletService.createNewTransaction(m);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTx(String orderBy) {
         return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectAll(orderBy);
@@ -57,6 +57,12 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
 
     @PreAuthorize("isAuthenticated()")
     public CoinpaymentWalletTransaction getCoinpaymentDepositTxById(int id) {
-        return (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        var m = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
+        if(m.getUserId() != userId) {
+            throw new UnauthorizedException("You have no permission.", "id");
+        }
+        return m;
     }
 }

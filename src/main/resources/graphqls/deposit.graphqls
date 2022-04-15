@@ -54,12 +54,11 @@ extend type Mutation {
     ) : PayResponse
 
     # bank deposit
-    bankForDeposit(
-        amount: Float,
-        currencyCode: String,
-        cryptoType: String
-    ) : BankDepositTransaction
+    bankForDeposit : String
     confirmBankDeposit(
-        id: Int
+        id: Int,
+        currencyCode: String,
+        amount: Float,
+        cryptoType: String
     ) : Int
 }

@@ -40,6 +40,10 @@ public class BankDepositService implements ITransactionService {
         return bankDepositDao.update(id, status);
     }
 
+    public int update(int id, String currency, double amount, double usdAmount, double deposited, double fee, String cryptoType, double cryptoPrice) {
+        return bankDepositDao.update(id, currency, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
+    }
+
     public BankDepositTransaction selectByUid(String uid) {
         return bankDepositDao.selectByUid(uid);
     }

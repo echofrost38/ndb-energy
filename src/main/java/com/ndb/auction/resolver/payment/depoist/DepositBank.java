@@ -4,8 +4,19 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.Notification;
+import com.ndb.auction.models.TaskSetting;
+import com.ndb.auction.models.tier.Tier;
+import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
+import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.InternalBalanceService;
+import com.ndb.auction.service.TaskSettingService;
+import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.payment.bank.BankDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -21,10 +32,19 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class DepositBank extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     @Autowired
+    private TierService tierService;
+
+    @Autowired
+    private TaskSettingService taskSettingService;
+
+    @Autowired
+    private InternalBalanceService balanceService;
+
+    @Autowired
     private BankDepositService bankDepositService;
 
     @PreAuthorize("isAuthenticated()")
-    public BankDepositTransaction bankForDeposit(Long amount, String currencyCode, String cryptoType) {
+    public String bankForDeposit() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -33,6 +53,33 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             new UnauthorizedException(msg, "userId");
         }
+
+        // generate UID for new bank transfer
+        String uid = "";
+        BankDepositTransaction uidChecker = null;
+        do {
+            uid = getBankUID();
+            uidChecker = bankDepositService.selectByUid(uid);
+        } while (uidChecker != null);
+
+        // get bankDetailsId from currency
+        int bankDetailsId = 1; // test
+
+        // create new deposit & 
+        var m = new BankDepositTransaction(userId, 0, uid, bankDetailsId, "USDT", 1, "", 0, 0, 0);
+        bankDepositService.insert(m);
+
+        return uid;
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public int confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
+
+        var m = bankDepositService.selectById(id);
+        if(m == null) {
+            throw new UserNotFoundException("There is no such withdrawal request.", "id");
+        }
+        var userId = m.getUserId();
         
         // get fiat price, and calculate USD equivalent balance
         double usdAmount = 0.0;
@@ -52,25 +99,63 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         double fee = getTierFee(userId, cryptoAmount);
         double depoisted = cryptoAmount - fee;
 
-        // generate UID for new bank transfer
-        String uid = "";
-        BankDepositTransaction uidChecker = null;
-        do {
-            uid = getBankUID();
-            uidChecker = bankDepositService.selectByUid(uid);
-        } while (uidChecker != null);
+        // update user balance and tier
+        List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
-        // get bankDetailsId from currency
-        int bankDetailsId = 1; // test
+        double totalBalance = 0.0;
+        for (BalancePayload balance : balances) {
+            // get price and total balance
+            double _price = thirdAPIUtils.getCryptoPriceBySymbol(balance.getTokenSymbol());
+            double _balance = _price * (balance.getFree() + balance.getHold());
+            totalBalance += _balance;
+        }
 
-        // create new deposit & 
-        var m = new BankDepositTransaction(userId, amount, uid, bankDetailsId, cryptoType, cryptoPrice, currencyCode, usdAmount, fee, depoisted);
-        return bankDepositService.insert(m);
-    }
+        // update user tier points
+        User user = userService.getUserById(userId);
+        List<Tier> tierList = tierService.getUserTiers();
+        TaskSetting taskSetting = taskSettingService.getTaskSetting();
+        TierTask tierTask = tierTaskService.getTierTask(userId);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public int confirmBankDeposit(int id) {
-        return bankDepositService.update(id, 1);
+        if(tierTask == null) {
+            tierTask = new TierTask(userId);
+            tierTaskService.updateTierTask(tierTask);
+        }
+
+        if(tierTask.getWallet() < totalBalance) {
+
+            tierTask.setWallet(totalBalance);
+            // get point
+            double gainedPoint = 0.0;
+            for (WalletTask task : taskSetting.getWallet()) {
+                if(tierTask.getWallet() > task.getAmount()) {
+                    continue;
+                }                    
+                if(totalBalance < task.getAmount()) {
+                    break;
+                }
+                gainedPoint += task.getPoint();
+            }
+
+            double newPoint = user.getTierPoint() + gainedPoint;
+            int tierLevel = 0;
+            // check change in level
+            for (Tier tier : tierList) {
+                if(tier.getPoint() <= newPoint) {
+                    tierLevel = tier.getLevel();
+                }
+            }
+            userService.updateTier(user.getId(), tierLevel, newPoint);
+            tierTaskService.updateTierTask(tierTask);
+        }
+
+        notificationService.sendNotification(
+            userId,
+            Notification.DEPOSIT_SUCCESS, 
+            "PAYMENT CONFIRMED", 
+            String.format("Your deposit of %f %s was successful.", amount, cryptoType));
+
+
+        return bankDepositService.update(id, currencyCode, amount, usdAmount, depoisted, fee, cryptoType, cryptoPrice);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

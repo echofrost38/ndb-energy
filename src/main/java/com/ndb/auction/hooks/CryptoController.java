@@ -90,7 +90,12 @@ public class CryptoController extends BaseController {
         
 		// get currency and amount
         String currency = getString(request, "currency", true);
-        String cryptoType = currency.split(".")[0];
+        String cryptoType = "";
+        if(currency.contains(".")) {
+            cryptoType = currency.split("\\.")[0];
+        } else {
+            cryptoType = currency;
+        }
         Double amount = getDouble(request, "amount");
         Double fiatAmount = getDouble(request, "fiat_amount");
 		
@@ -104,8 +109,10 @@ public class CryptoController extends BaseController {
             Bid bid = bidService.getBid(txn.getAuctionId(), txn.getUserId());
     
             if (bid.isPendingIncrease()) {
-                double pendingPrice = bid.getDelta();
-                if (pendingPrice > fiatAmount) {
+                double pendingPrice = bid.getTempTokenAmount() * bid.getTempTokenPrice();
+                Double totalOrder = getTotalOrder(bid.getUserId(), pendingPrice);
+
+                if (totalOrder > fiatAmount) {
                     new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
                 }
                 bidService.increaseAmount(
@@ -115,10 +122,8 @@ public class CryptoController extends BaseController {
                 bid.setTokenPrice(bid.getTempTokenPrice());
                 bid.setTotalAmount((double) (bid.getTokenAmount() * bid.getTokenPrice()));
             } else {
-                Double totalAmount = bid.getTotalAmount();
+                Double totalAmount = bid.getTokenAmount() * bid.getTokenPrice();
                 Double totalOrder = getTotalOrder(bid.getUserId(), totalAmount);
-                // Double alreadyPaid = bid.getPaidAmount();
-                // bidService.updatePaid(bid.getUserId(), bid.getRoundId(), fiatAmount);
                 
                 if (totalOrder > fiatAmount) {
                     new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -220,7 +225,12 @@ public class CryptoController extends BaseController {
 
         // get currency and amount
         String currency = getString(request, "currency", true);
-        String cryptoType = currency.split(".")[0];
+        String cryptoType = "";
+        if(currency.contains(".")) {
+            cryptoType = currency.split("\\.")[0];
+        } else {
+            cryptoType = currency;
+        }
         Double amount = getDouble(request, "amount");
         Double fiatAmount = getDouble(request, "fiat_amount");
 

@@ -45,7 +45,17 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
                 // check save card
                 if (isSaveCard) {
-                    createParams = saveStripeCustomer(createParams, m);
+                    var customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
+                    createParams.setCustomer(customer.getId());
+                    createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
+
+                    // save customer
+                    var method = PaymentMethod.retrieve(m.getPaymentMethodId());
+
+                    var card = method.getCard();
+                    var stripeCustomer = new StripeCustomer(m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4());
+
+                    stripeCustomerDao.insert(stripeCustomer);
                 }
 
                 intent = PaymentIntent.create(createParams.build());
@@ -57,7 +67,18 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
-                handleSuccessPresaleOrder(m, presaleOrder, intent);
+
+                // check amount
+                long paidAmount = intent.getAmount();
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
+                }
+
+                handlePresaleOrder(userId, presaleOrder);
+                stripePresaleDao.update(m.getId(), 1);
             }
             response = generateResponse(intent, response);
 
@@ -107,7 +128,17 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 
-                handleSuccessPresaleOrder(m, presaleOrder, intent);
+                // check amount
+                long paidAmount = intent.getAmount();
+                double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+                double totalOrder = getTotalAmount(userId, orderAmount);
+                if (totalOrder > paidAmount) {
+                    String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                    throw new BalanceException(msg, "balance");
+                }
+
+                handlePresaleOrder(userId, presaleOrder);
+                stripePresaleDao.update(m.getId(), 1);
             }
             response = generateResponse(intent, response);
 
@@ -116,20 +147,6 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         }
 
         return response;
-    }
-
-    private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder, PaymentIntent intent) {
-        int userId = m.getUserId();
-        long paidAmount = intent.getAmount();
-        double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
-        double totalOrder = getTotalAmount(userId, orderAmount);
-        if (totalOrder > paidAmount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "balance");
-        }
-
-        handlePresaleOrder(userId, presaleOrder);
-        stripePresaleDao.update(m.getId(), 1);
     }
 
     @Override

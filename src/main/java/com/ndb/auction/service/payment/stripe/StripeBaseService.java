@@ -5,28 +5,18 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
-import com.ndb.auction.models.transactions.stripe.StripeCustomer;
-import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.stripe.Stripe;
-import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
 
-import com.stripe.model.PaymentMethod;
-import com.stripe.model.PaymentMethod.Card;
-import com.stripe.param.CustomerCreateParams;
-import com.stripe.param.PaymentIntentCreateParams.Builder;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import static com.stripe.param.PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION;
 
 @Service
 public class StripeBaseService extends BaseService {
@@ -126,21 +116,4 @@ public class StripeBaseService extends BaseService {
         }
         return response;
 	}
-    public Builder saveStripeCustomer(Builder createParams, StripeDepositTransaction m) throws StripeException {
-        Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
-        createParams.setCustomer(customer.getId());
-        createParams.setSetupFutureUsage(OFF_SESSION);
-
-        // save customer
-        PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
-
-        Card card = method.getCard();
-        StripeCustomer stripeCustomer = new StripeCustomer(
-                m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(),
-                card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
-        );
-
-        stripeCustomerDao.insert(stripeCustomer);
-        return createParams;
-    }
 }

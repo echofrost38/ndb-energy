@@ -131,8 +131,8 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
     }
 
     public int update(int id, String currency, double amount, double usdAmount, double deposited, double fee, String cryptoType, double cryptoPrice) {
-        String sql = "UPDATE TBL_BANK_DEPOSIT SET STATUS=1,AMOUNT=?,USD_AMOUNT=?,FIAT_TYPE=?,DEPOSITED=?,FEE=?,CTYPTO_TYPE=?,CRYPTO_PRICE=? WHERE ID=?";
-        return jdbcTemplate.update(sql, amount, usdAmount, currency, deposited, fee, cryptoType, cryptoPrice);
+        String sql = "UPDATE TBL_BANK_DEPOSIT SET STATUS=1,AMOUNT=?,USD_AMOUNT=?,FIAT_TYPE=?,DEPOSITED=?,FEE=?,CRYPTO_TYPE=?,CRYPTO_PRICE=? WHERE ID=?";
+        return jdbcTemplate.update(sql, amount, usdAmount, currency, deposited, fee, cryptoType, cryptoPrice, id);
     }
 
 }

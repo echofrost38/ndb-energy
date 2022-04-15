@@ -79,6 +79,11 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         if(m == null) {
             throw new UserNotFoundException("There is no such withdrawal request.", "id");
         }
+
+        if(m.getStatus()) {
+            throw new UserNotFoundException("This request is already confirmed.", "id");
+        }
+
         var userId = m.getUserId();
         
         // get fiat price, and calculate USD equivalent balance
@@ -89,8 +94,9 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             double currencyPrice = thirdAPIUtils.getCurrencyRate(currencyCode);
             if(currencyPrice == 0.0) {
                 usdAmount = (double) amount;
+            } else {
+                usdAmount = (double) amount / currencyPrice;
             }
-            usdAmount = (double) amount / currencyPrice;
         }
 
         // get crypto price, and calculate crypto amount

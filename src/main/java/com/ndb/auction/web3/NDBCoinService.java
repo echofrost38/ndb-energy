@@ -37,6 +37,9 @@ public class NDBCoinService {
     @Value("${bsc.json.rpc}")
     private String bscNetwork;
 
+    @Value("${bsc.json.chainid}")
+    private long bscChainId;
+
     @Value("${ndb.token.addr}")
     private String ndbTokenContract;
     @Value("${ndb.referral.addr}")
@@ -63,7 +66,7 @@ public class NDBCoinService {
     public void init() throws IOException {
         Web3j web3j = Web3j.build(new HttpService(bscNetwork));
         ndbCredential = Credentials.create(ndbKey);
-        txMananger = new FastRawTransactionManager(web3j, ndbCredential, 97);
+        txMananger = new FastRawTransactionManager(web3j, ndbCredential, bscChainId);
         ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, new DefaultGasProvider());
         ndbReferral = NDBReferral.load(ndbReferralContract, web3j, txMananger,gasPrice,gasLimit);
         ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
@@ -160,8 +163,10 @@ public class NDBCoinService {
         String responseBody = response.body();
         int responseStatusCode = response.statusCode();
         JSONObject json = new JSONObject(responseBody);
-        String price = json.getJSONObject("data").getString("price");
-        Double marketcap = total.divide(decimals).doubleValue()*Double.parseDouble(price);
+        Double price = Double.parseDouble(json.getJSONObject("data").getString("price"));
+        if (price.equals(0.0))
+            price=0.01; //ICO price
+        Double marketcap = total.divide(decimals).doubleValue()*price;
         return df.format(marketcap).toString();
     }
     public String getCirculatingSupply() throws ExecutionException, InterruptedException {

@@ -133,19 +133,18 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
     
             if(tierTask.getWallet() < totalBalance) {
     
-                tierTask.setWallet(totalBalance);
                 // get point
                 double gainedPoint = 0.0;
                 for (WalletTask task : taskSetting.getWallet()) {
-                    if(tierTask.getWallet() > task.getAmount()) {
-                        continue;
-                    }                    
-                    if(totalBalance < task.getAmount()) {
+                    if(tierTask.getWallet() > task.getAmount()) continue;
+                    if(totalBalance > task.getAmount()) {
+                        // add point
+                        gainedPoint += task.getPoint();
+                    } else {
                         break;
                     }
-                    gainedPoint += task.getPoint();
                 }
-    
+                
                 double newPoint = user.getTierPoint() + gainedPoint;
                 int tierLevel = 0;
                 // check change in level
@@ -155,6 +154,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
                     }
                 }
                 userService.updateTier(user.getId(), tierLevel, newPoint);
+                tierTask.setWallet(totalBalance);
                 tierTaskService.updateTierTask(tierTask);
             }
 

@@ -35,7 +35,7 @@ public class CoinpaymentWalletService extends CoinpaymentBaseService implements 
         post.addHeader("Accept-Language", "en-US");
         
         m = (CoinpaymentWalletTransaction) coinpaymentWalletDao.insert(m);
-
+        
         // get address
         String ipnUrl = COINSPAYMENT_IPN_URL + "/deposit/" + m.getId();
         CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(m.getCoin(), ipnUrl);

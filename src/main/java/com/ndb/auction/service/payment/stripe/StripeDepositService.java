@@ -145,7 +145,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         depositTransaction.setStatus(true);
         insert(depositTransaction);
-
+        
         internalBalanceService.addFreeBalance(userId, m.getCryptoType(), deposited);
 
         List<BalancePayload> balances = internalBalanceService.getInternalBalances(userId);
@@ -156,7 +156,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
             double _balance = _price * (balance.getFree() + balance.getHold());
             totalBalance += _balance;
         }
-
+        
         User user = userDao.selectById(userId);
         List<Tier> tierList = tierService.getUserTiers();
         TaskSetting taskSetting = taskSettingService.getTaskSetting();
@@ -169,19 +169,18 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         if(tierTask.getWallet() < totalBalance) {
 
-            tierTask.setWallet(totalBalance);
             // get point
             double gainedPoint = 0.0;
             for (WalletTask task : taskSetting.getWallet()) {
-                if(tierTask.getWallet() > task.getAmount()) {
-                    continue;
-                }                    
-                if(totalBalance < task.getAmount()) {
+                if(tierTask.getWallet() > task.getAmount()) continue;
+                if(totalBalance > task.getAmount()) {
+                    // add point
+                    gainedPoint += task.getPoint();
+                } else {
                     break;
                 }
-                gainedPoint += task.getPoint();
             }
-
+            
             double newPoint = user.getTierPoint() + gainedPoint;
             int tierLevel = 0;
             // check change in level
@@ -191,6 +190,7 @@ public class StripeDepositService extends StripeBaseService implements ITransact
                 }
             }
             userDao.updateTier(user.getId(), tierLevel, newPoint);
+            tierTask.setWallet(totalBalance);
             tierTaskService.updateTierTask(tierTask);
         }
         String formattedDeposit;

@@ -66,7 +66,7 @@ public class ShuftiController extends BaseController {
    		String reqQuery;
 		try {
 			reqQuery = getBody(request);
-            System.out.println(reqQuery);
+            System.out.println("SHUFTI CALLBACK: " + reqQuery);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

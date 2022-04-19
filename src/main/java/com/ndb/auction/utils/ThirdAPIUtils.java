@@ -27,9 +27,6 @@ public class ThirdAPIUtils {
         this.xchangeAPI = webClientBuilder
             .baseUrl("https://api.exchangerate.host")
             .build();
-        this.freaksAPI = webClientBuilder
-            .baseUrl("https://api.exchangerate.host/latest")
-            .build();
     }
 
     public double getCryptoPriceBySymbol(String symbol) {
@@ -80,10 +77,10 @@ public class ThirdAPIUtils {
 
     public double getCurrencyRate(String from) {
         try {
-            String converted = freaksAPI.get()
+            String converted = xchangeAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")
                     .queryParam("symbols", from)
-                    // .queryParam("apikey", freaksApiKey)
+                    .queryParam("base", "USD")
                     .build())
                 .retrieve()
                 .bodyToMono(String.class)

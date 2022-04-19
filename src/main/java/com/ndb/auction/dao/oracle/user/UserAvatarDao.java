@@ -66,7 +66,7 @@ public class UserAvatarDao extends BaseOracleDao {
 
 	public int insert(UserAvatar m) {
 		String sql = "INSERT INTO TBL_USER_AVATAR(ID,PURCHASED,HAIR_COLOR,SKIN_COLOR,PREFIX,NAME,REG_DATE,UPDATE_DATE)"
-				+ "VALUES(?,?,?,?,?,SYSDATE,SYSDATE)";
+				+ "VALUES(?,?,?,?,?,?,SYSDATE,SYSDATE)";
 		return jdbcTemplate.update(sql, m.getId(), m.getPurchased(), m.getHairColor(), m.getSkinColor(), m.getPrefix(), m.getName());
 	}
 

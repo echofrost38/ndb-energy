@@ -73,9 +73,9 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public int confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
+    public BankDepositTransaction confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
 
-        var m = bankDepositService.selectById(id);
+        var m = (BankDepositTransaction)bankDepositService.selectById(id);
         if(m == null) {
             throw new UserNotFoundException("There is no such withdrawal request.", "id");
         }
@@ -103,7 +103,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
         double cryptoAmount = usdAmount / cryptoPrice; // total usd
         double fee = getTierFee(userId, cryptoAmount);
-        double depoisted = cryptoAmount - fee;
+        double deposited = cryptoAmount - fee;
 
         // update user balance and tier
         List<BalancePayload> balances = balanceService.getInternalBalances(userId);
@@ -160,8 +160,13 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             "PAYMENT CONFIRMED", 
             String.format("Your deposit of %f %s was successful.", amount, cryptoType));
 
-
-        return bankDepositService.update(id, currencyCode, amount, usdAmount, depoisted, fee, cryptoType, cryptoPrice);
+        
+        int result = bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
+        if(result != 1) return null;
+        m.setDeposited(deposited);
+        m.setFee(fee);
+        m.setUsdAmount(usdAmount);
+        return m;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

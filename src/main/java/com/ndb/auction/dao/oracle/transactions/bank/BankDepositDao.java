@@ -29,6 +29,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 		BankDepositTransaction m = new BankDepositTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
+        m.setEmail(rs.getString("EMAIL"));
         m.setUid(rs.getString("UNID"));
 		m.setAmount(rs.getDouble("AMOUNT"));
 		m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
@@ -74,7 +75,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 
     @Override
     public List<? extends Transaction> selectAll(String orderBy) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy + " DESC";
@@ -83,7 +84,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 
     @Override
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE USER_ID = ?";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.USER_ID = ?";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
@@ -92,7 +93,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 
     @Override
     public Transaction selectById(int id) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE ID=?";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.WHERE ID=?";
 		return jdbcTemplate.query(sql, rs -> {
             if(!rs.next())
                 return null;
@@ -107,7 +108,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
     }
 
     public BankDepositTransaction selectByUid(String uid) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE UID=?";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.UID=?";
 		return jdbcTemplate.query(sql, rs -> {
             if(!rs.next())
                 return null;
@@ -116,17 +117,17 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
     }
 
     public List<BankDepositTransaction> selectUnconfirmedByAdmin() {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE STATUS = 0 ORDER BY ID DESC";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.STATUS = 0 ORDER BY TBL_BANK_DEPOSIT.ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public List<BankDepositTransaction> selectUnconfirmedByUser(int userId) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE USER_ID = ? AND STATUS = 0 ORDER BY ID DESC";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.USER_ID = ? AND TBL_BANK_DEPOSIT.STATUS = 0 ORDER BY TBL_BANK_DEPOSIT.ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     public List<BankDepositTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_BANK_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.USER_ID = ? AND TBL_BANK_DEPOSIT.CREATED_AT > ? AND TBL_BANK_DEPOSIT.CREATED_AT < ? ORDER BY TBL_BANK_DEPOSIT.ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
 

@@ -60,5 +60,5 @@ extend type Mutation {
         currencyCode: String,
         amount: Float,
         cryptoType: String
-    ) : Int
+    ) : BankDepositTransaction
 }

@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Transaction {
     protected int id;
     protected int userId;
+    protected String email;
     protected Double amount;
     protected Long createdAt;
     protected Long confirmedAt;

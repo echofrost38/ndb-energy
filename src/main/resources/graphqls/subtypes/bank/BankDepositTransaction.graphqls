@@ -5,7 +5,7 @@ type BankDepositTransaction {
     amount: Float,
     createdAt: Float,
     confirmedAt: Float,
-    status: Int,
+    status: Boolean,
     fiatType: String,
     usdAmount: Float,
     cryptoType: String,

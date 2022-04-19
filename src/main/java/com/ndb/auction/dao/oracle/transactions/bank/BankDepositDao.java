@@ -77,7 +77,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
     public List<? extends Transaction> selectAll(String orderBy) {
         String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID";
 		if (orderBy == null)
-			orderBy = "ID";
+			orderBy = "TBL_BANK_DEPOSIT.ID";
 		sql += " ORDER BY " + orderBy + " DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
@@ -86,8 +86,8 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
     public List<? extends Transaction> selectByUser(int userId, String orderBy) {
         String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.USER_ID = ?";
 		if (orderBy == null)
-			orderBy = "ID";
-		sql += " ORDER BY " + orderBy;
+			orderBy = "TBL_BANK_DEPOSIT.ID";
+		sql += " ORDER BY " + orderBy + " DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 

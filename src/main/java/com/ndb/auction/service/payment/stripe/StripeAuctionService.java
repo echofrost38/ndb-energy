@@ -44,19 +44,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
 
                 // check save card
                 if (isSaveCard) {
-                    Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
-                    createParams.setCustomer(customer.getId());
-                    createParams.setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION);
-
-                    // save customer
-                    PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
-
-                    Card card = method.getCard();
-                    StripeCustomer stripeCustomer = new StripeCustomer(
-                            m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(), card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
-                    );
-
-                    stripeCustomerDao.insert(stripeCustomer);
+                    createParams = saveStripeCustomer(createParams, m);
                 }
 
                 // Create a PaymentIntent with the order amount and currency

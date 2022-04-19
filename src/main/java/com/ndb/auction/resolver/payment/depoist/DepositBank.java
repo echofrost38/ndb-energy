@@ -106,6 +106,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         double deposited = cryptoAmount - fee;
 
         // update user balance and tier
+        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
         List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
         double totalBalance = 0.0;

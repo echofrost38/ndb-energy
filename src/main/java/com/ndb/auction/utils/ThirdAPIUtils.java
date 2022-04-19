@@ -31,7 +31,7 @@ public class ThirdAPIUtils {
             .baseUrl("https://api.exchangerate.host")
             .build();
         this.freaksAPI = webClientBuilder
-            .baseUrl("https://api.currencyfreaks.com")
+            .baseUrl("https://api.exchangerate.host/latest")
             .build();
     }
 
@@ -65,7 +65,7 @@ public class ThirdAPIUtils {
     public double currencyConvert(String from, String to, double amount) {
         try {
             String converted = xchangeAPI.get()
-                .uri(uriBuilder -> uriBuilder.path("/latest")
+                .uri(uriBuilder -> uriBuilder.path("/convert")
                     .queryParam("from", from)
                     .queryParam("to", to)
                     .queryParam("amount", amount)
@@ -86,7 +86,7 @@ public class ThirdAPIUtils {
             String converted = freaksAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")
                     .queryParam("symbols", from)
-                    .queryParam("apikey", freaksApiKey)
+                    // .queryParam("apikey", freaksApiKey)
                     .build())
                 .retrieve()
                 .bodyToMono(String.class)

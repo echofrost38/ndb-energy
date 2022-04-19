@@ -1,6 +1,7 @@
 type BankDepositTransaction {
     id: Int,
     userId: Int,
+    email: String,
     uid: String,
     amount: Float,
     createdAt: Float,

@@ -1,6 +1,7 @@
 type PaypalWithdraw {
     id: Int,
     userId: Int,
+    email: String,
     targetCurrency: String, 
     sourceToken: String,
     tokenPrice: Float,

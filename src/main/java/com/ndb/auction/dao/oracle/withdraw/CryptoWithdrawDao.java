@@ -27,6 +27,7 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         CryptoWithdraw m = new CryptoWithdraw();
         m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
+        m.setEmail(rs.getString("EMAIL"));  
 		m.setSourceToken(rs.getString("SOURCE"));
         m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
         // withdraw amount
@@ -80,25 +81,25 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
 
     @Override
     public List<? extends BaseWithdraw> selectByUser(int userId) {
-        var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID = ?";
+        var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.USER_ID = ?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectByStatus(int userId, int status) {
-        var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID=? AND STATUS=?";
+        var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.USER_ID=? AND TBL_CRYPTO_WITHDRAW.STATUS=?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectPendings() {
-        var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE STATUS=1";
+        var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.STATUS=1";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
     public BaseWithdraw selectById(int id) {
-        String sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE ID=?";
+        String sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.ID=?";
 		return jdbcTemplate.query(sql, rs -> {
 			if (!rs.next())
 				return null;
@@ -107,7 +108,7 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     }
 
     public List<CryptoWithdraw> selectRange(int userId, long from, long to) {
-        var sql = "SELECT * FROM TBL_CRYPTO_WITHDRAW WHERE USER_ID = ? AND REQUESTED_AT > ? AND REQUESTED_AT < ?";
+        var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.USER_ID = ? AND TBL_CRYPTO_WITHDRAW.REQUESTED_AT > ? AND TBL_CRYPTO_WITHDRAW.REQUESTED_AT < ?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     

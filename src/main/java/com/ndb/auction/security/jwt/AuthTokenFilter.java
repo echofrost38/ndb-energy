@@ -123,7 +123,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         AntPathMatcher matcher = new AntPathMatcher();
-        return matcher.match("/location", request.getServletPath()) || matcher.match("/favicon.ico", request.getServletPath());
+        return 
+            matcher.match("/location", request.getServletPath()) || 
+            matcher.match("/favicon.ico", request.getServletPath()) ||
+            matcher.match("/shufti", request.getServletPath());
     }
 
     private String parseJwt(HttpServletRequest request) {

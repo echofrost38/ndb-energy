@@ -16,6 +16,7 @@ public class BaseWithdraw {
     // id
     protected int id;
     protected int userId;
+    protected String email;
     
     // withdraw details
     protected String targetCurrency;

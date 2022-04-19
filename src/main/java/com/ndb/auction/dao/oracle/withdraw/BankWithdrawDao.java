@@ -21,6 +21,7 @@ public class BankWithdrawDao extends BaseOracleDao {
 		BankWithdrawRequest m = new BankWithdrawRequest();
 		m.setId(rs.getInt("ID"));
         m.setUserId(rs.getInt("USER_ID"));
+        // m.setEmail(rs.getString("EMAIL"));
         m.setTargetCurrency(rs.getString("TAR_CURRENCY"));
         m.setWithdrawAmount(rs.getDouble("WITHDRAW"));
         m.setFee(rs.getDouble("FEE"));

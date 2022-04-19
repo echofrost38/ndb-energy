@@ -1,6 +1,7 @@
 type CryptoWithdraw {
     id: Int,
     userId: Int,
+    email: String,
     sourceToken: String,
     tokenPrice: Float,
     withdrawAmount: Float,

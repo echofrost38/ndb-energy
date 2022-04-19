@@ -27,6 +27,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         PaypalWithdraw m = new PaypalWithdraw();
         m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
+        m.setEmail(rs.getString("EMAIL"));
         m.setTargetCurrency(rs.getString("TARGET"));
 		m.setSourceToken(rs.getString("SOURCE"));
         m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
@@ -82,25 +83,25 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
 
     @Override
     public List<? extends BaseWithdraw> selectByUser(int userId) {
-        var sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE USER_ID = ?";
+        var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.USER_ID = ?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectByStatus(int userId, int status) {
-        var sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE USER_ID=? AND STATUS=?";
+        var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.USER_ID=? AND TBL_PAYPAL_WITHDRAW.STATUS=?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
     }
 
     @Override
     public List<? extends BaseWithdraw> selectPendings() {
-        var sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE STATUS=1";
+        var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.STATUS=1";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     @Override
     public BaseWithdraw selectById(int id) {
-        String sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE ID=?";
+        String sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.ID=?";
 		return jdbcTemplate.query(sql, rs -> {
 			if (!rs.next())
 				return null;
@@ -109,7 +110,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     }
 
     public PaypalWithdraw selectByPayoutId(String payoutId) {
-        String sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE PAYOUT_ID=?";
+        String sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.PAYOUT_ID=?";
         return jdbcTemplate.query(sql,  rs -> {
 			if (!rs.next())
 				return null;
@@ -123,7 +124,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     }
 
     public List<PaypalWithdraw> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_PAYPAL_WITHDRAW WHERE USER_ID = ? AND REQUESTED_AT > ? AND REQUESTED_AT < ? ORDER BY ID DESC";
+        String sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.USER_ID = ? AND TBL_PAYPAL_WITHDRAW.REQUESTED_AT > ? AND TBL_PAYPAL_WITHDRAW.REQUESTED_AT < ? ORDER BY TBL_PAYPAL_WITHDRAW.ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
 

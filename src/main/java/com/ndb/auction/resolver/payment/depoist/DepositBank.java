@@ -161,12 +161,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             String.format("Your deposit of %f %s was successful.", amount, cryptoType));
 
         
-        int result = bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
-        if(result != 1) return null;
-        m.setDeposited(deposited);
-        m.setFee(fee);
-        m.setUsdAmount(usdAmount);
-        return m;
+        bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
+        return (BankDepositTransaction) bankDepositService.selectById(id);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

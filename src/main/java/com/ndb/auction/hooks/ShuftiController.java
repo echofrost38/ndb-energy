@@ -10,9 +10,13 @@ import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.models.Notification;
-import com.ndb.auction.models.Shufti.Response.*;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.Shufti.ShuftiReference;
+import com.ndb.auction.models.Shufti.Response.Address;
+import com.ndb.auction.models.Shufti.Response.Document;
+import com.ndb.auction.models.Shufti.Response.Proof;
+import com.ndb.auction.models.Shufti.Response.ShuftiResponse;
+import com.ndb.auction.models.Shufti.Response.VerificationResult;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
@@ -99,7 +103,6 @@ public class ShuftiController extends BaseController {
                 ShuftiResponse statusResponse = shuftiService.checkShuftiStatus(reference);
                 if(statusResponse == null) {
                     System.out.println("Error for getting status: " + reference);
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
 
                 if(statusResponse.getEvent().equals("verification.accepted")) {
@@ -195,36 +198,28 @@ public class ShuftiController extends BaseController {
     }
 
     private UserDetail generateUserDetailEntity(ShuftiResponse response) {
-
         Document userDocument = response.getVerification_data().getDocument();
+        Proof userProof = response.getAdditional_data().getDocument().getProof();
         Address userAddress = response.getVerification_data().getAddress();
 
-        UserDetail userDetail = UserDetail.builder()
+        return UserDetail.builder()
                 .firstName(userDocument.getName().getFirst_name())
                 .lastName(userDocument.getName().getLast_name())
                 .issueDate(userDocument.getIssue_date())
                 .expiryDate(userDocument.getExpiry_date())
+                .nationality(userProof.getNationality())
+                .countryCode(userProof.getCountry_code())
+                .documentType(userProof.getDocument_type())
+                .placeOfBirth(userProof.getPlace_of_birth())
+                .documentNumber(userProof.getDocument_number())
+                .personalNumber(userProof.getPersonal_number())
+                .height(userProof.getHeight())
+                .country(userProof.getCountry())
+                .authority(userProof.getAuthority())
                 .dob(userDocument.getDob())
                 .age(userDocument.getAge())
                 .gender(userDocument.getGender())
                 .address(userAddress.getFull_address())
                 .build();
-
-        if(response.getAdditional_data() != null &&
-                response.getAdditional_data().getDocument() != null) {
-
-            Proof additionalData = response.getAdditional_data().getDocument().getProof();
-
-            userDetail.setNationality(additionalData.getNationality());
-            userDetail.setCountryCode(additionalData.getCountry_code());
-            userDetail.setDocumentType(additionalData.getDocument_type());
-            userDetail.setDocumentNumber(additionalData.getDocument_number());
-            userDetail.setPersonalNumber(additionalData.getPersonal_number());
-            userDetail.setHeight(additionalData.getHeight());
-            userDetail.setCountry(additionalData.getCountry());
-            userDetail.setAuthority(additionalData.getAuthority());
-        }
-
-        return userDetail;
     }
 }

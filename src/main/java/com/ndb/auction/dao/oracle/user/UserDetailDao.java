@@ -78,17 +78,33 @@ public class UserDetailDao extends BaseOracleDao {
                 " PLACE_OF_BIRTH, GENDER, HEIGHT, DELETED, REG_DATE, UPDATE_DATE)"
                 + "VALUES(SEQ_USER_DETAIL.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
+
         jdbcTemplate.update(
                 connection -> {
-                    PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
+                    PreparedStatement ps = connection.prepareStatement(sql, new String[]{"ID"});
                     int i = 1;
                     ps.setLong(i++, m.getUserId());
                     ps.setString(i++, m.getFirstName());
                     ps.setString(i++, m.getLastName());
-                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getDob())));
+
+                    if (m.getDob() != null) {
+                        ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getDob())));
+                    } else {
+                        ps.setDate(i++, null);
+                    }
                     ps.setString(i++, m.getAddress());
-                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getIssueDate())));
-                    ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getExpiryDate())));
+
+                    if (m.getIssueDate() != null) {
+                        ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getIssueDate())));
+                    } else {
+                        ps.setDate(i++, null);
+                    }
+
+                    if(m.getExpiryDate() != null) {
+                        ps.setDate(i++, Date.valueOf(LocalDate.parse(m.getExpiryDate())));
+                    } else {
+                        ps.setDate(i++, null);
+                    }
                     ps.setString(i++, m.getNationality());
                     ps.setString(i++, m.getPersonalNumber());
                     ps.setString(i++, m.getDocumentNumber());
@@ -103,6 +119,7 @@ public class UserDetailDao extends BaseOracleDao {
                     return ps;
                 }, keyHolder);
         m.setId(keyHolder.getKey().intValue());
+
         return m;
     }
 

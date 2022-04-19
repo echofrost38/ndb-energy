@@ -18,9 +18,6 @@ public class ThirdAPIUtils {
     private WebClient xchangeAPI;
     private WebClient freaksAPI;
 
-    @Value("${freaks.api.key}")
-    private String freaksApiKey;
-
     private static Gson gson = new Gson();
 
     public ThirdAPIUtils (WebClient.Builder webClientBuilder) {

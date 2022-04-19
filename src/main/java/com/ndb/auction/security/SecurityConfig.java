@@ -108,7 +108,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/stripe/**").permitAll()
 				.antMatchers("/paypal/**").permitAll()
 				.antMatchers("/crypto/**").permitAll()
-				.antMatchers("/shufti/**").permitAll()
 				.antMatchers("/ipn/**").permitAll()
 				.antMatchers("/location").permitAll()
 				.antMatchers("/favicon.ico").permitAll()

@@ -93,7 +93,7 @@ public class BankDepositDao extends BaseOracleDao implements ITransactionDao {
 
     @Override
     public Transaction selectById(int id) {
-        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.WHERE TBL_BANK_DEPOSIT.ID=?";
+        String sql = "SELECT TBL_BANK_DEPOSIT.*, TBL_USER.EMAIL from TBL_BANK_DEPOSIT left JOIN TBL_USER on TBL_BANK_DEPOSIT.USER_ID = TBL_USER.ID WHERE TBL_BANK_DEPOSIT.ID=?";
 		return jdbcTemplate.query(sql, rs -> {
             if(!rs.next())
                 return null;

@@ -128,8 +128,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             matcher.match("/favicon.ico", request.getServletPath()) ||
             matcher.match("/shufti", request.getServletPath()) ||
             matcher.match("/stripe", request.getServletPath()) ||
-            matcher.match("/ipn", request.getServletPath()) ||
-            matcher.match("/paypal", request.getServletPath());
+            matcher.match("/ipn/**", request.getServletPath()) ||
+            matcher.match("/paypal/**", request.getServletPath());
     }
 
     private String parseJwt(HttpServletRequest request) {

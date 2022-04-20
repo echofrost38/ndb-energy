@@ -159,7 +159,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             userId,
             Notification.DEPOSIT_SUCCESS, 
             "PAYMENT CONFIRMED", 
-            String.format("Your deposit of %f %s was successful.", amount, cryptoType));
+            String.format("Your deposit of %f %s was successful.", deposited, cryptoType));
 
         
         bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);

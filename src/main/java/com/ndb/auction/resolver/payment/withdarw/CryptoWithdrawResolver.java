@@ -84,6 +84,11 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
+    public List<CryptoWithdraw> getAllCryptoWithdraws() {
+        return (List<CryptoWithdraw>) cryptoWithdrawService.getAllWithdrawRequests();
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")

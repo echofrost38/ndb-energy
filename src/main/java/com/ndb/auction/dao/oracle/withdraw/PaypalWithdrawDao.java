@@ -81,6 +81,11 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         return jdbcTemplate.update(sql, status, reason, requestId);
     }
 
+    public List<? extends BaseWithdraw> selectAll() {
+        var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
     @Override
     public List<? extends BaseWithdraw> selectByUser(int userId) {
         var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.USER_ID = ?";
@@ -99,6 +104,11 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
+    public List<? extends BaseWithdraw> selectPendings(int userId) {
+        var sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.STATUS=1 AND TBL_PAYPAL_WITHDRAW.USER_ID=?";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
+    }
+
     @Override
     public BaseWithdraw selectById(int id) {
         String sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.ID=?";
@@ -107,6 +117,15 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
 				return null;
 			return extract(rs);
 		}, id);
+    }
+
+    public BaseWithdraw selectById(int id, int userId) {
+        String sql = "SELECT TBL_PAYPAL_WITHDRAW.*, TBL_USER.EMAIL from TBL_PAYPAL_WITHDRAW left JOIN TBL_USER on TBL_PAYPAL_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_PAYPAL_WITHDRAW.ID=? AND TBL_PAYPAL_WITHDRAW.USER_ID=?";
+		return jdbcTemplate.query(sql, rs -> {
+			if (!rs.next())
+				return null;
+			return extract(rs);
+		}, id, userId);
     }
 
     public PaypalWithdraw selectByPayoutId(String payoutId) {

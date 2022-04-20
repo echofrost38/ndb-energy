@@ -61,9 +61,15 @@ extend type Query {
         status: Int
     ) : [PaypalWithdraw]
     getPaypalPendingWithdrawRequests : [PaypalWithdraw]
+    getPaypalPendingWithdrawRequestsByAdmin : [PaypalWithdraw]
     getPaypalWithdrawById(
         id: Int
     ) : PaypalWithdraw
+    getPaypalWithdrawByIdByAdmin(
+        id: Int
+    ) : PaypalWithdraw
+    getAllPaypalWithdraws : [PaypalWithdraw]
+
 
     # Crypto queries
     getCryptoWithdrawByUser : [CryptoWithdraw]
@@ -81,6 +87,7 @@ extend type Query {
     getCryptoWithdrawById(
         id: Int
     ) : CryptoWithdraw
+    getAllCryptoWithdraws : [CryptoWithdraw]
 
     # Bank withdraw
     getPendingBankWithdrawRequests : [BankWithdrawRequest]

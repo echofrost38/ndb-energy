@@ -115,27 +115,48 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByUserByAdmin(int userId) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByStatus(int userId, int status) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByStatus(userId, status);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
+    public List<PaypalWithdraw> getAllPaypalWithdraws() {
+        return (List<PaypalWithdraw>) paypalWithdrawService.getAllWithdrawRequests();
+    }
+
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalPendingWithdrawRequests() {
+        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests(userId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @SuppressWarnings("unchecked")
+    public List<PaypalWithdraw> getPaypalPendingWithdrawRequestsByAdmin() {
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests();
     }
 
     @PreAuthorize("isAuthenticated()")
     public PaypalWithdraw getPaypalWithdrawById(int id) {
+        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, userId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PaypalWithdraw getPaypalWithdrawByIdByAdmin(int id) {
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id);
     }
 }

@@ -85,6 +85,11 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
+    public List<? extends BaseWithdraw> selectAll() {
+        var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+    }
+
     @Override
     public List<? extends BaseWithdraw> selectByStatus(int userId, int status) {
         var sql = "SELECT TBL_CRYPTO_WITHDRAW.*, TBL_USER.EMAIL from TBL_CRYPTO_WITHDRAW left JOIN TBL_USER on TBL_CRYPTO_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_CRYPTO_WITHDRAW.USER_ID=? AND TBL_CRYPTO_WITHDRAW.STATUS=?";

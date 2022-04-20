@@ -79,14 +79,26 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
         return paypalWithdrawDao.selectByStatus(userId, status);
     }
 
+    public List<? extends BaseWithdraw> getAllWithdrawRequests() {
+        return paypalWithdrawDao.selectAll();
+    }
+
     @Override
     public List<? extends BaseWithdraw> getAllPendingWithdrawRequests() {
         return paypalWithdrawDao.selectPendings();
     }
 
+    public List<? extends BaseWithdraw> getAllPendingWithdrawRequests(int userId) {
+        return paypalWithdrawDao.selectPendings(userId);
+    }
+
     @Override
     public BaseWithdraw getWithdrawRequestById(int id) {
         return paypalWithdrawDao.selectById(id);
+    }
+
+    public BaseWithdraw getWithdrawRequestById(int id, int userId) {
+        return paypalWithdrawDao.selectById(id, userId);
     }
 
     public PaypalWithdraw getWithdrawByPayoutId(String payoutId) {

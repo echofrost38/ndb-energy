@@ -42,6 +42,10 @@ public class CryptoWithdrawService extends BaseService implements IWithdrawServi
         return cryptoWithdrawDao.selectPendings();
     }
 
+    public List<? extends BaseWithdraw> getAllWithdrawRequests() {
+        return cryptoWithdrawDao.selectAll();
+    }
+
     @Override
     public BaseWithdraw getWithdrawRequestById(int id) {
         return cryptoWithdrawDao.selectById(id);

@@ -21,15 +21,15 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSale(int presaleId, int orderId, Double amount, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse payStripeForPreSale(int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId, paymentMethodId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, fiatAmount, fiatType, paymentIntentId, paymentMethodId);
         return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Double amount, int cardId, String paymentIntentId) {
+    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
@@ -37,7 +37,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, paymentIntentId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, fiatAmount, fiatType, paymentIntentId);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }
 

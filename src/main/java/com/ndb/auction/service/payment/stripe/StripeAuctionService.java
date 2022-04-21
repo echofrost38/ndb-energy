@@ -28,14 +28,14 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
         StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(m.getUserId(),m.getAmount());
-        m.setFee(getStripeFee(m.getUserId(), m.getAmount()));
+        double totalAmount = getTotalAmount(m.getUserId(),m.getFiatAmount());
+        m.setFee(getStripeFee(m.getUserId(), m.getFiatAmount()));
         try {
             if (m.getPaymentIntentId() == null) {
 
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
-                        .setCurrency("usd")
+                        .setCurrency(m.getFiatType())
                         .setAmount((long) totalAmount)
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)

@@ -11,23 +11,24 @@ public class StripeAuctionTransaction extends StripeDepositTransaction {
 
     private Double fee;
 
-    public StripeAuctionTransaction(int userId, int auctionId, Double amount, String paymentIntentId, String paymentMethodId) {
+    public StripeAuctionTransaction(int userId, int auctionId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId) {
+        if(fiatType == null) {
+            fiatType = "USD";
+            fiatAmount = amount;
+        }
+
         this.userId = userId;
         this.auctionId = auctionId;
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
-        this.fiatType = "USD";
-        this.fiatAmount = amount;
         this.amount = amount;
         this.bidId = 0;
+        this.fiatAmount = fiatAmount;
+        this.fiatType = fiatType;
     }
 
-    public StripeAuctionTransaction(int userId, int auctionId, Double amount) {
-       this(userId, auctionId, amount,null,null);
-    }
-
-    public StripeAuctionTransaction(int userId, int auctionId, Double amount, String paymentIntentId ) {
-     this(userId, auctionId, amount, paymentIntentId, null);
+    public StripeAuctionTransaction(int userId, int auctionId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId ) {
+        this(userId, auctionId, amount, fiatAmount, fiatType, paymentIntentId, null);
     }
 
     private int auctionId;

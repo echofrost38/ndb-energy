@@ -188,7 +188,6 @@ public class UserWalletService {
             userWallet = UserWallet.load(contractAddress, web3j, credentials, gasPrice, gasLimit);
         }
         catch(Exception e) {
-            
         }
         return userWallet;
     }

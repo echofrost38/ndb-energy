@@ -31,7 +31,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDeposit(Double amount, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse stripeForDeposit(Double amount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -41,12 +41,12 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             throw new UnauthorizedException(msg, "userId");
         }
 
-        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId, paymentMethodId);
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, fiatAmount, fiatType, cryptoType, paymentIntentId, paymentMethodId);
         return stripeDepositService.createDeposit(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDepositWithSavedCard(Double amount, String cryptoType, int cardId, String paymentIntentId) {
+    public PayResponse stripeForDepositWithSavedCard(Double amount, Double fiatAmount, String fiatType, String cryptoType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -61,7 +61,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }
-        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, cryptoType, paymentIntentId);
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, fiatAmount, fiatType, cryptoType, paymentIntentId);
         return stripeDepositService.createDepositWithSavedCard(m, customer);
     }
 

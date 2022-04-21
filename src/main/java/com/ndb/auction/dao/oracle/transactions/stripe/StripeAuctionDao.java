@@ -23,7 +23,7 @@ public class StripeAuctionDao extends BaseOracleDao {
 		StripeAuctionTransaction m = new StripeAuctionTransaction();
 		m.setId(rs.getInt("ID"));
 		m.setUserId(rs.getInt("USER_ID"));
-		m.setAmount(rs.getDouble("USD_AMOUNT"));
+		m.setAmount(rs.getDouble("AMOUNT"));
         m.setFee(rs.getDouble("FEE"));
         m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
@@ -39,7 +39,7 @@ public class StripeAuctionDao extends BaseOracleDao {
 
     public int insert(Transaction _m) {
         StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
-        String sql = "INSERT INTO TBL_STRIPE_AUCTION(ID,USER_ID,USD_AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,AUCTION_ID,BID_ID,FEE)"
+        String sql = "INSERT INTO TBL_STRIPE_AUCTION(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,AUCTION_ID,BID_ID,FEE)"
         + " VALUES(SEQ_STRIPE_AUCTION.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?)";
         return jdbcTemplate.update(sql,m.getUserId(), m.getAmount(), m.getFiatType(), m.getFiatAmount(), m.getPaymentMethodId(), m.getPaymentIntentId(), m.getAuctionId(), m.getBidId(), m.getFee());
     }

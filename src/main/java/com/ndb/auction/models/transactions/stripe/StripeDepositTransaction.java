@@ -24,27 +24,20 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     private Double fee;
     private Double deposited;
 
-    public StripeDepositTransaction(int userId, Double usdAmount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId, String paymentMethodId) {
-        if (fiatType == null) {
-            fiatType = "USD";
-            fiatAmount = usdAmount;
-        }
-
+    public StripeDepositTransaction(int userId, Double amount, String cryptoType, String paymentIntentId, String paymentMethodId) {
         this.userId = userId;
-        this.amount = usdAmount;
+        this.amount = amount;
         this.cryptoType = cryptoType;
         this.paymentIntentId = paymentIntentId;
         this.paymentMethodId = paymentMethodId;
         this.status = false;
-        this.fiatType = fiatType;
-        this.fiatAmount = fiatAmount;
     }
 
-    public StripeDepositTransaction(int userId, Double usdAmount, Double fiatAmount, String fiatType, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
+    public StripeDepositTransaction(int userId, Double amount, String cryptoType, Double cryptoPrice, String paymentIntentId, String paymentMethodId, Double fee, Double deposited) {
         this.userId = userId;
-        this.amount = usdAmount;
-        this.fiatAmount = fiatAmount;
-        this.fiatType = fiatType;
+        this.amount = amount;
+        this.fiatAmount = amount;
+        this.fiatType = "USD";
         this.cryptoType = cryptoType;
         this.cryptoPrice = cryptoPrice;
         this.paymentIntentId = paymentIntentId;
@@ -55,11 +48,11 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     }
 
     public StripeDepositTransaction(int userId, Double amount, String cryptoType) {
-        this(userId, amount, amount,"USD", cryptoType, null, null);
+        this(userId, amount, cryptoType, null, null);
     }
 
-    public StripeDepositTransaction(int userId, Double amount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId) {
-        this(userId, amount, fiatAmount, fiatType, cryptoType, paymentIntentId, null);
+    public StripeDepositTransaction(int userId, Double amount, String cryptoType, String paymentIntentId) {
+        this(userId, amount, cryptoType, paymentIntentId, null);
 
     }
 }

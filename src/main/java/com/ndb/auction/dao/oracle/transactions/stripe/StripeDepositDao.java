@@ -23,7 +23,7 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
         StripeDepositTransaction m = new StripeDepositTransaction();
         m.setId(rs.getInt("ID"));
         m.setUserId(rs.getInt("USER_ID"));
-        m.setAmount(rs.getDouble("USD_AMOUNT"));
+        m.setAmount(rs.getDouble("AMOUNT"));
         m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
         m.setStatus(rs.getBoolean("STATUS"));
@@ -50,7 +50,7 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
 
     public int insert(Transaction _m) {
         StripeDepositTransaction m = (StripeDepositTransaction) _m;
-        String sql = "INSERT INTO TBL_STRIPE_DEPOSIT(ID,USER_ID,USD_AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,INTENT_ID,METHOD_ID,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
+        String sql = "INSERT INTO TBL_STRIPE_DEPOSIT(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,INTENT_ID,METHOD_ID,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
                 + " VALUES(SEQ_STRIPE_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?)";
 
         return jdbcTemplate.update(sql, m.getUserId(), m.getAmount(), m.getStatus(), m.getFiatType(),

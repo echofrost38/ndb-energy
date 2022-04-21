@@ -44,12 +44,12 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
+        double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                         .setAmount((long) totalAmount)
-                        .setCurrency(m.getFiatType())
+                        .setCurrency("USD")
                         .setConfirm(true)
                         .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
@@ -80,13 +80,13 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
+        double totalAmount = getTotalAmount(userId, m.getAmount());
         try {
             if(m.getPaymentIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                     .setAmount((long) totalAmount)
-                    .setCurrency(m.getFiatType())
+                    .setCurrency("USD")
                     .setCustomer(customer.getCustomerId())
                     .setConfirm(true)
                     .setPaymentMethod(customer.getPaymentMethod())
@@ -114,16 +114,16 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
     private void handleDepositSuccess(int userId, PaymentIntent intent, StripeDepositTransaction m) {
 
-        double fee = getStripeFee(userId, m.getFiatAmount()) / 100.00;
+        double fee = getStripeFee(userId, m.getAmount()) / 100.00;
         double amount = m.getAmount() / 100;
         double cryptoPrice = 1.0;
         if(!m.getCryptoType().equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
         }
 
-        double deposited = (amount - fee) / cryptoPrice;
+        double deposited = amount / cryptoPrice;
         var depositTransaction = new StripeDepositTransaction(
-                userId, m.getAmount(), m.getFiatAmount(), m.getFiatType() ,m.getCryptoType(),cryptoPrice, intent.getId(),
+                userId, m.getAmount() ,m.getCryptoType(),cryptoPrice, intent.getId(),
                 intent.getPaymentMethod(),fee,deposited);
 
         depositTransaction.setStatus(true);

@@ -29,7 +29,7 @@ public class StripePresaleDao extends BaseOracleDao implements ITransactionDao {
 		m.setUserId(rs.getInt("USER_ID"));
 		m.setOrderId(rs.getInt("ORDER_ID"));
         m.setPresaleId(rs.getInt("PRESALE_ID"));
-		m.setAmount(rs.getDouble("USD_AMOUNT"));
+		m.setAmount(rs.getDouble("AMOUNT"));
         m.setFee(rs.getDouble("FEE"));
         m.setCreatedAt(rs.getTimestamp("CREATED_AT").getTime());
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
@@ -44,7 +44,7 @@ public class StripePresaleDao extends BaseOracleDao implements ITransactionDao {
     @Override
     public Transaction insert(Transaction _m) {
         StripePresaleTransaction m = (StripePresaleTransaction) _m;
-        String sql = "INSERT INTO TBL_STRIPE_PRESALE(ID,USER_ID,USD_AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,ORDER_ID, PRESALE_ID, FEE)"
+        String sql = "INSERT INTO TBL_STRIPE_PRESALE(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,METHOD_ID,INTENT_ID,ORDER_ID, PRESALE_ID, FEE)"
         + " VALUES(SEQ_STRIPE_PRESALE.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(

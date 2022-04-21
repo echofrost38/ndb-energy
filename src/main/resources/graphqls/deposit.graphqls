@@ -41,21 +41,16 @@ extend type Mutation {
     # stripe deposit
     stripeForDeposit(
         amount: Float,
-        fiatAmount: Float,
-        fiatType: String,
         cryptoType: String,
         paymentIntentId: String,
         paymentMethodId: String,
         isSaveCard: Boolean
     ) : PayResponse
-
     stripeForDepositWithSavedCard(
         amount: Float,
-        fiatAmount: Float,
-        fiatType: String,
         cryptoType: String,
         cardId: Int,
-        paymentIntentId: String,
+        paymentIntentId: String
     ) : PayResponse
 
     # bank deposit

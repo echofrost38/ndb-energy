@@ -8,10 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class BaseWithdraw {
-    public static final int PENDING = 1;
-    public static final int APPROVE = 2;
-    public static final int COMPLETED = 3;
-    public static final int DENIED = 4;
+    public static final int PENDING = 0;
+    public static final int APPROVE = 1;
+    public static final int DENIED = 2;
 
     // id
     protected int id;

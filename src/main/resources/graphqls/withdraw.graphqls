@@ -23,9 +23,9 @@ extend type Mutation {
         code: String
     ) : CryptoWithdraw
     confirmCryptoWithdraw(
-        requestId: Int,
+        id: Int,
         status: Int,
-        reason: String
+        deniedReason: String
     ) : Int
 
     # Bank withdraw

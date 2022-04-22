@@ -129,6 +129,7 @@ public class AvatarService extends BaseService {
 			s3.putObject(bucketName, avatarUrl, input, metadata);
 		} catch (Exception e) {
 			// couldn't upload svg into s3
+			e.printStackTrace();
 			throw new S3Exception("Couldn't upload avatar component", "svg");
 		}
 		

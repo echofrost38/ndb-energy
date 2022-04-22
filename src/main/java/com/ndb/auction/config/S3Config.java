@@ -25,7 +25,7 @@ public class S3Config {
                 new BasicAWSCredentials(accessKey, secretKey);
         return AmazonS3ClientBuilder
                 .standard()
-                .withRegion("us-east-1")
+                .withRegion("eu-west-1")
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .build();
     }

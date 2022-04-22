@@ -31,8 +31,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        double totalAmount = getTotalAmount(userId, m.getAmount());
-        m.setFee(getStripeFee(userId, m.getAmount()));
+        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
+        m.setFee(getStripeFee(userId, m.getFiatAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
@@ -41,7 +41,13 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         try {
             if (m.getPaymentIntentId() == null) {
-                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder().setAmount((long) totalAmount).setCurrency("USD").setConfirm(true).setPaymentMethod(m.getPaymentMethodId()).setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL).setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC).setConfirm(true);
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                        .setAmount((long) totalAmount)
+                        .setCurrency(m.getFiatType())
+                        .setConfirm(true)
+                        .setPaymentMethod(m.getPaymentMethodId())
+                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
 
                 // check save card
                 if (isSaveCard) {
@@ -57,7 +63,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
-                handleSuccessPresaleOrder(m, presaleOrder, intent);
+                handleSuccessPresaleOrder(m, presaleOrder);
             }
             response = generateResponse(intent, response);
 
@@ -75,8 +81,8 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        double totalAmount = getTotalAmount(userId, m.getAmount());
-        m.setFee(getStripeFee(userId, m.getAmount()));
+        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
+        m.setFee(getStripeFee(userId, m.getFiatAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
         if (presaleOrder == null) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
@@ -88,13 +94,12 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             if(m.getPaymentIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                         .setAmount((long) totalAmount)
-                        .setCurrency("USD")
+                        .setCurrency(m.getFiatType())
                         .setCustomer(customer.getCustomerId())
                         .setConfirm(true)
                         .setPaymentMethod(customer.getPaymentMethod())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-                        .setConfirm(true);
+                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
 
                 intent = PaymentIntent.create(createParams.build());
                 stripePresaleDao.insert(m);
@@ -107,7 +112,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
 
-                handleSuccessPresaleOrder(m, presaleOrder, intent);
+                handleSuccessPresaleOrder(m, presaleOrder);
             }
             response = generateResponse(intent, response);
 
@@ -118,9 +123,9 @@ public class StripePresaleService extends StripeBaseService implements ITransact
         return response;
     }
 
-    private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder, PaymentIntent intent) {
+    private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder) {
         int userId = m.getUserId();
-        long paidAmount = intent.getAmount();
+        double paidAmount = m.getAmount();
         double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
         double totalOrder = getTotalAmount(userId, orderAmount);
         if (totalOrder > paidAmount) {

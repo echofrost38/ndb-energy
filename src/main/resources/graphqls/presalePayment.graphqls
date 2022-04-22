@@ -3,6 +3,8 @@ extend type Mutation {
         presaleId: Int,
         orderId: Int,
         amount: Float,
+        fiatAmount: Float,
+        fiatType: String,
         paymentIntentId: String,
         paymentMethodId: String,
         isSaveCard: Boolean
@@ -11,6 +13,8 @@ extend type Mutation {
         presaleId: Int,
         orderId: Int,
         amount: Float,
+        fiatAmount: Float,
+        fiatType: String,
         cardId: Int,
         paymentIntentId: String
     ) : PayResponse

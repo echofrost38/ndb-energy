@@ -60,15 +60,15 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForAuction(int roundId, Double amount, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse payStripeForAuction(int roundId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId, paymentMethodId);
+        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, fiatAmount, fiatType, paymentIntentId, paymentMethodId);
         return stripeAuctionService.createNewTransaction(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Double amount, int cardId, String paymentIntentId) {
+    public PayResponse payStripeForAuctionWithSavedCard(int roundId, Double amount, Double fiatAmount, String fiatType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
@@ -76,7 +76,7 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "USER_ID");
         }
-        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, paymentIntentId);
+        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, fiatAmount, fiatType, paymentIntentId);
         return stripeAuctionService.createNewTransactionWithSavedCard(m, customer);
     }
 }

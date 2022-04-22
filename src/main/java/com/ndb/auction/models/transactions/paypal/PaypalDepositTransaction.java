@@ -25,7 +25,9 @@ public class PaypalDepositTransaction extends FiatDepositTransaction {
 
     public PaypalDepositTransaction(
         int userId, 
-        Double amount, // pay amount
+        Double amount, // usd amount
+        double fiatAmount,
+        String fiatType,
         String cryptoType,
         Double cryptoPrice,
         String paypalOrderId,
@@ -34,9 +36,9 @@ public class PaypalDepositTransaction extends FiatDepositTransaction {
         Double deposited
     ) {
         this.userId = userId;
-        this.amount = amount;
-        this.fiatAmount = amount;
-        this.fiatType = "USD";
+        this.amount = amount; // usd
+        this.fiatAmount = fiatAmount;
+        this.fiatType = fiatType;
         this.cryptoType = cryptoType;
         this.cryptoPrice = cryptoPrice;
         this.paypalOrderId = paypalOrderId;

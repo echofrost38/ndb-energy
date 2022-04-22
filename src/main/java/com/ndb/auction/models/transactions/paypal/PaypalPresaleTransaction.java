@@ -15,6 +15,8 @@ public class PaypalPresaleTransaction extends PaypalDepositTransaction {
         int userId,
         int presaleId,
         int orderId,
+        double fiatAmount,
+        String fiatType,
         double amount,
         double fee,
         String paypalOrderId,
@@ -25,8 +27,8 @@ public class PaypalPresaleTransaction extends PaypalDepositTransaction {
         this.orderId = orderId;
         this.amount = amount;
         this.fee = fee;
-        this.fiatAmount = amount;
-        this.fiatType = "USD";
+        this.fiatAmount = fiatAmount;
+        this.fiatType = fiatType;
         this.paypalOrderId = paypalOrderId;
         this.paypalOrderStatus = paypalOrderStatus;
     }

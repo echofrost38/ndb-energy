@@ -14,17 +14,19 @@ public class PaypalAuctionTransaction extends PaypalDepositTransaction {
     public PaypalAuctionTransaction (
         int userId, 
         int auctionId, 
-        Double amount,
-        Double fee,
+        double fiatAmount,
+        String fiatType,
+        Double amount, // usd amount
+        Double fee, // usd fee
         String paypalOrderid,
         String payaplOrderStatus
     ) {
         this.userId = userId;
         this.auctionId = auctionId;
         this.amount = amount;
-        this.fiatAmount = amount;
         this.fee = fee;
-        this.fiatType = "USD";
+        this.fiatAmount = fiatAmount;
+        this.fiatType = fiatType;
         this.paypalOrderId = paypalOrderid;
         this.paypalOrderStatus = payaplOrderStatus;
     }

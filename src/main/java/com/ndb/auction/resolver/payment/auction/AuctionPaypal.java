@@ -61,20 +61,27 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 			throw new BidException(msg, "roundId");
 		}
 		
-		Double checkoutAmount = 0.0;
+		Double checkoutAmount = 0.0; // total amount in usd
+		double fiatAmount = 0.0; // total amount in target currency
 		Double amount = 0.0;
 		if(bid.isPendingIncrease()) {
-			amount = bid.getDelta();
+			amount = bid.getDelta(); // usd
 			checkoutAmount = getPayPalTotalOrder(userId, amount);
 		} else {
-			amount = bid.getTotalAmount();
-			checkoutAmount = getPayPalTotalOrder(userId, amount);
+			amount = bid.getTotalAmount(); // usd
+			checkoutAmount = getPayPalTotalOrder(userId, amount); 
+		}
+
+		if(currencyCode.equals("USD")) {
+			fiatAmount = checkoutAmount;
+		} else {
+			fiatAmount = thirdAPIUtils.currencyConvert("USD", currencyCode, checkoutAmount);
 		}
 
 		OrderDTO order = new OrderDTO();
 
 		DecimalFormat df = new DecimalFormat("#.00");
-		PurchaseUnit unit = new PurchaseUnit(df.format(checkoutAmount), currencyCode);
+		PurchaseUnit unit = new PurchaseUnit(df.format(fiatAmount), currencyCode);
 		order.getPurchaseUnits().add(unit);
 		
 		var appContext = new PayPalAppContextDTO();
@@ -87,7 +94,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
 		// Create not confirmed transaction
-        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, amount, checkoutAmount - amount, null, null);
+        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, fiatAmount, currencyCode, amount, checkoutAmount - amount, null, null);
 
 		// set order id and status
         entity.setPaypalOrderId(orderResponse.getId());

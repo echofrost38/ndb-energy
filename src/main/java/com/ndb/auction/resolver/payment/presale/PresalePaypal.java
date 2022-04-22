@@ -50,10 +50,16 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         double amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
         
         var checkoutAmount = getPayPalTotalOrder(userId, amount);
-        
+        var fiatAmount = 0.0;
+        if(currencyCode.equals("USD")) {
+			fiatAmount = checkoutAmount;
+		} else {
+			fiatAmount = thirdAPIUtils.currencyConvert("USD", currencyCode, checkoutAmount);
+		}
+
         var order = new OrderDTO();
         var df = new DecimalFormat("#.00");
-        var unit = new PurchaseUnit(df.format(checkoutAmount), currencyCode);
+        var unit = new PurchaseUnit(df.format(fiatAmount), currencyCode);
         order.getPurchaseUnits().add(unit);
         
         var appContext = new PayPalAppContextDTO();
@@ -64,7 +70,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, amount, checkoutAmount - amount,
+        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, fiatAmount, currencyCode, amount, checkoutAmount - amount,
             orderResponse.getId(), orderResponse.getStatus().toString());
         return paypalPresaleService.insert(m);
     }

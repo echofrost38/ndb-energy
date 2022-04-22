@@ -69,12 +69,20 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             throw new UnauthorizedException(msg, "userId");
         }
 
-        double fee = getPaypalFee(userId, amount);
+        // amount to usd value
+        double usdAmount = 0.0;
+        if(currencyCode.equals("USD")) {
+            usdAmount = amount;
+        } else {
+            usdAmount = apiUtil.currencyConvert(currencyCode, "USD", amount);
+        }
+
+        double fee = getPaypalFee(userId, usdAmount);
         double cryptoPrice = 1.0;
         if(!cryptoType.equals("USDT")) {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
         } 
-        double deposited = (amount - fee) / cryptoPrice;
+        double deposited = (usdAmount - fee) / cryptoPrice;
 
         var order = new OrderDTO();
         var unit = new PurchaseUnit(amount.toString(), currencyCode);
@@ -87,7 +95,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = new PaypalDepositTransaction(userId, amount, cryptoType, cryptoPrice, orderResponse.getId(), orderResponse.getStatus().toString(), fee, deposited);
+        var m = new PaypalDepositTransaction(userId, usdAmount, amount, currencyCode, cryptoType, cryptoPrice, orderResponse.getId(), orderResponse.getStatus().toString(), fee, deposited);
                 
         paypalDepositService.insert(m);
         return orderResponse;

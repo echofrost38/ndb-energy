@@ -18,8 +18,6 @@ import com.ndb.auction.models.avatar.AvatarSet;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
-import lombok.var;
-
 @Service
 public class AvatarService extends BaseService {
 

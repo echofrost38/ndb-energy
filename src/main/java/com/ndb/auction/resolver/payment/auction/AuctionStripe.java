@@ -27,7 +27,7 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
         return stripeBaseService.getPublicKey();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<StripeAuctionTransaction> getStripeAuctionTxByRound(int roundId) {
         return (List<StripeAuctionTransaction>) stripeAuctionService.selectByRound(roundId, null);
@@ -41,13 +41,13 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
         return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(id, null);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<StripeAuctionTransaction> getStripeAuctionTxByAdmin(int userId) {
         return (List<StripeAuctionTransaction>) stripeAuctionService.selectByUser(userId, null);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public List<StripeAuctionTransaction> getStripeAuctionTxForRoundByAdmin(int roundId, int userId) {
         return stripeAuctionService.selectByIds(roundId, userId);
     }

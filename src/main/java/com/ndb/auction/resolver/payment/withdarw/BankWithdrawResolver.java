@@ -84,17 +84,17 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         return m;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public List<BankWithdrawRequest> getPendingBankWithdrawRequests() {
         return bankWithdrawService.getAllPendingRequests();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public List<BankWithdrawRequest> getAllApprovedBankWithdrawRequests() {
         return bankWithdrawService.getAllApproved();
     } 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public List<BankWithdrawRequest> getAllDeniedBankWithdrawRequests() {
         return bankWithdrawService.getAllDenied();
     }
@@ -106,17 +106,17 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         return bankWithdrawService.getRequestsByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankWithdrawRequest getBankWithdrawRequest(int id) {
         return bankWithdrawService.getRequestById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public int approveBankWithdrawRequest(int id) {
         return bankWithdrawService.approveRequest(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public int denyBankWithdrawRequest(int id, String reason) {
         return bankWithdrawService.denyRequest(id, reason);
     }

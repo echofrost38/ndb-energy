@@ -32,12 +32,12 @@ public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationR
 		return coinpaymentAuctionService.getExchangeRate();
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_SUPER')")
 	public CoinpaymentAuctionTransaction getCryptoAuctionTxById(int id) {
 		return (CoinpaymentAuctionTransaction) coinpaymentAuctionService.selectById(id);
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_SUPER')")
 	@SuppressWarnings("unchecked")
 	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByAdmin(int userId) {
 		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
@@ -51,13 +51,13 @@ public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationR
 		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_SUPER')")
 	@SuppressWarnings("unchecked")
 	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByRound(int roundId) {
 		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByAuctionId(roundId);
 	}
 	
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_SUPER')")
 	@SuppressWarnings("unchecked")
 	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxPerRoundByAdmin(int roundId, int userId) {
 		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);

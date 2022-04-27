@@ -65,7 +65,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     // confirm paypal withdraw
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         return cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
     }
@@ -78,19 +78,19 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByUserByAdmin(int userId) {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getAllCryptoWithdraws() {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getAllWithdrawRequests();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByStatusByAdmin(int userId, int status) {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByStatus(userId, status);
@@ -104,7 +104,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByStatus(userId, status);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoPendingWithdrawRequests() {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getAllPendingWithdrawRequests();

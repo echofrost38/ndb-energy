@@ -79,7 +79,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
         return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<StripeDepositTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
         return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);

@@ -102,7 +102,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     // confirm paypal withdraw
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public int confirmPaypalWithdraw(int id, int status, String deniedReason) throws Exception {
         return paypalWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
     }
@@ -115,20 +115,20 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByUserByAdmin(int userId) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByStatus(int userId, int status) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByStatus(userId, status);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getAllPaypalWithdraws() {
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllWithdrawRequests();
@@ -142,7 +142,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalPendingWithdrawRequestsByAdmin() {
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests();
@@ -155,7 +155,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public PaypalWithdraw getPaypalWithdrawByIdByAdmin(int id) {
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id);
     }

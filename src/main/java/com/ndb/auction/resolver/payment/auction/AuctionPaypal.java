@@ -146,7 +146,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		} else return false;
 	}
 
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
 	public List<PaypalAuctionTransaction> getAllPaypalAuctionTxns(String orderBy) {
 		return (List<PaypalAuctionTransaction>) paypalAuctionService.selectAll(orderBy);

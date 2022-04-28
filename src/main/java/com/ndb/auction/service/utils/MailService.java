@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
-import lombok.var;
 
 @Service
 public class MailService {

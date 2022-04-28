@@ -58,7 +58,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import lombok.var;
 import lombok.extern.slf4j.Slf4j;
 
 @Component

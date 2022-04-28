@@ -65,10 +65,9 @@ public class MailService {
 
     public void sendBackupEmail(List<User> users, String... paths) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setSubject("Backup report");
         helper.setText("Backed up database tables", true);
-        
         for (var user : users) {
             helper.addTo(user.getEmail());
         }

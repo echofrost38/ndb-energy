@@ -433,6 +433,9 @@ public class ScheduledTasks {
 
 		try {
 			s3.putObject(bucketName, tarName, inputStream, metadata);
+			
+			// sending email
+			mailService.sendBackupEmail(superAdmins, userFileName, balanceFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -441,9 +444,6 @@ public class ScheduledTasks {
 			tar.delete();
 		}
 
-		// sending email
-		mailService.sendBackupEmail(superAdmins, userFileName, balanceFileName);
-			
 		// delete local files
 		log.info("Uploaded");
 	}

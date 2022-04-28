@@ -59,7 +59,13 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
      * @return
      */
     @PreAuthorize("isAuthenticated()")
-    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken, String code) {
+    public PaypalWithdraw paypalWithdrawRequest(
+        String email, 
+        String target, 
+        double amount, // amount in source token
+        String sourceToken, 
+        String code
+    ) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
@@ -91,10 +97,18 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         } else {
             cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
         }
-
+        
         double totalUSD = amount * cryptoPrice;
-        double fee = getPaypalWithdrawFee(userId, totalUSD);
-        double withdrawAmount = totalUSD - fee;
+        double fiatAmount = 0.0;
+        if(target.equals("USD")) {
+            fiatAmount = totalUSD;
+        } else {
+            double fiatPrice = thirdAPIUtils.getCurrencyRate(target);
+            fiatAmount = totalUSD / fiatPrice;
+        }
+
+        double fee = getPaypalWithdrawFee(userId, fiatAmount);
+        double withdrawAmount = fiatAmount - fee;
 
         // send request
         var m = new PaypalWithdraw(userId, target, withdrawAmount, fee, sourceToken, cryptoPrice, amount, null, null, email);
@@ -102,7 +116,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     // confirm paypal withdraw
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public int confirmPaypalWithdraw(int id, int status, String deniedReason) throws Exception {
         return paypalWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
     }
@@ -115,20 +129,20 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByUserByAdmin(int userId) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
     }
 
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByStatus(int userId, int status) {
         return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByStatus(userId, status);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getAllPaypalWithdraws() {
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllWithdrawRequests();
@@ -142,7 +156,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalPendingWithdrawRequestsByAdmin() {
         return (List<PaypalWithdraw>) paypalWithdrawService.getAllPendingWithdrawRequests();
@@ -155,7 +169,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public PaypalWithdraw getPaypalWithdrawByIdByAdmin(int id) {
         return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id);
     }

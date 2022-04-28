@@ -72,7 +72,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         return uid;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankDepositTransaction confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
 
         var m = (BankDepositTransaction)bankDepositService.selectById(id);
@@ -166,7 +166,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         return (BankDepositTransaction) bankDepositService.selectById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<BankDepositTransaction> getAllBankDepositTxns(String orderBy) {
         return (List<BankDepositTransaction>) bankDepositService.selectAll(orderBy);
@@ -189,12 +189,12 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         return (BankDepositTransaction) m;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankDepositTransaction getBankDepositTxnByIdByAdmin(int id) {
         return (BankDepositTransaction) bankDepositService.selectById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public List<BankDepositTransaction> getUnconfirmedBankDepositTxns() {
         return bankDepositService.selectUnconfirmedByAdmin();
     }

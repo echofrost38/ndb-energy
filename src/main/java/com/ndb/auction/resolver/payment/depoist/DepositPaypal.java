@@ -185,7 +185,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         return false;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalDepositTransaction> getAllPaypalDepositTxns(String orderBy) {
         return (List<PaypalDepositTransaction>) paypalDepositService.selectAll(orderBy);

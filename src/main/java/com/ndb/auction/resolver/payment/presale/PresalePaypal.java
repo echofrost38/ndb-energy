@@ -107,7 +107,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
 		} else return false;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalPresaleTransaction> getAllPaypalPresaleTxns(String orderBy) {
         return (List<PaypalPresaleTransaction>) paypalPresaleService.selectAll(orderBy);

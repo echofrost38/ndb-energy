@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.BaseWithdraw;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.payload.request.paypal.Item;
@@ -37,9 +38,9 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
     public int confirmWithdrawRequest(int requestId, int status, String reason) throws Exception {
         
         // check status 
+        var m = (PaypalWithdraw)paypalWithdrawDao.selectById(requestId);
         if(status == BaseWithdraw.APPROVE) {
             // approve withdraw money
-            var m = (PaypalWithdraw)paypalWithdrawDao.selectById(requestId);
             
             if(m == null) {
                 String msg = messageSource.getMessage("no_withdrawal_request", null, Locale.ENGLISH);
@@ -52,7 +53,7 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var itemId = generateItemId(m);
 
             var df = new DecimalFormat("#.00");
-            var amount = new Amount("USD", df.format(m.getWithdrawAmount()));
+            var amount = new Amount(m.getTargetCurrency(), df.format(m.getWithdrawAmount()));
             var item = new Item(amount, itemId, m.getReceiver());   
             var payoutsDTO = new PayoutsDTO(batchHeader, item);
 
@@ -61,10 +62,35 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var batchHeaderResponse = response.getBatch_header();
             // check status!
             if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
+                // send failed notification
+                notificationService.sendNotification(
+                    m.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    String.format("Your PayPal withdarwal request has been failed. %s", reason));
                 return paypalWithdrawDao.confirmWithdrawRequest(requestId, BaseWithdraw.DENIED, "Cannot create payout");
             }
 
+            // deduct user's balance
+            var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
+            var userId = m.getUserId();
+            var _amount = m.getTokenAmount();
+            balanceDao.deductFreeBalance(userId, tokenId, _amount);
+
+            // send success notification
+            notificationService.sendNotification(
+                    m.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    String.format("Your %f %d withdarwal request has been approved", _amount, m.getSourceToken()));
+
             paypalWithdrawDao.updatePaypalID(m.getId(), batchHeaderResponse.getPayout_batch_id(), batchId, itemId);
+        } else {
+            notificationService.sendNotification(
+                    m.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    String.format("Your PayPal withdarwal request has been denied. %s", reason));
         }
         return paypalWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }

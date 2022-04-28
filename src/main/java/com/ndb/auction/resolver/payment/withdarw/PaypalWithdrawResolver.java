@@ -59,7 +59,13 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
      * @return
      */
     @PreAuthorize("isAuthenticated()")
-    public PaypalWithdraw paypalWithdrawRequest(String email, String target, double amount, String sourceToken, String code) {
+    public PaypalWithdraw paypalWithdrawRequest(
+        String email, 
+        String target, 
+        double amount, // amount in target currency to send in paypal
+        String sourceToken, 
+        String code
+    ) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();

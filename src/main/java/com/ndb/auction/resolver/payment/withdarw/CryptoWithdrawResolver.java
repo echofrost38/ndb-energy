@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -29,7 +30,13 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     private TotpService totpService;
 
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des, String code) {
+    public CryptoWithdraw cryptoWithdrawRequest(
+        double amount, 
+        String sourceToken, 
+        String network, 
+        String des, 
+        String code
+    ) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
@@ -67,7 +74,29 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
-        return cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
+        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
+        var request = cryptoWithdrawService.getWithdrawRequestById(id);
+        var tokenSymbol = request.getSourceToken();
+        var tokenAmount = request.getTokenAmount();
+
+        if(result == 1 && status == 1) {
+            // success
+            internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
+            notificationService.sendNotification(
+                request.getUserId(),
+                Notification.PAYMENT_RESULT,
+                "PAYMENT CONFIRMED",
+                String.format("Your %f %s withdarwal request has been approved", tokenAmount, tokenSymbol));
+            return result;    
+        } else if(status != 1) {
+            notificationService.sendNotification(
+                    request.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    String.format("Your %f %s withdarwal request has been denied", tokenAmount, tokenSymbol));
+        }
+
+        return result;
     }
 
     @PreAuthorize("isAuthenticated()")

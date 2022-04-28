@@ -35,7 +35,7 @@ public class BankWithdrawRequest extends BaseWithdraw {
         this.tokenAmount = tokenAmount;
         this.mode = mode;
         this.country = country;
-        this.nameOfHolder = nameOfHolder;
+        this.holderName = nameOfHolder;
         this.bankName = bankName;
         this.accountNumber = accNumber;
         this.metadata = metadata;
@@ -46,7 +46,7 @@ public class BankWithdrawRequest extends BaseWithdraw {
     
     private int mode; // international/domestic
     private String country; // 2 letter code / null
-    private String nameOfHolder;
+    private String holderName;
     private String bankName;
     private String accountNumber;
     

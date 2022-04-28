@@ -3,6 +3,7 @@ package com.ndb.auction.service.utils;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
+import lombok.var;
 
 @Service
 public class MailService {
@@ -58,6 +60,23 @@ public class MailService {
         helper.setTo(user.getEmail());
         String emailContent = getEmailContent(user, text, "AlertEmail.ftlh");
         helper.setText(emailContent, true);
+        javaMailSender.send(mimeMessage);
+    }
+
+    public void sendBackupEmail(List<User> users, String... paths) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject("Backup report");
+        helper.setText("Backed up database tables", true);
+        
+        for (var user : users) {
+            helper.addTo(user.getEmail());
+        }
+
+        for (var path : paths) {
+            var file = new java.io.File(path);
+            helper.addAttachment(path, file);
+        }
         javaMailSender.send(mimeMessage);
     }
 }

@@ -4,7 +4,7 @@ extend type Mutation {
     paypalWithdrawRequest(
         email: String,
         target: String,
-        withdrawAmount: Float,
+        amount: Float,
         sourceToken: String,
         code: String
     ) : PaypalWithdraw

@@ -69,30 +69,30 @@ public class NDBCoinService {
         txMananger = new FastRawTransactionManager(web3j, ndbCredential, bscChainId);
         ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, new DefaultGasProvider());
         ndbReferral = NDBReferral.load(ndbReferralContract, web3j, txMananger,gasPrice,gasLimit);
-        ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                .subscribe(event -> {
-                    handleEvent(event);
-                }, error -> {
-                    System.out.println("Error: " + error);
-                });
-        ndbReferral.activeReferrerEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                .subscribe(event -> {
-                    handleActiveReferrer(event);
-                }, error -> {
-                    System.out.println("Error: " + error);
-                });
-        ndbReferral.referralRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                .subscribe(event -> {
-                    handleRecordReferrer(event);
-                }, error -> {
-                    System.out.println("Error: " + error);
-                });
-        ndbReferral.referralCommissionRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                .subscribe(event -> {
-                    handlereferralCommissionRecorded(event);
-                }, error -> {
-                    System.out.println("Error: " + error);
-                });
+        // ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleEvent(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.activeReferrerEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleActiveReferrer(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.referralRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleRecordReferrer(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.referralCommissionRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handlereferralCommissionRecorded(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
 
     }
 

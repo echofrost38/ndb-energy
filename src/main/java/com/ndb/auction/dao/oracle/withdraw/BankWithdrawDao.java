@@ -35,7 +35,7 @@ public class BankWithdrawDao extends BaseOracleDao {
 
         m.setMode(rs.getInt("W_MODE"));
         m.setCountry(rs.getString("COUNTRY"));
-        m.setNameOfHolder(rs.getString("HOLDER_NAME"));
+        m.setHolderName(rs.getString("HOLDER_NAME"));
         m.setBankName(rs.getString("BANK_NAME"));
         m.setAccountNumber(rs.getString("ACC_NUM"));
 
@@ -53,7 +53,7 @@ public class BankWithdrawDao extends BaseOracleDao {
             "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getTargetCurrency(), m.getWithdrawAmount(), m.getFee(), 
             m.getSourceToken(), m.getTokenPrice(), m.getTokenAmount(), m.getDeniedReason(), m.getMode(), m.getCountry(),
-            m.getNameOfHolder(), m.getBankName(), m.getAccountNumber(), m.getMetadata(), m.getAddress(), m.getPostCode());
+            m.getHolderName(), m.getBankName(), m.getAccountNumber(), m.getMetadata(), m.getAddress(), m.getPostCode());
     }
 
     public List<BankWithdrawRequest> selectPending() {

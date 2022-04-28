@@ -69,11 +69,11 @@ public class StripeWalletService extends StripeBaseService implements ITransacti
 		try {
 			if(m.getPaymentIntentId() == null) {
 				PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-						.setAmount(m.getAmount().longValue())
-						.setCurrency("USD")
-						.setCustomer(customerId)
-						.setConfirm(true)
-						.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
+					.setAmount(m.getAmount().longValue())
+					.setCurrency("USD")
+					.setCustomer(customerId)
+					.setConfirm(true)
+					.setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
 				intent = PaymentIntent.create(createParams.build());
 			} else if (m.getPaymentIntentId() != null) {

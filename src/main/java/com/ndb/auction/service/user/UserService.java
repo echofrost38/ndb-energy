@@ -441,6 +441,10 @@ public class UserService extends BaseService {
 		return userDao.selectByEmail(email);
 	}
 
+	public List<User> getAllUsers() {
+		return userDao.selectAll(null);
+	}
+
 	///////////////////////// Geo Location /////////
 	public GeoLocation addDisallowed(String country, String countryCode) {
 		GeoLocation geoLocation = geoLocationDao.getGeoLocation(countryCode);

@@ -13,8 +13,10 @@ type BankWithdrawRequest {
     confirmedAt: Float,
     mode: Int,
     country: String,
-    nameOfHolder: String,
+    holderName: String,
     bankName: String,
     accountNumber: String,
-    metadata: String
+    metadata: String,
+    address: String,
+    postCode: String
 }

@@ -33,7 +33,7 @@ public class BankWithdrawDao extends BaseOracleDao {
         m.setRequestedAt(rs.getTimestamp("REQUESTED_AT").getTime());
         m.setConfirmedAt(   rs.getTimestamp("CONFIRMED_AT").getTime());
 
-        m.setMode(rs.getInt("MODE"));
+        m.setMode(rs.getInt("W_MODE"));
         m.setCountry(rs.getString("COUNTRY"));
         m.setNameOfHolder(rs.getString("HOLDER_NAME"));
         m.setBankName(rs.getString("BANK_NAME"));
@@ -49,7 +49,7 @@ public class BankWithdrawDao extends BaseOracleDao {
 
     public int insert(BankWithdrawRequest m) {
         String sql = "INSERT INTO TBL_BANK_WITHDRAW(ID,USER_ID,TAR_CURRENCY,WITHDRAW,FEE,SRC_TOKEN,TKN_PRICE,TKN_AMT," + 
-            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA,ADDRESS,POSTCODE)" + 
+            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,W_MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA,ADDRESS,POSTCODE)" + 
             "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getTargetCurrency(), m.getWithdrawAmount(), m.getFee(), 
             m.getSourceToken(), m.getTokenPrice(), m.getTokenAmount(), m.getDeniedReason(), m.getMode(), m.getCountry(),

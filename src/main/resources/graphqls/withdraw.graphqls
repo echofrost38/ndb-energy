@@ -39,6 +39,8 @@ extend type Mutation {
         bankName: String,
         accNumber: String,
         metadata: String,
+        address: String,
+        postCode: String,
         code: String
     ) : BankWithdrawRequest
     approveBankWithdrawRequest(

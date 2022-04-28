@@ -22,7 +22,9 @@ public class BankWithdrawRequest extends BaseWithdraw {
         String nameOfHolder,
         String bankName,
         String accNumber,
-        String metadata
+        String metadata, 
+        String address, 
+        String postCode
     ) {
         this.userId = userId;
         this.targetCurrency = tarCurrency;
@@ -37,6 +39,8 @@ public class BankWithdrawRequest extends BaseWithdraw {
         this.bankName = bankName;
         this.accountNumber = accNumber;
         this.metadata = metadata;
+        this.address = address;
+        this.postCode = postCode;
         this.status = 0;
     }
     
@@ -48,4 +52,8 @@ public class BankWithdrawRequest extends BaseWithdraw {
     
     // json string
     private String metadata;
+
+    // string
+    private String address;
+    private String postCode;
 }

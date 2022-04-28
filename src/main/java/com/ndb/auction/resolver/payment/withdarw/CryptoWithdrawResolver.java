@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -30,13 +29,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     private TotpService totpService;
 
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw cryptoWithdrawRequest(
-        double amount, 
-        String sourceToken, 
-        String network, 
-        String des, 
-        String code
-    ) {
+    public CryptoWithdraw cryptoWithdrawRequest(double amount, String sourceToken, String network, String des, String code) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
@@ -72,31 +65,9 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     // confirm paypal withdraw
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
-        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
-        var request = cryptoWithdrawService.getWithdrawRequestById(id);
-        var tokenSymbol = request.getSourceToken();
-        var tokenAmount = request.getTokenAmount();
-
-        if(result == 1 && status == 1) {
-            // success
-            internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
-            notificationService.sendNotification(
-                request.getUserId(),
-                Notification.PAYMENT_RESULT,
-                "PAYMENT CONFIRMED",
-                String.format("Your %f %s withdarwal request has been approved", tokenAmount, tokenSymbol));
-            return result;    
-        } else if(status != 1) {
-            notificationService.sendNotification(
-                    request.getUserId(),
-                    Notification.PAYMENT_RESULT,
-                    "PAYMENT CONFIRMED",
-                    String.format("Your %f %s withdarwal request has been denied", tokenAmount, tokenSymbol));
-        }
-
-        return result;
+        return cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -107,19 +78,19 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByUserByAdmin(int userId) {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getAllCryptoWithdraws() {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getAllWithdrawRequests();
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByStatusByAdmin(int userId, int status) {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByStatus(userId, status);
@@ -133,7 +104,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByStatus(userId, status);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoPendingWithdrawRequests() {
         return (List<CryptoWithdraw>) cryptoWithdrawService.getAllPendingWithdrawRequests();

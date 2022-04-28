@@ -46,7 +46,7 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
         return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.selectById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentPresaleTransaction> getCryptoPresaleTxByAdmin(int userId, int presaleId) {
         return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.select(userId, presaleId);

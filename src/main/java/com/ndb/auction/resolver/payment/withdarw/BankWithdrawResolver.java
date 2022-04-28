@@ -31,7 +31,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     @PreAuthorize("isAuthenticated()")
     public BankWithdrawRequest bankWithdrawRequest(
         String targetCurrency,
-        double amount, // requested amount in source token!
+        double amount, // requested amount in USD!
         String sourceToken,
         int mode,
         String country, // ignore for international 
@@ -39,6 +39,8 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         String bankName,
         String accNumber,
         String metadata,
+        String address,
+        String postCode,
         String code
     ) {
         // check user and kyc status
@@ -63,46 +65,38 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
 
         // get token balance
         double tokenBalance = internalBalanceService.getFreeBalance(userId, sourceToken);
-        double usdBalance = amount * tokenPrice;
-
-        // get target currency price
-        double fiatAmount = 0.0;
-        if(targetCurrency.equals("USD")) {
-            fiatAmount = usdBalance;
-        } else {
-            double fiatPrice = thirdAPIUtils.getCurrencyRate(targetCurrency);
-            fiatAmount = usdBalance / fiatPrice;
-        }
+        double usdBalance = tokenBalance * tokenPrice;
 
         // checking balance 
-        if(tokenBalance < amount) {
+        if(usdBalance < amount) {
             String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
             throw new BalanceException(msg, "amount");
         }
-        
+
         // get fee in usd
-        var fee = getTierFee(userId, fiatAmount); 
-        var withdrawAmount = fiatAmount - fee; // amount in target currency
-        
+        var fee = getTierFee(userId, amount); 
+        var withdrawAmount = amount - fee;
+        var tokenAmount = amount / tokenPrice;
+
         var m = new BankWithdrawRequest(
-            userId, targetCurrency, withdrawAmount, fee, sourceToken, tokenPrice, amount,
-            mode, country, holderName, bankName, accNumber, metadata
+            userId, targetCurrency, withdrawAmount, fee, sourceToken, tokenPrice, tokenAmount,
+            mode, country, holderName, bankName, accNumber, metadata, address, postCode
         );
         bankWithdrawService.createNewRequest(m);
         return m;
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<BankWithdrawRequest> getPendingBankWithdrawRequests() {
         return bankWithdrawService.getAllPendingRequests();
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<BankWithdrawRequest> getAllApprovedBankWithdrawRequests() {
         return bankWithdrawService.getAllApproved();
     } 
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<BankWithdrawRequest> getAllDeniedBankWithdrawRequests() {
         return bankWithdrawService.getAllDenied();
     }
@@ -114,17 +108,17 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         return bankWithdrawService.getRequestsByUser(userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public BankWithdrawRequest getBankWithdrawRequest(int id) {
         return bankWithdrawService.getRequestById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public int approveBankWithdrawRequest(int id) {
         return bankWithdrawService.approveRequest(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public int denyBankWithdrawRequest(int id, String reason) {
         return bankWithdrawService.denyRequest(id, reason);
     }

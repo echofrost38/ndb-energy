@@ -41,16 +41,19 @@ public class BankWithdrawDao extends BaseOracleDao {
 
         // json string
         m.setMetadata(rs.getString("METADATA"));
+
+        m.setAddress(rs.getString("ADDRESS"));
+        m.setPostCode(rs.getString("POSTCODE"));
 		return m;
 	}
 
     public int insert(BankWithdrawRequest m) {
         String sql = "INSERT INTO TBL_BANK_WITHDRAW(ID,USER_ID,TAR_CURRENCY,WITHDRAW,FEE,SRC_TOKEN,TKN_PRICE,TKN_AMT," + 
-            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA)" + 
-            "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?)";
+            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA,ADDRESS,POSTCODE)" + 
+            "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getTargetCurrency(), m.getWithdrawAmount(), m.getFee(), 
             m.getSourceToken(), m.getTokenPrice(), m.getTokenAmount(), m.getDeniedReason(), m.getMode(), m.getCountry(),
-            m.getNameOfHolder(), m.getBankName(), m.getAccountNumber(), m.getMetadata());
+            m.getNameOfHolder(), m.getBankName(), m.getAccountNumber(), m.getMetadata(), m.getAddress(), m.getPostCode());
     }
 
     public List<BankWithdrawRequest> selectPending() {

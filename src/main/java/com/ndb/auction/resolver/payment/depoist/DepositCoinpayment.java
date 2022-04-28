@@ -35,7 +35,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         return (CoinpaymentWalletTransaction) coinpaymentWalletService.createNewTransaction(m);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTx(String orderBy) {
         return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectAll(orderBy);
@@ -49,7 +49,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByAdmin(int userId, String orderBy) {
         return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);

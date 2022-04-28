@@ -104,7 +104,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
             fiatAmount = totalUSD;
         } else {
             double fiatPrice = thirdAPIUtils.getCurrencyRate(target);
-            fiatAmount = totalUSD / fiatPrice;
+            fiatAmount = totalUSD * fiatPrice;
         }
 
         double fee = getPaypalWithdrawFee(userId, fiatAmount);

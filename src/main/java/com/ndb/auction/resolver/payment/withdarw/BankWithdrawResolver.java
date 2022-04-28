@@ -73,7 +73,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
             fiatAmount = usdBalance;
         } else {
             double fiatPrice = thirdAPIUtils.getCurrencyRate(targetCurrency);
-            fiatAmount = usdBalance / fiatPrice;
+            fiatAmount = usdBalance * fiatPrice;
         }
 
         // checking balance 

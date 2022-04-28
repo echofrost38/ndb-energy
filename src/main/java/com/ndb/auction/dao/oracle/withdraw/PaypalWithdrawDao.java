@@ -31,9 +31,9 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         m.setTargetCurrency(rs.getString("TARGET"));
 		m.setSourceToken(rs.getString("SOURCE"));
         m.setTokenPrice(rs.getDouble("TOKEN_PRICE"));
-        m.setWithdrawAmount(rs.getDouble("AMOUNT"));
+        m.setTokenAmount(rs.getDouble("AMOUNT"));
         m.setFee(rs.getDouble("FEE"));
-        m.setTokenAmount((m.getWithdrawAmount() + m.getFee()) / m.getTokenPrice());
+        m.setWithdrawAmount(rs.getDouble("WITHDRAW"));
         m.setStatus(rs.getInt("STATUS"));
         m.setDeniedReason(rs.getString("REASON"));
         m.setRequestedAt(rs.getTimestamp("REQUESTED_AT").getTime());
@@ -48,8 +48,8 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
     @Override
     public BaseWithdraw insert(BaseWithdraw baseWithdraw) {
         var m = (PaypalWithdraw)baseWithdraw;
-        var sql = "INSERT INTO TBL_PAYPAL_WITHDRAW(ID,USER_ID,TARGET,SOURCE,TOKEN_PRICE,AMOUNT,FEE,STATUS,REASON,REQUESTED_AT,CONFIRMED_AT,BATCH_ID,ITEM_ID,RECEIVER)"
-        + " VALUES(SEQ_PAYPAL_WITHDRAW.NEXTVAL,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?)";
+        var sql = "INSERT INTO TBL_PAYPAL_WITHDRAW(ID,USER_ID,TARGET,SOURCE,TOKEN_PRICE,AMOUNT,WITHDRAW,FEE,STATUS,REASON,REQUESTED_AT,CONFIRMED_AT,BATCH_ID,ITEM_ID,RECEIVER)"
+        + " VALUES(SEQ_PAYPAL_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?)";
         var keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -62,6 +62,7 @@ public class PaypalWithdrawDao extends BaseOracleDao implements IWithdrawDao {
                         ps.setString(i++, m.getTargetCurrency());
                         ps.setString(i++, m.getSourceToken());
                         ps.setDouble(i++, m.getTokenPrice());
+                        ps.setDouble(i++, m.getTokenAmount());
                         ps.setDouble(i++, m.getWithdrawAmount());
                         ps.setDouble(i++, m.getFee());
                         ps.setString(i++, m.getDeniedReason());

@@ -1,11 +1,8 @@
 package com.ndb.auction.schedule;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -14,7 +11,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,16 +22,7 @@ import javax.mail.MessagingException;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.drive.DriveScopes;
+import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.user.User;
@@ -42,9 +30,12 @@ import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.PresaleService;
+import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
+import com.ndb.auction.service.TokenAssetService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.utils.MailService;
+import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -54,8 +45,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +79,18 @@ public class ScheduledTasks {
 	@Autowired
 	MailService mailService;
 
+	@Autowired
+	TokenAssetService tokenAssetService;
+
+	@Autowired
+	ShuftiService shuftiService;
+
+	@Autowired
+	UserDetailDao userDetailDao;
+
+	@Autowired
+	ThirdAPIUtils apiUtils;
+
 	private Auction startedRound;
 	private Long startedCounter;
 
@@ -104,14 +107,6 @@ public class ScheduledTasks {
 	private final static String bucketName = "nyyu-dev-backup";
 	// check transaction
 	private Map<String, BigInteger> pendingTransactions;
-
-    /** Global instance of the JSON factory. */
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    /** Directory to store authorization tokens for this application. */
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
-	private static final String CREDENTIALS_FILE_PATH = "google/credentials.json";
-	private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
-	private static final String APPLICATION_NAME = "Nyyu";
 
 	public ScheduledTasks(AmazonS3 s3) {
 		this.readyCounter = 0L;
@@ -308,28 +303,6 @@ public class ScheduledTasks {
 		}
 	}
 
-	private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
-        InputStream in = new ClassPathResource(CREDENTIALS_FILE_PATH).getInputStream();
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder()
-			.setPort(8000)
-			.build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-        //returns an authorized Credential object.
-        return credential;
-    }
-
 	private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
 		try (OutputStream outputStream = Files.newOutputStream(outputFile);
 			GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
@@ -346,7 +319,7 @@ public class ScheduledTasks {
 		}
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60)
+	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");
@@ -354,76 +327,101 @@ public class ScheduledTasks {
 		var dateTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		var hour = LocalDateTime.now().getHourOfDay();
 		var userFileName = String.format("user-%s-%d.csv", dateTime, hour);
-		var balanceFileName = String.format("balance-%s-%d.csv", dateTime, hour);
+		
 		var tarName = String.format("db-%s-%d.tar.gz", dateTime, hour);
 
 		// loading user and balances from database & save to local file
 		var users = userService.getAllUsers();
 		var superAdmins = new ArrayList<User>();
+		var tokens = tokenAssetService.getAllTokenAssets(null);
 
+		var headerList = new ArrayList<String>();
+		headerList.add("ID");
+		headerList.add("EMAIL");
+		headerList.add("PREFIX");
+		headerList.add("NAME");
+		headerList.add("KYC STATUS");
+		headerList.add("FIRSTNAME");
+		headerList.add("SURNAME");
+		headerList.add("ADDRESS");
+		headerList.add("COUNTRY");
+		headerList.add("ZIP");
+		
+		var prices = new ArrayList<Double>();
+		for (var token : tokens) {
+			headerList.add(token.getTokenSymbol() + "_FREE");
+			headerList.add(token.getTokenSymbol() + "_HOLD");
+			var price = apiUtils.getCryptoPriceBySymbol(token.getTokenSymbol());
+			prices.add(price);
+		}
+		headerList.add("TOTAL_BALANCE");
+		
 		// filt writer
 		var userOut = new FileWriter(userFileName);
-		var balanceOut = new FileWriter(balanceFileName);
 		
-		var userPrinter = new CSVPrinter(userOut, CSVFormat.EXCEL);
-		var balancePrinter = new CSVPrinter(balanceOut, CSVFormat.EXCEL); 
+		var userPrinter = new CSVPrinter(userOut, CSVFormat.EXCEL); 
 		try {
-			userPrinter.printRecord("ID", "EMAIL");
-			balancePrinter.printRecord("USER_ID", "FREE", "HOLD", "TOKEN");
+			userPrinter.printRecord(headerList.toArray());
 
 			for (var user : users) {
 				// check super admin
 				if(user.getRole().contains("ROLE_SUPER")) {
 					superAdmins.add(user);
 				}
+				var row = new ArrayList<Object>();
+				row.add(user.getId());
+				row.add(user.getEmail());
+				row.add(user.getAvatar() == null ? "" : user.getAvatar().getPrefix());
+				row.add(user.getAvatar() == null ? "" : user.getAvatar().getName());
 
-				userPrinter.printRecord(user.getId(), user.getEmail());
-				var balances = balanceService.getInternalBalances(user.getId());
-				for (var balance : balances) {
-					balancePrinter.printRecord(user.getId(), balance.getFree(), balance.getHold(), balance.getTokenSymbol());
+				// check kyc
+				boolean kycStatus = shuftiService.kycStatusCkeck(user.getId());
+				row.add(kycStatus ? "PASSED" : "FAILED");
+
+				// get user details
+				var userDetail = userDetailDao.selectByUserId(user.getId());
+				if(userDetail != null) {
+					row.add(userDetail.getFirstName());
+					row.add(userDetail.getLastName());
+					var address = userDetail.getAddress();
+					row.add(address);
+					var addressArray = address.split("\\s*,\\s*");
+					row.add(addressArray[addressArray.length - 1]);
+					row.add("");
+				} else {
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
 				}
+
+				var totalBalance = 0.0; 
+				var i = 0;
+				for (var token : tokens) {
+					var tempBalance = balanceService.getBalance(user.getId(), token.getTokenSymbol());
+					var free = tempBalance == null ? 0.0 : tempBalance.getFree();
+					var hold = tempBalance == null ? 0.0 : tempBalance.getHold();
+					row.add(free); row.add(hold);
+					totalBalance += (free + hold) * prices.get(i++);
+				}
+				row.add(totalBalance);
+				userPrinter.printRecord(row);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			userPrinter.close();
-			balancePrinter.close();
 		}
-
-		// // upload into google drive
-		// final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-		// Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-		// 	.setApplicationName(APPLICATION_NAME)
-		// 	.build();
-		
-		// File userFileMetadata = new File();
-		// userFileMetadata.setName(userFileName);
-
-		// FileContent userMediaContent = new FileContent("text/csv", userFilePath);
-		// File userFile = service.files().create(userFileMetadata, userMediaContent)
-		// 	.setFields("id")
-		// 	.execute();
-		// // log.info(userFile.getId());
-		// System.out.println(userFile.getId());
-		
-		// File balanceFileMetadata = new File();
-		// balanceFileMetadata.setName(balanceFileName);
 		
 		java.io.File userFilePath = new java.io.File(userFileName);
-		java.io.File balanceFilePath = new java.io.File(balanceFileName);
-		// FileContent balanceMediaContent = new FileContent("text/csv", balanceFilePath);
-		// File balanceFile = service.files().create(balanceFileMetadata, balanceMediaContent)
-		// 	.setFields("id")
-		// 	.execute();
-		// // log.info(balanceFile.getId());
-		// System.out.println(balanceFile.getId());
 
 		// upload into S3 bucket
 		log.info("Saved on local, getting ready for uploading....");
 
 		var tarOut = Paths.get(tarName);
-		compressTarGzip(tarOut, Paths.get(userFileName), Paths.get(balanceFileName));
+		compressTarGzip(tarOut, Paths.get(userFileName));
 		
 		var tar = new java.io.File(tarName);
 		var inputStream = new FileInputStream(tar);
@@ -435,12 +433,11 @@ public class ScheduledTasks {
 			s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			mailService.sendBackupEmail(superAdmins, userFileName, balanceFileName);
+			mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			userFilePath.delete();
-			balanceFilePath.delete();
 			tar.delete();
 		}
 

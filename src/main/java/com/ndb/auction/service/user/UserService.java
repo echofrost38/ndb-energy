@@ -426,6 +426,7 @@ public class UserService extends BaseService {
 		var users = userDao.selectList(null, offset, limit, null);
 		for (User user : users) {
 			user.setVerify(userVerifyDao.selectById(user.getId()));
+			user.setAvatar(userAvatarDao.selectById(user.getId()));
 		}
 		return users;
 	}
@@ -442,7 +443,11 @@ public class UserService extends BaseService {
 	}
 
 	public List<User> getAllUsers() {
-		return userDao.selectAll(null);
+		var users = userDao.selectAll(null);
+		for (var user : users) {
+			user.setAvatar(userAvatarDao.selectById(user.getId()));
+		}
+		return users;
 	}
 
 	///////////////////////// Geo Location /////////

@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/paypal")
+@Slf4j
 public class PaypalController extends BaseController {
 
     @Autowired
@@ -46,6 +49,8 @@ public class PaypalController extends BaseController {
             apiContext.addConfiguration(Constants.PAYPAL_WEBHOOK_ID, WEBHOOK_ID);
             var headerMap = getHeadersInfo(request);
             var reqBody = getBody(request);
+            log.info("PayPal webhook: %s", reqBody);
+
             Boolean result = Event.validateReceivedEvent(apiContext, headerMap, reqBody);
 
             if(!result) {

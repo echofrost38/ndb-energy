@@ -116,8 +116,17 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         return bankWithdrawService.getRequestsByUser(userId);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    public BankWithdrawRequest getBankWithdrawRequestById(int id) {
+        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        var m = bankWithdrawService.getRequestById(id);
+        if(m.getUserId() != userId) return null;
+        return m;
+    }
+
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public BankWithdrawRequest getBankWithdrawRequest(int id) {
+    public BankWithdrawRequest getBankWithdrawRequestByIdByAdmin(int id) {
         return bankWithdrawService.getRequestById(id);
     }
 

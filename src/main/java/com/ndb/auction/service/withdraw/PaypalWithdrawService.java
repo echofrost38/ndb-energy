@@ -71,19 +71,6 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
                 return paypalWithdrawDao.confirmWithdrawRequest(requestId, BaseWithdraw.DENIED, "Cannot create payout");
             }
 
-            // deduct user's balance
-            // var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
-            // var userId = m.getUserId();
-            // var _amount = m.getTokenAmount();
-            // balanceDao.deductFreeBalance(userId, tokenId, _amount);
-
-            // // send success notification
-            // notificationService.sendNotification(
-            //         m.getUserId(),
-            //         Notification.PAYMENT_RESULT,
-            //         "PAYMENT CONFIRMED",
-            //         String.format("Your %f %s withdarwal request has been approved", _amount, m.getSourceToken()));
-
             paypalWithdrawDao.updatePaypalID(m.getId(), batchHeaderResponse.getPayout_batch_id(), batchId, itemId);
         } else {
             notificationService.sendNotification(
@@ -92,6 +79,11 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
                     "PAYMENT CONFIRMED",
                     String.format("Your PayPal withdarwal request has been denied. %s", reason));
         }
+        // submitted status!!!!!
+        return paypalWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
+    }
+
+    public int updateWithdrawRequest(int requestId, int status, String reason) {
         return paypalWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }
 

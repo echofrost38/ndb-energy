@@ -72,6 +72,8 @@ public class PaypalController extends BaseController {
                         "PAYMENT CONFIRMED",
                         String.format("Your %f %s withdarwal request has been approved", tokenAmount, m.getSourceToken())
                     );
+                    /// 3 means success
+                    papalWithdrawService.updateWithdrawRequest(m.getId(), 3, "");
                     break;
                 case "PAYMENT.PAYOUTSBATCH.DENIED":
                     String _payoutId = hookEvent.getResource().getBatch_header().getPayout_batch_id();
@@ -84,7 +86,8 @@ public class PaypalController extends BaseController {
                         _m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,
                         "PAYMENT CONFIRMED",
-                    "Your PayPal withdarwal request has been denied.");                   
+                    "Your PayPal withdarwal request has been denied.");  
+                    papalWithdrawService.updateWithdrawRequest(_m.getId(), 2, "Denied by PayPal");
                     break;
             }
             return ResponseEntity.ok().body("Payment success");

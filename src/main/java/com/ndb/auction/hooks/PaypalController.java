@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/paypal")
+@RequestMapping("/")
 @Slf4j
 public class PaypalController extends BaseController {
 
@@ -37,7 +37,7 @@ public class PaypalController extends BaseController {
         this.paypalConfig = paypalConfig;
     }
 
-	@PostMapping(value = "/")
+	@PostMapping("/paypal")
     public ResponseEntity<String> paymentSuccess(HttpServletRequest request) {
         
         try {

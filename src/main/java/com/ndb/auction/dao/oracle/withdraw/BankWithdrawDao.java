@@ -21,7 +21,7 @@ public class BankWithdrawDao extends BaseOracleDao {
 		BankWithdrawRequest m = new BankWithdrawRequest();
 		m.setId(rs.getInt("ID"));
         m.setUserId(rs.getInt("USER_ID"));
-        // m.setEmail(rs.getString("EMAIL"));
+        m.setEmail(rs.getString("EMAIL"));
         m.setTargetCurrency(rs.getString("TAR_CURRENCY"));
         m.setWithdrawAmount(rs.getDouble("WITHDRAW"));
         m.setFee(rs.getDouble("FEE"));
@@ -57,27 +57,27 @@ public class BankWithdrawDao extends BaseOracleDao {
     }
 
     public List<BankWithdrawRequest> selectPending() {
-        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 0";
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.STATUS = 0";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public List<BankWithdrawRequest> selectApproved() {
-        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 1";
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.STATUS = 1";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public List<BankWithdrawRequest> selectDenied() {
-        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE STATUS = 2";
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.STATUS = 2";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public List<BankWithdrawRequest> selectByUser(int userId) {
-        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE USER_ID = ?";
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.USER_ID = ?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
     public BankWithdrawRequest selectById(int id) {
-        String sql = "SELECT * FROM TBL_BANK_WITHDRAW WHERE ID = ?";
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.ID = ?";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;

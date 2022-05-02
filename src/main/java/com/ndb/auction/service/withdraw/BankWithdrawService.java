@@ -37,6 +37,10 @@ public class BankWithdrawService extends BaseService{
         return bankWithdrawDao.selectDenied();   
     }
 
+    public List<BankWithdrawRequest> getAllRequests() {
+        return bankWithdrawDao.selectAll();
+    }
+
     public List<BankWithdrawRequest> getRequestsByUser(int userId) {
         return bankWithdrawDao.selectByUser(userId);
     }

@@ -99,6 +99,7 @@ extend type Query {
     getAllApprovedBankWithdrawRequests : [BankWithdrawRequest]
     getAllDeniedBankWithdrawRequests : [BankWithdrawRequest]
     getBankWithdrawRequests : [BankWithdrawRequest]
+    getBankWithdrawRequestsByAdmin : [BankWithdrawRequest]
     getBankWithdrawRequestById(
         id: Int
     ) : BankWithdrawRequest

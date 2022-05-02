@@ -73,6 +73,11 @@ public class BankWithdrawDao extends BaseOracleDao {
 
     public List<BankWithdrawRequest> selectByUser(int userId) {
         String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.USER_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
+    }
+
+    public List<BankWithdrawRequest> selectAll() {
+        String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 

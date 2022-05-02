@@ -72,17 +72,17 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             }
 
             // deduct user's balance
-            var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
-            var userId = m.getUserId();
-            var _amount = m.getTokenAmount();
-            balanceDao.deductFreeBalance(userId, tokenId, _amount);
+            // var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
+            // var userId = m.getUserId();
+            // var _amount = m.getTokenAmount();
+            // balanceDao.deductFreeBalance(userId, tokenId, _amount);
 
-            // send success notification
-            notificationService.sendNotification(
-                    m.getUserId(),
-                    Notification.PAYMENT_RESULT,
-                    "PAYMENT CONFIRMED",
-                    String.format("Your %f %d withdarwal request has been approved", _amount, m.getSourceToken()));
+            // // send success notification
+            // notificationService.sendNotification(
+            //         m.getUserId(),
+            //         Notification.PAYMENT_RESULT,
+            //         "PAYMENT CONFIRMED",
+            //         String.format("Your %f %s withdarwal request has been approved", _amount, m.getSourceToken()));
 
             paypalWithdrawDao.updatePaypalID(m.getId(), batchHeaderResponse.getPayout_batch_id(), batchId, itemId);
         } else {

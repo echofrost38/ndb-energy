@@ -148,7 +148,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return m;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_SUPER')")
     public CryptoWithdraw getCryptoWithdrawByIdByAdmin(int id) {
         return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
     }

@@ -34,7 +34,7 @@ public class PaypalController extends BaseController {
         this.paypalConfig = paypalConfig;
     }
 
-	@PostMapping(value = "/auction")
+	@PostMapping(value = "/")
     public ResponseEntity<String> paymentSuccess(HttpServletRequest request) {
         
         try {
@@ -64,8 +64,8 @@ public class PaypalController extends BaseController {
                     notificationService.sendNotification(
                         m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,
-                        "WITHDRAW SUCCESS",
-                        "Your withdrawal request was successful."
+                        "PAYMENT CONFIRMED",
+                        String.format("Your %f %s withdarwal request has been approved", tokenAmount, m.getSourceToken())
                     );
                     break;
                 case "PAYMENT.PAYOUTSBATCH.DENIED":
@@ -78,9 +78,8 @@ public class PaypalController extends BaseController {
                     notificationService.sendNotification(
                         _m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,
-                        "WITHDRAW FAILED",
-                        "Your withdrawal request failedKYC VERIFIED."
-                    );
+                        "PAYMENT CONFIRMED",
+                    "Your PayPal withdarwal request has been denied.");                   
                     break;
             }
             return ResponseEntity.ok().body("Payment success");

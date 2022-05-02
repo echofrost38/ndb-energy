@@ -90,6 +90,9 @@ extend type Query {
         id: Int
     ) : CryptoWithdraw
     getAllCryptoWithdraws : [CryptoWithdraw]
+    getCryptoWithdrawByIdByAdmin(
+        id: Int
+    ) : CryptoWithdraw
 
     # Bank withdraw
     getPendingBankWithdrawRequests : [BankWithdrawRequest]

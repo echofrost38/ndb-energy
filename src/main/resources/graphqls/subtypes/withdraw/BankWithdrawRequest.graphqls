@@ -1,6 +1,7 @@
 type BankWithdrawRequest {
     id: Int,
     userId: Int,
+    email: String,
     targetCurrency: String,
     withdrawAmount: Float,
     fee: Float,

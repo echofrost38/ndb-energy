@@ -30,7 +30,7 @@ public class PaypalController extends BaseController {
     private PaypalWithdrawService papalWithdrawService;
 
     private final PaypalConfig paypalConfig;
-    public static final String WEBHOOK_ID = "4SU29595XK298014Y";
+    public static final String WEBHOOK_ID = "0X538017S25613946";
 
     @Autowired
     public PaypalController(PaypalConfig paypalConfig) {

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Locale;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.BaseWithdraw;
@@ -18,10 +19,14 @@ import com.ndb.auction.utils.PaypalHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PaypalWithdrawService extends BaseService implements IWithdrawService {
 
     private final PaypalHttpClient payPalHttpClient;
+    private ObjectMapper mapper = new ObjectMapper();
 
 	@Autowired
 	public PaypalWithdrawService(PaypalHttpClient payPalHttpClient) {
@@ -62,6 +67,7 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var batchHeaderResponse = response.getBatch_header();
             // check status!
             if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
+                log.debug("Batch Header Response: {}", mapper.writeValueAsString(batchHeaderResponse));
                 // send failed notification
                 notificationService.sendNotification(
                     m.getUserId(),

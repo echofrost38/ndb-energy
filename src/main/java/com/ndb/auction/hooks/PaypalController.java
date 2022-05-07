@@ -49,7 +49,7 @@ public class PaypalController extends BaseController {
             apiContext.addConfiguration(Constants.PAYPAL_WEBHOOK_ID, WEBHOOK_ID);
             var headerMap = getHeadersInfo(request);
             var reqBody = getBody(request);
-            log.info("PayPal webhook: %s", reqBody);
+            log.info("PayPal webhook: {}", reqBody);
 
             Boolean result = Event.validateReceivedEvent(apiContext, headerMap, reqBody);
 
@@ -80,8 +80,6 @@ public class PaypalController extends BaseController {
                     PaypalWithdraw _m = papalWithdrawService.getWithdrawByPayoutId(_payoutId);
 
                     // check pending status
-                    double _tokenAmount = _m.getTokenAmount();
-                    balanceService.deductFree(_m.getUserId(), _m.getSourceToken(), _tokenAmount);
                     notificationService.sendNotification(
                         _m.getUserId(),
                         Notification.WITHDRAW_SUCCESS,

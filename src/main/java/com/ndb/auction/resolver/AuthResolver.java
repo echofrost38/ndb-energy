@@ -216,4 +216,8 @@ public class AuthResolver extends BaseResolver
 		return new Credentials("success", token);
 	}
 
+	@PreAuthorize("isAuthenticated()")
+	public void resetGoogleAuth() {
+		
+	}
 }

@@ -11,11 +11,7 @@ import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.payment.ITransactionService;
-import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.PaymentMethod;
-import com.stripe.model.PaymentMethod.Card;
-import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import org.springframework.stereotype.Service;

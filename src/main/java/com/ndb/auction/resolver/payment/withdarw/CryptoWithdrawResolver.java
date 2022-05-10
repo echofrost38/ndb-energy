@@ -3,12 +3,15 @@ package com.ndb.auction.resolver.payment.withdarw;
 import java.util.List;
 import java.util.Locale;
 
+import javax.mail.MessagingException;
+
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 
@@ -29,6 +32,9 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Autowired
     private TotpService totpService;
 
+    @Autowired
+    private MailService mailService;
+
     @PreAuthorize("isAuthenticated()")
     public CryptoWithdraw cryptoWithdrawRequest(
         double amount, 
@@ -36,10 +42,11 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         String network, 
         String des, 
         String code
-    ) {
+    ) throws MessagingException {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
+        var user = userService.getUserById(userId);
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
@@ -68,20 +75,40 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         double withdrawAmount = amount - fee;
 
         var m = new CryptoWithdraw(userId, withdrawAmount, fee, sourceToken, cryptoPrice, amount, network, des); 
-        return (CryptoWithdraw) cryptoWithdrawService.createNewWithdrawRequest(m);
+        var res = (CryptoWithdraw) cryptoWithdrawService.createNewWithdrawRequest(m);
+
+        var superUsers = userService.getUsersByRole("ROLE_SUPER");
+        mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Crypto");
+        return res;
     }
 
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
-        var request = cryptoWithdrawService.getWithdrawRequestById(id);
+        var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
         var tokenSymbol = request.getSourceToken();
         var tokenAmount = request.getTokenAmount();
 
         if(result == 1 && status == 1) {
+            // transfer funds
+            if(tokenSymbol.equals("NDB")) {
+                String transactionHash = ndbCoinService.transferNDB(request.getUserId(), request.getDestination(), request.getWithdrawAmount());
+                if(transactionHash == null) {
+                    // cannot transfer NDB
+                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                    throw new UnauthorizedException(msg, "id"); 
+                }
+            }
+            
             // success
+            var balance = internalBalanceService.getBalance(request.getUserId(), tokenSymbol);
+            if(balance.getFree() < tokenAmount) {
+                String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                throw new BalanceException(msg, "amount");
+            }
             internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
+
             notificationService.sendNotification(
                 request.getUserId(),
                 Notification.PAYMENT_RESULT,

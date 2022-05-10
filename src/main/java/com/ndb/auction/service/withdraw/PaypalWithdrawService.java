@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.BaseWithdraw;
@@ -50,6 +51,13 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             if(m == null) {
                 String msg = messageSource.getMessage("no_withdrawal_request", null, Locale.ENGLISH);
 			    throw new UserNotFoundException(msg, "withdrawal request");
+            }
+
+            var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
+            var balance = balanceDao.selectById(m.getUserId(), tokenId);
+            if(balance.getFree() < m.getTokenAmount()) {
+                String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                throw new BalanceException(msg, "amount");
             }
 
             // create payouts request body

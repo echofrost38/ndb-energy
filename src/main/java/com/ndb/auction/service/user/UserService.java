@@ -418,6 +418,10 @@ public class UserService extends BaseService {
 		return user;
 	}
 
+	public List<User> getUsersByRole(String role) {
+		return userDao.selectByRole(role);
+	}
+
 	public int getUserCount() {
 		return userDao.countAll();
 	}

@@ -1,9 +1,11 @@
 package com.ndb.auction.service.withdraw;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.withdraw.BankWithdrawDao;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.BankWithdrawRequest;
 import com.ndb.auction.service.BaseService;
@@ -55,6 +57,14 @@ public class BankWithdrawService extends BaseService{
             // success
             var request = bankWithdrawDao.selectById(id);
             var tokenId = tokenAssetService.getTokenIdBySymbol(request.getSourceToken());
+
+            // get free balance
+            var balance = balanceDao.selectById(request.getUserId(), tokenId);
+            if(balance.getFree() < request.getTokenAmount()) {
+                String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                throw new BalanceException(msg, "amount");
+            }
+
             balanceDao.deductFreeBalance(request.getUserId(), tokenId, request.getTokenAmount());
 
             notificationService.sendNotification(

@@ -260,7 +260,7 @@ public class BaseService {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
 			balanceDao.addFreeBalance(userId, tokenId, ndb);
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
-			ndbCoinService.transferNDB(userId, order.getExtAddr(), Double.valueOf(ndb));
+			ndbCoinService.transferNDB(userId, order.getExtAddr(), ndb);
 		}
 
 		// update user tier points

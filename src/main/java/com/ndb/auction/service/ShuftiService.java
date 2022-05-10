@@ -138,7 +138,7 @@ public class ShuftiService extends BaseService{
     }
 
     public boolean kycStatusCkeck(int userId) {
-        ShuftiReference _reference = shuftiDao.selectById(userId);
+        // ShuftiReference _reference = shuftiDao.selectById(userId);
         return true;
         // if(_reference == null) {
         //     return false;

@@ -6,7 +6,6 @@ import com.ndb.auction.payload.response.FiatConverted;
 import com.ndb.auction.payload.response.FreaksResponse;
 
 import org.apache.http.HttpHeaders;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,7 +15,6 @@ public class ThirdAPIUtils {
 
     private WebClient binanceAPI;
     private WebClient xchangeAPI;
-    private WebClient freaksAPI;
 
     private static Gson gson = new Gson();
 

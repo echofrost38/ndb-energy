@@ -11,7 +11,6 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,6 @@ import org.apache.commons.csv.CSVPrinter;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +102,7 @@ public class ScheduledTasks {
 	private Long readyPresaleCounter;
 
 	private final AmazonS3 s3;
-	private final static String bucketName = "nyyu-live-backup";
+	private final static String bucketName = "nyyu-dev-backup";
 	// check transaction
 	private Map<String, BigInteger> pendingTransactions;
 
@@ -277,7 +275,6 @@ public class ScheduledTasks {
 				// end
 				presaleService.closePresale(startedPresale.getId());
 				startedPresale = null;
-				startedPresale = null;
 			}
 		}
 	}
@@ -287,6 +284,12 @@ public class ScheduledTasks {
 		if(pendingTransactions.containsKey(hash)) 
 			return;
 		pendingTransactions.put(hash, blockNum);
+	}
+
+	public void forceToClosePresale(int presaleId) {
+		presaleService.closePresale(presaleId);
+		startedPresale = null;
+		startedPresaleCounter = 0L;		
 	}
 
 	@Scheduled(fixedRate = 1000 * 120)
@@ -319,7 +322,7 @@ public class ScheduledTasks {
 		}
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60)
+	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");

@@ -9,15 +9,22 @@ import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
+import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.WithdrawRequest;
+import com.ndb.auction.service.TokenAssetService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import freemarker.core.ParseException;
 import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 
 @Service
 public class MailService {
@@ -25,6 +32,12 @@ public class MailService {
 	private JavaMailSender javaMailSender;
 	
 	private final Configuration configuration;
+
+    private UserDetailDao userDetailDao;
+
+    private TokenAssetService tokenAssetService;
+
+    private CryptoBalanceDao balanceDao;
 	
 	@Autowired
     public MailService(Configuration configuration, JavaMailSender javaMailSender) {
@@ -74,6 +87,46 @@ public class MailService {
         for (var path : paths) {
             var file = new java.io.File(path);
             helper.addAttachment(path, file);
+        }
+        javaMailSender.send(mimeMessage);
+    }
+
+    private String fillWithdrawRequestEmail(String template, WithdrawRequest contents) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        StringWriter stringWriter = new StringWriter();
+        Map<String, Object> model = new HashMap<>();
+        model.put("withdrawType", contents.getWithdrawType());
+        configuration.getTemplate(template).process(model, stringWriter);
+        return stringWriter.getBuffer().toString();
+    }
+
+    public void sendWithdrawRequestNotifyEmail(
+        List<User> superUsers, User requester, String type, double withdrawAmount, String currency, String destination, String bankMeta
+    ) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject("Withdraw Request");
+        
+        // getting required information
+        String avatarName = requester.getAvatar().getPrefix() + "." + requester.getAvatar().getName();
+        var userDetail = userDetailDao.selectByUserId(requester.getId());
+        var fullName = userDetail.getFirstName() + " " + userDetail.getLastName();
+        var tokenId = tokenAssetService.getTokenIdBySymbol(currency);
+        var balance = balanceDao.selectById(requester.getId(), tokenId).getFree();
+
+        // withdarw type message
+        String typeMessage = "";
+        if(type.equals("PayPal")) {
+            typeMessage = "PayPal email";
+        }
+
+        // build withdraw request
+        var withdrawRequest = new WithdrawRequest(
+            type, avatarName, requester.getEmail(), fullName, userDetail.getAddress(), 
+            userDetail.getCountry(), balance, withdrawAmount, currency, typeMessage, destination, bankMeta);
+
+        helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest));
+        for(var user: superUsers) {
+            helper.addTo(user.getEmail());
         }
         javaMailSender.send(mimeMessage);
     }

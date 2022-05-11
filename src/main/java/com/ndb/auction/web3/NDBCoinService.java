@@ -194,7 +194,7 @@ public class NDBCoinService {
         return false;
     }
 
-    public boolean transferNDB(int userId, String address, Double amount) {
+    public String transferNDB(int userId, String address, Double amount) {
         try {
 
             @SuppressWarnings("deprecation")
@@ -205,12 +205,9 @@ public class NDBCoinService {
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
-            String transactionHash = receipt.getTransactionHash();
-            // withdrawService.createNewWithdrawTxn(withTxn);
-
+            return receipt.getTransactionHash();
         } catch (Exception e) {
-            return false;
+            return null;
         }
-        return true;
     }
 }

@@ -1,13 +1,17 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import javax.mail.MessagingException;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.BankWithdrawRequest;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.BankWithdrawService;
 
@@ -16,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import freemarker.template.TemplateException;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
@@ -27,6 +32,9 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
 
     @Autowired
     private TotpService totpService;
+
+    @Autowired
+    private MailService mailService;
 
     @PreAuthorize("isAuthenticated()")
     public BankWithdrawRequest bankWithdrawRequest(
@@ -42,11 +50,12 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         String address,
         String postCode,
         String code
-    ) {
+    ) throws MessagingException {
         // check user and kyc status
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
+        var user = userService.getUserById(userId);
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if(!kycStatus) {
@@ -91,6 +100,18 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
             mode, country, holderName, bankName, accNumber, metadata, address, postCode
         );
         bankWithdrawService.createNewRequest(m);
+
+        // send request email
+        var superUsers = userService.getUsersByRole("ROLE_SUPER");
+        try {
+            mailService.sendWithdrawRequestNotifyEmail(
+                superUsers, user, "Bank", amount, sourceToken, "", 
+                String.format("Bank: %s\nAddress: %s\nSWIFT: %s\nAccount Number/IBAN\n", 
+                bankName, address, "swift code", accNumber)
+            );
+        } catch (TemplateException | IOException e) {
+            e.printStackTrace();
+        }
         return m;
     }
 

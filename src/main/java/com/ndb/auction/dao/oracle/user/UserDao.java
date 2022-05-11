@@ -203,6 +203,11 @@ public class UserDao extends BaseOracleDao {
 		return m;
 	}
 
+	public List<User> selectByRole(String role) {
+		var sql = "SELECT * FROM TBL_USER WHERE ROLE LIKE '%' || ? || '%'";
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), role);
+	}
+
 	public int updatePassword(int id, String password) {
 		String sql = "UPDATE TBL_USER SET PASSWORD=?,LAST_PASSWORD_CHANGE_DATE=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, password, id);

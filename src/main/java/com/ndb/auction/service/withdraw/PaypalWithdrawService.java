@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.BaseWithdraw;
@@ -52,6 +53,13 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
 			    throw new UserNotFoundException(msg, "withdrawal request");
             }
 
+            var tokenId = tokenAssetService.getTokenIdBySymbol(m.getSourceToken());
+            var balance = balanceDao.selectById(m.getUserId(), tokenId);
+            if(balance.getFree() < m.getTokenAmount()) {
+                String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+                throw new BalanceException(msg, "amount");
+            }
+
             // create payouts request body
             var batchId = generateBatchId(m);
             var batchHeader = new SenderBatchHeader(batchId);
@@ -67,7 +75,7 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
             var batchHeaderResponse = response.getBatch_header();
             // check status!
             if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
-                log.info("Batch Header Response: {}", mapper.writeValueAsString(batchHeaderResponse));
+                log.debug("Batch Header Response: {}", mapper.writeValueAsString(batchHeaderResponse));
                 // send failed notification
                 notificationService.sendNotification(
                     m.getUserId(),

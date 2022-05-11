@@ -147,7 +147,7 @@ public class MailService {
             type, avatarName, requester.getEmail(), fullName, address, 
             country, balance, withdrawAmount, currency, typeMessage, destination, bankMeta);
 
-        helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest));
+        helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest), true);
         for(var user: superUsers) {
             helper.addTo(user.getEmail());
         }

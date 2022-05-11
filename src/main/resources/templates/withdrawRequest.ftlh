@@ -60,23 +60,23 @@
           line-height: 22px;
         "
       >
-        Prefix-Username: ${avatarName}
-        Email Address: ${email}
-        Full Name: ${fullName}
-        Address: ${address}
-        Country: ${country}
+        <p>Prefix-Username: ${avatarName} </p>
+        <p>Email Address: ${email}</p>
+        <p>Full Name: ${fullName}</p>
+        <p>Address: ${address}</p>
+        <p>Country: ${country}</p>
 
-        Current Balances: ${balance}
-        Show only available balances
+        <p>Current Balances: ${balance}</p>
+        <p>Show only available balances</p>
 
 
-        Payment Details
-        Requested Amount: ${requestAmount}
-        Requested Payment Method: ${withdrawType}
-        Requested Payment Currency: ${currency}     
+        <p>Payment Details</p>
+        <p>Requested Amount: ${requestAmount}</p>
+        <p>Requested Payment Method: ${withdrawType}</p>
+        <p>Requested Payment Currency: ${currency}     </p>
 
-        ${typeMessage} for transfer: ${destination}
-        ${bank}         
+        <p>${typeMessage} for transfer: ${destination}</p>
+        ${bank}         </p>
       </div>
       
       <div

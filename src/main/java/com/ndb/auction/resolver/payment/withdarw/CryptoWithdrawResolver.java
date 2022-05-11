@@ -81,7 +81,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Crypto", amount, sourceToken, des, "");
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Crypto", sourceToken, amount, sourceToken, des, "");
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }

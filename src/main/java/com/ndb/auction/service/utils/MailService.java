@@ -77,15 +77,4 @@ public class MailService {
         }
         javaMailSender.send(mimeMessage);
     }
-
-    public void sendWithdrawRequestNotifyEmail(List<User> superUsers, User requester, String type) throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-        helper.setSubject("Withdraw Request");
-        helper.setText(String.format("User(%s) sent %s withdrawal request.", requester.getEmail(), type));
-        for(var user: superUsers) {
-            helper.addTo(user.getEmail());
-        }
-        javaMailSender.send(mimeMessage);
-    }
 }

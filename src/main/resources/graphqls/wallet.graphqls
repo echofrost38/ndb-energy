@@ -38,11 +38,11 @@ extend type Mutation {
         network: String,
         cryptoType: String
     ) : CoinpaymentWalletTransaction
-#    withdrawCrypto(
-#        to: String,
-#        amount: Float,
-#        tokenSymbol: String
-#    ) : Boolean
+    withdrawCrypto(
+        to: String,
+        amount: Float,
+        tokenSymbol: String
+    ) : Boolean
     depositWithPlaid : String
     plaidExchangeToken(
         publicToken: String

@@ -281,6 +281,9 @@ public class BaseService {
             var fiatRemainPaid = (ndb - available) * order.getNdbPrice();
             int tokenId = tokenAssetService.getTokenIdBySymbol("USDT");
             balanceDao.addFreeBalance(userId, tokenId, fiatRemainPaid);
+
+            // close presale
+            schedule.forceToClosePresale(order.getPresaleId());
         }
 
 		// update user tier points

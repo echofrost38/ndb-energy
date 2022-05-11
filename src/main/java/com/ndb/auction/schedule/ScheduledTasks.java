@@ -275,7 +275,6 @@ public class ScheduledTasks {
 				// end
 				presaleService.closePresale(startedPresale.getId());
 				startedPresale = null;
-				startedPresale = null;
 			}
 		}
 	}
@@ -285,6 +284,12 @@ public class ScheduledTasks {
 		if(pendingTransactions.containsKey(hash)) 
 			return;
 		pendingTransactions.put(hash, blockNum);
+	}
+
+	public void forceToClosePresale(int presaleId) {
+		presaleService.closePresale(presaleId);
+		startedPresale = null;
+		startedPresaleCounter = 0L;		
 	}
 
 	@Scheduled(fixedRate = 1000 * 120)

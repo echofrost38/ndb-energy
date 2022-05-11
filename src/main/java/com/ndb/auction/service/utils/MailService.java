@@ -32,11 +32,14 @@ public class MailService {
 	private JavaMailSender javaMailSender;
 	
 	private final Configuration configuration;
-
+	
+    @Autowired
     private UserDetailDao userDetailDao;
-
+	
+    @Autowired
     private TokenAssetService tokenAssetService;
-
+	
+    @Autowired
     private CryptoBalanceDao balanceDao;
 	
 	@Autowired
@@ -95,6 +98,17 @@ public class MailService {
         StringWriter stringWriter = new StringWriter();
         Map<String, Object> model = new HashMap<>();
         model.put("withdrawType", contents.getWithdrawType());
+        model.put("avatarName", contents.getAvatarName());
+        model.put("email", contents.getEmail());
+        model.put("fullName", contents.getFullName());
+        model.put("address", contents.getAddress());
+        model.put("country", contents.getCountry());
+        model.put("balance", contents.getBalance());
+        model.put("requestAmount", contents.getRequestAmount());
+        model.put("currency", contents.getCurrency());
+        model.put("typeMessage", contents.getTypeMessage());
+        model.put("destination", contents.getDestination());
+        model.put("bank", contents.getBankMetadata());
         configuration.getTemplate(template).process(model, stringWriter);
         return stringWriter.getBuffer().toString();
     }
@@ -109,7 +123,16 @@ public class MailService {
         // getting required information
         String avatarName = requester.getAvatar().getPrefix() + "." + requester.getAvatar().getName();
         var userDetail = userDetailDao.selectByUserId(requester.getId());
-        var fullName = userDetail.getFirstName() + " " + userDetail.getLastName();
+        var fullName = "";
+        var address = "";
+        var country = "";
+        if(userDetail != null) {
+            fullName = userDetail.getFirstName() + " " + userDetail.getLastName();
+            address = userDetail.getAddress();
+            var tempList = userDetail.getAddress().split(",");
+            country = tempList[tempList.length - 1].substring(1);
+        }
+        
         var tokenId = tokenAssetService.getTokenIdBySymbol(currency);
         var balance = balanceDao.selectById(requester.getId(), tokenId).getFree();
 
@@ -121,8 +144,8 @@ public class MailService {
 
         // build withdraw request
         var withdrawRequest = new WithdrawRequest(
-            type, avatarName, requester.getEmail(), fullName, userDetail.getAddress(), 
-            userDetail.getCountry(), balance, withdrawAmount, currency, typeMessage, destination, bankMeta);
+            type, avatarName, requester.getEmail(), fullName, address, 
+            country, balance, withdrawAmount, currency, typeMessage, destination, bankMeta);
 
         helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest));
         for(var user: superUsers) {

@@ -15,8 +15,9 @@ public class WithdrawRequest {
     private String address;
     private String country;
     private double balance;
-    private double requestAmount;
     private String currency;
+    private double requestAmount;
+    private String requestCurrency;
     private String typeMessage;
     private String destination;
     private String bankMetadata;

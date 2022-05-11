@@ -65,15 +65,17 @@
         <p>Full Name: ${fullName}</p>
         <p>Address: ${address}</p>
         <p>Country: ${country}</p>
+        <br>
 
-        <p>Current Balances: ${balance}</p>
+        <p>Current Balances: ${balance} ${sourceToken}</p>
         <p>Show only available balances</p>
-
+        <br>
 
         <p>Payment Details</p>
         <p>Requested Amount: ${requestAmount}</p>
         <p>Requested Payment Method: ${withdrawType}</p>
-        <p>Requested Payment Currency: ${currency}     </p>
+        <p>Requested Payment Currency: ${requestCurrency}     </p>
+        <br>
 
         <p>${typeMessage} for transfer: ${destination}</p>
         ${bank}         </p>

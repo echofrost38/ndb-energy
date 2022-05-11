@@ -104,8 +104,9 @@ public class MailService {
         model.put("address", contents.getAddress());
         model.put("country", contents.getCountry());
         model.put("balance", contents.getBalance());
+        model.put("sourceToken", contents.getCurrency());
         model.put("requestAmount", contents.getRequestAmount());
-        model.put("currency", contents.getCurrency());
+        model.put("requestCurrency", contents.getRequestCurrency());
         model.put("typeMessage", contents.getTypeMessage());
         model.put("destination", contents.getDestination());
         model.put("bank", contents.getBankMetadata());
@@ -114,7 +115,8 @@ public class MailService {
     }
 
     public void sendWithdrawRequestNotifyEmail(
-        List<User> superUsers, User requester, String type, double withdrawAmount, String currency, String destination, String bankMeta
+        List<User> superUsers, User requester, String type, String currency, double withdrawAmount, 
+        String withdrawCurrency, String destination, String bankMeta
     ) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -140,12 +142,16 @@ public class MailService {
         String typeMessage = "";
         if(type.equals("PayPal")) {
             typeMessage = "PayPal email";
+        } else if(type.equals("Crypto")) {
+            typeMessage = "Wallet address";
+        } else if(type.equals("Bank")) {
+            typeMessage = "Bank Transfer";
         }
 
         // build withdraw request
         var withdrawRequest = new WithdrawRequest(
-            type, avatarName, requester.getEmail(), fullName, address, 
-            country, balance, withdrawAmount, currency, typeMessage, destination, bankMeta);
+            type, avatarName, requester.getEmail(), fullName, address, country, balance, currency, 
+            withdrawAmount, withdrawCurrency, typeMessage, destination, bankMeta);
 
         helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest), true);
         for(var user: superUsers) {

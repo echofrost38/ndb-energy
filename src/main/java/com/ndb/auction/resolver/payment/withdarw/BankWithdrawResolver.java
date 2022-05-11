@@ -105,7 +105,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
             mailService.sendWithdrawRequestNotifyEmail(
-                superUsers, user, "Bank", amount, sourceToken, "", 
+                superUsers, user, "Bank", sourceToken, amount, targetCurrency, "", 
                 String.format("Bank: %s\nAddress: %s\nSWIFT: %s\nAccount Number/IBAN\n", 
                 bankName, address, "swift code", accNumber)
             );

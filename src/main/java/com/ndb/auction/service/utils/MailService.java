@@ -12,6 +12,7 @@ import javax.mail.internet.MimeMessage;
 import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.BankMeta;
 import com.ndb.auction.payload.WithdrawRequest;
 import com.ndb.auction.service.TokenAssetService;
 
@@ -109,14 +110,14 @@ public class MailService {
         model.put("requestCurrency", contents.getRequestCurrency());
         model.put("typeMessage", contents.getTypeMessage());
         model.put("destination", contents.getDestination());
-        model.put("bank", contents.getBankMetadata());
+        model.put("bank", contents.getBankMeta());
         configuration.getTemplate(template).process(model, stringWriter);
         return stringWriter.getBuffer().toString();
     }
 
     public void sendWithdrawRequestNotifyEmail(
         List<User> superUsers, User requester, String type, String currency, double withdrawAmount, 
-        String withdrawCurrency, String destination, String bankMeta
+        String withdrawCurrency, String destination, BankMeta bankMeta
     ) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -145,7 +146,7 @@ public class MailService {
         } else if(type.equals("Crypto")) {
             typeMessage = "Wallet address";
         } else if(type.equals("Bank")) {
-            typeMessage = "Bank Transfer";
+            typeMessage = "Account Details";
         }
 
         // build withdraw request

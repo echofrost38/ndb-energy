@@ -20,5 +20,5 @@ public class WithdrawRequest {
     private String requestCurrency;
     private String typeMessage;
     private String destination;
-    private String bankMetadata;
+    private BankMeta bankMeta;
 }

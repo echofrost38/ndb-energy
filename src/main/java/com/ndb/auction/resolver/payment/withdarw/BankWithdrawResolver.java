@@ -9,6 +9,7 @@ import javax.mail.MessagingException;
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.withdraw.BankWithdrawRequest;
+import com.ndb.auction.payload.BankMeta;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
@@ -104,11 +105,10 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         // send request email
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
-            mailService.sendWithdrawRequestNotifyEmail(
-                superUsers, user, "Bank", sourceToken, amount, targetCurrency, "", 
-                String.format("Bank: <b>%s</b><br>Address: <b>%s</b><br>SWIFT: <b>%s</b><br>Account Number/IBAN: <b>%s</b><br>", 
-                bankName, address, "swift code", accNumber)
+            var bankMeta = new BankMeta(
+                bankName, address, "swift code", accNumber
             );
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Bank", sourceToken, amount, targetCurrency, "", bankMeta);
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }

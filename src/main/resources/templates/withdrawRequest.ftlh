@@ -78,7 +78,14 @@
         <br>
 
         <p>${typeMessage} for transfer: <b>${destination}</b></p>
-        ${bank}         </p>
+        <p>
+          <#if withdrawType == "Bank">
+            <p>Bank: <b>${bankMeta.name}</b></p>
+            <p>Address: <b>${bankMeta.address}</b></p>
+            <p>SWIFT: <b>${bankMeta.swift}</b></p>
+            <p>Account Number/IBAN: <b>${bankMeta.iban}</b></p>
+          </#if> 
+        </p>
       </div>
       
       <div

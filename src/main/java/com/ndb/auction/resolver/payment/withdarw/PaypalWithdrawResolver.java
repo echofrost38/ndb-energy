@@ -121,7 +121,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         var res = (PaypalWithdraw) paypalWithdrawService.createNewWithdrawRequest(m);
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "PayPal", sourceToken, amount, target, email, "");
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "PayPal", sourceToken, amount, target, email, null);
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }

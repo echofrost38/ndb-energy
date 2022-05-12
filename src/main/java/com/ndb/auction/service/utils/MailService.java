@@ -110,7 +110,7 @@ public class MailService {
         model.put("requestCurrency", contents.getRequestCurrency());
         model.put("typeMessage", contents.getTypeMessage());
         model.put("destination", contents.getDestination());
-        model.put("bank", contents.getBankMeta());
+        model.put("bankMeta", contents.getBankMeta());
         configuration.getTemplate(template).process(model, stringWriter);
         return stringWriter.getBuffer().toString();
     }

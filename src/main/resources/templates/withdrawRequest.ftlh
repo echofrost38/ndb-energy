@@ -60,24 +60,24 @@
           line-height: 22px;
         "
       >
-        <p>Prefix-Username: ${avatarName} </p>
-        <p>Email Address: ${email}</p>
-        <p>Full Name: ${fullName}</p>
-        <p>Address: ${address}</p>
-        <p>Country: ${country}</p>
+        <p>Prefix-Username: <b>${avatarName}</b> </p>
+        <p>Email Address: <b>${email}</b></p>
+        <p>Full Name: <b>${fullName}</b></p>
+        <p>Address: <b>${address}</b></p>
+        <p>Country: <b>${country}</b></p>
         <br>
 
-        <p>Current Balances: ${balance} ${sourceToken}</p>
+        <p>Current Balances: <b>${balance} ${sourceToken}</b></p>
         <p>Show only available balances</p>
         <br>
 
         <p>Payment Details</p>
-        <p>Requested Amount: ${requestAmount}</p>
-        <p>Requested Payment Method: ${withdrawType}</p>
-        <p>Requested Payment Currency: ${requestCurrency}     </p>
+        <p>Requested Amount: <b>${requestAmount}</b></p>
+        <p>Requested Payment Method: <b>${withdrawType}</b></p>
+        <p>Requested Payment Currency: <b>${requestCurrency}</b>     </p>
         <br>
 
-        <p>${typeMessage} for transfer: ${destination}</p>
+        <p>${typeMessage} for transfer: <b>${destination}</b></p>
         ${bank}         </p>
       </div>
       

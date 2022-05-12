@@ -106,7 +106,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         try {
             mailService.sendWithdrawRequestNotifyEmail(
                 superUsers, user, "Bank", sourceToken, amount, targetCurrency, "", 
-                String.format("Bank: %s\nAddress: %s\nSWIFT: %s\nAccount Number/IBAN\n", 
+                String.format("Bank: <b>%s</b><br>Address: <b>%s</b><br>SWIFT: <b>%s</b><br>Account Number/IBAN: <b>%s</b><br>", 
                 bankName, address, "swift code", accNumber)
             );
         } catch (TemplateException | IOException e) {

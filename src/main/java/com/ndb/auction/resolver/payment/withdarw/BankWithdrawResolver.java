@@ -108,7 +108,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
             var bankMeta = new BankMeta(
                 bankName, address, "swift code", accNumber
             );
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Bank", sourceToken, amount, targetCurrency, "", bankMeta);
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Bank", sourceToken, withdrawAmount, targetCurrency, "", bankMeta);
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }

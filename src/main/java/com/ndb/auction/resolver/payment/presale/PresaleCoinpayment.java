@@ -22,9 +22,8 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
     public CoinpaymentPresaleTransaction createChargeForPresale(int presaleId, int orderId, double amount, String coin, String network, String cryptoType, Double cryptoAmount) throws ParseException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        double total = getTotalCoinpaymentOrder(userId, cryptoAmount);
-        // crypto amount means total order!!!!! including fee
-        CoinpaymentPresaleTransaction m = new CoinpaymentPresaleTransaction(userId, presaleId, orderId, amount, total-cryptoAmount, coin, network, total, cryptoType);
+        double total = getTotalCoinpaymentOrder(userId, amount);
+        CoinpaymentPresaleTransaction m = new CoinpaymentPresaleTransaction(userId, presaleId, orderId, amount, total-amount, coin, network, cryptoAmount, cryptoType);
         return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.createNewTransaction(m);
     }
 

@@ -240,7 +240,8 @@ public class CryptoController extends BaseController {
         if (status >= 100 || status == 2) {
 
             CoinpaymentPresaleTransaction txn = (CoinpaymentPresaleTransaction) coinpaymentPresaleService.selectById(id);
-            
+            User user = userService.getUserById(txn.getUserId());
+
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
             double totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
             Double totalOrder = getTotalOrder(txn.getUserId(), totalPrice);
@@ -248,9 +249,54 @@ public class CryptoController extends BaseController {
             if(totalOrder > fiatAmount) {
                 new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-            presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
+    
+            // processing order
+            double ndb = presaleOrder.getNdbAmount();
+            if(presaleOrder.getDestination() == PreSaleOrder.INTERNAL) {
+                balanceService.addFreeBalance(user.getId(), "NDB", Double.valueOf(ndb));
+            } else if (presaleOrder.getDestination() == PreSaleOrder.EXTERNAL) {
+                // transfer ndb
+                ndbCoinService.transferNDB(txn.getUserId(), presaleOrder.getExtAddr(), Double.valueOf(ndb));
+            }
+    
+            // update user tier points
+            List<Tier> tierList = tierService.getUserTiers();
+            TaskSetting taskSetting = taskSettingService.getTaskSetting();
+            TierTask tierTask = tierTaskService.getTierTask(user.getId());
+            
+            if(tierTask == null) {
+                tierTask = new TierTask(user.getId());
+                tierTaskService.updateTierTask(tierTask);
+            }
+            
+            double presalePoint = tierTask.getDirect();
+            presalePoint += taskSetting.getDirect() * totalPrice;
+            tierTask.setDirect(presalePoint);
+    
+            double newPoint = user.getTierPoint() + taskSetting.getDirect() * totalPrice;
+            int tierLevel = 0;
+    
+            // check change in level
+            for (Tier tier : tierList) {
+                if(tier.getPoint() <= newPoint) {
+                    tierLevel = tier.getLevel();
+                }
+            }
+            userService.updateTier(user.getId(), tierLevel, newPoint);
+            tierTaskService.updateTierTask(tierTask);
+            presaleOrderService.updateStatus(presaleOrder.getId());
+            presaleService.addSoldAmount(presaleOrder.getPresaleId(), ndb);
+
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
+    
+            // send notification to user for payment result!!
+            notificationService.sendNotification(
+                    txn.getUserId(),
+                    Notification.PAYMENT_RESULT,
+                    "PAYMENT CONFIRMED",
+                    "Your deposit of " + amount + cryptoType + " for the presale round was successful.");
         }
+
 
         return null;
     }

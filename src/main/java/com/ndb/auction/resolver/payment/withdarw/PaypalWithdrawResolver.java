@@ -1,10 +1,7 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-
-import javax.mail.MessagingException;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -20,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import freemarker.template.TemplateException;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
@@ -61,7 +57,6 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
      * @param amount crypto amount to withdraw
      * @param sourceToken crypto token to withdraw
      * @return
-     * @throws MessagingException
      */
     @PreAuthorize("isAuthenticated()")
     public PaypalWithdraw paypalWithdrawRequest(
@@ -70,11 +65,10 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         double amount, // amount in source token
         String sourceToken, 
         String code
-    ) throws MessagingException {
+    ) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
-        var user = userService.getUserById(userId);
 
         // check withdraw code
         if(!totpService.checkWithdrawCode(userEmail, code)) {
@@ -118,14 +112,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         // send request
         var m = new PaypalWithdraw(userId, target, withdrawAmount, fee, sourceToken, cryptoPrice, amount, null, null, email);
-        var res = (PaypalWithdraw) paypalWithdrawService.createNewWithdrawRequest(m);
-        var superUsers = userService.getUsersByRole("ROLE_SUPER");
-        try {
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "PayPal", sourceToken, amount, target, email, null);
-        } catch (TemplateException | IOException e) {
-            e.printStackTrace();
-        }
-        return res;
+        return (PaypalWithdraw) paypalWithdrawService.createNewWithdrawRequest(m);
     }
 
     // confirm paypal withdraw

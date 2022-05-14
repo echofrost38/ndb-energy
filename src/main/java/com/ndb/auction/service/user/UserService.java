@@ -204,40 +204,6 @@ public class UserService extends BaseService {
 		return null;
 	}
 
-	public String updateGoogleSecret(int userId) {
-		var user = userDao.selectById(userId);
-		var securities = userSecurityDao.selectByUserId(userId);
-		UserSecurity currentSecurity = null;
-		for (var security : securities) {
-			if(security.getAuthType().equals("app")) {
-				currentSecurity = security;
-				break;
-			}
-		}
-		String tfaSecret = totpService.generateSecret();
-		if(currentSecurity == null) {
-			currentSecurity = new UserSecurity(userId, "app", true, tfaSecret);
-			userSecurityDao.insert(currentSecurity);
-		} else {
-			userSecurityDao.updateTfaSecret(currentSecurity.getId(), tfaSecret);
-		}
-		userSecurityDao.updateTfaEnabled(currentSecurity.getId(), false);
-		return totpService.getUriForImage(tfaSecret, user.getEmail());
-	}
-
-	public String confirmGoogleAuthUpdate(int userId, String code) {
-		var securities = userSecurityDao.selectByUserId(userId);
-		for (var security : securities) {
-			if(security.getAuthType().equals("app")) {
-				boolean status = totpService.verifyCode(code, security.getTfaSecret());
-				if(!status) return "Failed, 2FA code mismatch.";
-				userSecurityDao.updateTfaEnabled(security.getId(), true);
-				return "Success";
-			}
-		}
-		return "Failed, there is no google auth secret.";
-	}
-
 	public String disable2FA(int userId, String method) {
 		try{
 			userSecurityDao.updateTfaDisabled(userId, method, false);
@@ -287,6 +253,7 @@ public class UserService extends BaseService {
 		} else {
 			return "Failed";
 		}
+
 	}
 
 	public String signin2FA(User user) {
@@ -449,10 +416,6 @@ public class UserService extends BaseService {
 		user.setVerify(userVerifyDao.selectById(id));
 
 		return user;
-	}
-
-	public List<User> getUsersByRole(String role) {
-		return userDao.selectByRole(role);
 	}
 
 	public int getUserCount() {

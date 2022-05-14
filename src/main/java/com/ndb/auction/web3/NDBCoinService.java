@@ -59,7 +59,7 @@ public class NDBCoinService {
     private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("600000");
+    private final BigInteger gasLimit = new BigInteger("300000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
     @PostConstruct
@@ -67,7 +67,7 @@ public class NDBCoinService {
         Web3j web3j = Web3j.build(new HttpService(bscNetwork));
         ndbCredential = Credentials.create(ndbKey);
         txMananger = new FastRawTransactionManager(web3j, ndbCredential, bscChainId);
-        ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, gasPrice, gasLimit);
+        ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, new DefaultGasProvider());
         ndbReferral = NDBReferral.load(ndbReferralContract, web3j, txMananger,gasPrice,gasLimit);
         // ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
         //         .subscribe(event -> {
@@ -194,22 +194,23 @@ public class NDBCoinService {
         return false;
     }
 
-    public String transferNDB(int userId, String address, Double amount) {
+    public boolean transferNDB(int userId, String address, Double amount) {
         try {
 
-            Web3j web3j = Web3j.build(new HttpService(bscNetwork));
             @SuppressWarnings("deprecation")
-            ERC20 ndbToken = ERC20.load(ndbTokenContract, web3j, ndbCredential, gasPrice, gasLimit);
-            
-            BigInteger _amount = BigInteger.valueOf(amount.longValue());
+            ERC20 ndbToken = ERC20.load(ndbTokenContract, BEP20NET, ndbCredential, gasPrice, gasLimit);
+            Long lamount = (long) (amount * 10000);
+            BigInteger _amount = BigInteger.valueOf(lamount);
             _amount = _amount.multiply(decimals);
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
-            return receipt.getTransactionHash();
+            String transactionHash = receipt.getTransactionHash();
+            // withdrawService.createNewWithdrawTxn(withTxn);
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            return false;
         }
+        return true;
     }
 }

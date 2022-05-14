@@ -216,4 +216,17 @@ public class AuthResolver extends BaseResolver
 		return new Credentials("success", token);
 	}
 
+	@PreAuthorize("isAuthenticated()")
+	public String resetGoogleAuth() {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int id = userDetails.getId();
+		return userService.updateGoogleSecret(id);
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public String confirmGoogleAuthReset(String code) {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int id = userDetails.getId();
+		return userService.confirmGoogleAuthUpdate(id, code);
+	}
 }

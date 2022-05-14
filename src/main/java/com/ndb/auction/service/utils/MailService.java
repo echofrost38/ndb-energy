@@ -9,15 +9,23 @@ import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
+import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.payload.BankMeta;
+import com.ndb.auction.payload.WithdrawRequest;
+import com.ndb.auction.service.TokenAssetService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import freemarker.core.ParseException;
 import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 
 @Service
 public class MailService {
@@ -25,6 +33,15 @@ public class MailService {
 	private JavaMailSender javaMailSender;
 	
 	private final Configuration configuration;
+	
+    @Autowired
+    private UserDetailDao userDetailDao;
+	
+    @Autowired
+    private TokenAssetService tokenAssetService;
+	
+    @Autowired
+    private CryptoBalanceDao balanceDao;
 	
 	@Autowired
     public MailService(Configuration configuration, JavaMailSender javaMailSender) {
@@ -74,6 +91,72 @@ public class MailService {
         for (var path : paths) {
             var file = new java.io.File(path);
             helper.addAttachment(path, file);
+        }
+        javaMailSender.send(mimeMessage);
+    }
+
+    private String fillWithdrawRequestEmail(String template, WithdrawRequest contents) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        StringWriter stringWriter = new StringWriter();
+        Map<String, Object> model = new HashMap<>();
+        model.put("withdrawType", contents.getWithdrawType());
+        model.put("avatarName", contents.getAvatarName());
+        model.put("email", contents.getEmail());
+        model.put("fullName", contents.getFullName());
+        model.put("address", contents.getAddress());
+        model.put("country", contents.getCountry());
+        model.put("balance", contents.getBalance());
+        model.put("sourceToken", contents.getCurrency());
+        model.put("requestAmount", contents.getRequestAmount());
+        model.put("requestCurrency", contents.getRequestCurrency());
+        model.put("typeMessage", contents.getTypeMessage());
+        model.put("destination", contents.getDestination());
+        model.put("bankMeta", contents.getBankMeta());
+        configuration.getTemplate(template).process(model, stringWriter);
+        return stringWriter.getBuffer().toString();
+    }
+
+    public void sendWithdrawRequestNotifyEmail(
+        List<User> superUsers, User requester, String type, String currency, double withdrawAmount, 
+        String withdrawCurrency, String destination, BankMeta bankMeta
+    ) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject("Withdraw Request");
+        
+        // getting required information
+        String avatarName = requester.getAvatar().getPrefix() + "." + requester.getAvatar().getName();
+        var userDetail = userDetailDao.selectByUserId(requester.getId());
+        var fullName = "";
+        var address = "";
+        var country = "";
+        if(userDetail != null) {
+            fullName = userDetail.getFirstName() + " " + userDetail.getLastName();
+            address = userDetail.getAddress();
+            var tempList = userDetail.getAddress().split(",");
+            country = tempList[tempList.length - 1].substring(1);
+        }
+        
+        var tokenId = tokenAssetService.getTokenIdBySymbol(currency);
+        var balance = balanceDao.selectById(requester.getId(), tokenId).getFree();
+
+        // withdarw type message
+        String typeMessage = "";
+        if(type.equals("PayPal")) {
+            typeMessage = "PayPal email";
+        } else if(type.equals("Crypto")) {
+            typeMessage = "Wallet address";
+        } else if(type.equals("Bank")) {
+            typeMessage = "Account Details";
+        }
+
+        // build withdraw request
+        var withdrawRequest = new WithdrawRequest(
+            type, avatarName, requester.getEmail(), fullName, address, country, balance, currency, 
+            withdrawAmount, withdrawCurrency, typeMessage, destination, bankMeta);
+
+        helper.setText(fillWithdrawRequestEmail("withdrawRequest.ftlh", withdrawRequest), true);
+        for(var user: superUsers) {
+            helper.addTo(user.getEmail());
         }
         javaMailSender.send(mimeMessage);
     }

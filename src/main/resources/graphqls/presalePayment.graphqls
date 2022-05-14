@@ -27,7 +27,7 @@ extend type Mutation {
         network: String,
         cryptoType: String,
         cryptoAmount: Float
-    ) : String
+    ) : CoinpaymentPresaleTransaction
     # for paypal
     paypalForPresale(
         presaleId: Int,

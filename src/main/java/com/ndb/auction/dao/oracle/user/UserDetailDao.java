@@ -47,7 +47,7 @@ public class UserDetailDao extends BaseOracleDao {
     }
 
     public UserDetail selectById(int id) {
-        String sql = "SELECT * FROM TBL_USER_DETAIL WHERE ID=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_DETAIL WHERE ID=?";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
@@ -56,7 +56,7 @@ public class UserDetailDao extends BaseOracleDao {
     }
 
     public UserDetail selectByUserId(int userId) {
-        String sql = "SELECT * FROM TBL_USER_DETAIL WHERE USER_ID=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_DETAIL WHERE USER_ID=?";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;

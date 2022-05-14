@@ -37,6 +37,14 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
             throw new PreSaleException(msg, "presaleId");
         }
 
+        // check NDB amount
+        double remain = presale.getTokenAmount() - presale.getSold();
+        
+        if(ndbAmount > remain) {
+            String msg = messageSource.getMessage("presale_amount_overflow", null, Locale.ENGLISH);
+            throw new PreSaleException(msg, "ndbAmount");
+        }        
+
         if(presale.getStatus() != PreSale.STARTED) {
             String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
             throw new PreSaleException(msg, "presaleId");

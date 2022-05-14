@@ -38,6 +38,7 @@ import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
@@ -59,6 +60,7 @@ import com.ndb.auction.web3.UserWalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 public class BaseService {
@@ -249,6 +251,7 @@ public class BaseService {
         return result;
     }
 
+    @Transactional
     public void handlePresaleOrder(int userId, PreSaleOrder order) {
 		User user = userDao.selectById(userId);
 
@@ -256,12 +259,36 @@ public class BaseService {
 		double ndb = order.getNdbAmount();
 		Double fiatAmount = ndb * order.getNdbPrice();
 		
+        // check balance and remaining
+        var presale = presaleDao.selectById(order.getPresaleId());
+        double remain = presale.getTokenAmount() - presale.getSold();
+
+        var available = ndb;
+        var overflow = false;
+        if(remain < ndb) {
+            available = remain;
+            overflow = true;
+        }
+
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-			balanceDao.addFreeBalance(userId, tokenId, ndb);
+			balanceDao.addFreeBalance(userId, tokenId, available);
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
-			ndbCoinService.transferNDB(userId, order.getExtAddr(), Double.valueOf(ndb));
+			String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available);
+            if(hash == null) {
+                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+            }
 		}
+
+        if(overflow) {
+            // handle remained fiat into USDT
+            var fiatRemainPaid = (ndb - available) * order.getNdbPrice();
+            int tokenId = tokenAssetService.getTokenIdBySymbol("USDT");
+            balanceDao.addFreeBalance(userId, tokenId, fiatRemainPaid);
+
+            // close presale
+            schedule.forceToClosePresale(order.getPresaleId());
+        }
 
 		// update user tier points
 		List<Tier> tierList = tierService.getUserTiers();
@@ -306,6 +333,6 @@ public class BaseService {
 			userId,
 			Notification.PAYMENT_RESULT,
 			"PAYMENT CONFIRMED",
-			"Your purchase of " + ndb + "NDB" + " in the presale round was successful.");
+			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
 }

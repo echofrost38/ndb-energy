@@ -17,6 +17,7 @@ public class CoinpaymentPresaleTransaction extends CoinpaymentTransaction {
         this.presaleId = presaleId;
         this.orderId = orderId;
         this.network = network;
+        this.amount = amount;
         this.cryptoType = cryptoType;
         this.cryptoAmount = cryptoAmount;
         this.coin = coin;

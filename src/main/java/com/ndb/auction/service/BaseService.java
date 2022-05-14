@@ -38,6 +38,7 @@ import com.ndb.auction.dao.oracle.user.UserVerifyDao;
 import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.presale.PreSaleOrder;
@@ -273,7 +274,10 @@ public class BaseService {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
 			balanceDao.addFreeBalance(userId, tokenId, available);
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
-			ndbCoinService.transferNDB(userId, order.getExtAddr(), available);
+			String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available);
+            if(hash == null) {
+                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+            }
 		}
 
         if(overflow) {

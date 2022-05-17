@@ -390,7 +390,8 @@ public class UserService extends BaseService {
 			}
 			userDao.updatePassword(user.getId(), encoder.encode(newPass));
 		} else {
-			return "Failed";
+			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "code");
 		}
 
 		return "Success";

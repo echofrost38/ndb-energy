@@ -1,0 +1,12 @@
+extend type Mutation {
+    unknownMemoRecovery(
+        coin: String,
+        receiverAddr: String,
+        depositAmount: Float,
+        txId: String
+    ) : String
+}
+
+schema {
+    mutation: Mutation
+}

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -82,7 +81,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, String.format("Crypto(%s)", network), sourceToken, withdrawAmount, sourceToken, des, null);
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Crypto", sourceToken, amount, sourceToken, des, null);
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }
@@ -91,7 +90,6 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
         var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);

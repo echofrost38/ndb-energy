@@ -191,16 +191,6 @@ public class AuthResolver extends BaseResolver
 		return oAuth2RegistrationService.createRegistration(registration);
 	}
 
-	// public String addNewUser(int id, String email, String name) {
-	// 	TransactionReceipt receipt = userWalletService.addNewUser(id, lowerEmail(email), name);
-	// 	return receipt.getLogs().get(0).getData();
-	// }
-
-	// public String addHoldAmount(int id, String crypto, Long amount) {
-	// 	TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
-	// 	return receipt.getLogs().get(0).getData();
-	// }
-
 	// For Zendesk SSO
 	@PreAuthorize("isAuthenticated()")
 	public Credentials getZendeskJwt() {

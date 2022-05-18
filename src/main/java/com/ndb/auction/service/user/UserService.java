@@ -153,7 +153,8 @@ public class UserService extends BaseService {
 						userDao.updatePhone(user.getId(), phone);
 						return smsService.sendSMS(phone, code);
 					} catch (IOException | TemplateException e) {
-						return "error";
+						String msg = messageSource.getMessage("error_phone", null, Locale.ENGLISH);
+						throw new UserNotFoundException(msg, "phone");
 					}
 					case "email":
 					try {
@@ -426,6 +427,10 @@ public class UserService extends BaseService {
         }
 	}
 
+	public int updatePhone(int userId, String phone) {
+		return userDao.updatePhone(userId, phone);
+	}
+
 	public String changeName(int id, String newName) {
 		if(userAvatarDao.changeName(id, newName) > 0)
 			return "Success";
@@ -646,5 +651,4 @@ public class UserService extends BaseService {
 		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
-
 }

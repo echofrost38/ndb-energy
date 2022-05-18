@@ -5,6 +5,12 @@ extend type Mutation {
         depositAmount: Float,
         txId: String
     ) : String
+    requestPhone2FA(
+        phone: String
+    ) : String
+    confirmPhone2FA(
+        code: String
+    ) : String
 }
 
 schema {

@@ -153,8 +153,7 @@ public class UserService extends BaseService {
 						userDao.updatePhone(user.getId(), phone);
 						return smsService.sendSMS(phone, code);
 					} catch (IOException | TemplateException e) {
-						String msg = messageSource.getMessage("error_phone", null, Locale.ENGLISH);
-						throw new UserNotFoundException(msg, "phone");
+						return "error";
 					}
 					case "email":
 					try {
@@ -391,8 +390,7 @@ public class UserService extends BaseService {
 			}
 			userDao.updatePassword(user.getId(), encoder.encode(newPass));
 		} else {
-			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-			throw new UserNotFoundException(msg, "code");
+			return "Failed";
 		}
 
 		return "Success";
@@ -425,10 +423,6 @@ public class UserService extends BaseService {
         else{
             return "Invalid Code";
         }
-	}
-
-	public int updatePhone(int userId, String phone) {
-		return userDao.updatePhone(userId, phone);
 	}
 
 	public String changeName(int id, String newName) {
@@ -651,4 +645,5 @@ public class UserService extends BaseService {
 		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
+
 }

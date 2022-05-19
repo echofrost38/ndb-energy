@@ -28,15 +28,19 @@ public class ThirdAPIUtils {
     }
 
     public double getCryptoPriceBySymbol(String symbol) {
+        String symbolPair = "";
         try {
-            if(symbol.equals("USDT") || symbol.equals("USDC")) {
+            if(symbol.equals("USDC")) {
                 return 1.0;
+            } else if(symbol.equals("USDT")) {
+                symbolPair = "USDCUSDT";
+            } else {
+                symbolPair = symbol + "USDC";
             }
-
-            String symbolPair = symbol + "USDT";
+            String s = symbolPair;
             CoinPrice objs = binanceAPI.get()
                     .uri(uriBuilder -> uriBuilder.path("/ticker/price")
-                            .queryParam("symbol", symbolPair.toUpperCase())
+                            .queryParam("symbol", s.toUpperCase())
                             .build())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .retrieve()

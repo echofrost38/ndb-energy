@@ -85,6 +85,7 @@ public class CryptoController extends BaseController {
 		
 		String _hmac = buildHmacSignature(reqQuery, COINSPAYMENT_IPN_SECRET);
 		if(!_hmac.equals(hmac)) {
+            log.error("hmac doesn't match");
 			throw new IPNExceptions("not match");
 		}
         

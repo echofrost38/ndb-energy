@@ -10,16 +10,20 @@ import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
+import com.ndb.auction.models.withdraw.Token;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
+import com.ndb.auction.service.withdraw.TokenService;
+import com.ndb.auction.web3.CryptoWithdrawalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
 import graphql.kickstart.tools.GraphQLMutationResolver;
@@ -32,10 +36,16 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 	protected CryptoWithdrawService cryptoWithdrawService;
 
     @Autowired
+    protected CryptoWithdrawalService adminWalletService;
+
+    @Autowired
     private TotpService totpService;
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @PreAuthorize("isAuthenticated()")
     public CryptoWithdraw cryptoWithdrawRequest(
@@ -81,7 +91,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         var superUsers = userService.getUsersByRole("ROLE_SUPER");
         try {
-            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, "Crypto", sourceToken, amount, sourceToken, des, null);
+            mailService.sendWithdrawRequestNotifyEmail(superUsers, user, String.format("Crypto(%s)", network), sourceToken, withdrawAmount, sourceToken, des, null);
         } catch (TemplateException | IOException e) {
             e.printStackTrace();
         }
@@ -90,6 +100,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
+    @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
         var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
@@ -113,6 +124,18 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
                 String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
                 throw new BalanceException(msg, "amount");
             }
+
+            // transfer
+            var hash = adminWalletService.withdrawToken(
+                request.getNetwork(), 
+                request.getSourceToken(), 
+                request.getDestination(), 
+                request.getWithdrawAmount());
+            if(hash.equals("Failed")) {
+                String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                throw new UnauthorizedException(msg, "id"); 
+            }
+            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), hash);
             internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
 
             notificationService.sendNotification(
@@ -184,5 +207,21 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public CryptoWithdraw getCryptoWithdrawByIdByAdmin(int id) {
         return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
+    }
+    ////////////////////////////////// ADMIN WALLET
+
+    @PreAuthorize("hasRole('ROLE_SUPER')")
+    public double getAdminWalletBalance(String network, String token) {
+        return adminWalletService.getBalance(network, token);
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPER')")
+    public Token addNewWithdrawToken(String tokenName, String tokenSymbol, String network, String address) {
+        return tokenService.addNewToken(tokenName, tokenSymbol, network, address, true);
+    }
+
+    // for test
+    public String transferToken(String network, String token, String address, double amount) {
+        return adminWalletService.withdrawToken(network, token, address, amount);
     }
 }

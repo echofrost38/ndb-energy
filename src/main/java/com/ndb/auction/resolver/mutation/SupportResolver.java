@@ -7,7 +7,6 @@ import com.ndb.auction.payload.RecoveryRequest;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.service.utils.TotpService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -16,19 +15,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
-import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class SupportResolver implements GraphQLMutationResolver {
-    @Autowired
+    
     private MailService mailService;
-    @Autowired
     private UserService userService;
-    @Autowired
-    private TotpService totpService;
+
     @Autowired
 	private MessageSource messageSource;
+
+    @Autowired
+    public SupportResolver(MailService mailService, UserService userService) {
+        this.mailService = mailService;
+        this.userService = userService;
+    }
 
     // Unknown Memo/Tag Recovery
 	@PreAuthorize("isAuthenticated()")
@@ -55,16 +56,13 @@ public class SupportResolver implements GraphQLMutationResolver {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int userId = userDetails.getId();
 		var user = userService.getUserById(userId);
-        
-        // if(!totpService.check2FACode(user.getEmail(), code)) {
-
-        // }
-        
-        if(phone == null || phone.equals("")) {
-            String msg = messageSource.getMessage("no_phone", null, Locale.ENGLISH);
-            throw new UserNotFoundException(msg, "phone");
-        }
-        user.setPhone(phone);
+		if(user.getPhone() == null || user.getPhone().equals("")) {
+			if(phone == null || phone.equals("")) {
+				String msg = messageSource.getMessage("no_phone", null, Locale.ENGLISH);
+				throw new UserNotFoundException(msg, "phone");
+			}
+            user.setPhone(phone);
+		} 
 		return userService.request2FA(user.getEmail(), "phone", user.getPhone());
 	}
 
@@ -75,19 +73,5 @@ public class SupportResolver implements GraphQLMutationResolver {
 		var user = userService.getUserById(userId);
 		return userService.confirmRequest2FA(user.getEmail(), "phone", code);
 	}
-
-    @PreAuthorize("isAuthenticated()")
-    public String sendCode() {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		var email = userDetails.getEmail();
-        var user = userService.getUserByEmail(email);
-        var code = totpService.getWithdrawCode(email);
-        try {
-            mailService.sendVerifyEmail(user, code, "withdraw.ftlh");   
-        } catch (Exception e) {
-            return "Failed";
-        }
-        return email.replaceAll("(?<=.)[^@](?=[^@]*?@)|(?:(?<=@.)|(?!^)\\G(?=[^@]*$)).(?!$)", "*");
-    }
 
 }

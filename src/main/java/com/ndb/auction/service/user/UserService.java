@@ -150,9 +150,10 @@ public class UserService extends BaseService {
 					return qrUri;
 					case "phone":
 					try {
+						var result = smsService.sendSMS(phone, code);
 						userDao.updatePhone(user.getId(), phone);
-						return smsService.sendSMS(phone, code);
-					} catch (IOException | TemplateException e) {
+						return result;
+					} catch (Exception e) {
 						String msg = messageSource.getMessage("error_phone", null, Locale.ENGLISH);
 						throw new UserNotFoundException(msg, "phone");
 					}

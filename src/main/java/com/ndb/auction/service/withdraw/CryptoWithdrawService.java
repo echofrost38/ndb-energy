@@ -27,10 +27,6 @@ public class CryptoWithdrawService extends BaseService implements IWithdrawServi
         return cryptoWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }
 
-    public int updateCryptoWithdrawTxHash(int withdrawId, String hash) {
-        return cryptoWithdrawDao.updateCryptoWithdarwTxHash(withdrawId, hash);
-    }
-
     @Override
     public List<? extends BaseWithdraw> getWithdrawRequestByUser(int userId) {
         return cryptoWithdrawDao.selectByUser(userId);

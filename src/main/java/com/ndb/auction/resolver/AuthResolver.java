@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.OAuth2Setting;
 import com.ndb.auction.models.user.TwoFAEntry;
 import com.ndb.auction.models.user.User;
@@ -214,9 +215,15 @@ public class AuthResolver extends BaseResolver
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	public String confirmGoogleAuthReset(String code) {
+	public String confirmGoogleAuthReset(String googleCode, String mailCode) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int id = userDetails.getId();
-		return userService.confirmGoogleAuthUpdate(id, code);
+
+		if(!totpService.checkVerifyCode(userDetails.getEmail(), mailCode)) {
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "phone");
+        }
+
+		return userService.confirmGoogleAuthUpdate(id, googleCode);
 	}
 }

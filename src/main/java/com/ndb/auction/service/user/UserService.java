@@ -384,7 +384,7 @@ public class UserService extends BaseService {
 
 	public String resetPassword(String email, String code, String newPass) {
 
-		if (totpService.check2FACode(email, code)) {
+		if (totpService.verifyCode(email, code)) {
 			User user = userDao.selectByEmail(email);
 			if (user == null) {
 				String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);

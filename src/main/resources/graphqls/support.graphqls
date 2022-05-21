@@ -11,7 +11,14 @@ extend type Mutation {
     ) : String
     confirmPhone2FA(
         smsCode: String,
-        mailCode: String
+        mailCode: String,
+        token: String
+    ) : String
+    resetGoogleAuthRequest : GAuthResetResponse
+    confirmGoogleAuthReset(
+        googleCode: String,
+        mailCode: String,
+        token: String
     ) : String
 }
 

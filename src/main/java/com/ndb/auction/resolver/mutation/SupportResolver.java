@@ -4,9 +4,14 @@ import java.util.Locale;
 
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.payload.RecoveryRequest;
+import com.ndb.auction.payload.response.GAuthResetResponse;
+import com.ndb.auction.service.auth.AuthResetService;
+import com.ndb.auction.service.auth.PhoneResetService;
+import com.ndb.auction.service.user.UserAuthService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.utils.MailService;
+import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +28,27 @@ import lombok.RequiredArgsConstructor;
 public class SupportResolver implements GraphQLMutationResolver {
     @Autowired
     private MailService mailService;
+    
     @Autowired
     private UserService userService;
+
     @Autowired
-    private TotpService totpService;
+    private UserAuthService userAuthService;
+
     @Autowired
 	private MessageSource messageSource;
+
+    @Autowired
+    private AuthResetService gAuthResetService;
+
+    @Autowired
+    private PhoneResetService phoneResetService;
+
+    @Autowired
+    private TotpService totpService;
+
+    @Autowired
+    private SMSService smsService;
 
     // Unknown Memo/Tag Recovery
 	@PreAuthorize("isAuthenticated()")
@@ -56,17 +76,24 @@ public class SupportResolver implements GraphQLMutationResolver {
 		int userId = userDetails.getId();
 		var user = userService.getUserById(userId);
         
-        
-        if(phone == null || phone.equals("")) {
-            String msg = messageSource.getMessage("no_phone", null, Locale.ENGLISH);
+        var token = phoneResetService.saveNewRequest(userId, phone);
+        if(token.equals("Failed")) {
+            return token;
+        }
+
+        var code = totpService.get2FACode(user.getEmail());
+        try {
+            smsService.sendSMS(phone, code);
+        } catch (Exception e) {
+            e.printStackTrace();
+            String msg = messageSource.getMessage("error_phone", null, Locale.ENGLISH);
             throw new UserNotFoundException(msg, "phone");
         }
-        user.setPhone(phone);
-		return userService.request2FA(user.getEmail(), "phone", user.getPhone());
+        return token;
 	}
     
 	@PreAuthorize("isAuthenticated()")
-	public String confirmPhone2FA(String smsCode, String mailCode) {
+	public String confirmPhone2FA(String smsCode, String mailCode, String token) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var user = userService.getUserById(userId);
@@ -76,7 +103,22 @@ public class SupportResolver implements GraphQLMutationResolver {
             throw new UserNotFoundException(msg, "phone");
         }
 
-		return userService.confirmRequest2FA(user.getEmail(), "phone", smsCode);
+        var phoneResetRequest = phoneResetService.getByUserId(userId, token);
+        if(phoneResetRequest == null) {
+            String msg = messageSource.getMessage("no_request", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "token");
+        }
+
+        if(!totpService.check2FACode(user.getEmail(), smsCode)) {
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "phone");
+        }
+
+		var result = userAuthService.confirmPhone2FA(userId, phoneResetRequest.getPhone());
+        if(result.equals("Success")) {
+            phoneResetService.updateStatus(userId, token, 1);
+        }
+        return result;
 	}
 
     @PreAuthorize("isAuthenticated()")
@@ -92,5 +134,44 @@ public class SupportResolver implements GraphQLMutationResolver {
         }
         return email.replaceAll("(?<=.)[^@](?=[^@]*?@)|(?:(?<=@.)|(?!^)\\G(?=[^@]*$)).(?!$)", "*");
     }
+
+    @PreAuthorize("isAuthenticated()")
+	public GAuthResetResponse resetGoogleAuthRequest() {
+		var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int userId = userDetails.getId();
+		return gAuthResetService.saveNewGAuthRequest(userId, userDetails.getEmail());
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public String confirmGoogleAuthReset(String googleCode, String mailCode, String token) {
+		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int userId = userDetails.getId();
+        String result = "";
+		if(!totpService.checkVerifyCode(userDetails.getEmail(), mailCode)) {
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "phone");
+        }
+
+        // get request
+        var resetRequest = gAuthResetService.getRequestByUser(userId, token);
+        if(resetRequest == null) {
+            String msg = messageSource.getMessage("no_request", null, Locale.ENGLISH);
+            throw new UserNotFoundException(msg, "token");
+        }
+
+        // check google code
+        if(totpService.verifyCode(googleCode, resetRequest.getSecret())) {
+            // passed code
+            // 1) update user security setting
+            result = userAuthService.confirmGoogleAuthUpdate(userId, resetRequest.getSecret());
+            // 2) update request status
+            if(result.equals("Success")) {
+                gAuthResetService.updateRequestStatus(userId, token, 1);
+                return result;
+            }
+        }
+        gAuthResetService.updateRequestStatus(userId, token, 0);
+		return "Failed";
+	}
 
 }

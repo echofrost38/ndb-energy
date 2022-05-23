@@ -5,7 +5,6 @@ import com.ndb.auction.models.BaseModel;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
 public class UserSecurity extends BaseModel {
 
 	public UserSecurity () {

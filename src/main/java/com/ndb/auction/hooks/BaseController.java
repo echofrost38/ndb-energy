@@ -45,6 +45,9 @@ public class BaseController {
     UserAvatarService userAvatarService;
 
     @Autowired
+    UserReferralService userReferralService;
+
+    @Autowired
     UserKybService userKybService;
 
     @Autowired

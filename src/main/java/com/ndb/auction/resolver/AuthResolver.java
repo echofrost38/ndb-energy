@@ -13,8 +13,10 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.payload.Credentials;
+import com.ndb.auction.service.user.UserAuthService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,9 @@ import graphql.kickstart.tools.GraphQLMutationResolver;
 public class AuthResolver extends BaseResolver
 		implements GraphQLMutationResolver {
 	
+	@Autowired
+	private UserAuthService userAuthService;
+	
 	private String lowerEmail(String email) {
 		return email.toLowerCase();
 	}
@@ -36,29 +41,29 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String verifyAccount(String email, String code) {
-		if (userService.verifyAccount(lowerEmail(email), code)) {
+		if (userAuthService.verifyAccount(lowerEmail(email), code)) {
 			return "Success";
 		}
 		return "Failed";
 	}
 
 	public String resendVerifyCode(String email) {
-		return userService.resendVerifyCode(lowerEmail(email));
+		return userAuthService.resendVerifyCode(lowerEmail(email));
 	}
 
 	public String request2FA(String email, String method, String phone) {
-		return userService.request2FA(lowerEmail(email), method, phone);
+		return userAuthService.request2FA(lowerEmail(email), method, phone);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public String disable2FA(String method) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int id = userDetails.getId();
-		return userService.disable2FA(id, method);
+		return userAuthService.disable2FA(id, method);
 	}
 
 	public Credentials confirmRequest2FA(String email, String method, String code) {
-		String result = userService.confirmRequest2FA(lowerEmail(email), method, code);
+		String result = userAuthService.confirmRequest2FA(lowerEmail(email), method, code);
 		if(result.equals("Success")) {
 			String jwt = jwtUtils.generateJwtToken(email);
 			return new Credentials("Success", jwt);
@@ -146,7 +151,7 @@ public class AuthResolver extends BaseResolver
 	}
 
 	public String resetPassword(String email, String code, String newPassword) {
-		return userService.resetPassword(lowerEmail(email), code, newPassword);
+		return userAuthService.resetPassword(lowerEmail(email), code, newPassword);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -204,19 +209,5 @@ public class AuthResolver extends BaseResolver
 		String token = jwtUtils.generateZendeskJwtToken(user);
 
 		return new Credentials("success", token);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public String resetGoogleAuth() {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int id = userDetails.getId();
-		return userService.updateGoogleSecret(id);
-	}
-
-	@PreAuthorize("isAuthenticated()")
-	public String confirmGoogleAuthReset(String code) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		int id = userDetails.getId();
-		return userService.confirmGoogleAuthUpdate(id, code);
 	}
 }

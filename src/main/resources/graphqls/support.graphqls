@@ -5,11 +5,20 @@ extend type Mutation {
         depositAmount: Float,
         txId: String
     ) : String
+    sendVerifyCode : String
     requestPhone2FA(
         phone: String
     ) : String
     confirmPhone2FA(
-        code: String
+        smsCode: String,
+        mailCode: String,
+        token: String
+    ) : String
+    resetGoogleAuthRequest : GAuthResetResponse
+    confirmGoogleAuthReset(
+        googleCode: String,
+        mailCode: String,
+        token: String
     ) : String
 }
 

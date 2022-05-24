@@ -26,8 +26,8 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 import java.text.DecimalFormat;
+
 @Service
 public class NDBCoinService {
 
@@ -59,9 +59,11 @@ public class NDBCoinService {
     private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("600000");
+    private final BigInteger gasLimit = new BigInteger("8000000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    
+    @SuppressWarnings("deprecation")
     @PostConstruct
     public void init() throws IOException {
         Web3j web3j = Web3j.build(new HttpService(bscNetwork));

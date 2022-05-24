@@ -1,37 +1,107 @@
 package com.ndb.auction.service;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.S3Exception;
 import com.ndb.auction.models.SkillSet;
 import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarFacts;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AvatarService extends BaseService {
 
+	private final AmazonS3 s3;
+
+	private static final String bucketName = "nyyu-avatars";
+
+	public AvatarService (AmazonS3 s3) {
+		this.s3 = s3;
+	}
+
+	private String buildAvatarUrl(String groupId, int compId) {
+		return String.format("avatar_comp_%s_%d", groupId, compId);
+	}
+
 	public AvatarComponent createAvatarComponent(String groupId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
 		price = price == null ? 0 : price;
 		AvatarComponent component = new AvatarComponent(groupId, tierLevel, price, limited, svg, width, top, left);
 		AvatarComponent newComponent = avatarComponentDao.createAvatarComponent(component);
+
+		// upload into aws s3 bucket
+		try {
+			// generate input stream from svg string
+			String avatarUrl = buildAvatarUrl(groupId, newComponent.getCompId());
+			InputStream input = IOUtils.toInputStream(svg, StandardCharsets.UTF_8);
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(svg.length());
+			s3.putObject(bucketName, avatarUrl, input, metadata);
+		} catch (Exception e) {
+			// couldn't upload svg into s3
+			e.printStackTrace();
+			throw new S3Exception("Couldn't upload avatar component", "svg");
+		}
 		return newComponent;
 	}
 
 	public List<AvatarComponent> getAvatarComponents() {
-		return avatarComponentDao.getAvatarComponents();
+		var components = avatarComponentDao.getAvatarComponents();
+
+		// download svg from s3
+		for (var component : components) {
+			try {
+				String avatarUrl = buildAvatarUrl(component.getGroupId(), component.getCompId());
+				var svgObject = s3.getObject(bucketName, avatarUrl);
+				var svgStream = svgObject.getObjectContent();
+				var svg = new String(svgStream.readAllBytes(), StandardCharsets.UTF_8);
+				component.setSvg(svg);
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		return components;
 	}
 
 	public List<AvatarComponent> getAvatarComponentsByGroupId(String groupId) {
-		return avatarComponentDao.getAvatarComponentsByGid(groupId);
+		var components = avatarComponentDao.getAvatarComponentsByGid(groupId);
+		// download svg from s3
+		for (var component : components) {
+			try {
+				String avatarUrl = buildAvatarUrl(component.getGroupId(), component.getCompId());
+				var svgObject = s3.getObject(bucketName, avatarUrl);
+				var svgStream = svgObject.getObjectContent();
+				var svg = new String(svgStream.readAllBytes(), StandardCharsets.UTF_8);
+				component.setSvg(svg);
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		return components;
 	}
 
 	public AvatarComponent getAvatarComponent(String groupId, int compId) {
-		return avatarComponentDao.getAvatarComponent(groupId, compId);
+		var component = avatarComponentDao.getAvatarComponent(groupId, compId);
+		try {
+			String avatarUrl = buildAvatarUrl(component.getGroupId(), component.getCompId());
+			var svgObject = s3.getObject(bucketName, avatarUrl);
+			var svgStream = svgObject.getObjectContent();
+			var svg = new String(svgStream.readAllBytes(), StandardCharsets.UTF_8);
+			component.setSvg(svg);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new S3Exception("cannot download svg from s3", "svg");
+		}
+		return component;
 	}
 
 	public AvatarComponent updateAvatarComponent(String groupId, int compId, Integer tierLevel, Double price, Integer limited, String svg, int width, int top, int left) {
@@ -50,6 +120,20 @@ public class AvatarService extends BaseService {
 		component.setWidth(width);
 		component.setTop(top);
 		component.setLeft(left);
+
+		// upload into aws s3 bucket
+		try {
+			// generate input stream from svg string
+			String avatarUrl = buildAvatarUrl(groupId, compId);
+			InputStream input = IOUtils.toInputStream(svg, StandardCharsets.UTF_8);
+			ObjectMetadata metadata = new ObjectMetadata();
+			metadata.setContentLength(svg.length());
+			s3.putObject(bucketName, avatarUrl, input, metadata);
+		} catch (Exception e) {
+			// couldn't upload svg into s3
+			e.printStackTrace();
+			throw new S3Exception("Couldn't upload avatar component", "svg");
+		}
 		
 		return avatarComponentDao.updateAvatarComponent(component);
 	}
@@ -146,11 +230,37 @@ public class AvatarService extends BaseService {
 	}
 
 	public List<AvatarComponent> getAvatarComponentsBySet(List<AvatarSet> set) {
-		return avatarComponentDao.getAvatarComponentsBySet(set);
+		var components = avatarComponentDao.getAvatarComponentsBySet(set);
+		// download svg from s3
+		for (var component : components) {
+			try {
+				String avatarUrl = buildAvatarUrl(component.getGroupId(), component.getCompId());
+				var svgObject = s3.getObject(bucketName, avatarUrl);
+				var svgStream = svgObject.getObjectContent();
+				var svg = new String(svgStream.readAllBytes(), StandardCharsets.UTF_8);
+				component.setSvg(svg);
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		return components;
 	}
 
 	public List<AvatarComponent> getAvatarComponentsById(String groupId) {
-		return avatarComponentDao.getAvatarComponentsByGid(groupId);
+		var components = avatarComponentDao.getAvatarComponentsByGid(groupId);
+		// download svg from s3
+		for (var component : components) {
+			try {
+				String avatarUrl = buildAvatarUrl(component.getGroupId(), component.getCompId());
+				var svgObject = s3.getObject(bucketName, avatarUrl);
+				var svgStream = svgObject.getObjectContent();
+				var svg = new String(svgStream.readAllBytes(), StandardCharsets.UTF_8);
+				component.setSvg(svg);
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		return components;
 	}
 
 	public List<AvatarSet> getAvatarSetById(int profileId) {

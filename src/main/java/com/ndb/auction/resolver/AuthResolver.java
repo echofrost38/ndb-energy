@@ -31,8 +31,8 @@ public class AuthResolver extends BaseResolver
 		return email.toLowerCase();
 	}
 	
-	public String signup(String email, String password, String country,String referredByCode) {
-		return userService.createUser(lowerEmail(email), password, country,referredByCode);
+	public String signup(String email, String password, String country) {
+		return userService.createUser(lowerEmail(email), password, country);
 	}
 
 	public String verifyAccount(String email, String code) {
@@ -190,16 +190,6 @@ public class AuthResolver extends BaseResolver
 				clientName);
 		return oAuth2RegistrationService.createRegistration(registration);
 	}
-
-	// public String addNewUser(int id, String email, String name) {
-	// 	TransactionReceipt receipt = userWalletService.addNewUser(id, lowerEmail(email), name);
-	// 	return receipt.getLogs().get(0).getData();
-	// }
-
-	// public String addHoldAmount(int id, String crypto, Long amount) {
-	// 	TransactionReceipt receipt = userWalletService.addHoldAmount(id, crypto, amount);
-	// 	return receipt.getLogs().get(0).getData();
-	// }
 
 	// For Zendesk SSO
 	@PreAuthorize("isAuthenticated()")

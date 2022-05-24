@@ -22,7 +22,6 @@ import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.BaseService;
 
-import com.ndb.auction.utils.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,13 +38,8 @@ public class UserService extends BaseService {
 
 	@Autowired
 	PasswordEncoder encoder;
-	private final RandomStringGenerator stringGenerator;
 
-	public UserService(RandomStringGenerator stringGenerator) {
-		this.stringGenerator = stringGenerator;
-	}
-
-	public String createUser(String email, String password, String country,String referredByCode) {
+	public String createUser(String email, String password, String country) {
 		User user = userDao.selectEntireByEmail(email);
 		if (user != null) {
 			if(user.getDeleted() == 0){
@@ -64,28 +58,13 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-			user = userDao.selectByEmail(email);
-			UserReferral referral = new UserReferral();
-			referral.setId(user.getId());
-			referral.setReferralCode(generateCode());
-			if (userReferralDao.existsUserByReferralCode(referredByCode)==1)
-				referral.setReferredByCode(referredByCode);
 
-			userReferralDao.insert(referral);
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);
 		}
 		sendEmailCode(user, VERIFY_TEMPLATE);
 		return "Success";
-	}
-	private String generateCode() {
-		String generated = "";
-		do {
-			generated = stringGenerator.generate();
-		} while (userReferralDao.existsUserByReferralCode(generated)==1);
-
-		return generated;
 	}
 
 	public boolean verifyAccount(String email, String code) {
@@ -171,10 +150,12 @@ public class UserService extends BaseService {
 					return qrUri;
 					case "phone":
 					try {
+						var result = smsService.sendSMS(phone, code);
 						userDao.updatePhone(user.getId(), phone);
-						return smsService.sendSMS(phone, code);
-					} catch (IOException | TemplateException e) {
-						return "error";
+						return result;
+					} catch (Exception e) {
+						String msg = messageSource.getMessage("error_phone", null, Locale.ENGLISH);
+						throw new UserNotFoundException(msg, "phone");
 					}
 					case "email":
 					try {
@@ -411,7 +392,8 @@ public class UserService extends BaseService {
 			}
 			userDao.updatePassword(user.getId(), encoder.encode(newPass));
 		} else {
-			return "Failed";
+			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+			throw new UserNotFoundException(msg, "code");
 		}
 
 		return "Success";
@@ -446,6 +428,10 @@ public class UserService extends BaseService {
         }
 	}
 
+	public int updatePhone(int userId, String phone) {
+		return userDao.updatePhone(userId, phone);
+	}
+
 	public String changeName(int id, String newName) {
 		if(userAvatarDao.changeName(id, newName) > 0)
 			return "Success";
@@ -468,7 +454,7 @@ public class UserService extends BaseService {
 		user.setAvatar(userAvatarDao.selectById(id));
 		user.setSecurity(userSecurityDao.selectByUserId(id));
 		user.setVerify(userVerifyDao.selectById(id));
-		user.setReferral(userReferralDao.selectById(id));
+
 		return user;
 	}
 
@@ -666,5 +652,4 @@ public class UserService extends BaseService {
 		}
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
-
 }

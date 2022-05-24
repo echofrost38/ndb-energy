@@ -110,9 +110,6 @@ public class BaseService {
     public UserAvatarDao userAvatarDao;
 
     @Autowired
-    public UserReferralDao userReferralDao;
-
-    @Autowired
     public UserKybDao userKybDao;
 
     @Autowired

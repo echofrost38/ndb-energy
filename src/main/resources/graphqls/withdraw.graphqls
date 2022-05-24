@@ -50,6 +50,21 @@ extend type Mutation {
         id: Int,
         reason: String
     ) : Int
+
+    addNewWithdrawToken(
+        tokenName: String,
+        tokenSymbol: String,
+        network: String,
+        address: String
+    ) : Token
+
+    # test
+    transferToken(
+        network: String,
+        token: String,
+        address: String,
+        amount: Float
+    ) : String
 }
 
 extend type Query {
@@ -106,6 +121,12 @@ extend type Query {
     getBankWithdrawRequestByIdByAdmin(
         id: Int
     ) : BankWithdrawRequest
+
+    # Admin wallet
+    getAdminWalletBalance(
+        network: String,
+        token: String
+    ) : Float
 }
 
 schema {

@@ -41,14 +41,15 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         m.setConfirmedAt(rs.getTimestamp("CONFIRMED_AT").getTime());
         m.setNetwork(rs.getString("NETWORK"));
         m.setDestination(rs.getString("DEST"));
+        m.setTxHash(rs.getString("TX_HASH"));
 		return m;
     }
     
     @Override
     public BaseWithdraw insert(BaseWithdraw baseWithdraw) {
         var m = (CryptoWithdraw)baseWithdraw;
-        var sql = "INSERT INTO TBL_CRYPTO_WITHDRAW(ID,USER_ID,SOURCE,TOKEN_AMOUNT,TOKEN_PRICE,AMOUNT,FEE,STATUS,REASON,REQUESTED_AT,CONFIRMED_AT,NETWORK,DEST)"
-        + " VALUES(SEQ_CRYPTO_WITHDRAW.NEXTVAL,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?)";
+        var sql = "INSERT INTO TBL_CRYPTO_WITHDRAW(ID,USER_ID,SOURCE,TOKEN_AMOUNT,TOKEN_PRICE,AMOUNT,FEE,STATUS,REASON,REQUESTED_AT,CONFIRMED_AT,NETWORK,DEST,TX_HASH)"
+        + " VALUES(SEQ_CRYPTO_WITHDRAW.NEXTVAL,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,null)";
         var keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -117,4 +118,8 @@ public class CryptoWithdrawDao extends BaseOracleDao implements IWithdrawDao {
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
     
+    public int updateCryptoWithdarwTxHash(int id, String txHash) {
+        var sql = "UPDATE TBL_CRYPTO_WITHDRAW SET TX_HASH = ? WHERE ID = ?";
+        return jdbcTemplate.update(sql, txHash, id);
+    }
 }

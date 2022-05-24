@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.google.gson.reflect.TypeToken;
 import com.ndb.auction.exceptions.AuctionException;
-import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
@@ -335,7 +334,6 @@ public class BidService extends BaseService {
 
 			Bid bid = iterator.next();
 			int userId = bid.getUserId();
-			Boolean captureError = false;
 			// check bid status 
 			// A) if winner 
 			if(bid.getStatus() == Bid.WINNER) {
@@ -347,7 +345,6 @@ public class BidService extends BaseService {
 						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
 						intent.capture();
 					} catch (Exception e) {
-						captureError = true;
 						break;
 					}
 				}
@@ -362,7 +359,6 @@ public class BidService extends BaseService {
 					// deduct hold value
 					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
 					if(tokenId == null) {
-						captureError = true;
 						break;
 					}
 					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
@@ -413,7 +409,6 @@ public class BidService extends BaseService {
 						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
 						intent.cancel();
 					} catch (Exception e) {
-						captureError = true;
 						break;
 					}
 				}
@@ -428,7 +423,6 @@ public class BidService extends BaseService {
 					// deduct hold value
 					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
 					if(tokenId == null) {
-						captureError = true;
 						break;
 					}
 					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);

@@ -15,4 +15,5 @@ public class Transaction {
     protected Long createdAt;
     protected Long confirmedAt;
     protected Boolean status;
+    protected Boolean isShow;
 }

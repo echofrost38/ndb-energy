@@ -4,10 +4,12 @@ extend type Query {
         orderBy: String
     ) : [PaypalDepositTransaction]
     getPaypalDepositTxnsByUser(
-        orderBy: String
+        orderBy: String,
+        status: Int
     ) : [PaypalDepositTransaction]
     getPaypalDepositTxnById(
-        id: Int
+        id: Int,
+        status: Int
     ) : PaypalDepositTransaction
 
     # bank deposit queries
@@ -15,10 +17,12 @@ extend type Query {
         orderBy: String
     ) : [BankDepositTransaction]
     getBankDepositTxnsByUser(
-        orderBy: String
+        orderBy: String,
+        status: Int
     ) : [BankDepositTransaction]
     getBankDepositTxnById(
-        id: Int
+        id: Int,
+        status: Int
     ) : BankDepositTransaction
     getBankDepositTxnByIdByAdmin(
         id: Int
@@ -37,6 +41,10 @@ extend type Mutation {
     captureOrderForDeposit(
         orderId: String
     ) : Boolean
+    changePayPalDepositShowStatus(
+        id: Int,
+        status: Int
+    ) : Int
     
     # stripe deposit
     stripeForDeposit(
@@ -48,6 +56,10 @@ extend type Mutation {
         paymentMethodId: String,
         isSaveCard: Boolean
     ) : PayResponse
+    changeStripeDepositShowStatus(
+        id: Int,
+        status: Int
+    ) : Int
 
     stripeForDepositWithSavedCard(
         amount: Float,
@@ -66,4 +78,8 @@ extend type Mutation {
         amount: Float,
         cryptoType: String
     ) : BankDepositTransaction
+    changeBankDepositShowStatus(
+        id: Int,
+        status: Int
+    ) : Int
 }

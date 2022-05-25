@@ -103,7 +103,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
-        var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
+        var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
         var tokenSymbol = request.getSourceToken();
         var tokenAmount = request.getTokenAmount();
 
@@ -157,16 +157,16 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<CryptoWithdraw> getCryptoWithdrawByUser() {
+    public List<CryptoWithdraw> getCryptoWithdrawByUser(int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
+        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId, showStatus);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByUserByAdmin(int userId) {
-        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
+        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId, 1);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -196,17 +196,17 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw getCryptoWithdrawById(int id) {
+    public CryptoWithdraw getCryptoWithdrawById(int id, int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
+        var m = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, showStatus);
         if(m.getUserId() != userId) return null;
         return m;
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public CryptoWithdraw getCryptoWithdrawByIdByAdmin(int id) {
-        return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
+        return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
     }
     ////////////////////////////////// ADMIN WALLET
 
@@ -220,8 +220,10 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return tokenService.addNewToken(tokenName, tokenSymbol, network, address, true);
     }
 
-    // for test
-    public String transferToken(String network, String token, String address, double amount) {
-        return adminWalletService.withdrawToken(network, token, address, amount);
+    @PreAuthorize("isAuthenticated()")
+    public int changeCryptoWithdrawShowStatus(int id, int showStatus) {
+        return cryptoWithdrawService.changeShowStatus(id, showStatus);
     }
+
+
 }

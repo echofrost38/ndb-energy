@@ -313,7 +313,7 @@ public class CryptoController extends BaseController {
 		log.info("IPN status : {}", status);
 		if (status >= 100 || status == 2) {
             
-            CoinpaymentWalletTransaction txn = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
+            CoinpaymentWalletTransaction txn = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id, 1);
             if(txn == null) {
                 log.error("txn is null");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 

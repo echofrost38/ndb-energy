@@ -15,7 +15,12 @@ public class BankDepositTransaction extends FiatDepositTransaction{
     private String uid;
     private int bankDetailId;
 
+    private String cryptoType;
+    private double cryptoPrice;
+
     private double usdAmount;
+    private double fee;
+    private double deposited;
 
     public BankDepositTransaction (
         int userId,

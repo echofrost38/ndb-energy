@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class PaypalWithdrawService extends BaseService implements IWithdrawService {
+public class PaypalWithdrawService extends BaseService {
 
     private final PaypalHttpClient payPalHttpClient;
     private ObjectMapper mapper = new ObjectMapper();
@@ -34,17 +34,15 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
 		this.payPalHttpClient = payPalHttpClient;
 	}
 
-    @Override
     public BaseWithdraw createNewWithdrawRequest(BaseWithdraw baseWithdraw) {
         var m = (PaypalWithdraw)baseWithdraw;
         return paypalWithdrawDao.insert(m);
     }
 
-    @Override
     public int confirmWithdrawRequest(int requestId, int status, String reason) throws Exception {
         
         // check status 
-        var m = (PaypalWithdraw)paypalWithdrawDao.selectById(requestId);
+        var m = (PaypalWithdraw)paypalWithdrawDao.selectById(requestId, 1);
         if(status == BaseWithdraw.APPROVE) {
             // approve withdraw money
             
@@ -101,12 +99,10 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
         return paypalWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }
 
-    @Override
-    public List<? extends BaseWithdraw> getWithdrawRequestByUser(int userId) {
-        return paypalWithdrawDao.selectByUser(userId);
+    public List<? extends BaseWithdraw> getWithdrawRequestByUser(int userId, int showStatus) {
+        return paypalWithdrawDao.selectByUser(userId, showStatus);
     }
 
-    @Override
     public List<? extends BaseWithdraw> getWithdrawRequestByStatus(int userId, int status) {
         return paypalWithdrawDao.selectByStatus(userId, status);
     }
@@ -115,7 +111,6 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
         return paypalWithdrawDao.selectAll();
     }
 
-    @Override
     public List<? extends BaseWithdraw> getAllPendingWithdrawRequests() {
         return paypalWithdrawDao.selectPendings();
     }
@@ -124,13 +119,12 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
         return paypalWithdrawDao.selectPendings(userId);
     }
 
-    @Override
-    public BaseWithdraw getWithdrawRequestById(int id) {
-        return paypalWithdrawDao.selectById(id);
+    public BaseWithdraw getWithdrawRequestById(int id, int showStatus) {
+        return paypalWithdrawDao.selectById(id, showStatus);
     }
 
-    public BaseWithdraw getWithdrawRequestById(int id, int userId) {
-        return paypalWithdrawDao.selectById(id, userId);
+    public BaseWithdraw getWithdrawRequestById(int id, int userId, int showStatus) {
+        return paypalWithdrawDao.selectByUserId(id, userId, showStatus);
     }
 
     public PaypalWithdraw getWithdrawByPayoutId(String payoutId) {
@@ -144,6 +138,10 @@ public class PaypalWithdrawService extends BaseService implements IWithdrawServi
 
     private String generateItemId(PaypalWithdraw m) {
         return String.format("ndb-withdraw-item-%d", m.getId());
+    }
+
+    public int changeShowStatus(int id, int status) {
+        return paypalWithdrawDao.changeShowStatus(id, status);
     }
     
 }

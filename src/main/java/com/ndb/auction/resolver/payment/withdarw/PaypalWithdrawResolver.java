@@ -136,16 +136,16 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<PaypalWithdraw> getPaypalWithdrawByUser() {
+    public List<PaypalWithdraw> getPaypalWithdrawByUser(int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
+        return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId, showStatus);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<PaypalWithdraw> getPaypalWithdrawByUserByAdmin(int userId) {
-        return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId);
+        return (List<PaypalWithdraw>) paypalWithdrawService.getWithdrawRequestByUser(userId, 1);
     }
 
 
@@ -176,14 +176,19 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PaypalWithdraw getPaypalWithdrawById(int id) {
+    public PaypalWithdraw getPaypalWithdrawById(int id, int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, userId);
+        return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, userId, showStatus);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public PaypalWithdraw getPaypalWithdrawByIdByAdmin(int id) {
-        return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id);
+        return (PaypalWithdraw) paypalWithdrawService.getWithdrawRequestById(id, 1);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public int changePayPalWithdrawShowStatus(int id, int showStatus) {
+        return paypalWithdrawService.changeShowStatus(id, showStatus);
     }
 }

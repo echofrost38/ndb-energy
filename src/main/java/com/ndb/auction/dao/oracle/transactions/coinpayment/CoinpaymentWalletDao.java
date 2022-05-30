@@ -10,6 +10,7 @@ import java.util.List;
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.dao.oracle.transactions.ICryptoDepositTransactionDao;
+import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.CryptoDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Repository
 @NoArgsConstructor
 @Table(name = "TBL_COINPAYMENT_WALLET")
-public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDepositTransactionDao {
+public class CoinpaymentWalletDao extends BaseOracleDao implements ITransactionDao, ICryptoDepositTransactionDao {
 
     private static CoinpaymentWalletTransaction extract(ResultSet rs) throws SQLException {
 		CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction();
@@ -40,7 +41,6 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDeposi
 		m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
         m.setDepositAddress(rs.getString("DEPOSIT_ADDR"));
         m.setCoin(rs.getString("COIN"));
-        m.setIsShow(rs.getBoolean("IS_SHOW"));
 		return m;
 	}
 
@@ -56,10 +56,11 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDeposi
         return null;
     }
 
+    @Override
     public Transaction insert(Transaction _m) {
         CoinpaymentWalletTransaction m = (CoinpaymentWalletTransaction)_m;
-        String sql = "INSERT INTO TBL_COINPAYMENT_WALLET(ID,USER_ID,AMOUNT,FEE,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN, IS_SHOW)"
-				+ " VALUES(SEQ_COINPAY_WALLET.NEXTVAL,?,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?,1)";
+        String sql = "INSERT INTO TBL_COINPAYMENT_WALLET(ID,USER_ID,AMOUNT,FEE,CREATED_AT,STATUS,CRYPTO_TYPE,NETWORK,CRYPTO_AMOUNT,UPDATED_AT,DEPOSIT_ADDR,COIN)"
+				+ " VALUES(SEQ_COINPAY_WALLET.NEXTVAL,?,?,?,SYSDATE,0,?,?,?,SYSDATE,?,?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(
             new PreparedStatementCreator() {
@@ -83,6 +84,7 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDeposi
 		return m;
     }
 
+    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_WALLET";
 		if (orderBy == null)
@@ -91,23 +93,26 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDeposi
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
-    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
+    @Override
+    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_WALLET WHERE USER_ID = ?";
 		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
-		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
+		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
-    public Transaction selectById(int id, int status) {
+    @Override
+    public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_COINPAYMENT_WALLET WHERE ID=?";
 		return jdbcTemplate.query(sql, rs -> {
 			if (!rs.next())
 				return null;
 			return extract(rs);
-		}, id, status);
+		}, id);
     }
 
+    @Override
     public int update(int id, int status) {
         String sql = "UPDATE TBL_COINPAYMENT_WALLET SET STATUS=?, UPDATED_AT=SYSDATE WHERE ID=?";
 		return jdbcTemplate.update(sql, status, id);
@@ -128,8 +133,4 @@ public class CoinpaymentWalletDao extends BaseOracleDao implements ICryptoDeposi
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
     }
 
-    public int changeShowStatus(int id, int status) {
-        var sql = "UPDATE TBL_COINPAYMENT_WALLET SET IS_SHOW = ? WHERE ID = ?";
-        return jdbcTemplate.update(sql, status, id);
-    }
 }

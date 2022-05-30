@@ -11,5 +11,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CoinpaymentTransaction extends CryptoDepositTransaction {
     protected String coin;
-    protected Double fee;
 }

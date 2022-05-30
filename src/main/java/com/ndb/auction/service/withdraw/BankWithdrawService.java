@@ -43,20 +43,19 @@ public class BankWithdrawService extends BaseService{
         return bankWithdrawDao.selectAll();
     }
 
-    public List<BankWithdrawRequest> getRequestsByUser(int userId, int status) {
-        return bankWithdrawDao.selectByUser(userId, status);
+    public List<BankWithdrawRequest> getRequestsByUser(int userId) {
+        return bankWithdrawDao.selectByUser(userId);
     }
 
-    public BankWithdrawRequest getRequestById(int id, int status) {
-        return bankWithdrawDao.selectById(id, status);
+    public BankWithdrawRequest getRequestById(int id) {
+        return bankWithdrawDao.selectById(id);
     }
 
     public int approveRequest(int id) {
         int result = bankWithdrawDao.approveRequest(id);
         if(result == 1) {
             // success
-            // ignore show status
-            var request = bankWithdrawDao.selectById(id, 1);
+            var request = bankWithdrawDao.selectById(id);
             var tokenId = tokenAssetService.getTokenIdBySymbol(request.getSourceToken());
 
             // get free balance
@@ -83,7 +82,7 @@ public class BankWithdrawService extends BaseService{
         int result = bankWithdrawDao.denyRequest(id, reason);
         if(result == 1) {
             // success
-            var request = bankWithdrawDao.selectById(id, 1);
+            var request = bankWithdrawDao.selectById(id);
             notificationService.sendNotification(
                     request.getUserId(),
                     Notification.PAYMENT_RESULT,
@@ -93,10 +92,6 @@ public class BankWithdrawService extends BaseService{
         } else {
             return result;
         }
-    }
-
-    public int changeShowStatus(int id, int showStatus) {
-        return bankWithdrawDao.changeShowStatus(id, showStatus);
     }
 
 }

@@ -65,7 +65,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
         return stripeDepositService.createDepositWithSavedCard(m, customer);
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPER')")
+    @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
     public List<StripeDepositTransaction> getStripeDepositTx(String orderBy) {
         return (List<StripeDepositTransaction>) stripeDepositService.selectAll(orderBy);
@@ -73,32 +73,20 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<StripeDepositTransaction> getStripeDepositTxByUser(String orderBy, int status) {
+    public List<StripeDepositTransaction> getStripeDepositTxByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy, status);
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<StripeDepositTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
-        // admin will get all transactions by default
-        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy, 1);
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public StripeDepositTransaction getStripeDepositTxById(int id, int status) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        var tx = (StripeDepositTransaction) stripeDepositService.selectById(id, status);
-        if(tx.getUserId() == userId) {
-            return tx;
-        }
-        return null;
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changeStripeDepositShowStatus(int id, int status) {
-        return stripeDepositService.changeShowStatus(id, status);
+    public StripeDepositTransaction getStripeDepositTxById(int id) {
+        return (StripeDepositTransaction) stripeDepositService.selectById(id);
     }
 }

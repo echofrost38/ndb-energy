@@ -19,11 +19,6 @@ public class StripeDepositTransaction extends FiatDepositTransaction {
     protected String paymentMethodId;
     protected String paymentIntentId;
 
-    private String cryptoType;
-    private Double cryptoPrice;
-    private Double fee;
-    private Double deposited;
-
     public StripeDepositTransaction(int userId, Double usdAmount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId, String paymentMethodId) {
         if (fiatType == null) {
             fiatType = "USD";

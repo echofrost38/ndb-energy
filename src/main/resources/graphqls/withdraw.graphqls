@@ -13,10 +13,6 @@ extend type Mutation {
         status: Int,
         deniedReason: String
     ) : Int
-    changePayPalWithdrawShowStatus(
-        id: Int,
-        showStatus: Int
-    ) : Int
 
     # Crypto mutation
     cryptoWithdrawRequest(
@@ -31,10 +27,7 @@ extend type Mutation {
         status: Int,
         deniedReason: String
     ) : Int
-    changeCryptoWithdrawShowStatus(
-        id: Int,
-        showStatus: Int
-    ) : Int
+
     # Bank withdraw
     bankWithdrawRequest(
         targetCurrency: String,
@@ -57,10 +50,6 @@ extend type Mutation {
         id: Int,
         reason: String
     ) : Int
-    changeBankWithdrawShowStatus(
-        id: Int,
-        showStatus: Int
-    ) : Int
 
     addNewWithdrawToken(
         tokenName: String,
@@ -69,13 +58,18 @@ extend type Mutation {
         address: String
     ) : Token
 
+    # test
+    transferToken(
+        network: String,
+        token: String,
+        address: String,
+        amount: Float
+    ) : String
 }
 
 extend type Query {
     # PayPal Queries
-    getPaypalWithdrawByUser(
-        showStatus: Int
-    ) : [PaypalWithdraw]
+    getPaypalWithdrawByUser : [PaypalWithdraw]
     getPaypalWithdrawByUserByAdmin(
         userId: Int
     ) : [PaypalWithdraw]
@@ -86,8 +80,7 @@ extend type Query {
     getPaypalPendingWithdrawRequests : [PaypalWithdraw]
     getPaypalPendingWithdrawRequestsByAdmin : [PaypalWithdraw]
     getPaypalWithdrawById(
-        id: Int,
-        showStatus: Int
+        id: Int
     ) : PaypalWithdraw
     getPaypalWithdrawByIdByAdmin(
         id: Int
@@ -96,9 +89,7 @@ extend type Query {
 
 
     # Crypto queries
-    getCryptoWithdrawByUser(
-        showStatus: Int
-    ) : [CryptoWithdraw]
+    getCryptoWithdrawByUser : [CryptoWithdraw]
     getCryptoWithdrawByUserByAdmin(
         userId: Int
     ) : [CryptoWithdraw]
@@ -111,8 +102,7 @@ extend type Query {
     ) : [CryptoWithdraw]
     getCryptoPendingWithdrawRequests : [CryptoWithdraw]
     getCryptoWithdrawById(
-        id: Int,
-        showStatus: Int
+        id: Int
     ) : CryptoWithdraw
     getAllCryptoWithdraws : [CryptoWithdraw]
     getCryptoWithdrawByIdByAdmin(
@@ -123,13 +113,10 @@ extend type Query {
     getPendingBankWithdrawRequests : [BankWithdrawRequest]
     getAllApprovedBankWithdrawRequests : [BankWithdrawRequest]
     getAllDeniedBankWithdrawRequests : [BankWithdrawRequest]
-    getBankWithdrawRequests(
-        showStatus: Int
-    ) : [BankWithdrawRequest]
+    getBankWithdrawRequests : [BankWithdrawRequest]
     getBankWithdrawRequestsByAdmin : [BankWithdrawRequest]
     getBankWithdrawRequestById(
-        id: Int,
-        showStatus: Int
+        id: Int
     ) : BankWithdrawRequest
     getBankWithdrawRequestByIdByAdmin(
         id: Int

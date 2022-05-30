@@ -35,7 +35,6 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
         m.setCryptoPrice(rs.getDouble("CRYPTO_PRICE"));
         m.setFee(rs.getDouble("FEE"));
         m.setDeposited(rs.getDouble("DEPOSITED"));
-        m.setIsShow(rs.getBoolean("IS_SHOW"));
         return m;
     }
 
@@ -51,8 +50,8 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
 
     public int insert(Transaction _m) {
         StripeDepositTransaction m = (StripeDepositTransaction) _m;
-        String sql = "INSERT INTO TBL_STRIPE_DEPOSIT(ID,USER_ID,USD_AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,INTENT_ID,METHOD_ID,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED,IS_SHOW)"
-                + " VALUES(SEQ_STRIPE_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?,1)";
+        String sql = "INSERT INTO TBL_STRIPE_DEPOSIT(ID,USER_ID,USD_AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,INTENT_ID,METHOD_ID,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
+                + " VALUES(SEQ_STRIPE_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,?)";
 
         return jdbcTemplate.update(sql, m.getUserId(), m.getAmount(), m.getStatus(), m.getFiatType(),
                 m.getFiatAmount(), m.getPaymentIntentId(), m.getPaymentMethodId(),
@@ -66,34 +65,29 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
         sql += " ORDER BY " + orderBy;
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));    }
 
-    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
-        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE USER_ID = ? AND IS_SHOW = ?";
+    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
+        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE USER_ID = ?";
         if (orderBy == null)
             orderBy = "ID";
         sql += " ORDER BY " + orderBy;
-        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
-    public Transaction selectById(int id, int status) {
-        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE ID=? AND IS_SHOW = ?";
+    public Transaction selectById(int id) {
+        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE ID=?";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
             return extract(rs);
-        }, id, status);    }
+        }, id);    }
 
     public int update(int id, int status) {
         return 0;
     }
 
     public List<StripeDepositTransaction> selectRange(int userId, long from, long to) {
-        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? AND IS_SHOW = 1 ORDER BY ID DESC";
+        String sql = "SELECT * FROM TBL_STRIPE_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
-    }
-
-    public int changeShowStatus(int id, int status) {
-        var sql = "UPDATE TBL_STRIPE_DEPOSIT IS_SHOW = ? WHERE ID = ?";
-        return jdbcTemplate.update(sql, status, id);
     }
 
 }

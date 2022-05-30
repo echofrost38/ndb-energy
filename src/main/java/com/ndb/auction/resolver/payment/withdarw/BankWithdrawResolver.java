@@ -131,7 +131,7 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<BankWithdrawRequest> getBankWithdrawRequests(int showStatus) {
+    public List<BankWithdrawRequest> getBankWithdrawRequestsByUser(int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return bankWithdrawService.getRequestsByUser(userId, showStatus);

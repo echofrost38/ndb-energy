@@ -41,7 +41,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectAll(orderBy);
     }
 
-    @PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByUser(String orderBy, int showStatus) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();

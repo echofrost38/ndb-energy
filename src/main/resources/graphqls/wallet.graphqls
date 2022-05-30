@@ -7,7 +7,7 @@ extend type Query {
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByUser(
         orderBy: String,
-        status: Int
+        showStatus: Int
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByAdmin(
         userId: Int,
@@ -15,7 +15,7 @@ extend type Query {
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxById(
         id: Int,
-        status: Int
+        showStatus: Int
     ) : CoinpaymentWalletTransaction
 
     # Get Stripe Transaction for deposit
@@ -24,7 +24,7 @@ extend type Query {
     ) : [StripeDepositTransaction]
     getStripeDepositTxByUser(
         orderBy: String,
-        status: Int
+        showStatus: Int
     ) : [StripeDepositTransaction]
     getStripeDepositTxByAdmin(
         userId: Int,
@@ -32,7 +32,7 @@ extend type Query {
     ) : [StripeDepositTransaction]
     getStripeDepositTxById(
         id: Int,
-        status: Int
+        showStatus: Int
     ) : StripeDepositTransaction
 }
 
@@ -44,7 +44,7 @@ extend type Mutation {
     ) : CoinpaymentWalletTransaction
     changeCoinpaymentDepositShowStatus(
         id: Int,
-        status: Int
+        showStatus: Int
     ) : Int
 #    withdrawCrypto(
 #        to: String,

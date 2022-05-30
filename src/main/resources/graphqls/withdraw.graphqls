@@ -123,7 +123,7 @@ extend type Query {
     getPendingBankWithdrawRequests : [BankWithdrawRequest]
     getAllApprovedBankWithdrawRequests : [BankWithdrawRequest]
     getAllDeniedBankWithdrawRequests : [BankWithdrawRequest]
-    getBankWithdrawRequests(
+    getBankWithdrawRequestsByUser(
         showStatus: Int
     ) : [BankWithdrawRequest]
     getBankWithdrawRequestsByAdmin : [BankWithdrawRequest]

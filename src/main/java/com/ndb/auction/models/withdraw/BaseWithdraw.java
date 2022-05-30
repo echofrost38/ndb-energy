@@ -30,7 +30,6 @@ public class BaseWithdraw {
     // pending  : 1
     // approved : 2
     protected int status; 
-    protected boolean isShow;
 
     protected String deniedReason;
 

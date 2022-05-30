@@ -43,32 +43,26 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByUser(String orderBy, int showStatus) {
+    public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy, showStatus);
+        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByAdmin(int userId, String orderBy) {
-        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy, 1);
+        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public CoinpaymentWalletTransaction getCoinpaymentDepositTxById(int id, int showStatus) {
+    public CoinpaymentWalletTransaction getCoinpaymentDepositTxById(int id) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id, showStatus);
+        var m = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
         if(m.getUserId() != userId) {
             throw new UnauthorizedException("You have no permission.", "id");
         }
         return m;
     }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changeCoinpaymentDepositShowStatus(int id, int showStatus) {
-        return coinpaymentWalletService.changeShowStatus(id, showStatus);
-    }
-
 }

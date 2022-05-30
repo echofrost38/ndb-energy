@@ -17,7 +17,7 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 import com.ndb.auction.service.withdraw.TokenService;
-import com.ndb.auction.web3.WithdrawWalletService;
+import com.ndb.auction.web3.CryptoWithdrawalService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +36,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 	protected CryptoWithdrawService cryptoWithdrawService;
 
     @Autowired
-    protected WithdrawWalletService adminWalletService;
+    protected CryptoWithdrawalService adminWalletService;
 
     @Autowired
     private TotpService totpService;
@@ -103,7 +103,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
-        var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
+        var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
         var tokenSymbol = request.getSourceToken();
         var tokenAmount = request.getTokenAmount();
 
@@ -157,16 +157,16 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<CryptoWithdraw> getCryptoWithdrawByUser(int showStatus) {
+    public List<CryptoWithdraw> getCryptoWithdrawByUser() {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId, showStatus);
+        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @SuppressWarnings("unchecked")
     public List<CryptoWithdraw> getCryptoWithdrawByUserByAdmin(int userId) {
-        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId, 1);
+        return (List<CryptoWithdraw>) cryptoWithdrawService.getWithdrawRequestByUser(userId);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -196,17 +196,17 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     }
 
     @PreAuthorize("isAuthenticated()")
-    public CryptoWithdraw getCryptoWithdrawById(int id, int showStatus) {
+    public CryptoWithdraw getCryptoWithdrawById(int id) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, showStatus);
+        var m = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
         if(m.getUserId() != userId) return null;
         return m;
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public CryptoWithdraw getCryptoWithdrawByIdByAdmin(int id) {
-        return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
+        return (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id);
     }
     ////////////////////////////////// ADMIN WALLET
 
@@ -220,10 +220,8 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return tokenService.addNewToken(tokenName, tokenSymbol, network, address, true);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    public int changeCryptoWithdrawShowStatus(int id, int showStatus) {
-        return cryptoWithdrawService.changeShowStatus(id, showStatus);
+    // for test
+    public String transferToken(String network, String token, String address, double amount) {
+        return adminWalletService.withdrawToken(network, token, address, amount);
     }
-
-
 }

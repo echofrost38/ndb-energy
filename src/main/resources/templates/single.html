@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Document</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat|Arial|Raleway"
+      rel="stylesheet"
+    />
+    <style>
+        body {
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+            font-size: 1.2rem;
+            color: #303030;
+            margin-top: 40px;
+            display: relative;
+            font-family: 'Montserrat', Arial, Raleway;
+        }
+
+        .header {
+            position: relative;
+        }
+
+        .header div {
+            display: inline-block;
+        }
+
+        .pub-info {
+            float: right;
+        }
+
+        .user-detail {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .user-detail span {
+            display: block;
+            text-align: right;
+            white-space: nowrap;
+            font-size: 1.4rem;
+            color: black;
+        }
+
+        table {
+            margin-top: 50px;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        tr td {
+            border-bottom: 1px solid #EDEDED;
+        }
+
+        td, th {
+            padding: 10px 0;
+        }
+
+        p {
+            margin: 4px 0;
+        }
+
+        .qr-detail {
+            margin-left: 8px;
+            font-size: 0.9rem;
+            color: #BCBCBC;
+        }
+
+        .qr {
+            width: 70px;
+            height: auto;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        span.address {
+            font-size: 1.1rem;
+        }
+
+        td:last-child {
+            text-align: right;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.sent {
+            margin-top: 20px;
+            border-top: 2px solid #1EC762;
+            color: #1EC762;
+            font-weight: bold;
+        }
+        
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .footer-body {
+            position: relative;
+        }
+
+        .doc-name {
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+        }
+
+        .doc-name span {
+            font-weight: bold;
+            font-size: 2.5rem;
+            color: black;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <div>
+                <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" />
+            </div>
+            <div class="pub-info">
+                <div class="user-detail">
+                    <span class="address" th:text="${currentDate}"></span>
+                    <span class="user-name" th:text="${fullname}"></span>
+                    <span class="address" th:text="${address}"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div th:if="${transactionType} == 'Deposit'">
+        <table>
+            <tr>
+                <td>Type</td>
+                <td th:text="${paymentType} + ' ' + ${transactionType}"></td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td th:text="${status}"></td>
+            </tr>
+            <tr>
+                <td>You Sent</td>
+                <td th:text="${fiatAmount} + ' ' + ${fiatType}"></td>
+            </tr>
+            <tr th:if="${paymentType != 'CRYPTO'}">
+                <td>We Converted</td>
+                <td th:text="${converted} + ' ' + ${cryptoType}"></td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td th:text="${fee} + ' ' + ${cryptoType}"></td>
+            </tr>
+        </table>
+        <table class="sent">
+            <tr>
+                <td>Amount Deposited</td>
+                <td th:text="${deposited} + ' ' + ${cryptoType}"></td>
+            </tr>
+        </table>
+    </div>
+    <div th:if="${transactionType} == 'Withdraw'">
+        <table>
+            <tr>
+                <td>Type</td>
+                <td th:text="${paymentType} + ' ' + ${transactionType}"></td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td th:text="${status}"></td>
+            </tr>
+            <tr>
+                <td>You requested</td>
+                <td th:text="${fiatAmount} + ' ' + ${fiatType}"></td>
+            </tr>
+            <tr th:if="${paymentType != 'CRYPTO'}">
+                <td>We Converted</td>
+                <td th:text="${converted} + ' ' + ${cryptoType}"></td>
+            </tr>
+            <tr>
+                <td>Fee</td>
+                <td th:text="${fee} + ' ' + ${cryptoType}"></td>
+            </tr>
+        </table>
+        <table class="sent">
+            <tr th:if="${paymentType != 'CRYPTO'}">
+                <td>Amount Sent</td>
+                <td th:text="${deposited} + ' ' + ${cryptoType}"></td>
+            </tr>
+            <tr th:if="${paymentType == 'CRYPTO'}">
+                <td>Amount Sent</td>
+                <td th:text="${deposited} + ' ' + ${desType}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <table>
+        <tr>
+            <td>Date</td>
+            <td th:text="${datetime}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'CREDIT'">
+            <td>Payment-ID</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'PAYPAL' and ${transactionType} == 'Deposit'">
+            <td>Payment-ID</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'PAYPAL' and ${transactionType} == 'Withdraw'">
+            <td>Receiver Email</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'CRYPTO' and ${transactionType} == 'Withdraw'">
+            <td>Destination Address</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'CRYPTO' and ${transactionType} == 'Deposit'">
+            <td>Deposit Address</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${paymentType} == 'BANK' and ${transactionType} == 'Deposit'">
+            <td>Reference Number</td>
+            <td th:text="${paymentId}"></td>
+        </tr>
+        <tr th:if="${reason}">
+            <td>Denial Reason</td>
+            <td th:text="${reason}"></td>
+        </tr>
+    </table>
+
+    <table th:if="${paymentType} == 'BANK' and ${transactionType} == 'Withdraw'">
+        <tr>
+            <td>Beneficiary</td>
+            <td>Water Department Ltd.</td>
+        </tr>
+        <tr>
+            <td>Account/IBAN</td>
+            <td>IB3948583293948588</td>
+        </tr>
+        <tr>
+            <td>Bank Code(BIC/SWIFT)</td>
+            <td>SE394572</td>
+        </tr>
+    </table>
+    <div id="footer">
+        <div class="footer-body">
+            <div>
+                <img th:src="@{classpath:static/images/qr.png}" alt="logo" class="qr" />
+                <span class="qr-detail">Republic of Lithuania, Vilnius, Kalvarijy Str. 125.</span>
+            </div>
+            <div class="doc-name">
+                <span>
+                    Nyyu UAB
+                </span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -33,6 +33,7 @@ import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripeCustomerService;
 import com.ndb.auction.service.payment.stripe.StripePresaleService;
+import com.ndb.auction.service.payment.stripe.StripeWalletService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
@@ -165,6 +166,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected StripeBaseService stripeBaseService;
+
+	@Autowired
+	protected StripeWalletService stripeWalletService;
 
 	@Autowired
 	protected ThirdAPIUtils thirdAPIUtils;

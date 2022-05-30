@@ -16,19 +16,12 @@ import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.withdraw.Token;
 import com.ndb.auction.payload.NetworkMetadata;
 
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.params.MainNetParams;
-import org.bitcoinj.script.Script;
-import org.bitcoinj.wallet.DeterministicSeed;
-import org.bitcoinj.wallet.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.web3j.contracts.eip20.generated.ERC20;
-import org.web3j.crypto.Bip32ECKeyPair;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.MnemonicUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
@@ -38,12 +31,9 @@ import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * This service will handle all token withdrawals except NDB 
  * (A) Supported Network
- * 0. BTC 
  * 1. ETH  https://bsc-dataseed.binance.org/
  * 2. BSC  https://mainnet.infura.io/v3/03021c5a727a40eb8d086a4d46d32ec7
  * 3. TRC
@@ -73,11 +63,19 @@ import lombok.extern.slf4j.Slf4j;
  *  2) BSC: 0xe9e7cea3dedca5984780bafc599bd69add087d56
  */
 @Service
-@Slf4j
-public class WithdrawWalletService {
+public class CryptoWithdrawalService {
 
-    @Value("${wallet.seed}")
-    private String SEED_PHRASE;
+    @Value("${eth.wallet.address}")
+    private String ETH_WALLET_ADDRESS;
+
+    @Value("${eth.wallet.pk}")
+    private String ETH_WALLET_KEY;
+
+    @Value("${bsc.wallet.address}")
+    private String BSC_WALLET_ADDRESS;
+
+    @Value("${bsc.wallet.pk}")
+    private String BSC_WALLET_KEY;
     
     // JSON RPC
     @Value("${bsc.json.rpc}")
@@ -123,12 +121,16 @@ public class WithdrawWalletService {
         
         var networkList = new ArrayList<NetworkMetadata>();
         networkList.add(NetworkMetadata.builder()
-            .network("ERC20")
+            .network("ETH")
             .jsonRpc(ETH_JSON_RPC)
+            .walletAddr(ETH_WALLET_ADDRESS)
+            .walletKey(ETH_WALLET_KEY)
             .build());
         networkList.add(NetworkMetadata.builder()
-            .network("BEP20")
+            .network("BSC")
             .jsonRpc(BSC_JSON_RPC)
+            .walletAddr(BSC_WALLET_ADDRESS)
+            .walletKey(BSC_WALLET_KEY)
             .build());
         networkMetadataMap = networkList.stream()
             .collect(Collectors.toMap(NetworkMetadata::getNetwork, Function.identity()));
@@ -137,17 +139,6 @@ public class WithdrawWalletService {
     // getting balance 
     public double getBalance(String network, String tokenSymbol) {
         try {
-            // bitcoin processing 
-            if(network.equals("BTC") && tokenSymbol.equals("BTC")) {
-                NetworkParameters params = MainNetParams.get();
-                var seed = new DeterministicSeed(SEED_PHRASE, null, "", 1409478661L);
-                Wallet wallet = Wallet.fromSeed(params, seed, Script.ScriptType.P2WPKH);
-                var addr = wallet.currentReceiveAddress();
-                log.info(addr.toString());
-                log.info(wallet.getBalance().toPlainString());
-                return 0.0;
-            }
-
             if(tokenList == null || tokenList.size() == 0) fillTokenMap();
             var netMetadata = networkMetadataMap.get(network);
             if(netMetadata == null) {
@@ -155,24 +146,19 @@ public class WithdrawWalletService {
                 throw new UserNotFoundException(msg, "network");
             }
             Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc())); 
-            
-            int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT, 0 | Bip32ECKeyPair.HARDENED_BIT, 0,0};
-            Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(MnemonicUtils.generateSeed(SEED_PHRASE, null));
-            Bip32ECKeyPair  derivedKeyPair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, derivationPath);
-            Credentials credentials = Credentials.create(derivedKeyPair);
-            credentials.getAddress();
-            
+            Credentials credential = Credentials.create(netMetadata.getWalletKey());   
+
             // get balance
-            if(network.equals("ERC20") && tokenSymbol.equals("ETH")) {
+            if(network.equals("ETH") && tokenSymbol.equals("ETH")) {
                 EthGetBalance ethBalance = web3
-                    .ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST)
+                    .ethGetBalance(ETH_WALLET_ADDRESS, DefaultBlockParameterName.LATEST)
                     .sendAsync()
                     .get();
                 var weiBalance = ethBalance.getBalance();
                 return Convert.fromWei(weiBalance.toString(), Unit.ETHER).doubleValue();
-            } else if (network.equals("BEP20") && tokenSymbol.equals("BNB")) {
+            } else if (network.equals("BSC") && tokenSymbol.equals("BNB")) {
                 EthGetBalance ethBalance = web3
-                    .ethGetBalance(credentials.getAddress(), DefaultBlockParameterName.LATEST)
+                    .ethGetBalance(BSC_WALLET_ADDRESS, DefaultBlockParameterName.LATEST)
                     .sendAsync()
                     .get();
                 var weiBalance = ethBalance.getBalance();
@@ -185,11 +171,11 @@ public class WithdrawWalletService {
                 ERC20 erc20 = ERC20.load(
                     tokenMetadata.getAddress(), 
                     web3, 
-                    credentials, 
+                    credential, 
                     gasPrice, 
                     gasLimit
                 );
-                var balance = erc20.balanceOf(credentials.getAddress()).sendAsync().get();
+                var balance = erc20.balanceOf(netMetadata.getWalletAddr()).sendAsync().get();
                 return Convert.fromWei(balance.toString(), Unit.ETHER).doubleValue();
             }
         } catch (Exception e) {
@@ -208,21 +194,17 @@ public class WithdrawWalletService {
                 throw new UserNotFoundException(msg, "network");
             }
             Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc())); 
+            Credentials credential = Credentials.create(netMetadata.getWalletKey());   
 
-            int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT, 0 | Bip32ECKeyPair.HARDENED_BIT, 0,0};
-            Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(MnemonicUtils.generateSeed(SEED_PHRASE, null));
-            Bip32ECKeyPair  derivedKeyPair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, derivationPath);
-            Credentials credentials = Credentials.create(derivedKeyPair);
-
-            if(network.equals("ERC20") && tokenSymbol.equals("ETH")) {
+            if(network.equals("ETH") && tokenSymbol.equals("ETH")) {
                 var bAmount = Convert.toWei(String.valueOf(amount), Convert.Unit.ETHER);
                 TransactionReceipt txnReceipt = Transfer.sendFunds(
-                    web3, credentials, address, bAmount, Convert.Unit.WEI).sendAsync().get();
+                    web3, credential, address, bAmount, Convert.Unit.WEI).sendAsync().get();
                 return txnReceipt.getTransactionHash();
-            } else if (network.equals("BEP20") && tokenSymbol.equals("BNB")) {
+            } else if (network.equals("BSC") && tokenSymbol.equals("BNB")) {
                 var bAmount = Convert.toWei(String.valueOf(amount), Convert.Unit.ETHER);
                 TransactionReceipt txnReceipt = Transfer.sendFunds(
-                    web3, credentials, address, bAmount, Convert.Unit.WEI).sendAsync().get();
+                    web3, credential, address, bAmount, Convert.Unit.WEI).sendAsync().get();
                 return txnReceipt.getTransactionHash();
             } else {
                 var bAmount = Convert.toWei(String.valueOf(amount), Convert.Unit.ETHER);
@@ -233,7 +215,7 @@ public class WithdrawWalletService {
                 ERC20 erc20 = ERC20.load(
                     tokenMetadata.getAddress(), 
                     web3, 
-                    credentials, 
+                    credential, 
                     gasPrice, 
                     gasLimit
                 );

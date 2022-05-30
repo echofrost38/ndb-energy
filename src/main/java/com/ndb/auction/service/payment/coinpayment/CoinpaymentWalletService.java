@@ -10,7 +10,6 @@ import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransact
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
 import com.ndb.auction.service.payment.ICryptoDepositService;
-import com.ndb.auction.service.payment.ITransactionService;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -20,7 +19,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CoinpaymentWalletService extends CoinpaymentBaseService implements ITransactionService, ICryptoDepositService {
+public class CoinpaymentWalletService extends CoinpaymentBaseService implements ICryptoDepositService {
 
     @Override
     public Transaction createNewTransaction(Transaction _m)
@@ -64,22 +63,18 @@ public class CoinpaymentWalletService extends CoinpaymentBaseService implements 
         return null;
     }
 
-    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
         return coinpaymentWalletDao.selectAll(orderBy);
     }
 
-    @Override
-    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        return coinpaymentWalletDao.selectByUser(userId, orderBy);
+    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
+        return coinpaymentWalletDao.selectByUser(userId, orderBy, status);
     }
 
-    @Override
-    public Transaction selectById(int id) {
-        return coinpaymentWalletDao.selectById(id);
+    public Transaction selectById(int id, int status) {
+        return coinpaymentWalletDao.selectById(id, status);
     }
 
-    @Override
     public int update(int id, int status) {
         return coinpaymentWalletDao.update(id, status);
     }
@@ -90,6 +85,10 @@ public class CoinpaymentWalletService extends CoinpaymentBaseService implements 
 
     public int deleteExpired(double days) {
         return coinpaymentWalletDao.deleteExpired(days);
+    }
+
+    public int changeShowStatus(int id, int status) {
+        return coinpaymentWalletDao.changeShowStatus(id, status);
     }
     
 }

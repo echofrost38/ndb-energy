@@ -52,9 +52,6 @@ public class ThirdAPIUtils {
                         return null;
                     })
                     .block();
-            if(symbol.equals("USDT")) {
-                return 1.0 / Double.valueOf(objs.getPrice());
-            } 
             return Double.valueOf(objs.getPrice());
         } catch (Exception e) {
         }

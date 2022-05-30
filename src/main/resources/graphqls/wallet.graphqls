@@ -6,14 +6,16 @@ extend type Query {
         orderBy: String
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByUser(
-        orderBy: String
+        orderBy: String,
+        status: Int
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByAdmin(
         userId: Int,
         orderBy: String
     ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxById(
-        id: Int
+        id: Int,
+        status: Int
     ) : CoinpaymentWalletTransaction
 
     # Get Stripe Transaction for deposit
@@ -21,14 +23,16 @@ extend type Query {
         orderBy: String
     ) : [StripeDepositTransaction]
     getStripeDepositTxByUser(
-        orderBy: String
+        orderBy: String,
+        status: Int
     ) : [StripeDepositTransaction]
     getStripeDepositTxByAdmin(
         userId: Int,
         orderBy: String
     ) : [StripeDepositTransaction]
     getStripeDepositTxById(
-        id: Int
+        id: Int,
+        status: Int
     ) : StripeDepositTransaction
 }
 
@@ -38,6 +42,10 @@ extend type Mutation {
         network: String,
         cryptoType: String
     ) : CoinpaymentWalletTransaction
+    changeCoinpaymentDepositShowStatus(
+        id: Int,
+        status: Int
+    ) : Int
 #    withdrawCrypto(
 #        to: String,
 #        amount: Float,

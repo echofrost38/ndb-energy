@@ -14,5 +14,6 @@ type PaypalWithdraw {
     confirmedAt: Float,
     senderBatchId: String,
     senderItemId: String,
-    receiver: String
+    receiver: String,
+    isShow: Boolean
 }

@@ -11,4 +11,5 @@ type CoinpaymentWalletTransaction {
     confirmedAt: Float,
     depositAddress: String,
     coin: String,
+    isShow: Boolean
 }

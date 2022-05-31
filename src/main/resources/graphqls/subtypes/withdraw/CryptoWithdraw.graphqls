@@ -13,5 +13,6 @@ type CryptoWithdraw {
     confirmedAt: Float,
     network: String,
     destination: String,
-    txHash: String
+    txHash: String,
+    isShow: Boolean
 }

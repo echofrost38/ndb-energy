@@ -265,7 +265,7 @@ public class BaseService {
 
         var available = ndb;
         var overflow = false;
-        if(remain < ndb) {
+        if(remain <= ndb) {
             available = remain;
             overflow = true;
         }

@@ -233,22 +233,13 @@ public class CryptoController extends BaseController {
             cryptoType = currency;
         }
         Double amount = getDouble(request, "amount");
-        Double fiatAmount = getDouble(request, "fiat_amount");
-
+        
         int status = getInt(request, "status");
         log.info("IPN status : {}", status);
 
         if (status >= 100 || status == 2) {
-
             CoinpaymentPresaleTransaction txn = (CoinpaymentPresaleTransaction) coinpaymentPresaleService.selectById(id);
-            
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
-            double totalPrice = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
-            Double totalOrder = getTotalOrder(txn.getUserId(), totalPrice);
-
-            if(totalOrder > fiatAmount) {
-                new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-            }
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }

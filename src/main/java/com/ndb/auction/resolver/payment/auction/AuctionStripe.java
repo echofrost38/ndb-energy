@@ -63,7 +63,16 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
     public PayResponse payStripeForAuction(int roundId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, fiatAmount, fiatType, paymentIntentId, paymentMethodId);
+
+        var bid = bidService.getBid(roundId, userId);
+        if(bid == null) {
+            String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "roundId");
+        }
+        var usdAmount = bid.getTokenAmount() * bid.getTokenPrice();
+        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
+        var _fiatamount = usdAmount * fiatPrice;
+        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, usdAmount, _fiatamount, fiatType, paymentIntentId, paymentMethodId);
         return stripeAuctionService.createNewTransaction(m, isSaveCard);
     }
 
@@ -76,7 +85,15 @@ public class AuctionStripe extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "USER_ID");
         }
-        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, amount, fiatAmount, fiatType, paymentIntentId);
+        var bid = bidService.getBid(roundId, userId);
+        if(bid == null) {
+            String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "roundId");
+        }
+        var usdAmount = bid.getTokenAmount() * bid.getTokenPrice();
+        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
+        var _fiatamount = usdAmount * fiatPrice;
+        StripeAuctionTransaction m = new StripeAuctionTransaction(userId, roundId, usdAmount, _fiatamount, fiatType, paymentIntentId);
         return stripeAuctionService.createNewTransactionWithSavedCard(m, customer);
     }
 }

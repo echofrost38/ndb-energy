@@ -74,7 +74,7 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
         if (orderBy == null)
             orderBy = "ID";
         sql += " ORDER BY " + orderBy;
-        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, status);
     }
 
     public Transaction selectById(int id, int status) {

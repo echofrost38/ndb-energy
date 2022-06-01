@@ -1,7 +1,6 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -90,12 +89,16 @@ public class PdfGenerationService {
     }
 
 
-    public String generatePdfForMultipleTransactions(int userId, String transactionType, String paymentType, long from, long to) {
+    public String generatePdfForMultipleTransactions(int userId, long from, long to) throws WriterException, IOException {
         var userDetail = userDetailDao.selectByUserId(userId);
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
+        
         var strFromDate = dateFormat.format(new Date(from));
         var strToDate = dateFormat.format(new Date(to));
+        
+        var qrContent = String.format("Nyyu from %s to %s statement", strFromDate, strToDate);
+        pdfGenerator.generateQRCodeImage(qrContent, 240, 240, QR_CODE_IMAGE_PATH);
 
         var strDateRange = String.format("%s - %s", strFromDate, strToDate);
 
@@ -150,6 +153,7 @@ public class PdfGenerationService {
         var i = 0;
         for (var token : tokens) {
             var tempBalance = balanceService.getBalance(userId, token.getTokenSymbol());
+            if(tempBalance == null) continue;
             totalBalance += (tempBalance.getFree() + tempBalance.getHold()) * prices.get(i);
         }   
 
@@ -162,10 +166,10 @@ public class PdfGenerationService {
         data.put("outgoings", outgoing);
         data.put("incomes", incoming);
 
-        var pdfFileName = String.format("%s-%s %s.pdf", "BANK", "Withdraw", strDateRange);
+        var pdfFileName = String.format("%s.pdf", "Statements");
         pdfGenerator.generatePdfFile("/statement", data, pdfFileName);
 
-        return "";
+        return pdfFileName;
     }
 
     private void fillDepositList(List<TransactionDetail> list, List<? extends Transaction> tList, String payment) {
@@ -216,16 +220,16 @@ public class PdfGenerationService {
             case "DEPOSIT":
                 switch (paymentType) {
                     case "PAYPAL":
-                        var ptransaction = (PaypalDepositTransaction) paypalDepositDao.selectById(id);
+                        var ptransaction = (PaypalDepositTransaction) paypalDepositDao.selectById(id, 1);
                         return buildFiatDepositPdf(userDetail, ptransaction, paymentType, ptransaction.getPaypalOrderId());
                     case "CREDIT":
-                        var stransaction = (StripeDepositTransaction) stripeDepositDao.selectById(id);
+                        var stransaction = (StripeDepositTransaction) stripeDepositDao.selectById(id, 1);
                         return buildFiatDepositPdf(userDetail, stransaction, paymentType, stransaction.getPaymentIntentId());
                     case "CRYPTO":
-                        var ctransaction = (CoinpaymentWalletTransaction) cryptoDepositDao.selectById(id);
+                        var ctransaction = (CoinpaymentWalletTransaction) cryptoDepositDao.selectById(id, 1);
                         return buildCryptoDepositPdf(userDetail, ctransaction);
                     case "BANK":
-                        var btransaction = (BankDepositTransaction) bankDepositDao.selectById(id);
+                        var btransaction = (BankDepositTransaction) bankDepositDao.selectById(id, 1);
                         return buildFiatDepositPdf(userDetail, btransaction, paymentType, btransaction.getUid());
                     default:
                         return null;
@@ -234,13 +238,13 @@ public class PdfGenerationService {
                 switch (paymentType) 
                 {
                     case "PAYPAL":
-                        var pwithdraw = (PaypalWithdraw) paypalWithdrawDao.selectById(id);
+                        var pwithdraw = (PaypalWithdraw) paypalWithdrawDao.selectById(id, 1);
                         return buildPayPalWithdrawPdf(userDetail, pwithdraw);
                     case "CRYPTO":
-                        var cwithdraw = (CryptoWithdraw) cryptoWithdrawDao.selectById(id);
+                        var cwithdraw = (CryptoWithdraw) cryptoWithdrawDao.selectById(id, 1);
                         return buildCrytoWithdrawPdf(userDetail, cwithdraw);
                     case "BANK":
-                        var bwithdraw = (BankWithdrawRequest) bankWithdrawDao.selectById(id);
+                        var bwithdraw = (BankWithdrawRequest) bankWithdrawDao.selectById(id, 1);
                         return buildBankWithdrawPdf(userDetail, bwithdraw);
                 }
                 break;
@@ -299,7 +303,7 @@ public class PdfGenerationService {
             data.put("address", userDetail.getAddress());
         }
 
-        data.put("datetime", new Timestamp(transaction.getConfirmedAt()));
+        data.put("datetime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SS").format(transaction.getConfirmedAt()));
         data.put("status", transaction.getStatus() ? "Successful" : "Pending");
         data.put("transactionType", "Deposit");
         data.put("paymentType", payment);
@@ -309,7 +313,7 @@ public class PdfGenerationService {
         data.put("cryptoType", transaction.getCryptoType());
 
         var date = new Date();
-        data.put("currentDate", new SimpleDateFormat("yyyy-MM-dd").format(date));
+        data.put("currentDate", new SimpleDateFormat("dd/MM/yyyy").format(date));
         return data;
     }
 
@@ -361,7 +365,7 @@ public class PdfGenerationService {
         data.put("paymentType", payment);
         data.put("transactionType", "Withdraw");
 
-        data.put("datetime", new Timestamp(withdraw.getConfirmedAt()));
+        data.put("datetime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SS").format(withdraw.getConfirmedAt()));
         
         /// it is source token and token amount to withdraw
         data.put("fiatAmount", withdraw.getTokenAmount()); 
@@ -377,7 +381,7 @@ public class PdfGenerationService {
         data.put("reason", withdraw.getDeniedReason());
 
         var date = new Date();
-        data.put("currentDate", new SimpleDateFormat("yyyy-MM-dd").format(date));
+        data.put("currentDate", new SimpleDateFormat("dd/MM/yyyy").format(date));
         return data;
     }
 

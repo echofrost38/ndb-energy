@@ -64,12 +64,12 @@
         }
 
         .qr-detail {
-            font-size: 0.9rem;
+            font-size: 14px;
             color: #BCBCBC;
         }
 
         .qr {
-            width: 70px;
+            width: 100px;
             height: auto;
         }
 
@@ -119,14 +119,15 @@
 
         .doc-name span:first-child {
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 18px;
             color: black;
+            margin-bottom: 8px;
         }
 
         #qrcode {
             position: absolute;
             right: 0;
-            bottom: -30px;
+            bottom: -50px;
         }
 
     </style>
@@ -135,12 +136,12 @@
     <header>
         <div class="header" style="font-family: 'Montserrat', Arial, Raleway;">
             <div>
-                <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" />
+                <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" width="60" height="50" />
             </div>
             <div class="pub-info">
                 <div class="user-detail">
                     <span class="address" th:text="${currentDate}"></span>
-                    <span class="user-name" th:text="${fullname}"></span>
+                    <span class="user-name" style="font-size: 18px; margin-bottom: 10px;" th:text="${fullname}"></span>
                     <span class="address" th:text="${address}"></span>
                 </div>
             </div>

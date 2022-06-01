@@ -22,11 +22,9 @@ extend type Mutation {
     createChargeForPresale(
         presaleId: Int,
         orderId: Int,
-        amount: Float,
         coin: String,
         network: String,
         cryptoType: String,
-        cryptoAmount: Float
     ) : CoinpaymentPresaleTransaction
     # for paypal
     paypalForPresale(

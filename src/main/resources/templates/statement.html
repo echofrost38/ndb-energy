@@ -1,151 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
+    <!-- <link
       href="https://fonts.googleapis.com/css2?family=Montserrat|Arial|Raleway"
       rel="stylesheet"
-    />
+    /> -->
     <title>Statement</title>
+    <style>
+    
+        body {
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+            font-size: 1.2rem;
+            color: #303030;
+            margin-top: 40px;
+            font-family: 'Montserrat', Arial, Raleway;
+        }
+
+        #header {
+            position: relative;
+        }
+
+        #header .pub-info {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        #header .pub-info div p {
+            text-align: right;
+        }
+
+        table {
+            margin-top: 270px;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+        }
+    
+        tr td {
+            border-bottom: 1px solid #EDEDED;
+        }
+    
+        td, th {
+            padding: 10px 0;
+        }
+    
+        p {
+            margin: 4px 0;
+        }
+    
+        footer {
+            margin: 100px 0;
+    
+        }
+    
+        .qr-detail {
+            font-size: 14px;
+            color: #BCBCBC;
+        }
+    
+        .doc-name {
+            font-weight: bold;
+            color: black;
+            vertical-align: bottom;
+        }
+    
+        .qr {
+            width: 100px;
+            height: auto;
+        }
+    
+        .user-name {
+            font-size: 1.4rem;
+            color: black;
+            font-weight: bold;
+        }
+    
+        th { text-align: left;}
+    
+        td:nth-child(3), td:nth-child(4),th:nth-child(3), th:nth-child(4) {
+            text-align: right;
+        }
+    
+        th {
+            border-bottom: 2px solid #303030;
+        }
+    
+        .top {
+            border-bottom: 2px solid black;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 32px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .footer-body {
+            position: relative;
+        }
+
+        .doc-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .doc-name span {
+            display: block;
+        }
+
+        .doc-name span:first-child {
+            font-weight: bold;
+            font-size: 18px;
+            color: black;
+            margin-bottom: 8px;
+        }
+
+        #qrcode {
+            position: absolute;
+            right: 0;
+            bottom: -50px;
+        }
+    </style>
 </head>
-<style>
-
-    body {
-        max-width: 800px;
-        width: 100%;
-        margin: auto;
-        font-size: 1.2rem;
-        color: #303030;
-        margin-top: 40px;
-        font-family: 'Montserrat', Arial, Raleway;
-    }
-
-    table {
-        margin-top: 50px;
-        border: none;
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    tr td {
-        border-bottom: 1px solid #EDEDED;
-    }
-
-    td, th {
-        padding: 10px 0;
-    }
-
-    p {
-        margin: 4px 0;
-    }
-
-    footer {
-        margin: 100px 0;
-
-    }
-
-    .qr-detail {
-        margin-left: 8px;
-        font-size: 0.9rem;
-        color: #BCBCBC;
-    }
-
-    .doc-name {
-        font-weight: bold;
-        color: black;
-        vertical-align: bottom;
-    }
-
-    .qr {
-        width: 70px;
-        height: auto;
-    }
-
-    .pub-info {
-        display: flex;
-        flex-direction: column;
-        text-align: right;
-        justify-content: end;
-        row-gap: 4px;
-    }
-
-    .user-name {
-        font-size: 1.4rem;
-        color: black;
-        font-weight: bold;
-    }
-
-    header, footer {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    th { text-align: left;}
-
-    td:nth-child(3), td:nth-child(4),th:nth-child(3), th:nth-child(4) {
-        text-align: right;
-    }
-
-    th {
-        border-bottom: 2px solid #303030;
-    }
-
-    .top {
-        border-bottom: 2px solid black;
-        font-weight: bold;
-        color: black;
-        margin-bottom: 32px;
-    }
-</style>
 <body>
     <div class="top">
         STATEMENT
     </div>
-    <header>
+    <div id="header">
         <div>
-            <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" />
+            <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" width="60" height="50" />
         </div>
         <div class="pub-info">
             <div>
                 <p th:text="${dateRange}"></p>
-                <p class="user-name" th:text="${fullname}"></p>
+                <p class="user-name" style="font-size: 18px;" th:text="${fullname}"></p>
             </div>
             <div style="color:black; margin-top: 10px;">
                 <p th:text="${address}"></p>
             </div>
-            <div style="margin-top:100px;">
-                <p class="user-name" th:text="${totalBalance}">&nbsp;USDT</p>
-                <P>Total Balance</P>
+            <div style="margin-top:40px;">
+                <p class="user-name" style="font-size: 20px;" th:text="${totalBalance} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total Balance</P>
             </div>
             <div style="margin-top:30px;">
-                <p class="user-name" th:text="${outgoings}">&nbsp;USDT</p>
-                <P>Total outgoings</P>
+                <p class="user-name" th:text="${outgoings} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total outgoings</P>
             </div>
             <div style="margin-top:30px;">
-                <p class="user-name" th:text="${incomes}">&nbsp;USDT</p>
-                <P>Total deposits</P>
+                <p class="user-name" th:text="${incomes} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total deposits</P>
             </div>
         </div>
-    </header>
+    </div>
     <table>
+        <tr>
+            <th>Date</th>
+            <th>Details</th>
+            <th>Amount</th>
+        </tr>
         <tr th:each="tx: ${transactions}">
-            <th th:text="${tx.requestAt}"></th>
-            <th th:text="${tx.detail}"></th>
-            <th th:text="${tx.amount}">&nbsp;USD</th>
+            <td th:text="${tx.confirmedAt}"></td>
+            <td th:text="${tx.detail}"></td>
+            <td th:text="${tx.amount}">&nbsp;USD</td>
         </tr>
         
         
     </table>
-    <footer>
-        <div>
-            <img src="qr.png" alt="logo" class="qr">
-            <span class="qr-detail">Republic of Lithuania, Vilnius, Kalvarijy Str. 125.</span>
+    <div id="footer">
+        <div class="footer-body">
+            <div class="doc-name">
+                <span>Nyyu UAB</span>
+                <span class="qr-detail">Republic of Lithuania, Vilnius, Kalvarijy Str. 125.</span>
+            </div>
+            <div id="qrcode">   
+                <img th:src="@{classpath:static/images/qr.png}" alt="logo" class="qr" />
+            </div>
         </div>
-        <div class="pub-info">
-            <span class="doc-name">Nyyu UAB</span>
-        </div>
-    </footer>
-</body>
+    </div>
+</body> 
 </html>

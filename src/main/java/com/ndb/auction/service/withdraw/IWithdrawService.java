@@ -20,5 +20,5 @@ public interface IWithdrawService {
     // get pending requests by admin 
     public List<? extends BaseWithdraw> getAllPendingWithdrawRequests();
 
-    public BaseWithdraw getWithdrawRequestById(int id);
+    public BaseWithdraw getWithdrawRequestById(int id, int status);
 }

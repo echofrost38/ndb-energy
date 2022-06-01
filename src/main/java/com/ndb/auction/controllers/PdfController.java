@@ -1,7 +1,10 @@
 package com.ndb.auction.controllers;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.zxing.WriterException;
 import com.ndb.auction.hooks.BaseController;
 import com.ndb.auction.service.PdfGenerationService;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -29,18 +32,16 @@ public class PdfController extends BaseController {
 
     // download transaction content pdf
     @GetMapping(value="/transactions")
-    public ResponseEntity<byte[]> downloadTransactionsAsPDF (HttpServletRequest request) {
+    public ResponseEntity<byte[]> downloadTransactionsAsPDF (HttpServletRequest request) throws WriterException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
         // get params from request
-        var transactionType = getString(request, "tx", true);
-        var paymentType = getString(request, "payment", true);
         var from = getLong(request, "from");
         var to = getLong(request, "to");
         
         // generate pdf and get file path
-        var pdfPath = pdfGenerationService.generatePdfForMultipleTransactions(userId, transactionType, paymentType, from, to);
+        var pdfPath = pdfGenerationService.generatePdfForMultipleTransactions(userId, from, to);
 
         var file = new FileSystemResource(pdfPath);
         try {

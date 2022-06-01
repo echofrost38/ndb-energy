@@ -19,5 +19,6 @@ type BankWithdrawRequest {
     accountNumber: String,
     metadata: String,
     address: String,
-    postCode: String
+    postCode: String,
+    isShow: Boolean
 }

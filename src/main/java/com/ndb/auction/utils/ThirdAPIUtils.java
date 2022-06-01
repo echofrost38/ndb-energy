@@ -81,6 +81,7 @@ public class ThirdAPIUtils {
     }
 
     public double getCurrencyRate(String from) {
+        if(from.equals("USD")) return 1.0;
         try {
             String converted = xchangeAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")

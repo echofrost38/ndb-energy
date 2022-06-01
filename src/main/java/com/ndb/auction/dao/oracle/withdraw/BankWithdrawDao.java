@@ -39,6 +39,7 @@ public class BankWithdrawDao extends BaseOracleDao {
         m.setHolderName(rs.getString("HOLDER_NAME"));
         m.setBankName(rs.getString("BANK_NAME"));
         m.setAccountNumber(rs.getString("ACC_NUM"));
+        m.setShow(rs.getBoolean("IS_SHOW"));
 
         // json string
         m.setMetadata(rs.getString("METADATA"));
@@ -50,8 +51,8 @@ public class BankWithdrawDao extends BaseOracleDao {
 
     public int insert(BankWithdrawRequest m) {
         String sql = "INSERT INTO TBL_BANK_WITHDRAW(ID,USER_ID,TAR_CURRENCY,WITHDRAW,FEE,SRC_TOKEN,TKN_PRICE,TKN_AMT," + 
-            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,W_MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA,ADDRESS,POSTCODE)" + 
-            "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?)";
+            "STATUS,DENIED_REASON,REQUESTED_AT,CONFIRMED_AT,W_MODE,COUNTRY,HOLDER_NAME,BANK_NAME,ACC_NUM,METADATA,ADDRESS,POSTCODE,IS_SHOW)" + 
+            "VALUES(SEQ_BANK_WITHDRAW.NEXTVAL,?,?,?,?,?,?,?,0,?,SYSDATE,SYSDATE,?,?,?,?,?,?,?,?,1)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getTargetCurrency(), m.getWithdrawAmount(), m.getFee(), 
             m.getSourceToken(), m.getTokenPrice(), m.getTokenAmount(), m.getDeniedReason(), m.getMode(), m.getCountry(),
             m.getHolderName(), m.getBankName(), m.getAccountNumber(), m.getMetadata(), m.getAddress(), m.getPostCode());
@@ -72,8 +73,11 @@ public class BankWithdrawDao extends BaseOracleDao {
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
-    public List<BankWithdrawRequest> selectByUser(int userId) {
+    public List<BankWithdrawRequest> selectByUser(int userId, int status) {
         String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.USER_ID = ?";
+        if(status == 0) {
+            sql += " AND TBL_BANK_WITHDRAW.IS_SHOW = 1";
+        }
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId);
     }
 
@@ -82,8 +86,11 @@ public class BankWithdrawDao extends BaseOracleDao {
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
-    public BankWithdrawRequest selectById(int id) {
+    public BankWithdrawRequest selectById(int id, int status) {
         String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL FROM TBL_BANK_WITHDRAW LEFT JOIN TBL_USER ON TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.ID = ?";
+        if(status == 0) {
+            sql += " AND TBL_BANK_WITHDRAW.IS_SHOW = 1";
+        }
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
@@ -104,6 +111,11 @@ public class BankWithdrawDao extends BaseOracleDao {
     public List<BankWithdrawRequest> selectRange(int userId, long from, long to) {
         String sql = "SELECT TBL_BANK_WITHDRAW.*, TBL_USER.EMAIL from TBL_BANK_WITHDRAW left JOIN TBL_USER on TBL_BANK_WITHDRAW.USER_ID = TBL_USER.ID WHERE TBL_BANK_WITHDRAW.USER_ID = ? AND TBL_BANK_WITHDRAW.REQUESTED_AT > ? AND TBL_BANK_WITHDRAW.REQUESTED_AT < ? ORDER BY TBL_BANK_WITHDRAW.ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
+    }
+    
+    public int changeShowStatus(int id, int showStatus) {
+        var sql = "UPDATE TBL_BANK_WITHDRAW SET IS_SHOW WHERE ID = ?";
+        return jdbcTemplate.update(sql, showStatus, id);
     }
 
 }

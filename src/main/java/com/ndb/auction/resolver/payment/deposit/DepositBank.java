@@ -1,4 +1,4 @@
-package com.ndb.auction.resolver.payment.depoist;
+package com.ndb.auction.resolver.payment.deposit;
 
 import java.util.List;
 import java.util.Locale;

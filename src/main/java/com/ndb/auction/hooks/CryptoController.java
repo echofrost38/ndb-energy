@@ -15,9 +15,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
 import com.ndb.auction.models.transactions.CryptoTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.service.user.WhitelistService;
@@ -104,10 +102,10 @@ public class CryptoController extends BaseController {
 		log.info("IPN status : {}", status);
 
         if (status >= 100 || status == 2) {
-            CoinpaymentAuctionTransaction txn = (CoinpaymentAuctionTransaction) coinpaymentAuctionService.selectById(id);
+            CoinpaymentDepositTransaction txn = coinpaymentAuctionService.selectById(id);
             User user = userService.getUserById(txn.getUserId());
     
-            Bid bid = bidService.getBid(txn.getAuctionId(), txn.getUserId());
+            Bid bid = bidService.getBid(txn.getOrderId(), txn.getUserId());
     
             if (bid.isPendingIncrease()) {
                 double pendingPrice = bid.getTempTokenAmount() * bid.getTempTokenPrice();
@@ -238,7 +236,7 @@ public class CryptoController extends BaseController {
         log.info("IPN status : {}", status);
 
         if (status >= 100 || status == 2) {
-            CoinpaymentPresaleTransaction txn = (CoinpaymentPresaleTransaction) coinpaymentPresaleService.selectById(id);
+            var txn = coinpaymentPresaleService.selectById(id);
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
@@ -304,7 +302,7 @@ public class CryptoController extends BaseController {
 		log.info("IPN status : {}", status);
 		if (status >= 100 || status == 2) {
             
-            CoinpaymentWalletTransaction txn = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id, 1);
+            var txn = coinpaymentWalletService.selectById(id);
             if(txn == null) {
                 log.error("txn is null");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
@@ -322,7 +320,7 @@ public class CryptoController extends BaseController {
             double fee = getCoinpaymentFee(userId, amount);
             double deposited = amount - fee;
             // update coinpayment deposit transaction
-            int result = coinpaymentWalletService.updateStatus(txn.getId(), 1, deposited, fee, cryptoType);
+            int result = coinpaymentWalletService.updateStatus(id, amount, deposited, fee, cryptoType);
             log.info("num of updated: {}", result);
 
             result = balanceService.addFreeBalance(userId, cryptoType, deposited);

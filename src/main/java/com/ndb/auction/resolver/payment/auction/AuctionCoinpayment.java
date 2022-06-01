@@ -3,7 +3,7 @@ package com.ndb.auction.resolver.payment.auction;
 import java.io.IOException;
 import java.util.List;
 
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -17,62 +17,67 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-    // for Coinpayments
+    
+	private static final String AUCTION = "AUCTION";
+
+	// for Coinpayments
 	@PreAuthorize("isAuthenticated()")
-	public CoinpaymentAuctionTransaction createCryptoPaymentForAuction(int roundId, Double amount, String cryptoType, String network, String coin) throws ParseException, IOException {
+	public CoinpaymentDepositTransaction createCryptoPaymentForAuction(int roundId, String cryptoType, String network, String coin) throws ParseException, IOException {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		double total = getTotalCoinpaymentOrder(userId, amount);
-		CoinpaymentAuctionTransaction _m = new CoinpaymentAuctionTransaction(roundId, userId, amount, total - amount, cryptoType, network, coin);
-		return (CoinpaymentAuctionTransaction) coinpaymentAuctionService.createNewTransaction(_m);
+
+		var bid = bidService.getBid(roundId, userId);
+		var orderAmount = bid.getTokenAmount() * bid.getTokenPrice();
+		double total = getTotalCoinpaymentOrder(userId, orderAmount);
+		CoinpaymentDepositTransaction _m = new CoinpaymentDepositTransaction(roundId, userId, orderAmount, total - orderAmount, AUCTION, cryptoType, network, coin);
+		return coinpaymentAuctionService.createNewTransaction(_m);
 	}
 
-	// @PreAuthorize("isAuthenticated()")
 	public String getExchangeRate() throws ParseException, IOException {
 		return coinpaymentAuctionService.getExchangeRate();
 	}
 
 	@PreAuthorize("hasRole('ROLE_SUPER')")
-	public CoinpaymentAuctionTransaction getCryptoAuctionTxById(int id) {
-		return (CoinpaymentAuctionTransaction) coinpaymentAuctionService.selectById(id);
+	public CoinpaymentDepositTransaction getCryptoAuctionTxById(int id) {
+		return coinpaymentAuctionService.selectById(id);
 	}
 
 	@PreAuthorize("hasRole('ROLE_SUPER')")
-	@SuppressWarnings("unchecked")
-	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByAdmin(int userId) {
-		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
+	public List<CoinpaymentDepositTransaction> getCryptoAuctionTxByAdmin(int userId) {
+		return coinpaymentAuctionService.selectByUser(userId, 1, AUCTION);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	@SuppressWarnings("unchecked")
-	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByUser() {
+	public List<CoinpaymentDepositTransaction> getCryptoAuctionTxByUser() {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByUser(userId, null);
+		return coinpaymentAuctionService.selectByUser(userId, 1, AUCTION);
 	}
 
 	@PreAuthorize("hasRole('ROLE_SUPER')")
-	@SuppressWarnings("unchecked")
-	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxByRound(int roundId) {
-		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.selectByAuctionId(roundId);
+	public List<CoinpaymentDepositTransaction> getCryptoAuctionTxByRound(int roundId) {
+		return coinpaymentAuctionService.selectByOrderId(roundId, AUCTION);
 	}
 	
 	@PreAuthorize("hasRole('ROLE_SUPER')")
-	@SuppressWarnings("unchecked")
-	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTxPerRoundByAdmin(int roundId, int userId) {
-		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+	public List<CoinpaymentDepositTransaction> getCryptoAuctionTxPerRoundByAdmin(int roundId, int userId) {
+		return coinpaymentAuctionService.selectByOrderIdByUser(userId, roundId, AUCTION);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-	@SuppressWarnings("unchecked")
-	public List<CoinpaymentAuctionTransaction> getCryptoAuctionTx(int roundId) {
+	public List<CoinpaymentDepositTransaction> getCryptoAuctionTx(int roundId) {
 		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-		return (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+		return coinpaymentAuctionService.selectByOrderIdByUser(userId, roundId, AUCTION);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	public double getCryptoPrice(String symbol) {
 		return 	thirdAPIUtils.getCryptoPriceBySymbol(symbol);
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	public int updateCoinpaymentTxHash(int id, String txHash) {
+		return coinpaymentAuctionService.updateTxHash(id, txHash);
 	}
 }

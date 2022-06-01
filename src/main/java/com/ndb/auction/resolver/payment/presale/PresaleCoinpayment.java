@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -19,9 +19,12 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
+    
+    private static final String PRESALE = "PRESALE";
+    
     // create crypto payment
     @PreAuthorize("isAuthenticated()")
-    public CoinpaymentPresaleTransaction createChargeForPresale(int presaleId, int orderId, String coin, String network, String cryptoType) throws ParseException, IOException {
+    public CoinpaymentDepositTransaction createChargeForPresale(int presaleId, int orderId, String coin, String network, String cryptoType) throws ParseException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -38,40 +41,25 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
 
         double total = getTotalCoinpaymentOrder(userId, _cryptoAmount);
         // crypto amount means total order!!!!! including fee
-        CoinpaymentPresaleTransaction m = new CoinpaymentPresaleTransaction(userId, presaleId, orderId, usdAmount, total-_cryptoAmount, coin, network, total, cryptoType);
-        return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.createNewTransaction(m);
-    }
-
-    @SuppressWarnings("unchecked")
-    @PreAuthorize("isAuthenticated()")
-    public List<CoinpaymentPresaleTransaction> getAllCryptoPresaleTx(String orderBy) {
-        return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.selectAll(orderBy);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @SuppressWarnings("unchecked")
-    public List<CoinpaymentPresaleTransaction> getCryptoPresaleTxByUser(String orderBy) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.selectByUser(userId, orderBy);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public CoinpaymentPresaleTransaction getCryptoPresaleTxById(int id) {
-        return (CoinpaymentPresaleTransaction) coinpaymentPresaleService.selectById(id);
+        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(orderId, userId, usdAmount, total-_cryptoAmount, PRESALE, coin, network, cryptoType);
+        return coinpaymentPresaleService.createNewTransaction(m);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    @SuppressWarnings("unchecked")
-    public List<CoinpaymentPresaleTransaction> getCryptoPresaleTxByAdmin(int userId, int presaleId) {
-        return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.select(userId, presaleId);
+    public List<CoinpaymentDepositTransaction> getAllCryptoPresaleTx() {
+        return coinpaymentPresaleService.selectAll(PRESALE);
     }
 
     @PreAuthorize("isAuthenticated()")
-    @SuppressWarnings("unchecked")
-    public List<CoinpaymentPresaleTransaction> getCryptoPresaleTx(int presaleId) {
+    public List<CoinpaymentDepositTransaction> getCryptoPresaleTxByUser() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<CoinpaymentPresaleTransaction>) coinpaymentPresaleService.select(userId, presaleId);
+        return coinpaymentPresaleService.selectByUser(userId, 1, PRESALE);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    public CoinpaymentDepositTransaction getCryptoPresaleTxById(int id) {
+        return coinpaymentPresaleService.selectById(id);
+    }
+
 }

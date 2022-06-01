@@ -52,6 +52,9 @@ public class ThirdAPIUtils {
                         return null;
                     })
                     .block();
+            if(symbol.equals("USDT")) {
+                return 1.0 / Double.valueOf(objs.getPrice());
+            } 
             return Double.valueOf(objs.getPrice());
         } catch (Exception e) {
         }
@@ -78,7 +81,6 @@ public class ThirdAPIUtils {
     }
 
     public double getCurrencyRate(String from) {
-        if(from.equals("USD")) return 1.0;
         try {
             String converted = xchangeAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")

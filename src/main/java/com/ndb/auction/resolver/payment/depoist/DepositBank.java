@@ -75,8 +75,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankDepositTransaction confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
 
-        // ignore show status
-        var m = (BankDepositTransaction)bankDepositService.selectById(id, 1);
+        var m = (BankDepositTransaction)bankDepositService.selectById(id);
         if(m == null) {
             throw new UserNotFoundException("There is no such withdrawal request.", "id");
         }
@@ -164,8 +163,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
 
         
         bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
-        // ignore for admin
-        return (BankDepositTransaction) bankDepositService.selectById(id, 1);
+        return (BankDepositTransaction) bankDepositService.selectById(id);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -176,24 +174,24 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<BankDepositTransaction> getBankDepositTxnsByUser(String orderBy, int showStatus) {
+    public List<BankDepositTransaction> getBankDepositTxnsByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<BankDepositTransaction>) bankDepositService.selectByUser(userId, orderBy, showStatus);
+        return (List<BankDepositTransaction>) bankDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public BankDepositTransaction getBankDepositTxnById(int id, int showStatus) {
+    public BankDepositTransaction getBankDepositTxnById(int id) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = bankDepositService.selectById(id, showStatus);
+        var m = bankDepositService.selectById(id);
         if(m.getUserId() != userId) return null;
         return (BankDepositTransaction) m;
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankDepositTransaction getBankDepositTxnByIdByAdmin(int id) {
-        return (BankDepositTransaction) bankDepositService.selectById(id, 1);
+        return (BankDepositTransaction) bankDepositService.selectById(id);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -206,11 +204,6 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return bankDepositService.selectUnconfirmedByUser(userId);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changeBankDepositShowStatus(int id, int showStatus) {
-        return bankDepositService.changeShowStatus(id, showStatus);
     }
 
 }

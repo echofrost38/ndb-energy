@@ -78,10 +78,8 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         }
 
         double fee = getPaypalFee(userId, usdAmount);
-        double cryptoPrice = 1.0;
-        if(!cryptoType.equals("USDT")) {
-            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
-        } 
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        
         double deposited = (usdAmount - fee) / cryptoPrice;
 
         var order = new OrderDTO();
@@ -193,37 +191,15 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
 
     @PreAuthorize("isAuthenticated()")
     @SuppressWarnings("unchecked")
-    public List<PaypalDepositTransaction> getPaypalDepositTxnsByUser(String orderBy, int showStatus) {
+    public List<PaypalDepositTransaction> getPaypalDepositTxnsByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return (List<PaypalDepositTransaction>) paypalDepositService.selectByUser(userId, orderBy, showStatus);
+        return (List<PaypalDepositTransaction>) paypalDepositService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PaypalDepositTransaction getPaypalDepositTxnById(int id, int showStatus) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        var tx = (PaypalDepositTransaction) paypalDepositService.selectById(id, showStatus);
-        if(tx.getUserId() == userId) return tx;
-        return null;
-    }
-
-    @PreAuthorize("hasRole('ROLE_SUPER')")
-    @SuppressWarnings("unchecked")
-    public List<PaypalDepositTransaction> getPaypalDepositTxnsByAdmin(String orderBy) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return (List<PaypalDepositTransaction>) paypalDepositService.selectByUser(userId, orderBy, 1);
-    }
-
-    @PreAuthorize("hasRole('ROLE_SUPER')")
-    public PaypalDepositTransaction getPaypalDepositTxnByIdByAdmin(int id) {
-        return (PaypalDepositTransaction) paypalDepositService.selectById(id, 1);
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changePayPalDepositShowStatus(int id, int showStatus) {
-        return paypalDepositService.changeShowStatus(id, showStatus);
+    public PaypalDepositTransaction getPaypalDepositTxnById(int id) {
+        return (PaypalDepositTransaction) paypalDepositService.selectById(id);
     }
 
 }

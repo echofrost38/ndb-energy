@@ -13,6 +13,10 @@ extend type Mutation {
         status: Int,
         deniedReason: String
     ) : Int
+    changePayPalWithdrawShowStatus(
+        id: Int,
+        showStatus: Int
+    ) : Int
 
     # Crypto mutation
     cryptoWithdrawRequest(
@@ -27,7 +31,10 @@ extend type Mutation {
         status: Int,
         deniedReason: String
     ) : Int
-
+    changeCryptoWithdrawShowStatus(
+        id: Int,
+        showStatus: Int
+    ) : Int
     # Bank withdraw
     bankWithdrawRequest(
         targetCurrency: String,
@@ -50,11 +57,25 @@ extend type Mutation {
         id: Int,
         reason: String
     ) : Int
+    changeBankWithdrawShowStatus(
+        id: Int,
+        showStatus: Int
+    ) : Int
+
+    addNewWithdrawToken(
+        tokenName: String,
+        tokenSymbol: String,
+        network: String,
+        address: String
+    ) : Token
+
 }
 
 extend type Query {
     # PayPal Queries
-    getPaypalWithdrawByUser : [PaypalWithdraw]
+    getPaypalWithdrawByUser(
+        showStatus: Int
+    ) : [PaypalWithdraw]
     getPaypalWithdrawByUserByAdmin(
         userId: Int
     ) : [PaypalWithdraw]
@@ -65,7 +86,8 @@ extend type Query {
     getPaypalPendingWithdrawRequests : [PaypalWithdraw]
     getPaypalPendingWithdrawRequestsByAdmin : [PaypalWithdraw]
     getPaypalWithdrawById(
-        id: Int
+        id: Int,
+        showStatus: Int
     ) : PaypalWithdraw
     getPaypalWithdrawByIdByAdmin(
         id: Int
@@ -74,7 +96,9 @@ extend type Query {
 
 
     # Crypto queries
-    getCryptoWithdrawByUser : [CryptoWithdraw]
+    getCryptoWithdrawByUser(
+        showStatus: Int
+    ) : [CryptoWithdraw]
     getCryptoWithdrawByUserByAdmin(
         userId: Int
     ) : [CryptoWithdraw]
@@ -87,7 +111,8 @@ extend type Query {
     ) : [CryptoWithdraw]
     getCryptoPendingWithdrawRequests : [CryptoWithdraw]
     getCryptoWithdrawById(
-        id: Int
+        id: Int,
+        showStatus: Int
     ) : CryptoWithdraw
     getAllCryptoWithdraws : [CryptoWithdraw]
     getCryptoWithdrawByIdByAdmin(
@@ -98,14 +123,23 @@ extend type Query {
     getPendingBankWithdrawRequests : [BankWithdrawRequest]
     getAllApprovedBankWithdrawRequests : [BankWithdrawRequest]
     getAllDeniedBankWithdrawRequests : [BankWithdrawRequest]
-    getBankWithdrawRequests : [BankWithdrawRequest]
+    getBankWithdrawRequestsByUser(
+        showStatus: Int
+    ) : [BankWithdrawRequest]
     getBankWithdrawRequestsByAdmin : [BankWithdrawRequest]
     getBankWithdrawRequestById(
-        id: Int
+        id: Int,
+        showStatus: Int
     ) : BankWithdrawRequest
     getBankWithdrawRequestByIdByAdmin(
         id: Int
     ) : BankWithdrawRequest
+
+    # Admin wallet
+    getAdminWalletBalance(
+        network: String,
+        token: String
+    ) : Float
 }
 
 schema {

@@ -1,9 +1,7 @@
 package com.ndb.auction.service;
 
 import com.ndb.auction.dao.oracle.transactions.bank.BankDepositDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentAuctionDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentWalletDao;
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalDepositDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
@@ -24,19 +22,13 @@ public class FinancialService extends BaseService {
     private StripeAuctionDao stripeAuctionDao;
 
     @Autowired
-    private CoinpaymentAuctionDao coinpaymentAuctionDao;
-
-    @Autowired
     private StripePresaleDao stripePresaleDao;
-
-    @Autowired
-    private CoinpaymentPresaleDao coinpaymentPresaleDao;
 
     @Autowired
     private PaypalDepositDao paypalDepositDao;
 
     @Autowired
-    private CoinpaymentWalletDao coinpaymentWalletDao;
+    private CoinpaymentTransactionDao coinpaymentTransactionDao;
 
     @Autowired
     private StripeDepositDao stripeDepositDao;
@@ -54,14 +46,14 @@ public class FinancialService extends BaseService {
 
         statement.setStripeAuctionTxns(stripeAuctionDao.selectRange(userId, from, to));
         statement.setPaypalAuctionTxns(paypalAuctionDao.selectRange(userId, from, to));
-        statement.setCoinpaymentAuctionTxns(coinpaymentAuctionDao.selectRange(userId, from, to));
+        statement.setCoinpaymentAuctionTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "AUCTION"));
         
         statement.setStripePresaleTxns(stripePresaleDao.selectRange(userId, from, to));
         statement.setPaypalPresaleTxns(paypalPresaleDao.selectRange(userId, from, to));
-        statement.setCoinpaymentPresaleTxns(coinpaymentPresaleDao.selectRange(userId, from, to));
+        statement.setCoinpaymentPresaleTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "PRESALE"));
         
         statement.setPaypalDepositTxns(paypalDepositDao.selectRange(userId, from, to));
-        statement.setCoinpaymentWalletTxns(coinpaymentWalletDao.selectRange(userId, from, to));
+        statement.setCoinpaymentWalletTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "DEPOSIT"));
         statement.setStripeDepositTxns(stripeDepositDao.selectRange(userId, from, to));
         statement.setBankDepositTxns(bankDepositDao.selectRange(userId, from, to));
         return statement;

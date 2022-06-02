@@ -7,12 +7,11 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.contracts.NDBreferral;
+import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
 
@@ -24,12 +23,11 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 import java.text.DecimalFormat;
+
 @Service
 public class NDBCoinService {
 
@@ -55,29 +53,30 @@ public class NDBCoinService {
 
     private Credentials ndbCredential;
     private NDBcoin ndbToken;
-    private NDBreferral ndbReferral;
+    private NDBReferral ndbReferral;
     private FastRawTransactionManager txMananger;
 
-    private Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
+    private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("600000");
+    private final BigInteger gasLimit = new BigInteger("8000000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    
+    @SuppressWarnings("deprecation")
     @PostConstruct
     public void init() throws IOException {
-        BEP20NET = Web3j.build(new HttpService(bscNetwork));
-      //  Web3j web3j = Web3j.build(new HttpService(bscNetwork));
+        Web3j web3j = Web3j.build(new HttpService(bscNetwork));
         ndbCredential = Credentials.create(ndbKey);
-        txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
-        ndbToken = NDBcoin.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
-        ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txMananger,gasPrice,gasLimit);
-        ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                 .subscribe(event -> {
-                     handleEvent(event);
-                 }, error -> {
-                     System.out.println("Error: " + error);
-                 });
+        txMananger = new FastRawTransactionManager(web3j, ndbCredential, bscChainId);
+        ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, gasPrice, gasLimit);
+        ndbReferral = NDBReferral.load(ndbReferralContract, web3j, txMananger,gasPrice,gasLimit);
+        // ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleEvent(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
         // ndbReferral.activeReferrerEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
         //         .subscribe(event -> {
         //             handleActiveReferrer(event);
@@ -99,17 +98,15 @@ public class NDBCoinService {
 
     }
 
-
-
-    private void handlereferralCommissionRecorded(NDBreferral.ReferralCommissionRecordedEventResponse event) {
+    private void handlereferralCommissionRecorded(NDBReferral.ReferralCommissionRecordedEventResponse event) {
         System.out.println("referralCommissionRecorded : "+event.referrer +" commission: " + event.commission);
     }
 
-    private void handleRecordReferrer(NDBreferral.ReferralRecordedEventResponse event) {
+    private void handleRecordReferrer(NDBReferral.ReferralRecordedEventResponse event) {
         System.out.println("RecordReferrer user: "+event.user +" referrer: " + event.referrer);
     }
 
-    private void handleActiveReferrer(NDBreferral.ActiveReferrerEventResponse event) {
+    private void handleActiveReferrer(NDBReferral.ActiveReferrerEventResponse event) {
         System.out.println("ActiveReferrer "+event.referrer +" Status: " + event.status);
     }
 
@@ -124,8 +121,7 @@ public class NDBCoinService {
         // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
 
         // add to unconfirmed list
-        schedule.addPendingTxn(txnHash, event);
-
+        schedule.addPendingTxn(txnHash, blockNumber);
         System.out.println("Pending: " + txnHash);
     }
 
@@ -137,8 +133,8 @@ public class NDBCoinService {
             return false ;
     }
 
-    public String activeReferrer(String _address,String _referralCode) throws Exception {
-        String transactionResponse = ndbReferral.activeReferrer(_address,_referralCode ).send().getTransactionHash();
+    public String activeReferrer(String _address,boolean _status) throws Exception {
+        String transactionResponse = ndbReferral.activeReferrer(_address,_status).send().getTransactionHash();
         return transactionResponse;
     }
     public String recordReferral(String _user,String _referrer) throws Exception {
@@ -185,16 +181,9 @@ public class NDBCoinService {
 
     }
 
-    public void checkReferral(String hash) throws IOException {
-        Optional<TransactionReceipt> transactionReceipt =
-                BEP20NET.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
-        int m =1 ;
-    }
-
     public boolean checkConfirmation(BigInteger targetNumber) {
         // check confirm or not
         try {
-            //Web3j web3j = Web3j.build(new HttpService(bscNetwork));
             BigInteger latestNumber = BEP20NET.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
             if(latestNumber.subtract(targetNumber).longValue() > 12L) {
                 return true;

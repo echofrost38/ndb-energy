@@ -131,10 +131,10 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<BankWithdrawRequest> getBankWithdrawRequests() {
+    public List<BankWithdrawRequest> getBankWithdrawRequestsByUser(int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return bankWithdrawService.getRequestsByUser(userId);
+        return bankWithdrawService.getRequestsByUser(userId, showStatus);
     }
     
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -143,17 +143,17 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     }
 
     @PreAuthorize("isAuthenticated()")
-    public BankWithdrawRequest getBankWithdrawRequestById(int id) {
+    public BankWithdrawRequest getBankWithdrawRequestById(int id, int showStatus) {
         var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = bankWithdrawService.getRequestById(id);
+        var m = bankWithdrawService.getRequestById(id, showStatus);
         if(m.getUserId() != userId) return null;
         return m;
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public BankWithdrawRequest getBankWithdrawRequestByIdByAdmin(int id) {
-        return bankWithdrawService.getRequestById(id);
+        return bankWithdrawService.getRequestById(id, 1);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
@@ -164,6 +164,11 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public int denyBankWithdrawRequest(int id, String reason) {
         return bankWithdrawService.denyRequest(id, reason);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public int changeBankWithdrawShowStatus(int id, int showStatus) {
+        return bankWithdrawService.changeShowStatus(id, showStatus);
     }
 
 }

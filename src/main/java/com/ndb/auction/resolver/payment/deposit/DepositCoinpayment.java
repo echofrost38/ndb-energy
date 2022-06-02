@@ -33,7 +33,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
             throw new UnauthorizedException(msg, "userId");
         }
 
-        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, DEPOSIT, cryptoType, network, coin);
+        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
         return coinpaymentWalletService.createNewTransaction(m);
     }
 

@@ -45,6 +45,7 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
             orderId, 
             userId, 
             usdAmount, 
+            _cryptoAmount,
             total- _cryptoAmount, 
             PRESALE, 
             cryptoType, 

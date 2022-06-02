@@ -20,14 +20,14 @@ public class CoinpaymentDepositTransaction extends CryptoDepositTransaction {
     protected int depositStatus;
     protected String txHash;
 
-    public CoinpaymentDepositTransaction(int orderId, int userId, double amount, double fee, String orderType, String cryptoType, String network, String coin) {
+    public CoinpaymentDepositTransaction(int orderId, int userId, double amount, double cryptoAmount, double fee, String orderType, String cryptoType, String network, String coin) {
         this.orderId = orderId;
         this.userId = userId;
         this.orderType = orderType;
         this.amount = amount;
         this.fee = fee;
         this.cryptoType = cryptoType;
-        this.cryptoAmount = 0.0;
+        this.cryptoAmount = cryptoAmount;
         this.network = network;
         this.txHash = "";
         this.coin = coin;

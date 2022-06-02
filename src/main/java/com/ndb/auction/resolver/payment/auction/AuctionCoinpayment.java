@@ -27,9 +27,18 @@ public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationR
         int userId = userDetails.getId();
 
 		var bid = bidService.getBid(roundId, userId);
-		var orderAmount = bid.getTokenAmount() * bid.getTokenPrice();
-		double total = getTotalCoinpaymentOrder(userId, orderAmount);
-		CoinpaymentDepositTransaction _m = new CoinpaymentDepositTransaction(roundId, userId, orderAmount, total - orderAmount, AUCTION, cryptoType, network, coin);
+
+		// check pending price
+		double orderAmount = 0.0;
+		if(bid.isPendingIncrease()) {
+			orderAmount = bid.getTempTokenAmount() * bid.getTempTokenPrice();
+		} else {
+			orderAmount = bid.getTokenAmount() * bid.getTokenPrice();
+		}		
+		var cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+		var cryptoAmount = orderAmount / cryptoPrice;
+		double total = getTotalCoinpaymentOrder(userId, cryptoAmount);
+		CoinpaymentDepositTransaction _m = new CoinpaymentDepositTransaction(roundId, userId, orderAmount, cryptoAmount, total - cryptoAmount, AUCTION, cryptoType, network, coin);
 		return coinpaymentAuctionService.createNewTransaction(_m);
 	}
 

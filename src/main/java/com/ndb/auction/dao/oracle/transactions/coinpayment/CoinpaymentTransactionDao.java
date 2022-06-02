@@ -113,12 +113,12 @@ public class CoinpaymentTransactionDao extends BaseOracleDao {
 
     // update status
     public int updateStatus(int id, int newStatus, double cryptoAmount, String cryptoType) {
-        var sql = "UPDATE TBL_COINPAYMENT_TRANSACTION SET STATUS=?, UPDATE_AT=SYSDATE, CRYPTO_AMOUNT = ?, CRYPTO_TYPE = ? WHERE ID=?";
+        var sql = "UPDATE TBL_COINPAYMENT_TRANSACTION SET STATUS=?, UPDATED_AT=SYSDATE, CRYPTO_AMOUNT = ?, CRYPTO_TYPE = ? WHERE ID=?";
 		return jdbcTemplate.update(sql, newStatus, cryptoAmount, cryptoType,  id);
     }
 
     public int updateStatus(int id, int newStatus, double cryptoAmount, double deposited, double fee, String cryptoType) {
-        var sql = "UPDATE TBL_COINPAYMENT_TRANSACTION SET STATUS=?, UPDATE_AT=SYSDATE, AMOUNT = ?, CRYPTO_AMOUNT=?,FEE=?, CRYPTO_TYPE = ? WHERE ID=?";
+        var sql = "UPDATE TBL_COINPAYMENT_TRANSACTION SET STATUS=?, UPDATED_AT=SYSDATE, AMOUNT = ?, CRYPTO_AMOUNT=?,FEE=?, CRYPTO_TYPE = ? WHERE ID=?";
 		return jdbcTemplate.update(sql, newStatus, cryptoAmount, deposited, fee, cryptoType,  id);
     }
 

@@ -60,7 +60,8 @@ public class NDBCoinService {
 
     private final BigInteger gasPrice = new BigInteger("20000000000");
     private final BigInteger gasLimit = new BigInteger("800000");
-    private final BigInteger decimals = new BigInteger("100000000");
+    private final BigInteger decimals = new BigInteger("1000000000000");
+    private final BigInteger m_decimals = new BigInteger("100000000");
 
     private final double multipler = 10000.0;
 
@@ -210,7 +211,7 @@ public class NDBCoinService {
             // avoid decimals
             amount *= multipler;
             BigInteger _amount = BigInteger.valueOf(amount.longValue());
-            _amount = _amount.multiply(decimals);
+            _amount = _amount.multiply(m_decimals);
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();

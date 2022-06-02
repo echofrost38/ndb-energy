@@ -81,7 +81,7 @@ public class CoinpaymentTransactionDao extends BaseOracleDao {
     public List<CoinpaymentDepositTransaction> selectByOrderTypeByUser(int userId, int showStatus, String orderType) {
         var sql = "SELECT * FROM TBL_COINPAYMENT_TRANSACTION WHERE USER_ID = ? AND ORDER_TYPE = ? AND STATUS != ?";
         if(showStatus == 0) {
-            sql += " IS_SHOW = 1";
+            sql += "AND IS_SHOW = 1";
         }
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), 
             userId, orderType, CoinpaymentDepositTransaction.EXPIRED);

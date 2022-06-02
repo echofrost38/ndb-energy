@@ -53,7 +53,7 @@ public class FinancialService extends BaseService {
         statement.setCoinpaymentPresaleTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "PRESALE"));
         
         statement.setPaypalDepositTxns(paypalDepositDao.selectRange(userId, from, to));
-        statement.setCoinpaymenDepositTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "DEPOSIT"));
+        statement.setCoinpaymentDepositTxns(coinpaymentTransactionDao.selectRange(userId, from, to, "DEPOSIT"));
         statement.setStripeDepositTxns(stripeDepositDao.selectRange(userId, from, to));
         statement.setBankDepositTxns(bankDepositDao.selectRange(userId, from, to));
         return statement;

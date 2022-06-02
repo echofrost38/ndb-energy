@@ -38,7 +38,7 @@ public class Statement {
 
     // 3) Wallet
     private List<PaypalDepositTransaction> paypalDepositTxns;
-    private List<CoinpaymentDepositTransaction> coinpaymentWalletTxns;
+    private List<CoinpaymentDepositTransaction> coinpaymenDepositTxns;
     private List<StripeDepositTransaction> stripeDepositTxns;
     private List<BankDepositTransaction> bankDepositTxns;
 }

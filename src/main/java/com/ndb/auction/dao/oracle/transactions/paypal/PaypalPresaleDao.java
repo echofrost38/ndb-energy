@@ -146,7 +146,7 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
     }
 
     public List<PaypalPresaleTransaction> selectByOrderId(int userId, int orderId) {
-        var sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND ORDER_ID = ?";
+        var sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND P_ORDER_ID = ?";
         return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, orderId);
     }
     

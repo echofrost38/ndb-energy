@@ -30,12 +30,7 @@ import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
-import com.ndb.auction.dao.oracle.user.UserAvatarDao;
-import com.ndb.auction.dao.oracle.user.UserDao;
-import com.ndb.auction.dao.oracle.user.UserKybDao;
-import com.ndb.auction.dao.oracle.user.UserSecurityDao;
-import com.ndb.auction.dao.oracle.user.UserVerifyDao;
-import com.ndb.auction.dao.oracle.user.WhitelistDao;
+import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.exceptions.BalanceException;
@@ -108,6 +103,9 @@ public class BaseService {
 
     @Autowired
     public UserAvatarDao userAvatarDao;
+
+    @Autowired
+    public UserReferralDao userReferralDao;
 
     @Autowired
     public UserKybDao userKybDao;
@@ -265,7 +263,7 @@ public class BaseService {
 
         var available = ndb;
         var overflow = false;
-        if(remain <= ndb) {
+        if(remain < ndb) {
             available = remain;
             overflow = true;
         }

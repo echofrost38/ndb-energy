@@ -71,7 +71,7 @@ public class StripeBaseService extends BaseService {
         double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         var white = whitelistDao.selectByUserId(userId);
 		if(white != null) tierFeeRate = 0.0;
-        return 100 * (amount + 0.30) / (100 - STRIPE_FEE - tierFeeRate);
+        return 100 * (amount + 30) / (100 - STRIPE_FEE - tierFeeRate);
     }
 
     public double getStripeFee(int userId, double amount) {
@@ -79,7 +79,7 @@ public class StripeBaseService extends BaseService {
         double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         var white = whitelistDao.selectByUserId(userId);
         if(white != null) tierFeeRate = 0.0;
-        return  (amount * (STRIPE_FEE + tierFeeRate) / 100) + 0.30;
+        return  (amount * (STRIPE_FEE + tierFeeRate) / 100) + 30;
     }
 
     public double getTotalAmount(int userId, double amount) {

@@ -1,0 +1,10 @@
+extend type Mutation {
+    # Update referral
+    updateReferral(
+        referralCode: String!,
+        wallet: String!,
+    ) : Int
+}
+schema {
+    mutation: Mutation
+}

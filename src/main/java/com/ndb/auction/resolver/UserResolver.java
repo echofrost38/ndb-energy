@@ -15,10 +15,8 @@ import com.ndb.auction.models.transactions.Statement;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.UserVerify;
-import com.ndb.auction.service.user.UserAuthService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,9 +26,6 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class UserResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-
-    @Autowired
-    private UserAuthService userAuthService;
 
     @PreAuthorize("isAuthenticated()")
     public User getUser() {
@@ -50,7 +45,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         int id = userDetails.getId();
-        return userAuthService.changePassword(id, newPassword);
+        return userService.changePassword(id, newPassword);
     }
 
     @PreAuthorize("isAuthenticated()")

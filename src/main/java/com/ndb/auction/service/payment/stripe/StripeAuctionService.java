@@ -26,7 +26,6 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
         PayResponse response = new PayResponse();
         double totalAmount = getTotalAmount(m.getUserId(),m.getFiatAmount());
         m.setFee(getStripeFee(m.getUserId(), m.getFiatAmount()));
-        totalAmount *= 100; // convert into cent
         try {
             if (m.getPaymentIntentId() == null) {
 
@@ -99,15 +98,14 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
     public PayResponse createNewTransactionWithSavedCard(StripeAuctionTransaction m, StripeCustomer customer) {
         PaymentIntent intent;
         PayResponse response = new PayResponse();
-        double totalAmount = getTotalAmount(m.getUserId(),m.getFiatAmount());
-        m.setFee(getStripeFee(m.getUserId(), m.getFiatAmount()));
-        totalAmount *= 100;
+        double totalAmount = getTotalAmount(m.getUserId(),m.getAmount());
+        m.setFee(getStripeFee(m.getUserId(), m.getAmount()));
         try {
 
             if(m.getPaymentIntentId() == null) {
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
-                        .setCurrency(m.getFiatType())
+                        .setCurrency("usd")
                         .setAmount((long) totalAmount)
                         .setCustomer(customer.getCustomerId())
                         .setPaymentMethod(customer.getPaymentMethod())

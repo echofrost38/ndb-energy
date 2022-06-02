@@ -12,6 +12,5 @@ type PaypalDepositTransaction {
     cryptoType: String,
     cryptoPrice: Float,
     fee: Float,
-    deposited: Float,
-    isShow: Boolean
+    deposited: Float
 }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
+import com.ndb.auction.dao.oracle.transactions.ITransactionDao;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Repository
 @NoArgsConstructor
 @Table(name = "TBL_PAYPAL_DEPOSIT")
-public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
+public class PaypalDepositDao extends BaseOracleDao implements ITransactionDao, IPaypalDao {
     
     private static PaypalDepositTransaction extract(ResultSet rs) throws SQLException {
 		PaypalDepositTransaction m = new PaypalAuctionTransaction();
@@ -41,7 +42,6 @@ public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
         m.setCryptoPrice(rs.getDouble("CRYPTO_PRICE"));
         m.setFee(rs.getDouble("FEE"));
         m.setDeposited(rs.getDouble("DEPOSITED"));
-        m.setIsShow(rs.getBoolean("IS_SHOW"));
 		return m;
 	}
     
@@ -55,10 +55,11 @@ public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
 		}, orderId);
     }
 
+    @Override
     public Transaction insert(Transaction _m) {
         PaypalDepositTransaction m = (PaypalDepositTransaction) _m;
-        String sql = "INSERT INTO TBL_PAYPAL_DEPOSIT(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED,IS_SHOW)"
-        + " VALUES(SEQ_PAYPAL_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?,?,1)";
+        String sql = "INSERT INTO TBL_PAYPAL_DEPOSIT(ID,USER_ID,AMOUNT,CREATED_AT,UPDATED_AT,STATUS,FIAT_TYPE,FIAT_AMOUNT,ORDER_ID,ORDER_STATUS,CRYPTO_TYPE,CRYPTO_PRICE,FEE,DEPOSITED)"
+        + " VALUES(SEQ_PAYPAL_DEPOSIT.NEXTVAL,?,?,SYSDATE,SYSDATE,0,?,?,?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -84,6 +85,7 @@ public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
         return m;
     }
 
+    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT";
 		if (orderBy == null)
@@ -92,29 +94,26 @@ public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
     }
 
-    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
+    @Override
+    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE USER_ID = ?";
-		if(status == 0) {
-            sql += " AND IS_SHOW = 1";
-        }
-        if (orderBy == null)
+		if (orderBy == null)
 			orderBy = "ID";
 		sql += " ORDER BY " + orderBy;
 		return jdbcTemplate.query(sql,(rs, rownumber) -> extract(rs), userId);
     }
 
-    public Transaction selectById(int id, int status) {
+    @Override
+    public Transaction selectById(int id) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE ID=?";
-		if(status == 0) {
-            sql += " AND IS_SHOW = 1";
-        }
-        return jdbcTemplate.query(sql, rs -> {
+		return jdbcTemplate.query(sql, rs -> {
 			if (!rs.next())
 				return null;
 			return extract(rs);
 		}, id);
     }
 
+    @Override
     public int update(int id, int status) {
         String sql = "UPDATE TBL_PAYPAL_DEPOSIT SET STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
@@ -128,11 +127,6 @@ public class PaypalDepositDao extends BaseOracleDao implements IPaypalDao {
     public List<PaypalDepositTransaction> selectRange(int userId, long from, long to) {
         String sql = "SELECT * FROM TBL_PAYPAL_DEPOSIT WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));
-    }
-
-    public int changeShowStatus(int id, int status) {
-        var sql = "UPDATE TBL_PAYPAL_DEPOSIT SET IS_SHOW = ? WHERE ID = ?";
-        return jdbcTemplate.update(sql, status, id);
     }
     
 }

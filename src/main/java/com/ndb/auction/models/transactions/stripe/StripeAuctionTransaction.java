@@ -9,6 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StripeAuctionTransaction extends StripeDepositTransaction {
 
+    private Double fee;
+
     public StripeAuctionTransaction(int userId, int auctionId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId) {
         if(fiatType == null) {
             fiatType = "USD";

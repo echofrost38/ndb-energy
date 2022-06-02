@@ -50,7 +50,6 @@ public class PreSale extends BaseModel {
         this.tokenPrice = tokenPrice;
         this.conditions = conditions;
         this.sold = 0.0;
-        this.status = COUNTDOWN;
     }
 
 }

@@ -1,11 +1,11 @@
-package com.ndb.auction.resolver.payment.deposit;
+package com.ndb.auction.resolver.payment.depoist;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
@@ -19,11 +19,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class DepositCoinpayment extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-    
-    private static final String DEPOSIT = "DEPOSIT";
     // get deposit address 
     @PreAuthorize("isAuthenticated()")
-    public CoinpaymentDepositTransaction createChargeForDeposit(String coin, String network, String cryptoType) throws ClientProtocolException, IOException {
+    public CoinpaymentWalletTransaction createChargeForDeposit(String coin, String network, String cryptoType) throws ClientProtocolException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         
@@ -33,41 +31,38 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
             throw new UnauthorizedException(msg, "userId");
         }
 
-        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
-        return coinpaymentWalletService.createNewTransaction(m);
+        CoinpaymentWalletTransaction m = new CoinpaymentWalletTransaction(userId, 0.0, 0.0, coin, network, 0.0, cryptoType);
+        return (CoinpaymentWalletTransaction) coinpaymentWalletService.createNewTransaction(m);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<CoinpaymentDepositTransaction> getCoinpaymentDepositTx() {
-        return coinpaymentWalletService.selectAll(DEPOSIT);
+    @SuppressWarnings("unchecked")
+    public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTx(String orderBy) {
+        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<CoinpaymentDepositTransaction> getCoinpaymentDepositTxByUser(int showStatus) {
+    @SuppressWarnings("unchecked")
+    public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return coinpaymentWalletService.selectByUser(userId, showStatus, DEPOSIT);
+        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<CoinpaymentDepositTransaction> getCoinpaymentDepositTxByAdmin(int userId) {
-        return coinpaymentWalletService.selectByUser(userId, 1, DEPOSIT);
+    @SuppressWarnings("unchecked")
+    public List<CoinpaymentWalletTransaction> getCoinpaymentDepositTxByAdmin(int userId, String orderBy) {
+        return (List<CoinpaymentWalletTransaction>) coinpaymentWalletService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public CoinpaymentDepositTransaction getCoinpaymentDepositTxById(int id) {
+    public CoinpaymentWalletTransaction getCoinpaymentDepositTxById(int id) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var m = coinpaymentWalletService.selectById(id);
+        var m = (CoinpaymentWalletTransaction) coinpaymentWalletService.selectById(id);
         if(m.getUserId() != userId) {
             throw new UnauthorizedException("You have no permission.", "id");
         }
         return m;
     }
-
-    @PreAuthorize("isAuthenticated()")
-    public int changeCoinpaymentDepositShowStatus(int id, int showStatus) {
-        return coinpaymentWalletService.changeShowStatus(id, showStatus);
-    }
-
 }

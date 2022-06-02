@@ -12,4 +12,5 @@ import lombok.Setter;
 public class AddressResult {
     private String address;
     private String pubkey;
+    private int dest_tag;
 }

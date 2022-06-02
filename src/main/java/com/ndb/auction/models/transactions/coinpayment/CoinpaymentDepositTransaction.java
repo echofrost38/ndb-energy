@@ -27,9 +27,11 @@ public class CoinpaymentDepositTransaction extends CryptoDepositTransaction {
         this.amount = amount;
         this.fee = fee;
         this.cryptoType = cryptoType;
+        this.cryptoAmount = 0.0;
         this.network = network;
+        this.txHash = "";
         this.coin = coin;
-        this.depositAddress = null;
+        this.depositAddress = "";
         this.depositStatus = 0; // pending
     }
 }

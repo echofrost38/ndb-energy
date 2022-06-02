@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
-import com.ndb.auction.payload.response.AddressResponse;
+import com.ndb.auction.payload.request.coinpayments.CoinPaymentsGetCallbackRequest;
+import com.ndb.auction.payload.response.coinpayment.AddressResponse;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;

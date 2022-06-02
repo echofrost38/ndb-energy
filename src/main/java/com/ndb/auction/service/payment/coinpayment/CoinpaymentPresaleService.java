@@ -2,6 +2,7 @@ package com.ndb.auction.service.payment.coinpayment;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -53,7 +54,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         String ipnUrl = COINSPAYMENT_IPN_URL + "/presale/" + m.getId();
         
         var txRequest = CoinpaymentCreateTransaction.builder()
-            .amount(m.getAmount())
+            .amount(BigDecimal.valueOf(m.getAmount()))
             .currency1("USD")
             .currency2(m.getCryptoType())
             .buyerEmail(userEmail)

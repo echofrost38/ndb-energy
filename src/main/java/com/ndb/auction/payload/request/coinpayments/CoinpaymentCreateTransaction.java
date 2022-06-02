@@ -1,7 +1,5 @@
 package com.ndb.auction.payload.request.coinpayments;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CoinpaymentCreateTransaction {
-    private BigDecimal amount; // usd 
+    private Double amount; // usd 
     private String currency1; // usd
     private String currency2; // cryptocurrency2
     private String buyerEmail; 

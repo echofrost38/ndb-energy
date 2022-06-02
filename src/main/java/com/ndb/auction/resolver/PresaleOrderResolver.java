@@ -3,15 +3,16 @@ package com.ndb.auction.resolver;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
 import com.ndb.auction.exceptions.PreSaleException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
+import com.ndb.auction.models.presale.PresaleOrderPayments;
 import com.ndb.auction.service.user.UserDetailsImpl;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -71,6 +72,14 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
     @PreAuthorize("isAuthenticated()")
     public PreSaleOrder getPresaleById(int id) {
         return presaleOrderService.getPresaleById(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public PresaleOrderPayments getPresaleOrderTransactions(int orderId) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+
+        return presaleOrderService.getPaymentsByOrder(userId, orderId);
     }
 
 }

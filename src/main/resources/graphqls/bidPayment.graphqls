@@ -15,27 +15,25 @@ extend type Query {
 		roundId: String!,
 		userId: String
 	) : [StripeAuctionTransaction]
-	
 	# for coinpayment
     getCryptoAuctionTxById(
 		id: Int!
-	) : CoinpaymentDepositTransaction
+	) : CoinpaymentAuctionTransaction
 	getCryptoAuctionTxByUser 
-	  : [CoinpaymentDepositTransaction]
+	  : [CoinpaymentAuctionTransaction]
 	getCryptoAuctionTxByAdmin(
 		userId: Int!
-	) : [CoinpaymentDepositTransaction]
+	) : [CoinpaymentAuctionTransaction]
 	getCryptoAuctionTxByRound(
 		roundId: Int!
-	) : [CoinpaymentDepositTransaction]
+	) : [CoinpaymentAuctionTransaction]
 	getCryptoAuctionTx(
 		roundId: Int!,
-	) : [CoinpaymentDepositTransaction]
+	) : [CoinpaymentAuctionTransaction]
 	getCryptoAuctionTxPerRoundByAdmin(
 		roundId: Int!,
 		userId: Int
-	) : [CoinpaymentDepositTransaction]
-	
+	) : [CoinpaymentAuctionTransaction]
 	# for paypal
 	getAllPaypalAuctionTxns(
 		orderBy: String
@@ -66,15 +64,13 @@ extend type Mutation {
 		cardId: Int,
 		paymentIntentId: String
 	) : PayResponse!
-    
-	createCryptoPaymentForAuction(
+    createCryptoPaymentForAuction(
 		roundId: Int!,
+		amount: Float,
 		cryptoType: String,
 		network: String,
 		coin: String!
-	) : CoinpaymentDepositTransaction
-	
-	
+	) : CoinpaymentAuctionTransaction
 	paypalForAuction(
 		roundId: Int,
 		currencyCode: String,

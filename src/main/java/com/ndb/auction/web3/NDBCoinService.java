@@ -58,13 +58,9 @@ public class NDBCoinService {
 
     private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
-    private final BigInteger gasPrice = new BigInteger("20000000000");
-    private final BigInteger gasLimit = new BigInteger("800000");
+    private final BigInteger gasPrice = new BigInteger("10000000000");
+    private final BigInteger gasLimit = new BigInteger("8000000");
     private final BigInteger decimals = new BigInteger("1000000000000");
-    private final BigInteger m_decimals = new BigInteger("100000000");
-
-    private final double multipler = 10000.0;
-
     private static final DecimalFormat df = new DecimalFormat("0.00");
     
     @SuppressWarnings("deprecation")
@@ -204,14 +200,11 @@ public class NDBCoinService {
         try {
 
             Web3j web3j = Web3j.build(new HttpService(bscNetwork));
-            ndbCredential = Credentials.create(ndbKey);
             @SuppressWarnings("deprecation")
             ERC20 ndbToken = ERC20.load(ndbTokenContract, web3j, ndbCredential, gasPrice, gasLimit);
             
-            // avoid decimals
-            amount *= multipler;
             BigInteger _amount = BigInteger.valueOf(amount.longValue());
-            _amount = _amount.multiply(m_decimals);
+            _amount = _amount.multiply(decimals);
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();

@@ -18,6 +18,7 @@ import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
@@ -320,6 +321,7 @@ public class BidService extends BaseService {
 	}
 
 	// not sychnorized
+	@SuppressWarnings("unchecked")
 	public void closeBid(int roundId) {
 
 		Auction auction = auctionDao.getAuctionById(roundId);
@@ -348,8 +350,8 @@ public class BidService extends BaseService {
 				}
 
 				// 2) check Coinpayment remove hold token
-				var coinpaymentTxns = coinpaymentAuctionService.selectByOrderIdByUser(userId, bid.getRoundId(), "AUCTION");
-				for (var coinpaymentTxn : coinpaymentTxns) {
+				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
 					// get crypto type and amount
 					String cryptoType = coinpaymentTxn.getCryptoType();
 					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();
@@ -412,8 +414,8 @@ public class BidService extends BaseService {
 				}
 
 				// 2) check Coinpayment remove hold token
-				var coinpaymentTxns = coinpaymentAuctionService.selectByOrderIdByUser(userId, roundId, "AUCTION");
-				for (var coinpaymentTxn : coinpaymentTxns) {
+				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
+				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
 					// get crypto type and amount
 					String cryptoType = coinpaymentTxn.getCryptoType();
 					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();

@@ -45,10 +45,6 @@ extend type Mutation {
         id: Int,
         showStatus: Int
     ) : Int
-    updateCoinpaymentTxHash(
-        id: Int,
-        txHash: String
-    ) : Int
     
     # stripe deposit
     stripeForDeposit(

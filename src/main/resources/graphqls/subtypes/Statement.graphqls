@@ -6,16 +6,16 @@ type Statement {
     # bid
     stripeAuctionTxns: [StripeAuctionTransaction],
     paypalAuctionTxns: [PaypalAuctionTransaction],
-    coinpaymentAuctionTxns: [CoinpaymentDepositTransaction],
+    coinpaymentAuctionTxns: [CoinpaymentAuctionTransaction],
     
     # presale
     stripePresaleTxns: [StripePresaleTransaction],
     paypalPresaleTxns: [PaypalPresaleTransaction],
-    coinpaymentPresaleTxns: [CoinpaymentDepositTransaction],
+    coinpaymentPresaleTxns: [CoinpaymentPresaleTransaction],
     
     # deposit
     paypalDepositTxns: [PaypalDepositTransaction],
-    coinpaymentDepositTxns: [CoinpaymentDepositTransaction],
+    coinpaymentWalletTxns: [CoinpaymentWalletTransaction],
     stripeDepositTxns: [StripeDepositTransaction],
     bankDepositTxns: [BankDepositTransaction]
 }

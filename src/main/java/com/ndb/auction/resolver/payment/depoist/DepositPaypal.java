@@ -1,4 +1,4 @@
-package com.ndb.auction.resolver.payment.deposit;
+package com.ndb.auction.resolver.payment.depoist;
 
 import java.text.DecimalFormat;
 import java.util.List;

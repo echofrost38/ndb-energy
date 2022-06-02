@@ -1,5 +1,0 @@
-type PresaleOrderPayments {
-    coinpaymentTxns: [CoinpaymentDepositTransaction]
-    stripeTxns: [StripePresaleTransaction]
-    paypalTxns: [PaypalPresaleTransaction]
-}

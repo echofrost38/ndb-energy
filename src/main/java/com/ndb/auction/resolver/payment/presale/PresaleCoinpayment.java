@@ -27,6 +27,7 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
     public CoinpaymentDepositTransaction createChargeForPresale(int presaleId, int orderId, String coin, String network, String cryptoType) throws ParseException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        var userEmail = userDetails.getEmail();
 
         var order = presaleOrderService.getPresaleById(orderId);
 
@@ -36,23 +37,21 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
         }
 
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
-        var cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
-        var _cryptoAmount = usdAmount / cryptoPrice;
-
-        double total = getTotalCoinpaymentOrder(userId, _cryptoAmount);
+        usdAmount = getTierFee(userId, usdAmount);
+        
         // crypto amount means total order!!!!! including fee
         CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(
             orderId, 
             userId, 
             usdAmount, 
-            _cryptoAmount,
-            total- _cryptoAmount, 
+            0.0, // total order in crypto
+            0.0, 
             PRESALE, 
             cryptoType, 
             network, 
             coin);
 
-        return coinpaymentPresaleService.createNewTransaction(m);
+        return coinpaymentPresaleService.createNewTransaction(userEmail, m);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")

@@ -7,8 +7,8 @@ import java.util.Locale;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
-import com.ndb.auction.payload.response.AddressResponse;
+import com.ndb.auction.payload.request.coinpayments.CoinpaymentCreateTransaction;
+import com.ndb.auction.payload.response.coinpayment.CreateTxResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
-    public CoinpaymentDepositTransaction createNewTransaction(CoinpaymentDepositTransaction m)
+    public CoinpaymentDepositTransaction createNewTransaction(String userEmail, CoinpaymentDepositTransaction m)
             throws UnsupportedEncodingException, ClientProtocolException, IOException {
         
         // round existing
@@ -51,9 +51,16 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
         // get address
         String ipnUrl = COINSPAYMENT_IPN_URL + "/presale/" + m.getId();
-        CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(m.getCoin(), ipnUrl);
         
-        String payload = request.toString();
+        var txRequest = CoinpaymentCreateTransaction.builder()
+            .amount(m.getAmount())
+            .currency1("USD")
+            .currency2(m.getCryptoType())
+            .buyerEmail(userEmail)
+            .ipnUrl(ipnUrl)
+            .build();
+
+        String payload = txRequest.toString();
         payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";
         String hmac = buildHmacSignature(payload, COINSPAYMENT_PRIV_KEY);
         
@@ -64,10 +71,14 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         String content = EntityUtils.toString(response.getEntity());
         log.info("Coinpayment Get Callback address response: {}", content);
         
-        AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
+        CreateTxResponse addressResponse = gson.fromJson(content, CreateTxResponse.class);
         if(!addressResponse.getError().equals("ok")) return null;
         String address = addressResponse.getResult().getAddress();
-        coinpaymentTransactionDao.updateDepositAddress(m.getId(), address);
+        
+        double cryptoAmount = Double.valueOf(addressResponse.getResult().getAddress());
+        double fee = getTierFee(m.getUserId(), cryptoAmount);
+        coinpaymentTransactionDao.updateDepositAddress(m.getId(), cryptoAmount, fee, address);
+        
         m.setDepositAddress(address);
         return m;
     }

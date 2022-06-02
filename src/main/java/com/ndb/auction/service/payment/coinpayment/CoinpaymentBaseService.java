@@ -8,7 +8,7 @@ import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentPresaleDao
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentWalletDao;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.payload.request.CoinPaymentsRateRequest;
+import com.ndb.auction.payload.request.coinpayments.CoinPaymentsRateRequest;
 import com.ndb.auction.service.BaseService;
 
 import org.apache.http.ParseException;

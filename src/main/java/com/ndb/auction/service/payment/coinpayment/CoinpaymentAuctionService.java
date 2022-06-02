@@ -6,8 +6,8 @@ import java.util.Locale;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
-import com.ndb.auction.payload.response.AddressResponse;
+import com.ndb.auction.payload.request.coinpayments.CoinPaymentsGetCallbackRequest;
+import com.ndb.auction.payload.response.coinpayment.AddressResponse;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;

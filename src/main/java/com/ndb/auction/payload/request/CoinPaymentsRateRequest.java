@@ -1,4 +1,4 @@
-package com.ndb.auction.payload.request.coinpayments;
+package com.ndb.auction.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

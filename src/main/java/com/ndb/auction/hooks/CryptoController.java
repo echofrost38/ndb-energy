@@ -242,7 +242,7 @@ public class CryptoController extends BaseController {
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK); 
+        return null;
     }
 
     @PostMapping("/ipn/deposit/{id}")

@@ -1,4 +1,4 @@
-package com.ndb.auction.payload.response.coinpayment;
+package com.ndb.auction.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

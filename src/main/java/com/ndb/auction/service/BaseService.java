@@ -335,12 +335,4 @@ public class BaseService {
 			"PAYMENT CONFIRMED",
 			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
-
-    protected double getTierFee(int userId, double amount) {
-		User user = userDao.selectById(userId);
-		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-		var white = whitelistDao.selectByUserId(userId);
-		if(white != null) tierFeeRate = 0.0;
-		return amount * tierFeeRate / 100;
-	}
 }

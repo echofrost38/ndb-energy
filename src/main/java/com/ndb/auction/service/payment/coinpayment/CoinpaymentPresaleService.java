@@ -10,6 +10,8 @@ import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransac
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -18,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
     public CoinpaymentDepositTransaction createNewTransaction(CoinpaymentDepositTransaction m)
@@ -59,6 +62,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         CloseableHttpResponse response = client.execute(post);
         
         String content = EntityUtils.toString(response.getEntity());
+        log.info("Coinpayment Get Callback address response: {}", content);
         
         AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
         if(!addressResponse.getError().equals("ok")) return null;

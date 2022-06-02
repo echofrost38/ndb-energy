@@ -15,7 +15,7 @@ type Statement {
     
     # deposit
     paypalDepositTxns: [PaypalDepositTransaction],
-    coinpaymentWalletTxns: [CoinpaymentDepositTransaction],
+    coinpaymentDepositTxns: [CoinpaymentDepositTransaction],
     stripeDepositTxns: [StripeDepositTransaction],
     bankDepositTxns: [BankDepositTransaction]
 }

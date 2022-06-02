@@ -41,7 +41,16 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
 
         double total = getTotalCoinpaymentOrder(userId, _cryptoAmount);
         // crypto amount means total order!!!!! including fee
-        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(orderId, userId, usdAmount, total-_cryptoAmount, PRESALE, coin, network, cryptoType);
+        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(
+            orderId, 
+            userId, 
+            usdAmount, 
+            total- _cryptoAmount, 
+            PRESALE, 
+            cryptoType, 
+            network, 
+            coin);
+
         return coinpaymentPresaleService.createNewTransaction(m);
     }
 

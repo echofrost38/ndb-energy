@@ -1,0 +1,4 @@
+type GAuthResetResponse {
+    secret: String,
+    token: String
+}

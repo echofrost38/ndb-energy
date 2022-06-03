@@ -13,6 +13,7 @@ import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BankMeta;
+import com.ndb.auction.payload.RecoveryRequest;
 import com.ndb.auction.payload.WithdrawRequest;
 import com.ndb.auction.service.TokenAssetService;
 
@@ -160,4 +161,31 @@ public class MailService {
         }
         javaMailSender.send(mimeMessage);
     }
+
+    public String fillRecoveryEmailContent(RecoveryRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        StringWriter stringWriter = new StringWriter();
+        var model = new HashMap<String, Object>();
+        // destructure
+        model.put("email", request.getUser().getEmail());
+        model.put("prefix", request.getUser().getAvatar().getPrefix());
+        model.put("name", request.getUser().getAvatar().getName());
+        model.put("coin", request.getCoin());
+        model.put("address", request.getReceiverAddr());
+        model.put("txId", request.getTxId());
+        model.put("depositAmount", request.getDepositAmount());
+
+        configuration.getTemplate("recovery.ftlh").process(model, stringWriter);
+        return stringWriter.getBuffer().toString();
+    }
+
+    public void sendRecoveryEmail(RecoveryRequest request) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
+        var mimeMessage = javaMailSender.createMimeMessage();
+        var helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject("Recovery Request");
+        String emailContent = fillRecoveryEmailContent(request);
+        helper.setText(emailContent, true);
+        helper.addTo("info@ndb.money");
+        javaMailSender.send(mimeMessage);
+    }
+
 }

@@ -1,0 +1,8 @@
+type Token {
+    id: Int,
+    tokenName: String,
+    tokenSymbol:String,
+    network: String,
+    address: String,
+    withdrawable: Boolean
+}

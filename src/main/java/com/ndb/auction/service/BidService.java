@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.google.gson.reflect.TypeToken;
 import com.ndb.auction.exceptions.AuctionException;
-import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.AuctionStats;
 import com.ndb.auction.models.Bid;
@@ -19,7 +18,6 @@ import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.user.User;
@@ -322,7 +320,6 @@ public class BidService extends BaseService {
 	}
 
 	// not sychnorized
-	@SuppressWarnings("unchecked")
 	public void closeBid(int roundId) {
 
 		Auction auction = auctionDao.getAuctionById(roundId);
@@ -335,7 +332,6 @@ public class BidService extends BaseService {
 
 			Bid bid = iterator.next();
 			int userId = bid.getUserId();
-			Boolean captureError = false;
 			// check bid status 
 			// A) if winner 
 			if(bid.getStatus() == Bid.WINNER) {
@@ -347,14 +343,13 @@ public class BidService extends BaseService {
 						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
 						intent.capture();
 					} catch (Exception e) {
-						captureError = true;
 						break;
 					}
 				}
 
 				// 2) check Coinpayment remove hold token
-				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
-				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
+				var coinpaymentTxns = coinpaymentAuctionService.selectByOrderIdByUser(userId, bid.getRoundId(), "AUCTION");
+				for (var coinpaymentTxn : coinpaymentTxns) {
 					// get crypto type and amount
 					String cryptoType = coinpaymentTxn.getCryptoType();
 					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();
@@ -362,7 +357,6 @@ public class BidService extends BaseService {
 					// deduct hold value
 					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
 					if(tokenId == null) {
-						captureError = true;
 						break;
 					}
 					balanceDao.deductHoldBalance(userId, tokenId, cryptoAmount);
@@ -413,14 +407,13 @@ public class BidService extends BaseService {
 						PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
 						intent.cancel();
 					} catch (Exception e) {
-						captureError = true;
 						break;
 					}
 				}
 
 				// 2) check Coinpayment remove hold token
-				List<CoinpaymentAuctionTransaction> coinpaymentTxns = (List<CoinpaymentAuctionTransaction>) coinpaymentAuctionService.select(userId, roundId);
-				for (CoinpaymentAuctionTransaction coinpaymentTxn : coinpaymentTxns) {
+				var coinpaymentTxns = coinpaymentAuctionService.selectByOrderIdByUser(userId, roundId, "AUCTION");
+				for (var coinpaymentTxn : coinpaymentTxns) {
 					// get crypto type and amount
 					String cryptoType = coinpaymentTxn.getCryptoType();
 					Double cryptoAmount = coinpaymentTxn.getCryptoAmount();
@@ -428,7 +421,6 @@ public class BidService extends BaseService {
 					// deduct hold value
 					Integer tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
 					if(tokenId == null) {
-						captureError = true;
 						break;
 					}
 					balanceDao.releaseHoldBalance(userId, tokenId, cryptoAmount);

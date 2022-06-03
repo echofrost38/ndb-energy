@@ -124,31 +124,37 @@ public class PaypalPresaleDao extends BaseOracleDao implements ITransactionDao, 
 			public PaypalPresaleTransaction extractData(ResultSet rs) throws SQLException {
 				if (!rs.next())
 					return null;
-				return extract(rs);
-			}
-		}, id);
-    }
-
+                    return extract(rs);
+                }
+            }, id);
+        }
+        
     @Override
     public int update(int id, int status) {
         // TODO Auto-generated method stub
         return 0;
     }
-
+    
     public List<PaypalPresaleTransaction> selectByIds(int userId, int presaleId) {
         String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND PRESALE_ID = ?";
 		return jdbcTemplate.query(sql, new RowMapper<PaypalPresaleTransaction>() {
-			@Override
+            @Override
 			public PaypalPresaleTransaction mapRow(ResultSet rs, int rownumber) throws SQLException {
-				return extract(rs);
+                return extract(rs);
 			}
 		}, userId, presaleId);
     }
 
+    public List<PaypalPresaleTransaction> selectByOrderId(int userId, int orderId) {
+        var sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND P_ORDER_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, orderId);
+    }
+    
     public int updateOrderStatus(int id, String status) {
         String sql = "UPDATE TBL_PAYPAL_PRESALE SET STATUS = 1, ORDER_STATUS = ? WHERE ID = ?";
         return jdbcTemplate.update(sql, status, id);
     }
+
 
     public List<PaypalPresaleTransaction> selectRange(int userId, long from, long to) {
         String sql = "SELECT * FROM TBL_PAYPAL_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";

@@ -16,7 +16,6 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.InternalBalanceService;
-import com.ndb.auction.service.payment.ITransactionService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StripeDepositService extends StripeBaseService implements ITransactionService {
+public class StripeDepositService extends StripeBaseService {
 
     private final StripeDepositDao stripeDepositDao;
     private final InternalBalanceService internalBalanceService;
@@ -116,11 +115,8 @@ public class StripeDepositService extends StripeBaseService implements ITransact
 
         double fee = getStripeFee(userId, m.getFiatAmount()) / 100.00;
         double amount = m.getAmount() / 100;
-        double cryptoPrice = 1.0;
-        if(!m.getCryptoType().equals("USDT")) {
-            cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
-        }
-
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
+    
         double deposited = (amount - fee) / cryptoPrice;
         var depositTransaction = new StripeDepositTransaction(
                 userId, m.getAmount(), m.getFiatAmount(), m.getFiatType() ,m.getCryptoType(),cryptoPrice, intent.getId(),
@@ -196,27 +192,27 @@ public class StripeDepositService extends StripeBaseService implements ITransact
         return stripeDepositDao.insert(m);
     }
 
-    @Override
     public List<? extends Transaction> selectAll(String orderBy) {
         return stripeDepositDao.selectAll(orderBy);
     }
 
-    @Override
-    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
-        return stripeDepositDao.selectByUser(userId, orderBy);
+    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
+        return stripeDepositDao.selectByUser(userId, orderBy, status);
     }
 
-    @Override
-    public Transaction selectById(int id) {
-        return stripeDepositDao.selectById(id);
+    public Transaction selectById(int id, int status) {
+        return stripeDepositDao.selectById(id, status);
     }
 
-    @Override
     public int update(int id, int status) {
         return 0;
     }
 
     public StripeDepositTransaction selectByIntentId(String intentId) {
         return stripeDepositDao.selectByStripeIntentId(intentId);
+    }
+
+    public int changeShowStatus(int id, int status) {
+        return stripeDepositDao.changeShowStatus(id, status);
     }
 }

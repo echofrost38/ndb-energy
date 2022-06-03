@@ -24,6 +24,7 @@ public class UserReferralDao extends BaseOracleDao {
         m.setReferralCode(rs.getString("REFERRAL_CODE"));
         m.setReferredByCode(rs.getString("REFERRED_BY_CODE"));
         m.setWalletConnect(rs.getString("WALLET_CONNECT"));
+        m.setPaidTxn(rs.getString("PAID_TXN"));
         m.setActive(rs.getBoolean("ACTIVE"));
         m.setDeleted(rs.getInt("DELETED"));
         m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
@@ -75,6 +76,11 @@ public class UserReferralDao extends BaseOracleDao {
     public int updateWalletConnect(String referralCode, String walletConnect) {
         String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=? WHERE REFERRAL_CODE=?";
         return jdbcTemplate.update(sql, walletConnect, referralCode);
+    }
+
+    public int updatePaidCommissionTxn(String txn, String referralCode,String referredByCode) {
+        String sql = "UPDATE TBL_USER_REFERRAL SET PAID_TXN=? WHERE REFERRAL_CODE=? AND REFERRED_BY_CODE=?";
+        return jdbcTemplate.update(sql, txn, referralCode,referredByCode);
     }
 
     public int setReferralStatus(int id ,boolean status) {

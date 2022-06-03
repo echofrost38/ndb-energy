@@ -15,5 +15,6 @@ public class UserReferral extends BaseModel {
     private String referralCode;
     private String referredByCode;
     private String walletConnect;
+    private String paidTxn;
     private boolean active;
 }

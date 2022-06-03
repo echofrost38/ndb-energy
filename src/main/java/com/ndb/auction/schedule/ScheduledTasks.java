@@ -325,9 +325,9 @@ public class ScheduledTasks {
 						if (ndbCoinService.getReferrerByUserWallet(userReferral.getWalletConnect()).equals(emptyAddress)){
 							String hssh = ndbCoinService.recordReferral(userReferral.getWalletConnect(),referrerWallet);
 							if (!hash.isEmpty()){
-								String payTnx = ndbCoinService.payCommission(referrerWallet,(lvalue*10/100));
+								String payTnx = ndbCoinService.payCommission(referrerWallet,(lvalue));
 								System.out.println("PAY REFERRAL SUCCESS: " + payTnx);
-								String rfcTnx = ndbCoinService.recordReferralCommission(referrerWallet,(lvalue*10/100));
+								String rfcTnx = ndbCoinService.recordReferralCommission(referrerWallet,(lvalue));
 							}
 						}
 					}

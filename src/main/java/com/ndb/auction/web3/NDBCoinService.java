@@ -51,6 +51,9 @@ public class NDBCoinService {
     @Value("${ndb.referral.treasury}")
     private String referralTreasury;
 
+    @Value("${ndb.referral.commissionRate}")
+    private long referralCommissionRate;
+
     @Value("${pancakev2.rpc}")
     private String pancakev2RPC;
 
@@ -69,16 +72,15 @@ public class NDBCoinService {
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
     @PostConstruct
-    public void init() throws IOException {
+    public void init()  {
         try {
-           // BEP20NET = Web3j.build(new HttpService(bscNetwork));
             Web3jConfig web3jConfig = new Web3jConfig();
             BEP20NET = Web3j.build(web3jConfig.buildService(bscNetwork));
             //  Web3j web3j = Web3j.build(new HttpService(bscNetwork));
             ndbCredential = Credentials.create(ndbKey);
             txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
             ndbToken = NDBcoinV3.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
-            ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txMananger,gasPrice,gasLimit);
+            ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txMananger, gasPrice, gasLimit);
             ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
                     .subscribe(event -> {
                         handleEvent(event);
@@ -103,11 +105,9 @@ public class NDBCoinService {
             //         }, error -> {
             //             System.out.println("Error: " + error);
             //         });
-        }catch(Exception ex){
-            String m="1";
+        } catch (Exception ex){
+            System.out.println("INIT WEB3 : " + ex.getMessage());
         }
-
-
     }
 
 
@@ -149,7 +149,7 @@ public class NDBCoinService {
     }
 
     public String payCommission(String _referrer,long _commission) throws Exception {
-        BigInteger commission = BigInteger.valueOf(_commission).multiply(decimals);
+        BigInteger commission = BigInteger.valueOf(_commission*referralCommissionRate/100).multiply(decimals);
         String transferResponse = ndbToken.transferFrom(referralTreasury,_referrer,commission).send().getTransactionHash();
         return transferResponse;
     }
@@ -180,7 +180,7 @@ public class NDBCoinService {
     }
 
     public String recordReferralCommission(String _referrer,long _commission) throws Exception {
-        BigInteger commission = BigInteger.valueOf(_commission);
+        BigInteger commission = BigInteger.valueOf(_commission*referralCommissionRate/100);
         String transactionResponse = ndbReferral.recordReferralCommission(_referrer,commission).send().getTransactionHash();
         return transactionResponse;
     }
@@ -214,14 +214,6 @@ public class NDBCoinService {
     }
 
     public NDBCoinService() {
-
-
-    }
-
-    public void checkReferral(String hash) throws IOException {
-        Optional<TransactionReceipt> transactionReceipt =
-                BEP20NET.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
-        int m =1 ;
     }
 
     public boolean checkConfirmation(BigInteger targetNumber) {

@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public abstract class BaseModel {
+
     protected int id;
     protected Long regDate;
     protected Long updateDate;

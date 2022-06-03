@@ -10,21 +10,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.mail.MessagingException;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.ndb.auction.contracts.NDBcoinV3;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
+import com.ndb.auction.dao.oracle.user.UserReferralDao;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.InternalBalanceService;
@@ -87,6 +85,9 @@ public class ScheduledTasks {
 	UserDetailDao userDetailDao;
 
 	@Autowired
+	UserReferralDao userReferralDao;
+
+	@Autowired
 	ThirdAPIUtils apiUtils;
 
 	private Auction startedRound;
@@ -102,10 +103,11 @@ public class ScheduledTasks {
 	private Long readyPresaleCounter;
 
 	private final AmazonS3 s3;
-	private final static String bucketName = "nyyu-dev-backup";
+	private final static String bucketName = "nyyu-live-backup";
 	// check transaction
-	private Map<String, BigInteger> pendingTransactions;
-
+	//private Map<String,BigInteger> pendingTransactions;
+	private Map<String,String> pendingReferral;
+	private Map<String, NDBcoinV3.TransferEventResponse> pendingTransactions;
 	public ScheduledTasks(AmazonS3 s3) {
 		this.readyCounter = 0L;
 		this.startedCounter = 0L;
@@ -118,6 +120,7 @@ public class ScheduledTasks {
 		this.readyPresaleCounter = 0l;
 
 		pendingTransactions = new HashMap<>();
+		pendingReferral = new HashMap<>();
 		this.s3 = s3;
 	}
 
@@ -280,11 +283,13 @@ public class ScheduledTasks {
 	}
 
 	// add pending list
-	public void addPendingTxn(String hash, BigInteger blockNum) {
-		if(pendingTransactions.containsKey(hash)) 
+	public void addPendingTxn(String hash, NDBcoinV3.TransferEventResponse event) {
+		if(pendingTransactions.containsKey(hash))
 			return;
-		pendingTransactions.put(hash, blockNum);
+		pendingTransactions.put(hash, event);
 	}
+
+
 
 	public void forceToClosePresale(int presaleId) {
 		presaleService.closePresale(presaleId);
@@ -292,16 +297,44 @@ public class ScheduledTasks {
 		startedPresaleCounter = 0L;		
 	}
 
-	@Scheduled(fixedRate = 1000 * 120)
-	public void checkConfirmation() {
+	@Scheduled(fixedRate = 1000 * 50)
+	public void checkConfirmation() throws Exception {
+		String emptyAddress = "0x0000000000000000000000000000000000000000";
+		BigInteger decimals = new BigInteger("1000000000000");
 		Set<String> hashSet = this.pendingTransactions.keySet();
 		for (String hash : hashSet) {
-			BigInteger target = this.pendingTransactions.get(hash);
-			if(ndbCoinService.checkConfirmation(target)) {
+			NDBcoinV3.TransferEventResponse event = this.pendingTransactions.get(hash);
+			BigInteger blockNumber = event.log.getBlockNumber();
+			String receiveWallet = event.to.toLowerCase();
+			long lvalue = event.value.divide(decimals).longValue();
+			if(ndbCoinService.checkConfirmation(blockNumber)) {
 				// set success
 				System.out.println("SUCCESS: " + hash);
+				//ndbCoinService.checkReferral(hash);
+				// Check referral
+				UserReferral userReferral = userReferralDao.selectByWalletConnect(receiveWallet);
 				// withdrawService.updateStatus(hash);
-				pendingTransactions.remove(hash);
+				if (userReferral!=null) {
+
+					if (ndbCoinService.getReferrerActive(userReferral.getWalletConnect()).isEmpty()){
+						String result = ndbCoinService.activeReferrer(receiveWallet,userReferral.getReferralCode());
+					}
+
+					String referrerWallet= ndbCoinService.getReferrerWalletByActiveCode(userReferral.getReferredByCode());
+					if (!referrerWallet.isEmpty()){
+						if (ndbCoinService.getReferrerByUserWallet(userReferral.getWalletConnect()).equals(emptyAddress)){
+							String hssh = ndbCoinService.recordReferral(userReferral.getWalletConnect(),referrerWallet);
+							if (!hash.isEmpty()){
+								String payTnx = ndbCoinService.payCommission(referrerWallet,(lvalue*10/100));
+								System.out.println("PAY REFERRAL SUCCESS: " + payTnx);
+								String rfcTnx = ndbCoinService.recordReferralCommission(referrerWallet,(lvalue*10/100));
+							}
+						}
+					}
+					pendingTransactions.remove(hash);
+
+				}
+
 			}
 		}
 	}
@@ -322,7 +355,7 @@ public class ScheduledTasks {
 		}
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
+	@Scheduled(fixedRate = 1000 * 60 * 60)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");

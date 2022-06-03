@@ -11,32 +11,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CryptoWithdrawService extends BaseService {
+public class CryptoWithdrawService extends BaseService implements IWithdrawService {
 
     @Autowired
     private CryptoWithdrawDao cryptoWithdrawDao;
 
+    @Override
     public BaseWithdraw createNewWithdrawRequest(BaseWithdraw baseWithdraw) {
         var m = (CryptoWithdraw)baseWithdraw;
         return cryptoWithdrawDao.insert(m);
     }
 
+    @Override
     public int confirmWithdrawRequest(int requestId, int status, String reason) throws Exception {
         return cryptoWithdrawDao.confirmWithdrawRequest(requestId, status, reason);
     }
 
-    public int updateCryptoWithdrawTxHash(int withdrawId, String hash) {
-        return cryptoWithdrawDao.updateCryptoWithdarwTxHash(withdrawId, hash);
+    @Override
+    public List<? extends BaseWithdraw> getWithdrawRequestByUser(int userId) {
+        return cryptoWithdrawDao.selectByUser(userId);
     }
 
-    public List<? extends BaseWithdraw> getWithdrawRequestByUser(int userId, int status) {
-        return cryptoWithdrawDao.selectByUser(userId, status);
+    @Override
+    public List<? extends BaseWithdraw> getWithdrawRequestByStatus(int userId, int status) {
+        return cryptoWithdrawDao.selectByStatus(userId, status);
     }
 
-    public List<? extends BaseWithdraw> getWithdrawRequestByStatus(int userId, int approvedStatus) {
-        return cryptoWithdrawDao.selectByStatus(userId, approvedStatus);
-    }
-
+    @Override
     public List<? extends BaseWithdraw> getAllPendingWithdrawRequests() {
         return cryptoWithdrawDao.selectPendings();
     }
@@ -45,12 +46,9 @@ public class CryptoWithdrawService extends BaseService {
         return cryptoWithdrawDao.selectAll();
     }
 
-    public BaseWithdraw getWithdrawRequestById(int id, int showStatus) {
-        return cryptoWithdrawDao.selectById(id, showStatus);
-    }
-
-    public int changeShowStatus(int id, int showStatus) {
-        return cryptoWithdrawDao.changeShowStatus(id, showStatus);
+    @Override
+    public BaseWithdraw getWithdrawRequestById(int id) {
+        return cryptoWithdrawDao.selectById(id);
     }
     
 }

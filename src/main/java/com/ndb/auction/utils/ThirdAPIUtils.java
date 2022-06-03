@@ -28,19 +28,15 @@ public class ThirdAPIUtils {
     }
 
     public double getCryptoPriceBySymbol(String symbol) {
-        String symbolPair = "";
         try {
-            if(symbol.equals("USDC")) {
+            if(symbol.equals("USDT") || symbol.equals("USDC")) {
                 return 1.0;
-            } else if(symbol.equals("USDT")) {
-                symbolPair = "USDCUSDT";
-            } else {
-                symbolPair = symbol + "USDC";
             }
-            String s = symbolPair;
+
+            String symbolPair = symbol + "USDT";
             CoinPrice objs = binanceAPI.get()
                     .uri(uriBuilder -> uriBuilder.path("/ticker/price")
-                            .queryParam("symbol", s.toUpperCase())
+                            .queryParam("symbol", symbolPair.toUpperCase())
                             .build())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .retrieve()
@@ -52,9 +48,6 @@ public class ThirdAPIUtils {
                         return null;
                     })
                     .block();
-            if(symbol.equals("USDT")) {
-                return 1.0 / Double.valueOf(objs.getPrice());
-            } 
             return Double.valueOf(objs.getPrice());
         } catch (Exception e) {
         }
@@ -81,7 +74,6 @@ public class ThirdAPIUtils {
     }
 
     public double getCurrencyRate(String from) {
-        if(from.equals("USD")) return 1.0;
         try {
             String converted = xchangeAPI.get()
                 .uri(uriBuilder -> uriBuilder.path("/latest")

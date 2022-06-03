@@ -1,7 +1,10 @@
 package com.ndb.auction.service.payment.stripe;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.ndb.auction.exceptions.BalanceException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
@@ -25,9 +28,13 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        double totalAmount = getTotalAmount(userId, m.getFiatAmount()) * 100;
+        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
         m.setFee(getStripeFee(userId, m.getFiatAmount()));
-        var presaleOrder = presaleOrderDao.selectById(orderId);
+        PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
+        if (presaleOrder == null) {
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
+        }
 
         try {
             if (m.getPaymentIntentId() == null) {
@@ -71,10 +78,14 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
         int userId = m.getUserId();
         int orderId = m.getOrderId();
-        double totalAmount = getTotalAmount(userId, m.getFiatAmount()) * 100;
+        double totalAmount = getTotalAmount(userId, m.getFiatAmount());
         m.setFee(getStripeFee(userId, m.getFiatAmount()));
         PreSaleOrder presaleOrder = presaleOrderDao.selectById(orderId);
-        
+        if (presaleOrder == null) {
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
+        }
+
         try {
 
             if(m.getPaymentIntentId() == null) {
@@ -111,7 +122,14 @@ public class StripePresaleService extends StripeBaseService implements ITransact
 
     private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder) {
         int userId = m.getUserId();
-        
+        double paidAmount = m.getAmount();
+        double orderAmount = presaleOrder.getNdbPrice() * presaleOrder.getNdbAmount() * 100;
+        double totalOrder = getTotalAmount(userId, orderAmount);
+        if (totalOrder > paidAmount) {
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "balance");
+        }
+
         handlePresaleOrder(userId, presaleOrder);
         stripePresaleDao.update(m.getId(), 1);
     }

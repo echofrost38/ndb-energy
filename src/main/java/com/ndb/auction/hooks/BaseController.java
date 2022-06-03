@@ -21,11 +21,7 @@ import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
 import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
-import com.ndb.auction.service.user.UserAvatarService;
-import com.ndb.auction.service.user.UserKybService;
-import com.ndb.auction.service.user.UserSecurityService;
-import com.ndb.auction.service.user.UserService;
-import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.service.user.*;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.UserWalletService;
@@ -43,6 +39,9 @@ public class BaseController {
 
     @Autowired
     UserAvatarService userAvatarService;
+
+    @Autowired
+    UserReferralService userReferralService;
 
     @Autowired
     UserKybService userKybService;

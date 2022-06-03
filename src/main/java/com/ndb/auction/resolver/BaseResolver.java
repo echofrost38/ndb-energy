@@ -33,10 +33,8 @@ import com.ndb.auction.service.payment.stripe.StripeAuctionService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.payment.stripe.StripeCustomerService;
 import com.ndb.auction.service.payment.stripe.StripePresaleService;
-import com.ndb.auction.service.user.UserSecurityService;
-import com.ndb.auction.service.user.UserService;
-import com.ndb.auction.service.user.UserVerifyService;
-import com.ndb.auction.service.user.WhitelistService;
+import com.ndb.auction.service.payment.stripe.StripeWalletService;
+import com.ndb.auction.service.user.*;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.utils.ThirdAPIUtils;
@@ -70,6 +68,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected UserService userService;
+
+	@Autowired
+	protected UserReferralService referralService;
 
 	@Autowired
 	protected AuthenticationManager authenticationManager;
@@ -165,6 +166,9 @@ public class BaseResolver {
 
 	@Autowired
 	protected StripeBaseService stripeBaseService;
+
+	@Autowired
+	protected StripeWalletService stripeWalletService;
 
 	@Autowired
 	protected ThirdAPIUtils thirdAPIUtils;

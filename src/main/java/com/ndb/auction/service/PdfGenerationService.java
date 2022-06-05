@@ -76,7 +76,6 @@ public class PdfGenerationService {
     @Autowired
     private ThirdAPIUtils apiUtils;
 
-    private static final String QR_CODE_IMAGE_PATH = "./src/main/resources/static/images/qr.png";
 
     @Getter
     @Setter
@@ -100,7 +99,7 @@ public class PdfGenerationService {
         var strToDate = dateFormat.format(new Date(to));
         
         var qrContent = String.format("Nyyu from %s to %s statement", strFromDate, strToDate);
-        pdfGenerator.generateQRCodeImage(qrContent, 240, 240, QR_CODE_IMAGE_PATH);
+        pdfGenerator.generateQRCodeImage(qrContent, 240, 240);
 
         var strDateRange = String.format("%s - %s", strFromDate, strToDate);
 
@@ -240,7 +239,7 @@ public class PdfGenerationService {
         var userDetail = userDetailDao.selectByUserId(userId);
 
         var qrContent = String.format("Nyyu %s %s statement", paymentType, transactionType);
-        pdfGenerator.generateQRCodeImage(qrContent, 240, 240, QR_CODE_IMAGE_PATH);
+        pdfGenerator.generateQRCodeImage(qrContent, 240, 240);
 
         switch (transactionType) {
             case "DEPOSIT":

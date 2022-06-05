@@ -51,11 +51,11 @@ public class PdfGeneratorImpl implements PdfGenerator {
     }
 
     @Override
-    public void generateQRCodeImage(String text, int width, int height, String filePath) throws WriterException, IOException {
+    public void generateQRCodeImage(String text, int width, int height) throws WriterException, IOException {
         var qrCodeWriter = new QRCodeWriter();
         var bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
 
-        Path path = FileSystems.getDefault().getPath(filePath);
+        Path path = FileSystems.getDefault().getPath(resourceLoader.getResource("classpath:static/images/qr.png").getURI().getPath());
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
     }
     

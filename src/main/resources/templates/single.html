@@ -142,7 +142,9 @@
                 <div class="user-detail">
                     <span class="address" th:text="${currentDate}"></span>
                     <span class="user-name" style="font-size: 18px; margin-bottom: 10px;" th:text="${fullname}"></span>
+                    <span class="address" th:text="${street"></span>
                     <span class="address" th:text="${address}"></span>
+                    <span class="address" th:text="${country}"></span>
                 </div>
             </div>
         </div>
@@ -250,16 +252,16 @@
 
     <table th:if="${paymentType} == 'BANK' and ${transactionType} == 'Withdraw'"  style="font-family: 'Montserrat', Arial, Raleway;">
         <tr>
-            <td>Beneficiary</td>
-            <td>Water Department Ltd.</td>
+            <td>Account Holder</td>
+            <td th:text="${holder}"></td>
+        </tr>
+        <tr>
+            <td>Bank Name</td>
+            <td th:text="${bankName}"></td>
         </tr>
         <tr>
             <td>Account/IBAN</td>
-            <td>IB3948583293948588</td>
-        </tr>
-        <tr>
-            <td>Bank Code(BIC/SWIFT)</td>
-            <td>SE394572</td>
+            <td th:text="${accountNum}"></td>
         </tr>
     </table>
     <div id="footer" style="font-family: 'Montserrat', Arial, Raleway;">

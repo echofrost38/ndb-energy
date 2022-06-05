@@ -4,6 +4,7 @@ type CoinpaymentDepositTransaction {
     amount: Float,
     fee: Float,
     createdAt: Float,
+    depositAddress: Int,
     cryptoType: String,
     network: String,
     cryptoAmount: Float,

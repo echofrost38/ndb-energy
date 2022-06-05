@@ -68,7 +68,8 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         if(!addressResponse.getError().equals("ok")) return null;
         String address = addressResponse.getResult().getAddress();
         coinpaymentTransactionDao.updateDepositAddress(m.getId(), address);
-        return coinpaymentTransactionDao.selectById(m.getId());
+        m.setDepositAddress(address);
+        return m;
     }
         
 }

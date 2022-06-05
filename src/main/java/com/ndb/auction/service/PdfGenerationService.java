@@ -33,6 +33,7 @@ import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.utils.PdfGeneratorImpl;
 import com.ndb.auction.utils.ThirdAPIUtils;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +85,8 @@ public class PdfGenerationService {
         private String confirmedAt;
         private long epochTime;
         private String detail;
-        private double amount;
+        private String amount;
+        private String status;
         private int type;
     }
 
@@ -136,9 +138,15 @@ public class PdfGenerationService {
         // get outgoing and incoming within ranged time
         for (TransactionDetail transaction : sortedTransactionList) {
             if(transaction.getType() == DEPOSIT) {
-                incoming += transaction.getAmount();
+                try {
+                    incoming += Double.valueOf(transaction.getAmount());
+                } catch (Exception e) {
+                }
             } else if(transaction.getType() == WITHDRAW) {
-                outgoing += transaction.getAmount();
+                try {
+                    outgoing += Double.valueOf(transaction.getAmount());
+                } catch (Exception e) {
+                }
             }
         }
 
@@ -160,11 +168,21 @@ public class PdfGenerationService {
         var data = new HashMap<String, Object>();
         data.put("dateRange", strDateRange);
         data.put("fullname", userDetail.getFirstName() + " " + userDetail.getLastName());
-        data.put("address", userDetail.getAddress());
-        data.put("totalBalance", totalBalance);
+        
+        var addr = userDetail.getAddress().split(",");      
+        
+        
+        data.put("street", addr[0]);
+        data.put("country", addr[addr.length - 1]);
+        
+        addr = ArrayUtils.remove(addr, addr.length - 1);
+        addr = ArrayUtils.remove(addr, 0);
+
+        data.put("address", String.join(",", addr));
+        data.put("totalBalance", String.format("%.2f", totalBalance));
         data.put("transactions", sortedTransactionList);
-        data.put("outgoings", outgoing);
-        data.put("incomes", incoming);
+        data.put("outgoings", String.format("%.2f", outgoing));
+        data.put("incomes", String.format("%.2f", incoming));
 
         var pdfFileName = String.format("%s.pdf", "Statements");
         pdfGenerator.generatePdfFile("/statement", data, pdfFileName);
@@ -175,12 +193,13 @@ public class PdfGenerationService {
     private void fillDepositList(List<TransactionDetail> list, List<? extends Transaction> tList, String payment) {
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         list.addAll(tList.stream()
-            .filter(p -> p.getStatus())
+            // .filter(p -> p.getStatus())
             .map(p -> new TransactionDetail(
                 dateFormat.format(new Date(p.getConfirmedAt())), 
                 p.getConfirmedAt(),
                 String.format("%s %s", payment, "Deposit"), 
-                p.getDeposited(), 
+                String.format("%.2f", p.getDeposited()), 
+                p.getStatus() ? "Success" : "Failed",
                 DEPOSIT))
             .collect(Collectors.toList()));
     }
@@ -189,12 +208,14 @@ public class PdfGenerationService {
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         list.addAll(
             wList.stream()
-                .filter(p -> p.getStatus() == 1)
+                // .filter(p -> p.getStatus() == 1)
                 .map(p -> new TransactionDetail(
                     dateFormat.format(new Date(p.getConfirmedAt())), 
                     p.getConfirmedAt(),
                     String.format("%s %s", payment, "Withdraw"), 
-                    p.getWithdrawAmount(), 
+                    String.format("%.2f", p.getWithdrawAmount()), 
+                    p.getStatus() == 1 ? "Success" : 
+                        p.getStatus() == 2 ? "Denied" : "Pending",
                     WITHDRAW))  
                 .collect(Collectors.toList())
         );
@@ -300,7 +321,15 @@ public class PdfGenerationService {
             data.put("address", "");
         } else {
             data.put("fullname", userDetail.getFirstName() + ' ' + userDetail.getLastName());
-            data.put("address", userDetail.getAddress());
+            var addr = userDetail.getAddress().split(",");
+            
+            data.put("street", addr[0]);
+            data.put("country", addr[addr.length - 1]);
+            
+            addr = ArrayUtils.remove(addr, addr.length - 1);
+            addr = ArrayUtils.remove(addr, 0);
+
+            data.put("address", String.join(",", addr));
         }
 
         data.put("datetime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SS").format(transaction.getConfirmedAt()));
@@ -345,6 +374,9 @@ public class PdfGenerationService {
         var data = buildWithdrawCommon(userDetail, withdraw, "BANK", withdraw.getAccountNumber());
 
         data.put("cryptoType", withdraw.getTargetCurrency());
+        data.put("bankName", withdraw.getBankName());
+        data.put("accountNum", withdraw.getAccountNumber());
+        data.put("holder", withdraw.getHolderName());
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "BANK", "Withdraw", withdraw.getId());
         pdfGenerator.generatePdfFile("/single", data, pdfFileName);
@@ -359,7 +391,14 @@ public class PdfGenerationService {
             data.put("address", "");
         } else {
             data.put("fullname", userDetail.getFirstName() + ' ' + userDetail.getLastName());
-            data.put("address", userDetail.getAddress());
+            
+            var addr = userDetail.getAddress().split(",");
+            data.put("street", addr[0]);
+            data.put("country", addr[addr.length - 1]);
+            
+            addr = ArrayUtils.remove(addr, addr.length - 1);
+            addr = ArrayUtils.remove(addr, 0);
+            data.put("address", String.join(",", addr));
         }
 
         data.put("paymentType", payment);

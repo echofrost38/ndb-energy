@@ -12,6 +12,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class PdfGeneratorImpl implements PdfGenerator {
+
+    @Autowired
+    ResourceLoader resourceLoader;
 
     @Autowired
     private TemplateEngine templateEngine;
@@ -35,7 +39,9 @@ public class PdfGeneratorImpl implements PdfGenerator {
         try {
             FileOutputStream fileOS = new FileOutputStream(pdfFileName);
             ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(htmlContent);
+
+            renderer.getFontResolver().addFontDirectory(resourceLoader.getResource("classpath:static/fonts/").getURL().getPath(), true);
+            renderer.setDocumentFromString(htmlContent, String.valueOf(resourceLoader.getResource("classpath:static/fonts/").getURI()));
             renderer.layout();
             renderer.createPDF(fileOS, false);
             renderer.finishPDF();   

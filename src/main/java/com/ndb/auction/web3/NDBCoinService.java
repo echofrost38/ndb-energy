@@ -28,6 +28,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import java.text.DecimalFormat;
@@ -145,7 +146,13 @@ public class NDBCoinService {
         }
     }
 
-
+    public boolean isActiveReferrer(String referrer) throws ExecutionException, InterruptedException {
+        Tuple3<BigInteger, BigInteger, BigInteger> result = ndbReferral.referredUsers(referrer).sendAsync().get();
+        if (result.getValue1().intValue()>0)
+            return true;
+        else
+            return false;
+    }
 
     public String getTotalSupply() throws ExecutionException, InterruptedException {
         BigInteger total =  ndbToken.totalSupply().sendAsync().get();

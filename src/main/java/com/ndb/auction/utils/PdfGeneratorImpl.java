@@ -2,7 +2,6 @@ package com.ndb.auction.utils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -54,9 +53,8 @@ public class PdfGeneratorImpl implements PdfGenerator {
     public void generateQRCodeImage(String text, int width, int height) throws WriterException, IOException {
         var qrCodeWriter = new QRCodeWriter();
         var bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
-
-        Path path = FileSystems.getDefault().getPath(resourceLoader.getResource("classpath:static/images/qr.png").getURI().getPath());
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+        log.info("file path: {}", resourceLoader.getResource("classpath:static/images/qr.png").getURI().getPath());
+        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", Path.of(resourceLoader.getResource("classpath:static/images/qr.png").getURI()));
     }
     
 }

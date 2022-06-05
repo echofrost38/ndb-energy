@@ -48,12 +48,6 @@ public class NDBCoinService {
     @Value("${ndb.referral.addr}")
     private String ndbReferralContract;
 
-    @Value("${ndb.referral.treasury}")
-    private String referralTreasury;
-
-    @Value("${ndb.referral.commissionRate}")
-    private long referralCommissionRate;
-
     @Value("${pancakev2.rpc}")
     private String pancakev2RPC;
 
@@ -71,6 +65,7 @@ public class NDBCoinService {
     private final BigInteger gasLimit = new BigInteger("600000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    private final String emptyAddress = "0x0000000000000000000000000000000000000000";
     @PostConstruct
     public void init()  {
         try {
@@ -87,41 +82,10 @@ public class NDBCoinService {
                     }, error -> {
                         System.out.println("Error: " + error);
                     });
-            // ndbReferral.activeReferrerEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-            //         .subscribe(event -> {
-            //             handleActiveReferrer(event);
-            //         }, error -> {
-            //             System.out.println("Error: " + error);
-            //         });
-            // ndbReferral.referralRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-            //         .subscribe(event -> {
-            //             handleRecordReferrer(event);
-            //         }, error -> {
-            //             System.out.println("Error: " + error);
-            //         });
-            // ndbReferral.referralCommissionRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-            //         .subscribe(event -> {
-            //             handlereferralCommissionRecorded(event);
-            //         }, error -> {
-            //             System.out.println("Error: " + error);
-            //         });
+
         } catch (Exception ex){
             System.out.println("INIT WEB3 : " + ex.getMessage());
         }
-    }
-
-
-
-    private void handlereferralCommissionRecorded(NDBreferral.ReferralCommissionRecordedEventResponse event) {
-        System.out.println("referralCommissionRecorded : "+event.referrer +" commission: " + event.commission);
-    }
-
-    private void handleRecordReferrer(NDBreferral.ReferralRecordedEventResponse event) {
-        System.out.println("RecordReferrer user: "+event.user +" referrer: " + event.referrer);
-    }
-
-    private void handleActiveReferrer(NDBreferral.ActiveReferrerEventResponse event) {
-        System.out.println("ActiveReferrer "+event.referrer +" Status: " + event.status);
     }
 
     private void handleEvent(NDBcoinV3.TransferEventResponse event) throws IOException {
@@ -135,55 +99,53 @@ public class NDBCoinService {
         // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
 
         // add to unconfirmed list
-        schedule.addPendingTxn(txnHash, event);
-
+        schedule.addPendingTxn(txnHash, blockNumber);
         System.out.println("Pending: " + txnHash);
     }
 
-    public boolean isAvailableReferral(String wallet) throws ExecutionException, InterruptedException {
-        BigInteger value = ndbToken.balanceOf(wallet).sendAsync().get();
-        if (value.signum()==1)
-            return true;
-        else
-            return false ;
+    public String activeReferrer(String address , Double rate){
+        try {
+            BigInteger _rate = BigInteger.valueOf(rate.longValue());
+            TransactionReceipt receipt = ndbReferral.activeReferrer(address,_rate).send();
+            return receipt.getTransactionHash();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public String payCommission(String _referrer,long _commission) throws Exception {
-        BigInteger commission = BigInteger.valueOf(_commission*referralCommissionRate/100).multiply(decimals);
-        String transferResponse = ndbToken.transferFrom(referralTreasury,_referrer,commission).send().getTransactionHash();
-        return transferResponse;
+    public String recordReferral(String user , String referrer){
+        try {
+            TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
+            return receipt.getTransactionHash();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public String activeReferrer(String _address,String _referralCode) throws Exception {
-        String transactionResponse = ndbReferral.activeReferrer(_address,_referralCode ).send().getTransactionHash();
-        return transactionResponse;
+    public String updateReferrerRate(String referrer , Double rate){
+        try {
+            BigInteger _rate = BigInteger.valueOf(rate.longValue());
+            TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer,_rate).send();
+            return receipt.getTransactionHash();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public String getReferrerActive(String _address) throws ExecutionException, InterruptedException {
-        String referrerActive = ndbReferral.referrersActive(_address).sendAsync().get();
-        return referrerActive;
+    public String updateReferrer(String old , String current){
+        try {
+            TransactionReceipt receipt = ndbReferral.updateReferrer(old,current).send();
+            return receipt.getTransactionHash();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public String getReferrerWalletByActiveCode(String _code) throws ExecutionException, InterruptedException {
-        String referrerActive = ndbReferral.referrersCodeActive(_code).sendAsync().get();
-        return referrerActive;
-    }
 
-    public String getReferrerByUserWallet(String _address) throws ExecutionException, InterruptedException {
-        String referrerAddress = ndbReferral.referrers(_address).sendAsync().get();
-        return referrerAddress;
-    }
-
-    public String recordReferral(String _user,String _referrer) throws Exception {
-        String transactionResponse = ndbReferral.recordReferral(_user,_referrer).send().getTransactionHash();
-        return transactionResponse;
-    }
-
-    public String recordReferralCommission(String _referrer,long _commission) throws Exception {
-        BigInteger commission = BigInteger.valueOf(_commission*referralCommissionRate/100);
-        String transactionResponse = ndbReferral.recordReferralCommission(_referrer,commission).send().getTransactionHash();
-        return transactionResponse;
-    }
 
     public String getTotalSupply() throws ExecutionException, InterruptedException {
         BigInteger total =  ndbToken.totalSupply().sendAsync().get();

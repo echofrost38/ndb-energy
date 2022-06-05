@@ -105,9 +105,7 @@ public class ScheduledTasks {
 	private final AmazonS3 s3;
 	private final static String bucketName = "nyyu-live-backup";
 	// check transaction
-	//private Map<String,BigInteger> pendingTransactions;
-	private Map<String,String> pendingReferral;
-	private Map<String, NDBcoinV3.TransferEventResponse> pendingTransactions;
+	private Map<String, BigInteger> pendingTransactions;
 	public ScheduledTasks(AmazonS3 s3) {
 		this.readyCounter = 0L;
 		this.startedCounter = 0L;
@@ -120,7 +118,6 @@ public class ScheduledTasks {
 		this.readyPresaleCounter = 0l;
 
 		pendingTransactions = new HashMap<>();
-		pendingReferral = new HashMap<>();
 		this.s3 = s3;
 	}
 
@@ -283,10 +280,10 @@ public class ScheduledTasks {
 	}
 
 	// add pending list
-	public void addPendingTxn(String hash, NDBcoinV3.TransferEventResponse event) {
+	public void addPendingTxn(String hash, BigInteger blockNum) {
 		if(pendingTransactions.containsKey(hash))
 			return;
-		pendingTransactions.put(hash, event);
+		pendingTransactions.put(hash, blockNum);
 	}
 
 
@@ -297,45 +294,16 @@ public class ScheduledTasks {
 		startedPresaleCounter = 0L;		
 	}
 
-	@Scheduled(fixedRate = 1000 * 50)
-	public void checkConfirmation() throws Exception {
-		String emptyAddress = "0x0000000000000000000000000000000000000000";
-		BigInteger decimals = new BigInteger("1000000000000");
+	@Scheduled(fixedRate = 1000 * 120)
+	public void checkConfirmation() {
 		Set<String> hashSet = this.pendingTransactions.keySet();
 		for (String hash : hashSet) {
-			NDBcoinV3.TransferEventResponse event = this.pendingTransactions.get(hash);
-			BigInteger blockNumber = event.log.getBlockNumber();
-			String receiveWallet = event.to.toLowerCase();
-			long lvalue = event.value.divide(decimals).longValue();
-			if(ndbCoinService.checkConfirmation(blockNumber)) {
+			BigInteger target = this.pendingTransactions.get(hash);
+			if(ndbCoinService.checkConfirmation(target)) {
 				// set success
 				System.out.println("SUCCESS: " + hash);
-				//ndbCoinService.checkReferral(hash);
-				// Check referral
-				UserReferral userReferral = userReferralDao.selectByWalletConnect(receiveWallet);
 				// withdrawService.updateStatus(hash);
-				if (userReferral!=null) {
-
-					if (ndbCoinService.getReferrerActive(userReferral.getWalletConnect()).isEmpty()){
-						String result = ndbCoinService.activeReferrer(receiveWallet,userReferral.getReferralCode());
-					}
-
-					String referrerWallet= ndbCoinService.getReferrerWalletByActiveCode(userReferral.getReferredByCode());
-					if (!referrerWallet.isEmpty()){
-						if (ndbCoinService.getReferrerByUserWallet(userReferral.getWalletConnect()).equals(emptyAddress)){
-							String hssh = ndbCoinService.recordReferral(userReferral.getWalletConnect(),referrerWallet);
-							if (!hash.isEmpty()){
-								String payTxn = ndbCoinService.payCommission(referrerWallet,(lvalue));
-								System.out.println("PAY REFERRAL SUCCESS: " + payTxn);
-								userReferralDao.updatePaidCommissionTxn(payTxn,userReferral.getReferralCode(),userReferral.getReferredByCode());
-								String rfcTnx = ndbCoinService.recordReferralCommission(referrerWallet,(lvalue));
-							}
-						}
-					}
-					pendingTransactions.remove(hash);
-
-				}
-
+				pendingTransactions.remove(hash);
 			}
 		}
 	}

@@ -20,6 +20,7 @@
 
         .header {
             position: relative;
+            margin-bottom: 80px;
         }
 
         .header div {
@@ -32,7 +33,7 @@
 
         .user-detail {
             position: absolute;
-            bottom: 0;
+            top: 0;
             right: 0;
         }
 
@@ -43,12 +44,12 @@
             font-size: 1.4rem;
             color: black;
         }
-
+        
         table {
-            margin-top: 50px;
             border: none;
             border-collapse: collapse;
             width: 100%;
+            margin-top: 60px;
         }
 
         tr td {
@@ -142,7 +143,7 @@
                 <div class="user-detail">
                     <span class="address" th:text="${currentDate}"></span>
                     <span class="user-name" style="font-size: 18px; margin-bottom: 10px;" th:text="${fullname}"></span>
-                    <span class="address" th:text="${street"></span>
+                    <span class="address" th:text="${street}"></span>
                     <span class="address" th:text="${address}"></span>
                     <span class="address" th:text="${country}"></span>
                 </div>
@@ -151,7 +152,7 @@
     </header>
 
     <div th:if="${transactionType} == 'Deposit'" style="font-family: 'Montserrat', Arial, Raleway;">
-        <table>
+        <table class="contents">
             <tr>
                 <td>Type</td>
                 <td th:text="${paymentType} + ' ' + ${transactionType}"></td>
@@ -181,7 +182,7 @@
         </table>
     </div>
     <div th:if="${transactionType} == 'Withdraw'" style="font-family: 'Montserrat', Arial, Raleway;">
-        <table>
+        <table class="contents">
             <tr>
                 <td>Type</td>
                 <td th:text="${paymentType} + ' ' + ${transactionType}"></td>
@@ -215,8 +216,8 @@
         </table>
     </div>
 
-    <table style="font-family: 'Montserrat', Arial, Raleway;">
-        <tr>
+    <table style="font-family: 'Montserrat', Arial, Raleway;" class="contents">
+        <tr th:if="${paymentType} != 'BANK' and ${transactionType} != 'Withdraw'">
             <td>Date</td>
             <td th:text="${datetime}"></td>
         </tr>
@@ -251,6 +252,10 @@
     </table>
 
     <table th:if="${paymentType} == 'BANK' and ${transactionType} == 'Withdraw'"  style="font-family: 'Montserrat', Arial, Raleway;">
+        <tr>
+            <td>Date</td>
+            <td th:text="${datetime}"></td>
+        </tr>
         <tr>
             <td>Account Holder</td>
             <td th:text="${holder}"></td>

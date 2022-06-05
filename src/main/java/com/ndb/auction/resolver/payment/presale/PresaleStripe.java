@@ -24,17 +24,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
     public PayResponse payStripeForPreSale(int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-
-        // getting value from presale order
-        var order = presaleOrderService.getPresaleById(orderId);
-        if(order == null) {
-            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "order");
-        }
-        var usdAmount = order.getNdbAmount() * order.getNdbPrice();
-        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
-        var _fiatAmount = usdAmount * fiatPrice;
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId, paymentMethodId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, fiatAmount, fiatType, paymentIntentId, paymentMethodId);
         return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 
@@ -47,17 +37,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }
-
-        // getting value from presale order
-        var order = presaleOrderService.getPresaleById(orderId);
-        if(order == null) {
-            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "order");
-        }
-        var usdAmount = order.getNdbAmount() * order.getNdbPrice();
-        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
-        var _fiatAmount = usdAmount * fiatPrice;
-        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, amount, fiatAmount, fiatType, paymentIntentId);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }
 

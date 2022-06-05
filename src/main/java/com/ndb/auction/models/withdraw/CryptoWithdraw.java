@@ -10,7 +10,6 @@ import lombok.Setter;
 public class CryptoWithdraw extends BaseWithdraw {
     private String network;
     private String destination;
-    private String TxHash;
 
     public CryptoWithdraw (
         int userId, 

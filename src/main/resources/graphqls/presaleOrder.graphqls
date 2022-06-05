@@ -16,9 +16,6 @@ extend type Query {
     getPresaleById(
         id: Int
     ) : PreSaleOrder
-    getPresaleOrderTransactions(
-        orderId: Int
-    ) : PresaleOrderPayments
 }
 
 schema {

@@ -52,7 +52,7 @@ public class TokenAssetResolver extends BaseResolver implements GraphQLMutationR
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<String> getFavorAssets() {
+    public List<String> selectFavorAssets() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         FavorAsset m = tokenAssetService.selectFavorAsset(userId);

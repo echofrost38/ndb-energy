@@ -18,16 +18,16 @@ extend type Mutation {
         cardId: Int,
         paymentIntentId: String
     ) : PayResponse
-   
     # payment for presale
     createChargeForPresale(
         presaleId: Int,
         orderId: Int,
+        amount: Float,
         coin: String,
         network: String,
         cryptoType: String,
-    ) : CoinpaymentDepositTransaction
-    
+        cryptoAmount: Float
+    ) : CoinpaymentPresaleTransaction
     # for paypal
     paypalForPresale(
         presaleId: Int,
@@ -62,14 +62,23 @@ extend type Query {
         presaleId: Int,
         orderBy: String
     ) : [StripePresaleTransaction]
-    
     # for Coinpayment
-    getAllCryptoPresaleTx : [CoinpaymentDepositTransaction]
-    getCryptoPresaleTxByUser : [CoinpaymentDepositTransaction]
+    getAllCryptoPresaleTx(
+        orderBy: String
+    ) : [CoinpaymentPresaleTransaction]
+    getCryptoPresaleTxByUser(
+        orderBy: String
+    ) : [CoinpaymentPresaleTransaction]
     getCryptoPresaleTxById(
         id: Int
-    ) : CoinpaymentDepositTransaction
-    
+    ) : CoinpaymentPresaleTransaction
+    getCryptoPresaleTxByAdmin(
+        userId: Int,
+        presaleId: Int
+    ) : [CoinpaymentPresaleTransaction]
+    getCryptoPresaleTx(
+        presaleId: Int
+    ) : [CoinpaymentPresaleTransaction]
     # for paypal
     getAllPaypalPresaleTxns(
         orderBy: String

@@ -1,0 +1,16 @@
+type CoinpaymentAuctionTransaction {
+    id: Int,
+    userId: Int,
+    amount: Float,
+    fee: Float,
+    createdAt: Float,
+    status: Boolean, 
+    cryptoType: String,
+    network: String,
+    cryptoAmount: Float,
+    confirmedAt: Float,
+    depositAddress: String,
+    coin: String,
+    auctionId: Int,
+    bidId: Int
+}

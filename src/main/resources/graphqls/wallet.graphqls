@@ -2,32 +2,33 @@ extend type Query {
     getBalances : [BalancePayload]
     
     # Get Coinpayment Transaction for Deposit
-    getCoinpaymentDepositTx : [CoinpaymentDepositTransaction]
+    getCoinpaymentDepositTx(
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByUser(
-        showStatus: Int
-    ) : [CoinpaymentDepositTransaction]
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxByAdmin(
         userId: Int,
-    ) : [CoinpaymentDepositTransaction]
+        orderBy: String
+    ) : [CoinpaymentWalletTransaction]
     getCoinpaymentDepositTxById(
         id: Int
-    ) : CoinpaymentDepositTransaction
+    ) : CoinpaymentWalletTransaction
 
     # Get Stripe Transaction for deposit
     getStripeDepositTx(
         orderBy: String
     ) : [StripeDepositTransaction]
     getStripeDepositTxByUser(
-        orderBy: String,
-        showStatus: Int
+        orderBy: String
     ) : [StripeDepositTransaction]
     getStripeDepositTxByAdmin(
         userId: Int,
         orderBy: String
     ) : [StripeDepositTransaction]
     getStripeDepositTxById(
-        id: Int,
-        showStatus: Int
+        id: Int
     ) : StripeDepositTransaction
 }
 
@@ -36,11 +37,7 @@ extend type Mutation {
         coin: String,
         network: String,
         cryptoType: String
-    ) : CoinpaymentDepositTransaction
-    changeCoinpaymentDepositShowStatus(
-        id: Int,
-        showStatus: Int
-    ) : Int
+    ) : CoinpaymentWalletTransaction
 #    withdrawCrypto(
 #        to: String,
 #        amount: Float,

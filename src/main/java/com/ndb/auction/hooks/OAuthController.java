@@ -18,11 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 @Slf4j
 @RestController
 public class OAuthController {
+
+    private static final String twitterClientId = "RS14MW9FbWx1YjI4WDRYTDJkOW46MTpjaQ";
+    private static final String twitterClientSecret = "Yudj_KRcmRQG6BLsvhnN--0FOGMcrXJGbufao9S70JWS9BkcEp";
+    private static final String twitterCallbackUrl = "https://api.dev.nyyu.io/oauth2/callback/twitter";
 
     @GetMapping("/oauth2/authorize/manual/twitter")
     public void twitterOauthLogin(HttpServletRequest request, HttpServletResponse response) {

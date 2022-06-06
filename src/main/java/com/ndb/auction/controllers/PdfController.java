@@ -82,6 +82,8 @@ public class PdfController extends BaseController {
             var file = new FileSystemResource(pdfPath);
             var content = new byte[(int)file.contentLength()];
             IOUtils.read(file.getInputStream(), content);
+            var pdfFile = new java.io.File(pdfPath);
+            pdfFile.delete();
             return ResponseEntity.ok()
                 .header(
                     HttpHeaders.CONTENT_DISPOSITION, 
@@ -93,11 +95,7 @@ public class PdfController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } finally {
-            // delete file
-            var file = new java.io.File(pdfPath);
-            file.delete();
-        }
+        } 
     }
 
 }

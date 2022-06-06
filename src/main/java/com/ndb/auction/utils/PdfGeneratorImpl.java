@@ -19,13 +19,17 @@ public class PdfGeneratorImpl implements PdfGenerator {
     @Autowired
     ResourceLoader resourceLoader;
 
-    @Autowired
     private TemplateEngine templateEngine;
+
+    public PdfGeneratorImpl(TemplateEngine engine) {
+        this.templateEngine = engine;
+    }
 
     @Override
     public void generatePdfFile(String templateName, Map<String, Object> data, String pdfFileName) {
         Context context = new Context();
         context.setVariables(data);
+        
         var htmlContent = templateEngine.process(templateName, context);
 
         try {

@@ -190,7 +190,7 @@ public class PdfGenerationService {
         data.put("incomes", String.format("%.2f", incoming));
 
         var pdfFileName = String.format("%s.pdf", "Statements");
-        pdfGenerator.generatePdfFile("/statement", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/statement.html", data, pdfFileName);
 
         return pdfFileName;
     }
@@ -296,7 +296,7 @@ public class PdfGenerationService {
         data.put("deposited", String.format("%.8f", transaction.getCryptoAmount()));
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "Crypto","Deposit", transaction.getId());
-        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -315,7 +315,7 @@ public class PdfGenerationService {
         data.put("deposited", String.format("%.8f", transaction.getDeposited()));
         
         var pdfFileName = String.format("%s-%s-%d.pdf", payment, "Deposit", transaction.getId());
-        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -375,7 +375,7 @@ public class PdfGenerationService {
         data.put("cryptoType", withdraw.getTargetCurrency());
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "PayPal", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
 
     }
@@ -387,7 +387,7 @@ public class PdfGenerationService {
         data.put("cryptoType", withdraw.getSourceToken());
         data.put("desType", String.format("%s (%s)", withdraw.getSourceToken(), withdraw.getNetwork()));
         var pdfFileName = String.format("%s-%s-%d.pdf", "Crypto", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -401,7 +401,7 @@ public class PdfGenerationService {
         data.put("holder", withdraw.getHolderName());
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "BANK", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
     }
 

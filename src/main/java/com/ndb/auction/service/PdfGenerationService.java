@@ -109,7 +109,7 @@ public class PdfGenerationService {
         // get deposit transactions
         var cryptoDepositList = cryptoDepositDao.selectRange(userId, from, to, "DEPOSIT");
         var transactionDetailList = new ArrayList<TransactionDetail>();
-        fillDepositList(transactionDetailList, cryptoDepositList, "Crypto");
+        fillCryptoDepositList(transactionDetailList, cryptoDepositList, "Crypto");
         
         var stripeDepositList = stripeDepositDao.selectRange(userId, from, to);
         fillDepositList(transactionDetailList, stripeDepositList, "Credit");
@@ -224,6 +224,20 @@ public class PdfGenerationService {
                     WITHDRAW))  
                 .collect(Collectors.toList())
         );
+    }
+
+    private void fillCryptoDepositList(List<TransactionDetail> list, List<CoinpaymentDepositTransaction> tList, String payment) {
+        var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        list.addAll(tList.stream()
+            // .filter(p -> p.getStatus())
+            .map(p -> new TransactionDetail(
+                dateFormat.format(new Date(p.getConfirmedAt())), 
+                p.getConfirmedAt(),
+                String.format("%s %s", payment, "Deposit"), 
+                String.format("%.2f", p.getDeposited()), 
+                p.getDepositStatus() == 1 ? "Success" : p.getDepositStatus() == 0 ? "Pending" : "Expired",
+                DEPOSIT))
+            .collect(Collectors.toList()));
     }
 
     // Getting single or all transactions and generate pdf then return File

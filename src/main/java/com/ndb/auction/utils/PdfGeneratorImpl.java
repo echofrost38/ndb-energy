@@ -36,7 +36,10 @@ public class PdfGeneratorImpl implements PdfGenerator {
             FileOutputStream fileOS = new FileOutputStream(pdfFileName);
             ITextRenderer renderer = new ITextRenderer();
 
-            renderer.getFontResolver().addFontDirectory(resourceLoader.getResource("classpath:static/fonts/").getURL().getPath(), true);
+            var fontsPath = resourceLoader.getResource("classpath:static/fonts/").getURL().getPath();
+            log.info("font path: {}", fontsPath);
+
+            renderer.getFontResolver().addFontDirectory(fontsPath, true);
             renderer.setDocumentFromString(htmlContent, String.valueOf(resourceLoader.getResource("classpath:static/fonts/").getURI()));
             renderer.layout();
             renderer.createPDF(fileOS, false);

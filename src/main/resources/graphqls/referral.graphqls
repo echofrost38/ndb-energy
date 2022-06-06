@@ -5,6 +5,12 @@ extend type Mutation {
         wallet: String!,
     ) : Int
 }
+extend type Query {
+    #Empty value mean referral unavailable .
+	getReferral(): UserReferral
+}
+
 schema {
+    query: Query,
     mutation: Mutation
 }

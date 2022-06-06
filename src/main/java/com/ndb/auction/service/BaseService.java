@@ -44,6 +44,7 @@ import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
+import com.ndb.auction.service.user.UserReferralService;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
@@ -145,6 +146,9 @@ public class BaseService {
 
     @Autowired
     public NotificationService notificationService;
+
+    @Autowired
+    public UserReferralService userReferralService;
 
     @Autowired
     public UserWalletService userWalletService;

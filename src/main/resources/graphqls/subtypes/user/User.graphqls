@@ -17,6 +17,5 @@ type User {
    notifySetting: Int,
    avatar: UserAvatar,
    security: [UserSecurity],
-   verify: UserVerify,
-   referral: UserReferral
+   verify: UserVerify
 }

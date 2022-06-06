@@ -10,19 +10,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.ndb.auction.contracts.NDBcoinV3;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
-import com.ndb.auction.dao.oracle.user.UserReferralDao;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.service.AuctionService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.InternalBalanceService;
@@ -85,9 +87,6 @@ public class ScheduledTasks {
 	UserDetailDao userDetailDao;
 
 	@Autowired
-	UserReferralDao userReferralDao;
-
-	@Autowired
 	ThirdAPIUtils apiUtils;
 
 	private Auction startedRound;
@@ -103,9 +102,10 @@ public class ScheduledTasks {
 	private Long readyPresaleCounter;
 
 	private final AmazonS3 s3;
-	private final static String bucketName = "nyyu-live-backup";
+	private final static String bucketName = "nyyu-dev-backup";
 	// check transaction
 	private Map<String, BigInteger> pendingTransactions;
+
 	public ScheduledTasks(AmazonS3 s3) {
 		this.readyCounter = 0L;
 		this.startedCounter = 0L;
@@ -281,12 +281,10 @@ public class ScheduledTasks {
 
 	// add pending list
 	public void addPendingTxn(String hash, BigInteger blockNum) {
-		if(pendingTransactions.containsKey(hash))
+		if(pendingTransactions.containsKey(hash)) 
 			return;
 		pendingTransactions.put(hash, blockNum);
 	}
-
-
 
 	public void forceToClosePresale(int presaleId) {
 		presaleService.closePresale(presaleId);
@@ -324,7 +322,7 @@ public class ScheduledTasks {
 		}
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60)
+	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");

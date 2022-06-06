@@ -3,9 +3,7 @@ package com.ndb.auction.models.transactions;
 import java.util.List;
 
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentAuctionTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentPresaleTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalPresaleTransaction;
@@ -31,16 +29,16 @@ public class Statement {
     // 1) Bid
     private List<StripeAuctionTransaction> stripeAuctionTxns;
     private List<PaypalAuctionTransaction> paypalAuctionTxns;
-    private List<CoinpaymentAuctionTransaction> coinpaymentAuctionTxns;
+    private List<CoinpaymentDepositTransaction> coinpaymentAuctionTxns;
     
     // 2) Presale
     private List<StripePresaleTransaction> stripePresaleTxns;
     private List<PaypalPresaleTransaction> paypalPresaleTxns;
-    private List<CoinpaymentPresaleTransaction> coinpaymentPresaleTxns;
+    private List<CoinpaymentDepositTransaction> coinpaymentPresaleTxns;
 
     // 3) Wallet
     private List<PaypalDepositTransaction> paypalDepositTxns;
-    private List<CoinpaymentWalletTransaction> coinpaymentWalletTxns;
+    private List<CoinpaymentDepositTransaction> coinpaymentDepositTxns;
     private List<StripeDepositTransaction> stripeDepositTxns;
     private List<BankDepositTransaction> bankDepositTxns;
 }

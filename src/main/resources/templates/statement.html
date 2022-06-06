@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Statement</title>
+    <style>
+
+        body {
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+            font-size: 1.2rem;
+            color: #303030;
+            margin-top: 40px;
+            font-family: 'Montserrat', Arial, Raleway;
+        }
+
+        #header {
+            position: relative;
+        }
+
+        #header .pub-info {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        #header .pub-info div p {
+            text-align: right;
+            margin: 4px 0;
+        }
+
+        table {
+            margin-top: 70px;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+        }
+    
+        tr td {
+            border-bottom: 1px solid #EDEDED;
+        }
+    
+        td, th {
+            padding: 10px 0;
+        }
+
+        .qr-detail {
+            font-size: 14px;
+            color: #000000;
+        }
+
+        .qr-detail p {
+            margin: 2px 0;
+        }
+    
+        .doc-name {
+            color: black;
+            vertical-align: bottom;
+        }
+    
+        .qr {
+            width: 100px;
+            height: auto;
+        }
+    
+        .user-name {
+            font-size: 1.4rem;
+            color: black;
+            font-weight: bold;
+        }
+    
+        th { text-align: left;}
+    
+        td:nth-child(3), td:nth-child(4),th:nth-child(3), th:nth-child(4) {
+            text-align: right;
+        }
+    
+        th {
+            border-bottom: 2px solid #303030;
+        }
+    
+        .top {
+            position: relative;
+            border-bottom: 2px solid black;
+            margin-bottom: 32px;
+        }
+
+        .top .title {
+            font-weight: bold;
+            color: black;
+        }
+
+        .top .company {
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: black;
+        }
+
+        .doc-name span {
+            margin-top: 15px;
+            display: block;
+            font-weight: bold;
+        }
+
+        .doc-name span:first-child {
+            font-weight: bold;
+            font-size: 18px;
+            color: black;
+            margin-bottom: 8px;
+        }
+
+        #qrcode {
+            margin-top: 40px;
+            margin-left: -13px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="top">
+        <div class="title">STATEMENT</div>
+        <div class="company">NYYU.IO</div>
+    </div>
+    <div id="header">
+        <div>
+            <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" width="60" height="50" />
+            <div>
+                <div>
+                    <div class="doc-name">
+                        <span>Nyyu UAB</span>
+                        <div class="qr-detail">
+                            <p>Vilnius Park Town</p>
+                            <p>Lvivo g. 105, 2nd floor</p>
+                            <p>Vilnius 08104</p>
+                            <p>Lithuania</p>
+                        </div>
+                    </div>
+                    <div id="qrcode">   
+                        <img th:src="@{classpath:static/images/qr.png}" alt="logo" class="qr" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pub-info">
+            <div>
+                <p th:text="${dateRange}"></p>
+                <p class="user-name" style="font-size: 18px;" th:text="${fullname}"></p>
+            </div>
+            <div style="color:black; margin-top: 10px;">
+                <p th:text="${street}"></p>
+                <p th:text="${address}"></p>
+                <p th:text="${country}"></p>
+            </div>
+            <div style="margin-top:40px;">
+                <p class="user-name" style="font-size: 20px;" th:text="${totalBalance} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total Balance</P>
+            </div>
+            <div style="margin-top:30px;">
+                <p class="user-name" th:text="${outgoings} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total outgoings</P>
+            </div>
+            <div style="margin-top:30px;">
+                <p class="user-name" th:text="${incomes} + ' USDT'"></p>
+                <P style="float: right; text-align: right; font-size: 14px;">Total deposits</P>
+            </div>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Amount</th>
+        </tr>
+        <tr th:each="tx: ${transactions}">
+            <td th:text="${tx.confirmedAt}"></td>
+            <td th:text="${tx.detail}"></td>
+            <td th:text="${tx.status}"></td>
+            <td th:text="${tx.amount} + ' USDT'">&nbsp;USD</td>
+        </tr>
+        
+        
+    </table>
+    
+</body> 
+</html>

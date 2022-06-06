@@ -1,0 +1,18 @@
+type CoinpaymentDepositTransaction {
+    id: Int,
+    userId: Int,
+    amount: Float,
+    fee: Float,
+    createdAt: Float,
+    cryptoType: String,
+    network: String,
+    cryptoAmount: Float,
+    confirmedAt: Float,
+    depositAddress: String,
+    depositStatus: Int,
+    coin: String,
+    orderId: Int,
+    orderType: String,
+    txHash: String,
+    isShow: Boolean
+}

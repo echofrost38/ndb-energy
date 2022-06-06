@@ -69,7 +69,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String ip = RemoteIpHelper.getRemoteIpFrom(request);
             if (session == null || (ipFromSession = (String) session.getAttribute(SESSION_IP)) == null
                     || !ip.equals(ipFromSession)) {
-                LocationLog location = locationLogService.buildLog("116.111.228.41");
+                LocationLog location = locationLogService.buildLog(ip);
                 JsonObject errorObject;
                 if (location == null) {
                     if (userDetails != null) {
@@ -124,8 +124,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         AntPathMatcher matcher = new AntPathMatcher();
         return 
-            matcher.match("/", request.getServletPath());
-
+            matcher.match("/location", request.getServletPath()) || 
+            matcher.match("/favicon.ico", request.getServletPath()) ||
+            matcher.match("/shufti", request.getServletPath()) ||
+            matcher.match("/stripe", request.getServletPath()) ||
+            matcher.match("/ipn/**", request.getServletPath()) ||
+            matcher.match("/paypal/**", request.getServletPath());
     }
 
     private String parseJwt(HttpServletRequest request) {

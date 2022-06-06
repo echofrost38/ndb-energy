@@ -48,14 +48,17 @@ public class PdfController extends BaseController {
         try {
             var content = new byte[(int)file.contentLength()];
             IOUtils.read(file.getInputStream(), content);
-            return ResponseEntity.ok()
-                .header(
-                    HttpHeaders.CONTENT_DISPOSITION, 
-                    String.format("attachment; filename=\"%s\"", pdfPath)
+            var response = ResponseEntity.ok()
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION, 
+                String.format("attachment; filename=\"%s\"", pdfPath)
                 )
                 .contentLength(file.contentLength())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(content);
+            var pdfFile = new java.io.File(pdfPath);
+            pdfFile.delete();
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -1,7 +1,6 @@
 package com.ndb.auction.service;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 
 import com.google.zxing.WriterException;
 import com.ndb.auction.dao.oracle.transactions.bank.BankDepositDao;
-import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentWalletDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalDepositDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
 import com.ndb.auction.dao.oracle.user.UserDetailDao;
@@ -23,7 +22,7 @@ import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.models.transactions.FiatDepositTransaction;
 import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.bank.BankDepositTransaction;
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentWalletTransaction;
 import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.models.user.UserDetail;
@@ -34,7 +33,6 @@ import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.utils.PdfGeneratorImpl;
 import com.ndb.auction.utils.ThirdAPIUtils;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +49,7 @@ public class PdfGenerationService {
     @Autowired
     private PdfGeneratorImpl pdfGenerator;
     @Autowired
-    private CoinpaymentTransactionDao cryptoDepositDao;
+    private CoinpaymentWalletDao cryptoDepositDao;
     @Autowired
     private StripeDepositDao stripeDepositDao;
     @Autowired
@@ -77,6 +75,7 @@ public class PdfGenerationService {
     @Autowired
     private ThirdAPIUtils apiUtils;
 
+    private static final String QR_CODE_IMAGE_PATH = "./src/main/resources/static/images/qr.png";
 
     @Getter
     @Setter
@@ -85,30 +84,30 @@ public class PdfGenerationService {
         private String confirmedAt;
         private long epochTime;
         private String detail;
-        private String amount;
-        private String status;
+        private double amount;
         private int type;
     }
 
 
-    public String generatePdfForMultipleTransactions(int userId, long from, long to) throws WriterException, IOException, URISyntaxException {
+    public String generatePdfForMultipleTransactions(int userId, long from, long to) throws WriterException, IOException {
         var userDetail = userDetailDao.selectByUserId(userId);
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
         
         var strFromDate = dateFormat.format(new Date(from));
         var strToDate = dateFormat.format(new Date(to));
         
         var qrContent = String.format("Nyyu from %s to %s statement", strFromDate, strToDate);
-        pdfGenerator.generateQRCodeImage(qrContent, 240, 240);
+        pdfGenerator.generateQRCodeImage(qrContent, 240, 240, QR_CODE_IMAGE_PATH);
 
         var strDateRange = String.format("%s - %s", strFromDate, strToDate);
 
         var outgoing = 0.0; var incoming = 0.0;
 
         // get deposit transactions
-        var cryptoDepositList = cryptoDepositDao.selectRange(userId, from, to, "DEPOSIT");
+        var cryptoDepositList = cryptoDepositDao.selectRange(userId, from, to);
         var transactionDetailList = new ArrayList<TransactionDetail>();
-        fillCryptoDepositList(transactionDetailList, cryptoDepositList, "Crypto");
+        fillDepositList(transactionDetailList, cryptoDepositList, "Crypto");
         
         var stripeDepositList = stripeDepositDao.selectRange(userId, from, to);
         fillDepositList(transactionDetailList, stripeDepositList, "Credit");
@@ -137,15 +136,9 @@ public class PdfGenerationService {
         // get outgoing and incoming within ranged time
         for (TransactionDetail transaction : sortedTransactionList) {
             if(transaction.getType() == DEPOSIT) {
-                try {
-                    incoming += Double.valueOf(transaction.getAmount());
-                } catch (Exception e) {
-                }
+                incoming += transaction.getAmount();
             } else if(transaction.getType() == WITHDRAW) {
-                try {
-                    outgoing += Double.valueOf(transaction.getAmount());
-                } catch (Exception e) {
-                }
+                outgoing += transaction.getAmount();
             }
         }
 
@@ -166,33 +159,15 @@ public class PdfGenerationService {
 
         var data = new HashMap<String, Object>();
         data.put("dateRange", strDateRange);
-        
-        if(userDetail != null) {
-            data.put("fullname", userDetail.getFirstName() + " " + userDetail.getLastName());
-            
-            var addr = userDetail.getAddress().split(",");
-            if(addr.length > 3) {
-                data.put("street", String.format("%s,%s", addr[0], addr[1]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-                addr = ArrayUtils.remove(addr, 0);
-            } else {
-                data.put("street", String.format("%s,%s", addr[0]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-            }
-            data.put("address", String.join(",", addr));
-        }
-        
-        data.put("totalBalance", String.format("%.2f", totalBalance));
+        data.put("fullname", userDetail.getFirstName() + " " + userDetail.getLastName());
+        data.put("address", userDetail.getAddress());
+        data.put("totalBalance", totalBalance);
         data.put("transactions", sortedTransactionList);
-        data.put("outgoings", String.format("%.2f", outgoing));
-        data.put("incomes", String.format("%.2f", incoming));
+        data.put("outgoings", outgoing);
+        data.put("incomes", incoming);
 
         var pdfFileName = String.format("%s.pdf", "Statements");
-        pdfGenerator.generatePdfFile("/statement.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/statement", data, pdfFileName);
 
         return pdfFileName;
     }
@@ -200,27 +175,12 @@ public class PdfGenerationService {
     private void fillDepositList(List<TransactionDetail> list, List<? extends Transaction> tList, String payment) {
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         list.addAll(tList.stream()
-            // .filter(p -> p.getStatus())
+            .filter(p -> p.getStatus())
             .map(p -> new TransactionDetail(
                 dateFormat.format(new Date(p.getConfirmedAt())), 
                 p.getConfirmedAt(),
                 String.format("%s %s", payment, "Deposit"), 
-                String.format("%.2f", p.getDeposited()), 
-                p.getStatus() ? "Success" : "Failed",
-                DEPOSIT))
-            .collect(Collectors.toList()));
-    }
-
-    private void fillCryptoDepositList(List<TransactionDetail> list, List<CoinpaymentDepositTransaction> tList, String payment) {
-        var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        list.addAll(tList.stream()
-            // .filter(p -> p.getStatus())
-            .map(p -> new TransactionDetail(
-                dateFormat.format(new Date(p.getConfirmedAt())), 
-                p.getConfirmedAt(),
-                String.format("%s %s", payment, "Deposit"), 
-                String.format("%.2f", p.getDeposited()), 
-                p.getDepositStatus() == 1 ? "Success" : p.getDepositStatus() == 0 ? "Pending" : "Expired",
+                p.getDeposited(), 
                 DEPOSIT))
             .collect(Collectors.toList()));
     }
@@ -229,14 +189,12 @@ public class PdfGenerationService {
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         list.addAll(
             wList.stream()
-                // .filter(p -> p.getStatus() == 1)
+                .filter(p -> p.getStatus() == 1)
                 .map(p -> new TransactionDetail(
                     dateFormat.format(new Date(p.getConfirmedAt())), 
                     p.getConfirmedAt(),
                     String.format("%s %s", payment, "Withdraw"), 
-                    String.format("%.2f", p.getWithdrawAmount()), 
-                    p.getStatus() == 1 ? "Success" : 
-                        p.getStatus() == 2 ? "Denied" : "Pending",
+                    p.getWithdrawAmount(), 
                     WITHDRAW))  
                 .collect(Collectors.toList())
         );
@@ -250,14 +208,13 @@ public class PdfGenerationService {
      * @return
      * @throws IOException
      * @throws WriterException
-     * @throws URISyntaxException
      */
-    public String generatePdfForSingleTransaction(int id, int userId, String transactionType, String paymentType) throws WriterException, IOException, URISyntaxException {
+    public String generatePdfForSingleTransaction(int id, int userId, String transactionType, String paymentType) throws WriterException, IOException {
         
         var userDetail = userDetailDao.selectByUserId(userId);
 
         var qrContent = String.format("Nyyu %s %s statement", paymentType, transactionType);
-        pdfGenerator.generateQRCodeImage(qrContent, 240, 240);
+        pdfGenerator.generateQRCodeImage(qrContent, 240, 240, QR_CODE_IMAGE_PATH);
 
         switch (transactionType) {
             case "DEPOSIT":
@@ -269,7 +226,7 @@ public class PdfGenerationService {
                         var stransaction = (StripeDepositTransaction) stripeDepositDao.selectById(id, 1);
                         return buildFiatDepositPdf(userDetail, stransaction, paymentType, stransaction.getPaymentIntentId());
                     case "CRYPTO":
-                        var ctransaction = (CoinpaymentDepositTransaction) cryptoDepositDao.selectById(id);
+                        var ctransaction = (CoinpaymentWalletTransaction) cryptoDepositDao.selectById(id, 1);
                         return buildCryptoDepositPdf(userDetail, ctransaction);
                     case "BANK":
                         var btransaction = (BankDepositTransaction) bankDepositDao.selectById(id, 1);
@@ -298,7 +255,7 @@ public class PdfGenerationService {
         return "";    
     }
 
-    private String buildCryptoDepositPdf(UserDetail userDetail, CoinpaymentDepositTransaction transaction) {
+    private String buildCryptoDepositPdf(UserDetail userDetail, CoinpaymentWalletTransaction transaction) {
         if(transaction == null) return null;
         var data = buildDepositCommon(userDetail, transaction, "CRYPTO", transaction.getDepositAddress());
 
@@ -312,7 +269,7 @@ public class PdfGenerationService {
         data.put("deposited", String.format("%.8f", transaction.getCryptoAmount()));
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "Crypto","Deposit", transaction.getId());
-        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -331,7 +288,7 @@ public class PdfGenerationService {
         data.put("deposited", String.format("%.8f", transaction.getDeposited()));
         
         var pdfFileName = String.format("%s-%s-%d.pdf", payment, "Deposit", transaction.getId());
-        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -343,35 +300,11 @@ public class PdfGenerationService {
             data.put("address", "");
         } else {
             data.put("fullname", userDetail.getFirstName() + ' ' + userDetail.getLastName());
-            
-            var addr = userDetail.getAddress().split(",");
-            if(addr.length > 3) {
-                data.put("street", String.format("%s,%s", addr[0], addr[1]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-                addr = ArrayUtils.remove(addr, 0);
-            } else {
-                data.put("street", String.format("%s,%s", addr[0]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-            }
-            
-            data.put("address", String.join(",", addr));
+            data.put("address", userDetail.getAddress());
         }
 
         data.put("datetime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SS").format(transaction.getConfirmedAt()));
-        
-        // exception for crypto deposit
-        if(transaction.getStatus() == null) {
-            var _transaction = (CoinpaymentDepositTransaction) transaction;
-            data.put("status", _transaction.getDepositStatus() == 0 ? "Pending" : _transaction.getDepositStatus() == 1 ? "Successful" : "Expired"
-            );
-        } else {
-            data.put("status", transaction.getStatus() ? "Successful" : "Pending");
-        }
-        
+        data.put("status", transaction.getStatus() ? "Successful" : "Pending");
         data.put("transactionType", "Deposit");
         data.put("paymentType", payment);
         data.put("paymentId", paymentId);
@@ -391,8 +324,9 @@ public class PdfGenerationService {
         data.put("cryptoType", withdraw.getTargetCurrency());
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "PayPal", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
         return pdfFileName;
+
     }
 
     private String buildCrytoWithdrawPdf(UserDetail userDetail, CryptoWithdraw withdraw) {
@@ -402,7 +336,7 @@ public class PdfGenerationService {
         data.put("cryptoType", withdraw.getSourceToken());
         data.put("desType", String.format("%s (%s)", withdraw.getSourceToken(), withdraw.getNetwork()));
         var pdfFileName = String.format("%s-%s-%d.pdf", "Crypto", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -411,12 +345,9 @@ public class PdfGenerationService {
         var data = buildWithdrawCommon(userDetail, withdraw, "BANK", withdraw.getAccountNumber());
 
         data.put("cryptoType", withdraw.getTargetCurrency());
-        data.put("bankName", withdraw.getBankName());
-        data.put("accountNum", withdraw.getAccountNumber());
-        data.put("holder", withdraw.getHolderName());
 
         var pdfFileName = String.format("%s-%s-%d.pdf", "BANK", "Withdraw", withdraw.getId());
-        pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
+        pdfGenerator.generatePdfFile("/single", data, pdfFileName);
         return pdfFileName;
     }
 
@@ -428,22 +359,7 @@ public class PdfGenerationService {
             data.put("address", "");
         } else {
             data.put("fullname", userDetail.getFirstName() + ' ' + userDetail.getLastName());
-            
-            var addr = userDetail.getAddress().split(",");
-            if(addr.length > 3) {
-                data.put("street", String.format("%s,%s", addr[0], addr[1]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-                addr = ArrayUtils.remove(addr, 0);
-            } else {
-                data.put("street", String.format("%s,%s", addr[0]));
-                data.put("country", addr[addr.length - 1]);
-                addr = ArrayUtils.remove(addr, addr.length - 1);
-                addr = ArrayUtils.remove(addr, 0);
-            }
-            
-            data.put("address", String.join(",", addr));
+            data.put("address", userDetail.getAddress());
         }
 
         data.put("paymentType", payment);

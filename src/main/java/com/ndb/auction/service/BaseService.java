@@ -30,12 +30,7 @@ import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
-import com.ndb.auction.dao.oracle.user.UserAvatarDao;
-import com.ndb.auction.dao.oracle.user.UserDao;
-import com.ndb.auction.dao.oracle.user.UserKybDao;
-import com.ndb.auction.dao.oracle.user.UserSecurityDao;
-import com.ndb.auction.dao.oracle.user.UserVerifyDao;
-import com.ndb.auction.dao.oracle.user.WhitelistDao;
+import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.exceptions.BalanceException;
@@ -49,6 +44,7 @@ import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
+import com.ndb.auction.service.user.UserReferralService;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
@@ -107,6 +103,9 @@ public class BaseService {
     public UserDao userDao;
 
     @Autowired
+    public UserReferralDao userReferralDao;
+
+    @Autowired
     public UserAvatarDao userAvatarDao;
 
     @Autowired
@@ -147,6 +146,9 @@ public class BaseService {
 
     @Autowired
     public NotificationService notificationService;
+
+    @Autowired
+    public UserReferralService userReferralService;
 
     @Autowired
     public UserWalletService userWalletService;

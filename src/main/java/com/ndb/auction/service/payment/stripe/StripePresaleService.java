@@ -49,7 +49,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             } else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripePresaleDao.insert(m);
+                stripePresaleDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId()); 
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
@@ -93,11 +93,10 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripePresaleDao.insert(m);
+                stripePresaleDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId()); 
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
-
                 handleSuccessPresaleOrder(m, presaleOrder);
             }
             response = generateResponse(intent, response);

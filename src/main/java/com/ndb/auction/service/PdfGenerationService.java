@@ -94,7 +94,6 @@ public class PdfGenerationService {
     public String generatePdfForMultipleTransactions(int userId, long from, long to) throws WriterException, IOException, URISyntaxException {
         var userDetail = userDetailDao.selectByUserId(userId);
         var dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
         
         var strFromDate = dateFormat.format(new Date(from));
         var strToDate = dateFormat.format(new Date(to));
@@ -167,23 +166,26 @@ public class PdfGenerationService {
 
         var data = new HashMap<String, Object>();
         data.put("dateRange", strDateRange);
-        data.put("fullname", userDetail.getFirstName() + " " + userDetail.getLastName());
         
-        var addr = userDetail.getAddress().split(",");
-        if(addr.length > 3) {
-            data.put("street", String.format("%s,%s", addr[0], addr[1]));
-            data.put("country", addr[addr.length - 1]);
-            addr = ArrayUtils.remove(addr, addr.length - 1);
-            addr = ArrayUtils.remove(addr, 0);
-            addr = ArrayUtils.remove(addr, 0);
-        } else {
-            data.put("street", String.format("%s,%s", addr[0]));
-            data.put("country", addr[addr.length - 1]);
-            addr = ArrayUtils.remove(addr, addr.length - 1);
-            addr = ArrayUtils.remove(addr, 0);
+        if(userDetail != null) {
+            data.put("fullname", userDetail.getFirstName() + " " + userDetail.getLastName());
+            
+            var addr = userDetail.getAddress().split(",");
+            if(addr.length > 3) {
+                data.put("street", String.format("%s,%s", addr[0], addr[1]));
+                data.put("country", addr[addr.length - 1]);
+                addr = ArrayUtils.remove(addr, addr.length - 1);
+                addr = ArrayUtils.remove(addr, 0);
+                addr = ArrayUtils.remove(addr, 0);
+            } else {
+                data.put("street", String.format("%s,%s", addr[0]));
+                data.put("country", addr[addr.length - 1]);
+                addr = ArrayUtils.remove(addr, addr.length - 1);
+                addr = ArrayUtils.remove(addr, 0);
+            }
+            data.put("address", String.join(",", addr));
         }
         
-        data.put("address", String.join(",", addr));
         data.put("totalBalance", String.format("%.2f", totalBalance));
         data.put("transactions", sortedTransactionList);
         data.put("outgoings", String.format("%.2f", outgoing));
@@ -391,7 +393,6 @@ public class PdfGenerationService {
         var pdfFileName = String.format("%s-%s-%d.pdf", "PayPal", "Withdraw", withdraw.getId());
         pdfGenerator.generatePdfFile("/single.html", data, pdfFileName);
         return pdfFileName;
-
     }
 
     private String buildCrytoWithdrawPdf(UserDetail userDetail, CryptoWithdraw withdraw) {

@@ -73,7 +73,7 @@ public class PaypalWithdrawService extends BaseService {
             var batchHeaderResponse = response.getBatch_header();
             // check status!
             if(batchHeaderResponse == null || batchHeaderResponse.getBatch_status().equals("DENIED")) {
-                log.info("Batch Header Response: {}", mapper.writeValueAsString(batchHeaderResponse));
+                log.debug("Batch Header Response: {}", mapper.writeValueAsString(batchHeaderResponse));
                 // send failed notification
                 notificationService.sendNotification(
                     m.getUserId(),

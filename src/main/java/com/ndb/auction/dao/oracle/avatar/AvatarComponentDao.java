@@ -58,7 +58,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 						ps.setDouble(i++, m.getPrice());
 						ps.setInt(i++, m.getLimited());
 						ps.setInt(i++, m.getPurchased());
-						ps.setString(i++, "");
+						ps.setString(i++, m.getSvg());
 						ps.setInt(i++, m.getWidth());
 						ps.setInt(i++, m.getTop());
 						ps.setInt(i++, m.getLeft());
@@ -103,7 +103,7 @@ public class AvatarComponentDao extends BaseOracleDao {
 
 	public AvatarComponent updateAvatarComponent(AvatarComponent m) {
 		String sql = "UPDATE TBL_AVATAR_COMPONENT SET TIER_LEVEL=?, PRICE=?, LIMITED=?, PURCHASED=?, SVG=TO_CLOB(?),WIDTH=?,TOP=?,LEFT=? WHERE GROUP_ID=? AND COMP_ID=?";
-		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), "",
+		jdbcTemplate.update(sql, m.getTierLevel(), m.getPrice(), m.getLimited(), m.getPurchased(), m.getSvg(),
 				 m.getWidth(), m.getTop(), m.getLeft(), m.getGroupId(), m.getCompId());
 		return m;
 	}

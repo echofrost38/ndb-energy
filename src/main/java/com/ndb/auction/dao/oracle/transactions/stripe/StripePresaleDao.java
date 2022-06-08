@@ -124,6 +124,11 @@ public class StripePresaleDao extends BaseOracleDao implements ITransactionDao {
 		return jdbcTemplate.update(sql, status, paymentIntentId);
     }
 
+    public int updatePaymentIntent(int id, String paymentIntentId) {
+        var sql = "UPDATE TBL_STRIPE_PRESALE SET INTENT_ID = ?, UPDATED_AT = SYSDATE WHERE ID = ?";
+        return jdbcTemplate.update(sql, paymentIntentId, id);
+    }
+
     public List<StripePresaleTransaction> selectRange(int userId, long from, long to) {
         String sql = "SELECT * FROM TBL_STRIPE_PRESALE WHERE USER_ID = ? AND CREATED_AT > ? AND CREATED_AT < ? ORDER BY ID DESC";
 		return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs), userId, new Timestamp(from), new Timestamp(to));

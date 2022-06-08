@@ -1,4 +1,0 @@
-type UserReferralEarning {
-    name: String,
-    amount: Int
-}

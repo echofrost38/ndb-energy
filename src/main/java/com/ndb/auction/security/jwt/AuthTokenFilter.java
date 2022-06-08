@@ -69,7 +69,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String ip = RemoteIpHelper.getRemoteIpFrom(request);
             if (session == null || (ipFromSession = (String) session.getAttribute(SESSION_IP)) == null
                     || !ip.equals(ipFromSession)) {
-                LocationLog location = locationLogService.buildLog("116.111.228.41");
+                LocationLog location = locationLogService.buildLog(ip);
                 JsonObject errorObject;
                 if (location == null) {
                     if (userDetails != null) {

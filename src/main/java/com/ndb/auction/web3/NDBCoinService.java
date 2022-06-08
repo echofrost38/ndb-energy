@@ -58,8 +58,8 @@ public class NDBCoinService {
 
     private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
-    private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("800000");
+    private final BigInteger gasPrice = new BigInteger("20000000000");
+    private final BigInteger gasLimit = new BigInteger("80000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private final BigInteger m_decimals = new BigInteger("100000000");
 

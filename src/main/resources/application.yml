@@ -13,4 +13,4 @@ app:
       - http://localhost:4000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
-      - https://www.nyyu.io/oauth2/redirect   
+      - https://dev.nyyu.io/oauth2/redirect   

@@ -38,7 +38,7 @@ public class UserService extends BaseService {
 	@Autowired
 	PasswordEncoder encoder;
 
-	public String createUser(String email, String password, String country) {
+	public String createUser(String email, String password, String country,String referredByCode) {
 		User user = userDao.selectEntireByEmail(email);
 		if (user != null) {
 			if(user.getDeleted() == 0){
@@ -57,6 +57,7 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
+			userReferralService.createNewReferrer(user.getId(),referredByCode);
 
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());

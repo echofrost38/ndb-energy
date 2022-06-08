@@ -68,7 +68,6 @@ extend type Mutation {
         network: String,
         address: String
     ) : Token
-
 }
 
 extend type Query {

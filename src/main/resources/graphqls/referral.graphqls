@@ -8,6 +8,7 @@ extend type Mutation {
 extend type Query {
     # Empty value mean referral unavailable .
 	getReferral : UserReferral
+	getEarning : [UserReferralEarning]
 }
 
 schema {

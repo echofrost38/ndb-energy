@@ -3,11 +3,16 @@ package com.ndb.auction.service.user;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserDetail;
 import com.ndb.auction.models.user.UserReferral;
+import com.ndb.auction.models.user.UserReferralEarning;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.utils.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserReferralService extends BaseService {
     @Autowired
@@ -25,6 +30,25 @@ public class UserReferralService extends BaseService {
         UserReferral referral = userReferralDao.selectById(id);
         referral.setRate(tierRate[user.getTierLevel()]);
         return referral;
+    }
+
+    public List<UserReferralEarning> earningByReferrer(int userId){
+        List<UserReferralEarning> list =new ArrayList<>();
+        //ndbCoinService.getUserEarning("0x22a6D404D8cF1effA88fD27D095caD00Ca50190b");
+        UserReferral referrer = userReferralDao.selectById(userId);
+        List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
+        for (UserReferral item : users){
+            String address = item.getWalletConnect();
+            String name = userDao.selectById(item.getId()).getName();
+            if (!address.isEmpty()){
+                long amount = ndbCoinService.getUserEarning(address);
+                UserReferralEarning earning = new UserReferralEarning();
+                earning.setName(name);
+                earning.setAmount(amount);
+                list.add(earning);
+            }
+        }
+        return list;
     }
 
     public int insert(UserReferral m) {

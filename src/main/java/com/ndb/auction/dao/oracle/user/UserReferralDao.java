@@ -118,14 +118,14 @@ public class UserReferralDao extends BaseOracleDao {
 //        return m;
 //    }
 
-    public List<UserReferral> getAllByReferralCode(String referralCode) {
+    public List<UserReferral> getAllByReferredByCode(String referredByCode) {
         String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND DELETED=0";
         return jdbcTemplate.query(sql, new RowMapper<UserReferral>() {
             @Override
             public UserReferral mapRow(ResultSet rs, int rownumber) throws SQLException {
                 return extract(rs);
             }
-        });
+        },referredByCode);
     }
 
     public int existsUserByReferralCode(String code){

@@ -7,6 +7,7 @@ import javax.servlet.http.Part;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
+import com.ndb.auction.models.user.UserReferralEarning;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,5 +37,12 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
             return referralService.selectById(userId);
         }
         return new UserReferral();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<UserReferralEarning> getEarning() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return referralService.earningByReferrer(userId);
     }
 }

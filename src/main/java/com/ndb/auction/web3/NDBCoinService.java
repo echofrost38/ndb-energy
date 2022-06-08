@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -113,6 +114,16 @@ public class NDBCoinService {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public long getUserEarning(String address){
+        try {
+            long earning= ndbReferral.getEarning(address).send().divide(decimals).longValue();
+            return earning;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

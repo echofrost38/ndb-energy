@@ -237,18 +237,12 @@ public class CryptoController extends BaseController {
 
         if (status >= 100 || status == 2) {
             var txn = coinpaymentPresaleService.selectById(id);
-
-            if(txn.getDepositStatus() == 1) {
-                log.error("txn {} is already confirmed.", txn.getId());
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
-            }
-
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK); 
+        return null;
     }
 
     @PostMapping("/ipn/deposit/{id}")
@@ -314,7 +308,7 @@ public class CryptoController extends BaseController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             }
 
-            if(txn.getDepositStatus() == 1) {
+            if(txn.getStatus()) {
                 log.error("txn {} is already confirmed.", txn.getId());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }

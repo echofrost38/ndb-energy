@@ -13,6 +13,7 @@ import com.paypal.base.Constants;
 import com.paypal.base.rest.APIContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PaypalController extends BaseController {
 
+    @Value("{paypal.hook.id}")
+    private String WEBHOOK_ID;
+
     @Autowired
     private PaypalWithdrawService papalWithdrawService;
 
     private final PaypalConfig paypalConfig;
-    public static final String WEBHOOK_ID = "0X538017S25613946";
 
     @Autowired
     public PaypalController(PaypalConfig paypalConfig) {

@@ -140,12 +140,6 @@ public class ShuftiService extends BaseService{
     public boolean kycStatusCkeck(int userId) {
         ShuftiReference _reference = shuftiDao.selectById(userId);
 
-        var user = userDao.selectById(userId);
-        if(user.getEmail().equals("info@nyyu.io")) {
-            return true;
-        }
-
-        // return true;
         if(_reference == null) {
             return false;
         }

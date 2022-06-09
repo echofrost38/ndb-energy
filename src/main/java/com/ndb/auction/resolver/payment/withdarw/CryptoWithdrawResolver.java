@@ -121,34 +121,35 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         var tokenAmount = request.getTokenAmount();
 
         if(result == 1 && status == 1) {
-            // transfer funds
-            if(tokenSymbol.equals("NDB")) {
-                String transactionHash = ndbCoinService.transferNDB(request.getUserId(), request.getDestination(), request.getWithdrawAmount());
-                if(transactionHash == null) {
-                    // cannot transfer NDB
-                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
-                    throw new UnauthorizedException(msg, "id"); 
-                }
-            }
             
-            // success
             var balance = internalBalanceService.getBalance(request.getUserId(), tokenSymbol);
             if(balance.getFree() < tokenAmount) {
                 String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
                 throw new BalanceException(msg, "amount");
             }
+            
+            var transactionHash = "";
+            if(tokenSymbol.equals("NDB")) {
+                transactionHash = ndbCoinService.transferNDB(request.getUserId(), request.getDestination(), request.getWithdrawAmount());
+                if(transactionHash == null) {
+                    // cannot transfer NDB
+                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                    throw new UnauthorizedException(msg, "id"); 
+                }
+            } else {
+                // transfer
+                transactionHash = adminWalletService.withdrawToken(
+                    request.getNetwork(), 
+                    request.getSourceToken(), 
+                    request.getDestination(), 
+                    request.getWithdrawAmount());
+                if(transactionHash.equals("Failed")) {
+                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                    throw new UnauthorizedException(msg, "id"); 
+                }
+            }            
 
-            // transfer
-            var hash = adminWalletService.withdrawToken(
-                request.getNetwork(), 
-                request.getSourceToken(), 
-                request.getDestination(), 
-                request.getWithdrawAmount());
-            if(hash.equals("Failed")) {
-                String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
-                throw new UnauthorizedException(msg, "id"); 
-            }
-            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), hash);
+            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), transactionHash);
             internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
 
             notificationService.sendNotification(

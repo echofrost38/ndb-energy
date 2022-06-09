@@ -126,16 +126,16 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
             }
 
             // transfer
-            var hash = adminWalletService.withdrawToken(
-                request.getNetwork(), 
-                request.getSourceToken(), 
-                request.getDestination(), 
-                request.getWithdrawAmount());
-            if(hash.equals("Failed")) {
-                String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
-                throw new UnauthorizedException(msg, "id"); 
-            }
-            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), hash);
+            // var hash = adminWalletService.withdrawToken(
+            //     request.getNetwork(), 
+            //     request.getSourceToken(), 
+            //     request.getDestination(), 
+            //     request.getWithdrawAmount());
+            // if(hash.equals("Failed")) {
+            //     String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+            //     throw new UnauthorizedException(msg, "id"); 
+            // }
+            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), "hash");
             internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
 
             notificationService.sendNotification(

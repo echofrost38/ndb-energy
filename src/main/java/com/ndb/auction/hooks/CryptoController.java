@@ -231,6 +231,8 @@ public class CryptoController extends BaseController {
             cryptoType = currency;
         }
         Double amount = getDouble(request, "amount");
+        var fiatAmount = getDouble(request, "fiat_amount");
+        log.info("fiat amount: {}", fiatAmount);
         
         int status = getInt(request, "status");
         log.info("IPN status : {}", status);
@@ -244,6 +246,25 @@ public class CryptoController extends BaseController {
             }
 
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
+
+            // checking balance
+            var ndbToken = presaleOrder.getNdbAmount();
+            var ndbPrice = presaleOrder.getNdbPrice();
+            var totalPrice = ndbToken * ndbPrice;
+
+            if(totalPrice > fiatAmount) {
+                log.info("total order: {}", totalPrice);
+                notificationService.sendNotification(
+                    presaleOrder.getUserId(),
+                    Notification.DEPOSIT_SUCCESS, 
+                    "PAYMENT CONFIRMED", 
+                    String.format("Your deposit of %f %s was failed.", amount, cryptoType));
+                var price = apiUtil.getCryptoPriceBySymbol("USDT");
+                log.info("added free balance: {}", fiatAmount / price);
+                balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, fiatAmount / price);
+                return new ResponseEntity<>(HttpStatus.OK); 
+            }
+
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }

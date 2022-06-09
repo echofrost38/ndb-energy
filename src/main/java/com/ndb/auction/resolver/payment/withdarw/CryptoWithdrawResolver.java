@@ -32,6 +32,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
+    private final double BEP20FEE = 1;
+    private final double ERC20FEE = 1;
+
     @Autowired
 	protected CryptoWithdrawService cryptoWithdrawService;
 
@@ -84,6 +87,16 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
         // double totalUSD = amount * cryptoPrice;
         double fee = getTierFee(userId, amount);
+
+        // network fee
+        if(network.equals("ERC20")) {
+            fee += ERC20FEE / cryptoPrice;
+        } else if(network.equals("BEP20")) {
+            fee += BEP20FEE / cryptoPrice;
+        } else {
+            throw new BalanceException("Not supported withdrawal", "amount");
+        }
+
         double withdrawAmount = amount - fee;
 
         var m = new CryptoWithdraw(userId, withdrawAmount, fee, sourceToken, cryptoPrice, amount, network, des); 

@@ -15,6 +15,8 @@ import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +31,7 @@ import org.web3j.tx.FastRawTransactionManager;
 import java.text.DecimalFormat;
 
 @Service
+@Slf4j
 public class NDBCoinService {
 
     @Value("${ndb.private.key}")
@@ -215,6 +218,10 @@ public class NDBCoinService {
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
+
+            log.info("receipt hash: {}", receipt.getTransactionHash());
+            log.info("receipt status: {}", receipt.getStatus());
+
             return receipt.getTransactionHash();
         } catch (Exception e) {
             e.printStackTrace();

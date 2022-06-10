@@ -111,7 +111,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
             } else if(network.equals("BEP20")) {
                 fee += BEP20FEE / cryptoPrice;
             } else {
-                throw new BalanceException("Not supported withdrawal", "amount");
+                throw new BalanceException("Not supported withdrawal.", "amount");
             }
         }
 

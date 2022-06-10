@@ -303,7 +303,7 @@ public class PdfGenerationService {
         var data = buildDepositCommon(userDetail, transaction, "CRYPTO", transaction.getDepositAddress());
 
         data.put("fiatAmount", transaction.getCryptoAmount() + transaction.getFee());
-        data.put("fiatType", String.format("%s(%s)", 
+        data.put("fiatType", String.format("%s (%s)", 
             transaction.getCryptoType(), 
             transaction.getNetwork())
         );

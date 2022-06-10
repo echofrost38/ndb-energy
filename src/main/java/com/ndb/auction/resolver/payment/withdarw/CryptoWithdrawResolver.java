@@ -89,13 +89,13 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
 
         // check minimum 
-        if(network.equals("ERC20")) {
-            if(amount / cryptoPrice < MIN_WITHDRAW_BEP20) {
+        if(network.equals("BEP20")) {
+            if(amount * cryptoPrice < MIN_WITHDRAW_BEP20) {
                 var min = MIN_WITHDRAW_BEP20 / cryptoPrice;
                 throw new BalanceException(String.format("The minimum withdrawal amount for BSC Network is %f %s.", min, sourceToken), "amount");
             }
         } else if(network.equals("ERC20")) {
-            if(amount / cryptoPrice < MIN_WITHDRAW_ERC20) {
+            if(amount * cryptoPrice < MIN_WITHDRAW_ERC20) {
                 var min = MIN_WITHDRAW_ERC20 / cryptoPrice;
                 throw new BalanceException(String.format("The minimum withdrawal amount for ETH Network is %f %s.", min, sourceToken), "amount");
             }

@@ -36,7 +36,9 @@ public class ThirdAPIUtils {
                 symbolPair = "USDCUSDT";
             } else if(symbol.equals("BUSD")) {
                 symbolPair = "USDCBUSD";
-            }            
+            } else if(symbol.equals("NDB")) {
+                return 0.01;
+            }           
             else {
                 symbolPair = symbol + "USDC";
             }

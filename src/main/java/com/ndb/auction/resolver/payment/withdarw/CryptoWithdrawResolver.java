@@ -33,7 +33,10 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
     private final double BEP20FEE = 1;
-    private final double ERC20FEE = 1;
+    private final double ERC20FEE = 20;
+
+    private final double MIN_WITHDRAW_BEP20 = 10;
+    private final double MIN_WITHDRAW_ERC20 = 30;
 
     @Autowired
 	protected CryptoWithdrawService cryptoWithdrawService;
@@ -85,11 +88,24 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         // get crypto price
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
 
+        // check minimum 
+        if(network.equals("ERC20")) {
+            if(amount / cryptoPrice < MIN_WITHDRAW_BEP20) {
+                var min = MIN_WITHDRAW_BEP20 / cryptoPrice;
+                throw new BalanceException(String.format("The minimum withdrawal amount for BSC Network is %f %s.", min, sourceToken), "amount");
+            }
+        } else if(network.equals("ERC20")) {
+            if(amount / cryptoPrice < MIN_WITHDRAW_ERC20) {
+                var min = MIN_WITHDRAW_ERC20 / cryptoPrice;
+                throw new BalanceException(String.format("The minimum withdrawal amount for ETH Network is %f %s.", min, sourceToken), "amount");
+            }
+        }
+
         // double totalUSD = amount * cryptoPrice;
         double fee = getTierFee(userId, amount);
 
         // network fee
-        if(!sourceToken.equals("NDB") && cryptoPrice > 0.0) {
+        if(cryptoPrice > 0.0) {
             if(network.equals("ERC20")) {
                 fee += ERC20FEE / cryptoPrice;
             } else if(network.equals("BEP20")) {

@@ -2,6 +2,10 @@ package com.ndb.auction.service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.stereotype.Service;
 
 import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.models.SkillSet;
@@ -9,8 +13,6 @@ import com.ndb.auction.models.avatar.AvatarComponent;
 import com.ndb.auction.models.avatar.AvatarFacts;
 import com.ndb.auction.models.avatar.AvatarProfile;
 import com.ndb.auction.models.avatar.AvatarSet;
-
-import org.springframework.stereotype.Service;
 
 @Service
 public class AvatarService extends BaseService {
@@ -56,6 +58,18 @@ public class AvatarService extends BaseService {
 
 	public AvatarProfile createAvatarProfile(String name, String surname, List<SkillSet> skillSet, List<AvatarSet> avatarSet, List<AvatarFacts> factsSet, String hairColor, String skinColor, String details) {
 		
+		if(name == null) {
+			String msg = messageSource.getMessage("no_avatar_name", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "avatar");
+		}
+
+		Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(name);
+		if(m.find()) {
+			String msg = messageSource.getMessage("special_chars", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "avatar");
+		}
+
 		// check condition
 		AvatarProfile profile = avatarProfileDao.getAvatarProfileByName(surname);
 		if (profile != null) {

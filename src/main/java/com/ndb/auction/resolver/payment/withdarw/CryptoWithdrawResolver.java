@@ -83,18 +83,20 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         }
 
         // get crypto price
-        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);;
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
 
         // double totalUSD = amount * cryptoPrice;
         double fee = getTierFee(userId, amount);
 
         // network fee
-        if(network.equals("ERC20")) {
-            fee += ERC20FEE / cryptoPrice;
-        } else if(network.equals("BEP20")) {
-            fee += BEP20FEE / cryptoPrice;
-        } else {
-            throw new BalanceException("Not supported withdrawal", "amount");
+        if(!sourceToken.equals("NDB") && cryptoPrice > 0.0) {
+            if(network.equals("ERC20")) {
+                fee += ERC20FEE / cryptoPrice;
+            } else if(network.equals("BEP20")) {
+                fee += BEP20FEE / cryptoPrice;
+            } else {
+                throw new BalanceException("Not supported withdrawal", "amount");
+            }
         }
 
         double withdrawAmount = amount - fee;

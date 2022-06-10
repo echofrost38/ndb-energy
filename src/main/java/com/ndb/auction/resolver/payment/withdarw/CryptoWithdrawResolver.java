@@ -133,8 +133,13 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
-        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
+        
         var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
+        if(request.getStatus() != 0) {
+            throw new BalanceException("Already processed.", "amount");
+        }
+        
+        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
         var tokenSymbol = request.getSourceToken();
         var tokenAmount = request.getTokenAmount();
 

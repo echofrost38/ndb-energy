@@ -251,8 +251,9 @@ public class CryptoController extends BaseController {
             var ndbToken = presaleOrder.getNdbAmount();
             var ndbPrice = presaleOrder.getNdbPrice();
             var totalPrice = ndbToken * ndbPrice;
+            var totalOrder = getTotalOrder(presaleOrder.getUserId(), totalPrice);
 
-            if(totalPrice > fiatAmount) {
+            if(totalOrder > fiatAmount) {
                 log.info("total order: {}", totalPrice);
                 notificationService.sendNotification(
                     presaleOrder.getUserId(),
@@ -265,6 +266,9 @@ public class CryptoController extends BaseController {
                 return new ResponseEntity<>(HttpStatus.OK); 
             }
 
+            var overflow = (fiatAmount - totalOrder)/(fiatAmount/amount);
+            balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, overflow);
+            
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }

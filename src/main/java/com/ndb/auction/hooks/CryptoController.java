@@ -269,7 +269,7 @@ public class CryptoController extends BaseController {
             var overflow = (fiatAmount - totalOrder)/(fiatAmount/amount);
             balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, overflow);
             
-            presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
+            presaleService.handlePresaleOrder(presaleOrder.getUserId(), id, totalOrder, "CRYPTO", presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }
 

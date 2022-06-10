@@ -1,6 +1,7 @@
 package com.ndb.auction.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
+import com.ndb.auction.dao.oracle.user.WhitelistDao;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.presale.PresaleOrderPayments;
 
@@ -25,6 +27,9 @@ public class PresaleOrderService extends BaseService {
 
     @Autowired
     private PaypalPresaleDao paypalPresaleDao;
+
+    @Autowired
+    private WhitelistDao whitelistDao;
 
     protected CloseableHttpClient client;
 
@@ -44,12 +49,63 @@ public class PresaleOrderService extends BaseService {
         return presaleOrderDao.selectById(orderId);
     }
 
-    public int updateStatus(int orderId) {
-        return presaleOrderDao.updateStatus(orderId);
+    public int updateStatus(int orderId, int paymentId, double paidAmount, String paymentType) {
+        return presaleOrderDao.updateStatus(orderId, paymentId, paidAmount, paymentType);
     }
 
     public List<PreSaleOrder> getPresaleOrders(int presaleId) {
-        return presaleOrderDao.selectByPresaleId(presaleId);
+        var list = presaleOrderDao.selectByPresaleId(presaleId);
+
+        for (var order : list) {
+            if(order.getPaidAmount() > 0) continue;
+            var userId = order.getUserId(); var orderId = order.getId();
+            var coinpayments = coinpaymentTransactionDao.selectByOrderIdByUser(userId, orderId, "PRESALE");
+            var confirmedCrypto = coinpayments.stream()
+                .filter(c -> c.getDepositStatus() == 1)
+                .collect(Collectors.toList());
+            if(confirmedCrypto.size() > 0) {
+                var payment = confirmedCrypto.get(0);
+                var cryptoAmount = payment.getAmount();
+                var price = apiUtils.getCryptoPriceBySymbol(payment.getCryptoType());
+                var paid = cryptoAmount * price;
+                order.setPaidAmount(paid);
+                updateStatus(orderId, payment.getId(), paid, "CRYPTO");
+                continue;
+            }
+
+            var stripe = stripePresaleDao.selectByOrderId(userId, orderId);
+            var confirmedStripe = stripe.stream()
+                .filter(c -> c.getStatus())
+                .collect(Collectors.toList());
+            if(confirmedStripe.size() > 0) {
+                var payment = confirmedStripe.get(0);
+                order.setPaidAmount(payment.getAmount());
+                updateStatus(orderId, payment.getId(), payment.getAmount(), "STRIPE");
+                continue;
+            }
+            
+            var paypal = paypalPresaleDao.selectByOrderId(userId, orderId);
+            var confirmedPaypal = paypal.stream()
+                .filter(c -> c.getStatus())
+                .collect(Collectors.toList());
+            if(confirmedPaypal.size() > 0) {
+                var payment = confirmedPaypal.get(0);
+                order.setPaidAmount(payment.getAmount());
+                updateStatus(orderId, payment.getId(), payment.getAmount(), "PAYPAL");
+                continue;
+            }
+
+            // assume internal wallet
+            var tierFeeRate = 0.5;
+            var white = whitelistDao.selectByUserId(userId);
+            if(white != null) tierFeeRate = 0.0;
+
+            var totalOrder = 100 * (order.getNdbAmount() * order.getNdbPrice()) / (100 - tierFeeRate);
+            order.setPaidAmount(totalOrder);
+            updateStatus(orderId, 0, totalOrder, "NYYU");
+        }
+
+        return list;
     }
 
     public List<PreSaleOrder> getPresaleOrdersByUserId(int userId) {

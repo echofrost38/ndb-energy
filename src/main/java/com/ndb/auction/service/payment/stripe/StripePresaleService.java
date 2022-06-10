@@ -111,7 +111,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
     private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder) {
         int userId = m.getUserId();
         
-        handlePresaleOrder(userId, presaleOrder);
+        handlePresaleOrder(userId, m.getId(), m.getAmount(), "STRIPE", presaleOrder);
         stripePresaleDao.update(m.getId(), 1);
     }
 

@@ -252,7 +252,7 @@ public class BaseService {
     }
 
     @Transactional
-    public void handlePresaleOrder(int userId, PreSaleOrder order) {
+    public void handlePresaleOrder(int userId, int paymentId, double paidAmount, String paymentType, PreSaleOrder order) {
 		User user = userDao.selectById(userId);
 
 		// processing order
@@ -325,7 +325,7 @@ public class BaseService {
 
 		userDao.updateTier(userId, tierLevel, newPoint);
 		tierTaskService.updateTierTask(tierTask);
-		presaleOrderDao.updateStatus(order.getId());
+		presaleOrderDao.updateStatus(order.getId(), paymentId, paidAmount, paymentType);
 		presaleDao.updateSold(order.getPresaleId(), ndb);
 
 		// send notification to user for payment result!!

@@ -31,6 +31,12 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "order");
         }
+
+        if(order.getStatus() != 0) {
+            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
+        }
+
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = usdAmount * fiatPrice;
@@ -50,10 +56,17 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
 
         // getting value from presale order
         var order = presaleOrderService.getPresaleById(orderId);
+        
         if(order == null) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "order");
         }
+
+        if(order.getStatus() != 0) {
+            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
+        }
+
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = usdAmount * fiatPrice;

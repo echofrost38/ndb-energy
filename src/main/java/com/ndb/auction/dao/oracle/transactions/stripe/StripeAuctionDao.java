@@ -29,7 +29,7 @@ public class StripeAuctionDao extends BaseOracleDao {
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
         m.setPaymentMethodId(rs.getString("METHOD_ID"));
         m.setPaymentIntentId(rs.getString("INTENT_ID"));
 		m.setAuctionId(rs.getInt("AUCTION_ID"));

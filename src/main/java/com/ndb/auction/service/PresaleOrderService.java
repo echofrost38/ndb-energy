@@ -18,8 +18,12 @@ import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.paypal.PaypalBaseService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.user.WhitelistService;
+import com.ndb.auction.service.utils.MailService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class PresaleOrderService extends BaseService {
     
     private final double COINPAYMENT_FEE = 0.5;
@@ -45,6 +49,9 @@ public class PresaleOrderService extends BaseService {
     @Autowired
     private PaypalBaseService paypalBaseService;
 
+    @Autowired
+    private MailService mailService;
+
     protected CloseableHttpClient client;
 
     public PresaleOrderService(WebClient.Builder webClientBuilder) {
@@ -64,6 +71,23 @@ public class PresaleOrderService extends BaseService {
     }
 
     public int updateStatus(int orderId, int paymentId, double paidAmount, String paymentType) {
+        // send purchase email
+        var order = presaleOrderDao.selectById(orderId);
+        var presale = presaleDao.selectById(order.getPresaleId());
+        var user = userDao.selectById(order.getUserId());
+        var admins = userDao.selectByRole("ROLE_SUPER");
+        
+        try {
+            mailService.sendPurchase(
+                presale.getRound(), 
+                user.getEmail(), 
+                user.getAvatar().getPrefix() + user.getAvatar().getName(), 
+                paymentType, "USD", order.getNdbAmount(), paidAmount, admins);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("cannot send presale purchase email");
+        }
+
         return presaleOrderDao.updateStatus(orderId, paymentId, paidAmount, paymentType);
     }
 

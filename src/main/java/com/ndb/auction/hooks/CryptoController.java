@@ -231,18 +231,49 @@ public class CryptoController extends BaseController {
             cryptoType = currency;
         }
         Double amount = getDouble(request, "amount");
+        var fiatAmount = getDouble(request, "fiat_amount");
+        log.info("fiat amount: {}", fiatAmount);
         
         int status = getInt(request, "status");
         log.info("IPN status : {}", status);
 
         if (status >= 100 || status == 2) {
             var txn = coinpaymentPresaleService.selectById(id);
+
+            if(txn.getDepositStatus() == 1) {
+                log.error("txn {} is already confirmed.", txn.getId());
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+            }
+
             PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
-            presaleService.handlePresaleOrder(presaleOrder.getUserId(), presaleOrder);
+
+            // checking balance
+            var ndbToken = presaleOrder.getNdbAmount();
+            var ndbPrice = presaleOrder.getNdbPrice();
+            var totalPrice = ndbToken * ndbPrice;
+            var totalOrder = getTotalOrder(presaleOrder.getUserId(), totalPrice);
+
+            if(totalOrder > fiatAmount) {
+                log.info("total order: {}", totalPrice);
+                notificationService.sendNotification(
+                    presaleOrder.getUserId(),
+                    Notification.DEPOSIT_SUCCESS, 
+                    "PAYMENT CONFIRMED", 
+                    "Your purchase of " + ndbToken + "NDB" + " in the presale round was successful.");
+                var price = apiUtil.getCryptoPriceBySymbol("USDT");
+                log.info("added free balance: {}", fiatAmount / price);
+                balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, fiatAmount / price);
+                return new ResponseEntity<>(HttpStatus.OK); 
+            }
+
+            var overflow = (fiatAmount - totalOrder)/(fiatAmount/amount);
+            balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, overflow);
+            
+            presaleService.handlePresaleOrder(presaleOrder.getUserId(), id, totalOrder, "CRYPTO", presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
         }
 
-        return null;
+        return new ResponseEntity<>(HttpStatus.OK); 
     }
 
     @PostMapping("/ipn/deposit/{id}")
@@ -308,7 +339,7 @@ public class CryptoController extends BaseController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
             }
 
-            if(txn.getStatus()) {
+            if(txn.getDepositStatus() == 1) {
                 log.error("txn {} is already confirmed.", txn.getId());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
             }

@@ -10,5 +10,8 @@ type PreSaleOrder {
     ndbPrice: Float,
     status: Int,
     createdAt: Float,
-    updatedAt: Float
+    updatedAt: Float,
+    paidAmount: Float,
+    paymentId: Int,
+    paymentType: String
 }

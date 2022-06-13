@@ -188,4 +188,10 @@ public class MailService {
         javaMailSender.send(mimeMessage);
     }
 
+    public void sendPurchase(int round, String avatarName, String gateway, double ndb, double paid, List<User> admins) {
+        // fill mail content
+
+        // send
+        
+    }
 }

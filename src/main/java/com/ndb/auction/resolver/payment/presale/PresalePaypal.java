@@ -47,6 +47,12 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
             throw new BidException(msg, "orderId");
         }
+
+        if(presaleOrder.getStatus() != 0) {
+            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+            throw new BidException(msg, "order");
+        }
+
         double amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
         
         var checkoutAmount = getPayPalTotalOrder(userId, amount);
@@ -101,7 +107,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
             }
 
             // process order
-            presaleService.handlePresaleOrder(userId, presaleOrder);
+            presaleService.handlePresaleOrder(userId, m.getId(), m.getAmount(), "PAYPAL", presaleOrder);
             paypalPresaleService.updateOrderStatus(m.getId(), OrderStatus.COMPLETED.toString());
 			return true;
 		} else return false;

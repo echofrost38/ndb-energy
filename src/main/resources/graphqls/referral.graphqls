@@ -1,0 +1,17 @@
+extend type Mutation {
+    # Update referral
+    updateReferral(
+        referralCode: String!,
+        wallet: String!,
+    ) : Int
+}
+extend type Query {
+    # Empty value mean referral unavailable .
+	getReferral : UserReferral
+	getEarning : [UserReferralEarning]
+}
+
+schema {
+    query: Query,
+    mutation: Mutation
+}

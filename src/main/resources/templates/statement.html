@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <!-- <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat|Arial|Raleway"
+      rel="stylesheet"
+    /> -->
     <title>Statement</title>
     <style>
-
+    
         body {
             max-width: 800px;
             width: 100%;
@@ -26,11 +30,10 @@
 
         #header .pub-info div p {
             text-align: right;
-            margin: 4px 0;
         }
 
         table {
-            margin-top: 70px;
+            margin-top: 270px;
             border: none;
             border-collapse: collapse;
             width: 100%;
@@ -43,17 +46,23 @@
         td, th {
             padding: 10px 0;
         }
-
+    
+        p {
+            margin: 4px 0;
+        }
+    
+        footer {
+            margin: 100px 0;
+    
+        }
+    
         .qr-detail {
             font-size: 14px;
-            color: #000000;
-        }
-
-        .qr-detail p {
-            margin: 2px 0;
+            color: #BCBCBC;
         }
     
         .doc-name {
+            font-weight: bold;
             color: black;
             vertical-align: bottom;
         }
@@ -80,27 +89,31 @@
         }
     
         .top {
-            position: relative;
             border-bottom: 2px solid black;
+            font-weight: bold;
+            color: black;
             margin-bottom: 32px;
         }
 
-        .top .title {
-            font-weight: bold;
-            color: black;
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 800px;
         }
 
-        .top .company {
+        .footer-body {
+            position: relative;
+        }
+
+        .doc-name {
             position: absolute;
-            top: 0;
-            right: 0;
-            color: black;
+            bottom: 0;
+            left: 0;
         }
 
         .doc-name span {
-            margin-top: 15px;
             display: block;
-            font-weight: bold;
         }
 
         .doc-name span:first-child {
@@ -111,36 +124,19 @@
         }
 
         #qrcode {
-            margin-top: 40px;
-            margin-left: -13px;
+            position: absolute;
+            right: 0;
+            bottom: -50px;
         }
-
     </style>
 </head>
 <body>
     <div class="top">
-        <div class="title">STATEMENT</div>
-        <div class="company">NYYU.IO</div>
+        STATEMENT
     </div>
     <div id="header">
         <div>
             <img th:src="@{classpath:static/images/NYYULogo.png}" alt="logo" class="logo" width="60" height="50" />
-            <div>
-                <div>
-                    <div class="doc-name">
-                        <span>Nyyu UAB</span>
-                        <div class="qr-detail">
-                            <p>Vilnius Park Town</p>
-                            <p>Lvivo g. 105, 2nd floor</p>
-                            <p>Vilnius 08104</p>
-                            <p>Lithuania</p>
-                        </div>
-                    </div>
-                    <div id="qrcode">   
-                        <img th:src="@{classpath:static/images/qr.png}" alt="logo" class="qr" />
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="pub-info">
             <div>
@@ -148,9 +144,7 @@
                 <p class="user-name" style="font-size: 18px;" th:text="${fullname}"></p>
             </div>
             <div style="color:black; margin-top: 10px;">
-                <p th:text="${street}"></p>
                 <p th:text="${address}"></p>
-                <p th:text="${country}"></p>
             </div>
             <div style="margin-top:40px;">
                 <p class="user-name" style="font-size: 20px;" th:text="${totalBalance} + ' USDT'"></p>
@@ -170,18 +164,26 @@
         <tr>
             <th>Date</th>
             <th>Details</th>
-            <th>Status</th>
             <th>Amount</th>
         </tr>
         <tr th:each="tx: ${transactions}">
             <td th:text="${tx.confirmedAt}"></td>
             <td th:text="${tx.detail}"></td>
-            <td th:text="${tx.status}"></td>
-            <td th:text="${tx.amount} + ' USDT'">&nbsp;USD</td>
+            <td th:text="${tx.amount}">&nbsp;USD</td>
         </tr>
         
         
     </table>
-    
+    <div id="footer">
+        <div class="footer-body">
+            <div class="doc-name">
+                <span>Nyyu UAB</span>
+                <span class="qr-detail">Republic of Lithuania, Vilnius, Kalvarijy Str. 125.</span>
+            </div>
+            <div id="qrcode">   
+                <img th:src="@{classpath:static/images/qr.png}" alt="logo" class="qr" />
+            </div>
+        </div>
+    </div>
 </body> 
 </html>

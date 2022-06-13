@@ -45,18 +45,18 @@ public class StripePresaleService extends StripeBaseService implements ITransact
                 }
 
                 intent = PaymentIntent.create(createParams.build());
-                m = (StripePresaleTransaction) stripePresaleDao.insert(m);
+                stripePresaleDao.insert(m);
             } else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripePresaleDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId()); 
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
                 handleSuccessPresaleOrder(m, presaleOrder);
             }
             response = generateResponse(intent, response);
-            response.setPaymentId(m.getId());
+
         } catch (Exception e) {
             response.setError(e.getMessage());
         }
@@ -93,10 +93,11 @@ public class StripePresaleService extends StripeBaseService implements ITransact
             else {
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripePresaleDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId()); 
+                stripePresaleDao.insert(m);
             }
 
             if (intent != null && intent.getStatus().equals("succeeded")) {
+
                 handleSuccessPresaleOrder(m, presaleOrder);
             }
             response = generateResponse(intent, response);
@@ -111,7 +112,7 @@ public class StripePresaleService extends StripeBaseService implements ITransact
     private void handleSuccessPresaleOrder(StripePresaleTransaction m, PreSaleOrder presaleOrder) {
         int userId = m.getUserId();
         
-        handlePresaleOrder(userId, m.getId(), m.getAmount(), "STRIPE", presaleOrder);
+        handlePresaleOrder(userId, presaleOrder);
         stripePresaleDao.update(m.getId(), 1);
     }
 

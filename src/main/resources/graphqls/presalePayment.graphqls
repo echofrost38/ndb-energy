@@ -1,6 +1,5 @@
 extend type Mutation {
     payStripeForPreSale(
-        id: Int,
         presaleId: Int,
         orderId: Int,
         amount: Float,
@@ -11,7 +10,6 @@ extend type Mutation {
         isSaveCard: Boolean
     ) : PayResponse
     payStripeForPreSaleWithSavedCard(
-        id: Int,
         presaleId: Int,
         orderId: Int,
         amount: Float,

@@ -159,7 +159,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
         balanceDao.addFreeBalance(user.getId(), ndbId, 0);
 
-        int voltId = tokenAssetService.getTokenIdBySymbol("WATT");
+        int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
         balanceDao.addFreeBalance(user.getId(), voltId, 0);
         return user;
     }

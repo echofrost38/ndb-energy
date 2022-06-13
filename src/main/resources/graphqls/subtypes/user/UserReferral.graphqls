@@ -1,0 +1,6 @@
+type UserReferral {
+    id: Int,
+    referralCode: String,
+    referredByCode: String,
+    rate: Int
+}

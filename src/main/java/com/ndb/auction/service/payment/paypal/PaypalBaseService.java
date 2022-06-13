@@ -5,9 +5,7 @@ import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.BaseService;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-@Service
 public class PaypalBaseService extends BaseService {
     
     @Value("${website.url}")
@@ -20,7 +18,7 @@ public class PaypalBaseService extends BaseService {
         return paypalAuctionDao.selectByPaypalOrderId(orderId);
     }
 
-    public double getPayPalTotalOrder(int userId, double amount) {
+    protected double getPayPalTotalOrder(int userId, double amount) {
 		User user = userDao.selectById(userId);
 		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         var white = whitelistDao.selectByUserId(userId);

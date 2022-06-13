@@ -91,7 +91,7 @@ public class PresaleOrderService extends BaseService {
                 .collect(Collectors.toList());
             if(confirmedStripe.size() > 0) {
                 var payment = confirmedStripe.get(0);
-                order.setPaidAmount(stripeBaseService.getTotalOrder(userId, payment.getFiatAmount()));
+                order.setPaidAmount(stripeBaseService.getTotalAmount(userId, payment.getFiatAmount()));
                 updateStatus(orderId, payment.getId(), order.getPaidAmount(), "STRIPE");
                 continue;
             }

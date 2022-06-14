@@ -96,7 +96,7 @@ public class PresaleOrderService extends BaseService {
         var list = presaleOrderDao.selectByPresaleId(presaleId);
 
         for (var order : list) {
-            // if(order.getPaidAmount() > 0) continue;
+            if(order.getPaidAmount() > 0) continue;
             var userId = order.getUserId(); var orderId = order.getId();
             var coinpayments = coinpaymentTransactionDao.selectByOrderIdByUser(userId, orderId, "PRESALE");
             var confirmedCrypto = coinpayments.stream()

@@ -18,7 +18,6 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 	
 	public CurrentRound getCurrentRound() {
 		CurrentRound currentRound = new CurrentRound();
-
 		List<Auction> auctions = auctionService.getAuctionByStatus(Auction.STARTED);
 		if(auctions.size() != 0) {
 			currentRound.setAuction(auctions.get(0));

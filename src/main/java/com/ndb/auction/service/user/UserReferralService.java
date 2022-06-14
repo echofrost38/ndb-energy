@@ -81,7 +81,7 @@ public class UserReferralService extends BaseService {
         }
     }
 
-    public boolean updateWalletConnect(int userId,String wallet) throws Exception {
+    public boolean updateWalletByInvitedGuest(int userId,String wallet) throws Exception {
         try {
             UserReferral guestUser = userReferralDao.selectById(userId);
             User user = userDao.selectById(guestUser.getId()) ;

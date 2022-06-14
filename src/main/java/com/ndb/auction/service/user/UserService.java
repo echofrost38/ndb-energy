@@ -206,6 +206,8 @@ public class UserService extends BaseService {
 		user.setAvatar(userAvatarDao.selectById(id));
 		user.setSecurity(userSecurityDao.selectByUserId(id));
 		user.setVerify(userVerifyDao.selectById(id));
+		if (userVerifyDao.selectById(id).isKycVerified())
+			user.setReferral(userReferralDao.selectById(id));
 
 		return user;
 	}

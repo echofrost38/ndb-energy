@@ -7,16 +7,15 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBReferral;
-import com.ndb.auction.contracts.NDBcoinV4;
+import com.ndb.auction.contracts.NDBcoin;
 import com.ndb.auction.schedule.ScheduledTasks;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +25,13 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tuples.generated.Tuple2;
-import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 import java.text.DecimalFormat;
+
 @Service
+@Slf4j
 public class NDBCoinService {
 
     @Value("${ndb.private.key}")
@@ -58,40 +55,69 @@ public class NDBCoinService {
     private ScheduledTasks schedule;
 
     private Credentials ndbCredential;
-    private NDBcoinV4 ndbToken;
+    private NDBcoin ndbToken;
     private NDBReferral ndbReferral;
     private FastRawTransactionManager txMananger;
 
-    private Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
+    private final Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("600000");
+    private final BigInteger gasLimit = new BigInteger("800000");
     private final BigInteger decimals = new BigInteger("1000000000000");
-    private static final DecimalFormat df = new DecimalFormat("0.00");
-    private final String emptyAddress = "0x0000000000000000000000000000000000000000";
-    @PostConstruct
-    public void init()  {
-        try {
-            Web3jConfig web3jConfig = new Web3jConfig();
-            BEP20NET = Web3j.build(web3jConfig.buildService(bscNetwork));
-            //  Web3j web3j = Web3j.build(new HttpService(bscNetwork));
-            ndbCredential = Credentials.create(ndbKey);
-            txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
-            ndbToken = NDBcoinV4.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
-            ndbReferral = NDBReferral.load(ndbReferralContract, BEP20NET, txMananger, gasPrice, gasLimit);
-            ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
-                    .subscribe(event -> {
-                        handleEvent(event);
-                    }, error -> {
-                        System.out.println("Error: " + error);
-                    });
+    private final BigInteger m_decimals = new BigInteger("100000000");
 
-        } catch (Exception ex){
-            System.out.println("INIT WEB3 : " + ex.getMessage());
-        }
+    private final double multipler = 10000.0;
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+    
+    @SuppressWarnings("deprecation")
+    @PostConstruct
+    public void init() throws IOException {
+        Web3j web3j = Web3j.build(new HttpService(bscNetwork));
+        ndbCredential = Credentials.create(ndbKey);
+        txMananger = new FastRawTransactionManager(web3j, ndbCredential, bscChainId);
+        ndbToken = NDBcoin.load(ndbTokenContract, web3j, txMananger, gasPrice, gasLimit);
+        ndbReferral = NDBReferral.load(ndbReferralContract, web3j, txMananger,gasPrice,gasLimit);
+        // ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleEvent(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.activeReferrerEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleActiveReferrer(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.referralRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handleRecordReferrer(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+        // ndbReferral.referralCommissionRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+        //         .subscribe(event -> {
+        //             handlereferralCommissionRecorded(event);
+        //         }, error -> {
+        //             System.out.println("Error: " + error);
+        //         });
+
     }
 
-    private void handleEvent(NDBcoinV4.TransferEventResponse event) throws IOException {
+    private void handlereferralCommissionRecorded(NDBReferral.ReferralCommissionRecordedEventResponse event) {
+        System.out.println("referralCommissionRecorded : "+event.referrer +" commission: " + event.commission);
+    }
+
+    private void handleRecordReferrer(NDBReferral.ReferralRecordedEventResponse event) {
+        System.out.println("RecordReferrer user: "+event.user +" referrer: " + event.referrer);
+    }
+
+    private void handleActiveReferrer(NDBReferral.ActiveReferrerEventResponse event) {
+        System.out.println("ActiveReferrer "+event.referrer +" Status: " + event.status);
+    }
+
+    private void handleEvent(NDBcoin.TransferEventResponse event) throws IOException {
         // create new withdraw transaction record
         String from = event.from;
         String to = event.to;
@@ -106,64 +132,27 @@ public class NDBCoinService {
         System.out.println("Pending: " + txnHash);
     }
 
-    public String activeReferrer(String address , Double rate){
-        try {
-            BigInteger _rate = BigInteger.valueOf(rate.longValue());
-            TransactionReceipt receipt = ndbReferral.activeReferrer(address,_rate).send();
-            return receipt.getTransactionHash();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public long getUserEarning(String address){
-        try {
-            long earning= ndbReferral.getEarning(address).send().divide(decimals).longValue();
-            return earning;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public String recordReferral(String user , String referrer){
-        try {
-            TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
-            return receipt.getTransactionHash();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String updateReferrerRate(String referrer , Double rate){
-        try {
-            BigInteger _rate = BigInteger.valueOf(rate.longValue());
-            TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer,_rate).send();
-            return receipt.getTransactionHash();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String updateReferrer(String old , String current){
-        try {
-            TransactionReceipt receipt = ndbReferral.updateReferrer(old,current).send();
-            return receipt.getTransactionHash();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public boolean isActiveReferrer(String referrer) throws ExecutionException, InterruptedException {
-        Tuple2<BigInteger, BigInteger> result = ndbReferral.referredUsers(referrer).sendAsync().get();
-        if (result.getValue1().intValue()>0)
+    public boolean isAvailableReferral(String wallet) throws ExecutionException, InterruptedException {
+        BigInteger value = ndbToken.balanceOf(wallet).sendAsync().get();
+        if (value.signum()==1)
             return true;
         else
-            return false;
+            return false ;
+    }
+
+    public String activeReferrer(String _address,boolean _status) throws Exception {
+        String transactionResponse = ndbReferral.activeReferrer(_address,_status).send().getTransactionHash();
+        return transactionResponse;
+    }
+    public String recordReferral(String _user,String _referrer) throws Exception {
+        String transactionResponse = ndbReferral.recordReferral(_user,_referrer).send().getTransactionHash();
+        return transactionResponse;
+    }
+
+    public String recordReferralCommission(String _referrer,long _commission) throws Exception {
+        BigInteger commission = BigInteger.valueOf(_commission);
+        String transactionResponse = ndbReferral.recordReferralCommission(_referrer,commission).send().getTransactionHash();
+        return transactionResponse;
     }
 
     public String getTotalSupply() throws ExecutionException, InterruptedException {
@@ -195,12 +184,13 @@ public class NDBCoinService {
     }
 
     public NDBCoinService() {
+
+
     }
 
     public boolean checkConfirmation(BigInteger targetNumber) {
         // check confirm or not
         try {
-            //Web3j web3j = Web3j.build(new HttpService(bscNetwork));
             BigInteger latestNumber = BEP20NET.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
             if(latestNumber.subtract(targetNumber).longValue() > 12L) {
                 return true;
@@ -217,14 +207,21 @@ public class NDBCoinService {
         try {
 
             Web3j web3j = Web3j.build(new HttpService(bscNetwork));
+            ndbCredential = Credentials.create(ndbKey);
             @SuppressWarnings("deprecation")
             ERC20 ndbToken = ERC20.load(ndbTokenContract, web3j, ndbCredential, gasPrice, gasLimit);
-
+            
+            // avoid decimals
+            amount *= multipler;
             BigInteger _amount = BigInteger.valueOf(amount.longValue());
-            _amount = _amount.multiply(decimals);
+            _amount = _amount.multiply(m_decimals);
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
+
+            log.info("receipt hash: {}", receipt.getTransactionHash());
+            log.info("receipt status: {}", receipt.getStatus());
+
             return receipt.getTransactionHash();
         } catch (Exception e) {
             e.printStackTrace();

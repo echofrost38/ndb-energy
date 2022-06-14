@@ -1,20 +1,14 @@
 package com.ndb.auction.security.jwt;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.ndb.auction.models.LocationLog;
-import com.ndb.auction.service.LocationLogService;
-import com.ndb.auction.service.user.UserDetailsImpl;
-import com.ndb.auction.service.user.UserDetailsServiceImpl;
-import com.ndb.auction.utils.RemoteIpHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +20,14 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.ndb.auction.models.LocationLog;
+import com.ndb.auction.service.LocationLogService;
+import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.user.UserDetailsServiceImpl;
+import com.ndb.auction.utils.RemoteIpHelper;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
 
@@ -41,6 +43,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     private static final String SESSION_IP = "ip";
+
+    private static final Map<String, LocationLog> locationMap = new HashMap<>();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -62,14 +66,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
-        block_ipcheck:
-        {
+        block_ipcheck: {
             HttpSession session = request.getSession(false);
             String ipFromSession;
             String ip = RemoteIpHelper.getRemoteIpFrom(request);
             if (session == null || (ipFromSession = (String) session.getAttribute(SESSION_IP)) == null
                     || !ip.equals(ipFromSession)) {
-                LocationLog location = locationLogService.buildLog("116.111.228.41");
+
+                var location = locationMap.get(ip);
+                if (location == null) {
+                    // checking ip address ------> calling vpn api key
+                    location = locationLogService.buildLog(ip);
+                    if(location != null) 
+                        locationMap.put(ip, location);
+                }
                 JsonObject errorObject;
                 if (location == null) {
                     if (userDetails != null) {
@@ -123,13 +133,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         AntPathMatcher matcher = new AntPathMatcher();
-        return 
-            matcher.match("/location", request.getServletPath()) || 
-            matcher.match("/favicon.ico", request.getServletPath()) ||
-            matcher.match("/shufti", request.getServletPath()) ||
-            matcher.match("/stripe", request.getServletPath()) ||
-            matcher.match("/ipn/**", request.getServletPath()) ||
-            matcher.match("/paypal/**", request.getServletPath());
+        return matcher.match("/location", request.getServletPath()) ||
+                matcher.match("/favicon.ico", request.getServletPath()) ||
+                matcher.match("/shufti", request.getServletPath()) ||
+                matcher.match("/stripe", request.getServletPath()) ||
+                matcher.match("/ipn/**", request.getServletPath()) ||
+                matcher.match("/paypal/**", request.getServletPath());
     }
 
     private String parseJwt(HttpServletRequest request) {

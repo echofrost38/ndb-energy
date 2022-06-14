@@ -39,7 +39,6 @@ public class User extends BaseModel {
 	private UserAvatar avatar;
 	private List<UserSecurity> security;
 	private UserVerify verify;
-	private UserReferral referral;
 
 	public User(String email, String encodedPass, String country) {
 		this.email = email;

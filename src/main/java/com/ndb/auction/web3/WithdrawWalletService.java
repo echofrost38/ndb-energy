@@ -214,6 +214,10 @@ public class WithdrawWalletService {
             Bip32ECKeyPair  derivedKeyPair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, derivationPath);
             Credentials credentials = Credentials.create(derivedKeyPair);
 
+            if(!network.equals("ERC20") && !network.equals("BEP20")) {
+                return "Failed";
+            }
+
             if(network.equals("ERC20") && tokenSymbol.equals("ETH")) {
                 var bAmount = Convert.toWei(String.valueOf(amount), Convert.Unit.ETHER);
                 TransactionReceipt txnReceipt = Transfer.sendFunds(

@@ -106,7 +106,7 @@ public class PresaleOrderService extends BaseService {
                 var payment = confirmedCrypto.get(0);
                 var paid = getCryptoTotalOrder(userId, order.getNdbAmount() * order.getNdbPrice());
                 order.setPaidAmount(paid);
-                updateStatus(orderId, payment.getId(), paid, "CRYPTO");
+                presaleOrderDao.updateStatus(orderId, payment.getId(), paid, "CRYPTO");
                 continue;
             }
 
@@ -117,7 +117,7 @@ public class PresaleOrderService extends BaseService {
             if(confirmedStripe.size() > 0) {
                 var payment = confirmedStripe.get(0);
                 order.setPaidAmount(stripeBaseService.getTotalAmount(userId, payment.getFiatAmount()));
-                updateStatus(orderId, payment.getId(), order.getPaidAmount(), "STRIPE");
+                presaleOrderDao.updateStatus(orderId, payment.getId(), order.getPaidAmount(), "STRIPE");
                 continue;
             }
             
@@ -128,7 +128,7 @@ public class PresaleOrderService extends BaseService {
             if(confirmedPaypal.size() > 0) {
                 var payment = confirmedPaypal.get(0);
                 order.setPaidAmount(paypalBaseService.getPayPalTotalOrder(userId, payment.getAmount()));
-                updateStatus(orderId, payment.getId(), order.getPaidAmount(), "PAYPAL");
+                presaleOrderDao.updateStatus(orderId, payment.getId(), order.getPaidAmount(), "PAYPAL");
                 continue;
             }
 
@@ -139,7 +139,7 @@ public class PresaleOrderService extends BaseService {
 
             var totalOrder = 100 * (order.getNdbAmount() * order.getNdbPrice()) / (100 - tierFeeRate);
             order.setPaidAmount(totalOrder);
-            updateStatus(orderId, 0, totalOrder, "NYYU");
+            presaleOrderDao.updateStatus(orderId, 0, totalOrder, "NYYU");
         }
 
         return list;

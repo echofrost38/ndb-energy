@@ -28,7 +28,7 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
         m.setStatus(rs.getBoolean("STATUS"));
         m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
         m.setPaymentIntentId(rs.getString("INTENT_ID"));
         m.setPaymentMethodId(rs.getString("METHOD_ID"));
         m.setCryptoType(rs.getString("CRYPTO_TYPE"));

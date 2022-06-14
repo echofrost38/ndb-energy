@@ -51,7 +51,7 @@ public class StripeAuctionService extends StripeBaseService implements ITransact
                 // Confirm the paymentIntent to collect the money
                 intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripeAuctionDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId());
+                stripeAuctionDao.insert(m);
             }
 
             if (intent.getStatus().equals("requires_capture")) {

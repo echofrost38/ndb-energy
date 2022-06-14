@@ -3,7 +3,6 @@ package com.ndb.auction.resolver.payment.presale;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.AuctionException;
-import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.user.User;
@@ -45,11 +44,6 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
             throw new AuctionException(msg, "presaleId");
         }
 
-        if(order.getStatus() != 0) {
-            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
-            throw new BidException(msg, "order");
-        }
-
         // get amount 
         double totalOrder = 0.0;
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
@@ -71,7 +65,7 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
 
         // deduct free balance
         internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
-        stripeBaseService.handlePresaleOrder(userId, 0, totalOrder, "NYYU", order);
+        stripeBaseService.handlePresaleOrder(userId, order);
 
         return "Success";
     }

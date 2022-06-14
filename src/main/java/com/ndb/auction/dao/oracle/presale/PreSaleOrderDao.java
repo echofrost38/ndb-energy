@@ -38,10 +38,6 @@ public class PreSaleOrderDao extends BaseOracleDao {
         m.setName(rs.getString("NAME"));
         m.setCreatedAt(rs.getTimestamp("STARTED_AT").getTime());
         m.setUpdatedAt(rs.getTimestamp("UPDATED_AT").getTime());
-
-        m.setPaymentId(rs.getInt("PAYMENT_ID"));
-        m.setPaymentType(rs.getString("PAYMENT_TYPE"));
-        m.setPaidAmount(rs.getDouble("PAID_AMOUNT"));
         return m;
 	}
 
@@ -111,9 +107,9 @@ public class PreSaleOrderDao extends BaseOracleDao {
 		}, orderId);
     }
 
-    public int updateStatus(int orderId, int paymentId, double paidAmount, String paymentType) {
-        String sql = "UPDATE TBL_PRESALE_ORDER SET STATUS = 1,PAYMENT_ID=?,PAYMENT_TYPE=?,PAID_AMOUNT=?, UPDATED_AT=SYSDATE WHERE ID=?";
-        return jdbcTemplate.update(sql, paymentId, paymentType, paidAmount, orderId);
+    public int updateStatus(int orderId) {
+        String sql = "UPDATE TBL_PRESALE_ORDER SET STATUS = 1, UPDATED_AT=SYSDATE WHERE ID=?";
+        return jdbcTemplate.update(sql, orderId);
     }
 
 }

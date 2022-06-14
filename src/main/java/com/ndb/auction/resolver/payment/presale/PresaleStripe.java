@@ -21,7 +21,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSale(int id, int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse payStripeForPreSale(int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -31,21 +31,15 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "order");
         }
-
-        if(order.getStatus() != 0) {
-            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "order");
-        }
-
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = usdAmount * fiatPrice;
-        StripePresaleTransaction m = new StripePresaleTransaction(id, userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId, paymentMethodId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId, paymentMethodId);
         return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse payStripeForPreSaleWithSavedCard(int id, int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, int cardId, String paymentIntentId) {
+    public PayResponse payStripeForPreSaleWithSavedCard(int presaleId, int orderId, Double amount, Double fiatAmount, String fiatType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
@@ -56,21 +50,14 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
 
         // getting value from presale order
         var order = presaleOrderService.getPresaleById(orderId);
-        
         if(order == null) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "order");
         }
-
-        if(order.getStatus() != 0) {
-            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "order");
-        }
-
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = usdAmount * fiatPrice;
-        StripePresaleTransaction m = new StripePresaleTransaction(id, userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId);
+        StripePresaleTransaction m = new StripePresaleTransaction(userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId);
         return stripePresaleService.createNewTransactionWithSavedCard(m, customer);
     }
 

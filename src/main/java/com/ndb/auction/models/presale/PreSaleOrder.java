@@ -24,9 +24,6 @@ public class PreSaleOrder extends BaseModel {
         this.status = 0;
         this.prefix = null;
         this.name = null;
-        this.paidAmount = 0;
-        this.paymentId = 0;
-        this.paymentType = "";
     }
 
     public static int INTERNAL = 1;
@@ -43,11 +40,6 @@ public class PreSaleOrder extends BaseModel {
 
     private double ndbAmount;
     private double ndbPrice;
-
-    // for confirmed payment information
-    private String paymentType;
-    private int paymentId;
-    private double paidAmount;
 
     private int status;
 

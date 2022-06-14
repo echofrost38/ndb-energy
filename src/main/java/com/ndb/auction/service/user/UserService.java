@@ -38,7 +38,7 @@ public class UserService extends BaseService {
 	@Autowired
 	PasswordEncoder encoder;
 
-	public String createUser(String email, String password, String country) {
+	public String createUser(String email, String password, String country,String referredByCode) {
 		User user = userDao.selectEntireByEmail(email);
 		if (user != null) {
 			if(user.getDeleted() == 0){
@@ -57,7 +57,7 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-
+			userReferralService.createNewReferrer(user.getId(),"",referredByCode);
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);
@@ -340,7 +340,7 @@ public class UserService extends BaseService {
 		int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
 		balanceDao.addFreeBalance(user.getId(), ndbId, 0);
 
-		int voltId = tokenAssetService.getTokenIdBySymbol("WATT");
+		int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
 		balanceDao.addFreeBalance(user.getId(), voltId, 0);
 
 		// send email!

@@ -343,7 +343,7 @@ public class UserService extends BaseService {
 		int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");
 		balanceDao.addFreeBalance(user.getId(), ndbId, 0);
 
-		int voltId = tokenAssetService.getTokenIdBySymbol("VOLT");
+		int voltId = tokenAssetService.getTokenIdBySymbol("WATT");
 		balanceDao.addFreeBalance(user.getId(), voltId, 0);
 
 		// send email!

@@ -35,6 +35,11 @@ public class PresaleCoinpayment extends BaseResolver implements GraphQLQueryReso
             throw new UnauthorizedException(msg, "order");
         }
 
+        if(order.getStatus() != 0) {
+            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "order");
+        }
+
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
         var cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
         var _cryptoAmount = usdAmount / cryptoPrice;

@@ -3,7 +3,6 @@ package com.ndb.auction.utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ public class RandomStringGenerator {
 
     public String generate() {
 
-        SecureRandom random = new SecureRandom();
         String generated = "";
 
         var letters = "abcdefghijklmnopqrstyvwz0123456789"

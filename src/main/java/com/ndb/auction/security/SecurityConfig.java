@@ -100,7 +100,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/graphql/**").permitAll()
 				.antMatchers("/graphiql/**").permitAll()
 				.antMatchers("/vendor/**").permitAll()
-				// .antMatchers("/playground/**").permitAll()
+				.antMatchers("/playground/**").permitAll()
 				// .antMatchers("/subscriptions/**").permitAll()
 				// .antMatchers("/coinbase/**").permitAll()
 				.antMatchers("/auth/**", "/oauth2/**").permitAll()
@@ -114,7 +114,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/totalsupply/**").permitAll()
 				.antMatchers("/circulatingsupply/**").permitAll()
 				.antMatchers("/marketcap/**").permitAll()
-				// .antMatchers("/download/**").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()
@@ -133,9 +132,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.and()
 				.successHandler(oAuth2AuthenticationSuccessHandler)
 				.failureHandler(oAuth2AuthenticationFailureHandler);
-			// .and()
-			// .logout();
-        
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 	

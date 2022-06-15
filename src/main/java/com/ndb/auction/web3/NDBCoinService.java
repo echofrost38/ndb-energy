@@ -7,8 +7,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +16,8 @@ import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
 import com.ndb.auction.schedule.ScheduledTasks;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,15 +26,14 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
-import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tx.FastRawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 import java.text.DecimalFormat;
+
 @Service
+@Slf4j
 public class NDBCoinService {
 
     @Value("${ndb.private.key}")
@@ -65,10 +64,13 @@ public class NDBCoinService {
     private Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
 
     private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("600000");
+    private final BigInteger gasLimit = new BigInteger("800000");
     private final BigInteger decimals = new BigInteger("1000000000000");
+    private final BigInteger m_decimals = new BigInteger("100000000");
+
+    private final double multipler = 10000.0;
+
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    private final String emptyAddress = "0x0000000000000000000000000000000000000000";
     
     @SuppressWarnings("deprecation")
     @PostConstruct
@@ -95,10 +97,6 @@ public class NDBCoinService {
 
     private void handleEvent(NDBcoinV4.TransferEventResponse event) throws IOException {
         // create new withdraw transaction record
-        String from = event.from;
-        String to = event.to;
-        long lvalue = event.value.divide(decimals).longValue();
-        Double value = ((double)lvalue) / 10000.0;
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
         // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
@@ -219,14 +217,21 @@ public class NDBCoinService {
         try {
 
             Web3j web3j = Web3j.build(new HttpService(bscNetwork));
+            ndbCredential = Credentials.create(ndbKey);
             @SuppressWarnings("deprecation")
             ERC20 ndbToken = ERC20.load(ndbTokenContract, web3j, ndbCredential, gasPrice, gasLimit);
-
+            
+            // avoid decimals
+            amount *= multipler;
             BigInteger _amount = BigInteger.valueOf(amount.longValue());
-            _amount = _amount.multiply(decimals);
+            _amount = _amount.multiply(m_decimals);
 
             // create
             TransactionReceipt receipt = ndbToken.transfer(address, _amount).send();
+
+            log.info("receipt hash: {}", receipt.getTransactionHash());
+            log.info("receipt status: {}", receipt.getStatus());
+
             return receipt.getTransactionHash();
         } catch (Exception e) {
             e.printStackTrace();

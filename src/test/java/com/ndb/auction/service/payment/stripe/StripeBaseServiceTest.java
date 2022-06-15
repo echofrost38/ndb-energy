@@ -45,6 +45,7 @@ public class StripeBaseServiceTest {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Test
     public void stripeFeeTest() {
         
@@ -56,6 +57,7 @@ public class StripeBaseServiceTest {
         Assert.assertEquals(calculatedFee, fee);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void stripeFeeWhitelistTest() {
 
@@ -67,6 +69,7 @@ public class StripeBaseServiceTest {
         Assert.assertEquals(calculatedFee, fee);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void totalAmountTest() {
 

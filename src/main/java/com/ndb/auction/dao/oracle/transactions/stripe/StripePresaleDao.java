@@ -35,7 +35,7 @@ public class StripePresaleDao extends BaseOracleDao implements ITransactionDao {
         m.setConfirmedAt(rs.getTimestamp("UPDATED_AT").getTime());
 		m.setStatus(rs.getBoolean("STATUS"));
 		m.setFiatType(rs.getString("FIAT_TYPE"));
-        m.setFiatAmount(rs.getLong("FIAT_AMOUNT"));
+        m.setFiatAmount(rs.getDouble("FIAT_AMOUNT"));
         m.setPaymentMethodId(rs.getString("METHOD_ID"));
         m.setPaymentIntentId(rs.getString("INTENT_ID"));
 		return m;
@@ -122,6 +122,11 @@ public class StripePresaleDao extends BaseOracleDao implements ITransactionDao {
     public int updatePaymentStatus(String paymentIntentId, int status) {
         String sql = "UPDATE TBL_STRIPE_PRESALE SET STATUS=?, UPDATED_AT=SYSDATE WHERE INTENT_ID=?";
 		return jdbcTemplate.update(sql, status, paymentIntentId);
+    }
+
+    public int updatePaymentIntent(int id, String paymentIntentId) {
+        var sql = "UPDATE TBL_STRIPE_PRESALE SET INTENT_ID = ?, UPDATED_AT = SYSDATE WHERE ID = ?";
+        return jdbcTemplate.update(sql, paymentIntentId, id);
     }
 
     public List<StripePresaleTransaction> selectRange(int userId, long from, long to) {

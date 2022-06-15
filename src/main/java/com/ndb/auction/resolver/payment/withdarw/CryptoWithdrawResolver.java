@@ -32,6 +32,12 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
+    private final double BEP20FEE = 1;
+    private final double ERC20FEE = 20;
+
+    private final double MIN_WITHDRAW_BEP20 = 10;
+    private final double MIN_WITHDRAW_ERC20 = 30;
+
     @Autowired
 	protected CryptoWithdrawService cryptoWithdrawService;
 
@@ -80,10 +86,35 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         }
 
         // get crypto price
-        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);;
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
+
+        // check minimum 
+        if(network.equals("BEP20")) {
+            if(amount * cryptoPrice < MIN_WITHDRAW_BEP20) {
+                var min = MIN_WITHDRAW_BEP20 / cryptoPrice;
+                throw new BalanceException(String.format("The minimum withdrawal amount for BSC Network is %f %s.", min, sourceToken), "amount");
+            }
+        } else if(network.equals("ERC20")) {
+            if(amount * cryptoPrice < MIN_WITHDRAW_ERC20) {
+                var min = MIN_WITHDRAW_ERC20 / cryptoPrice;
+                throw new BalanceException(String.format("The minimum withdrawal amount for ETH Network is %f %s.", min, sourceToken), "amount");
+            }
+        }
 
         // double totalUSD = amount * cryptoPrice;
         double fee = getTierFee(userId, amount);
+
+        // network fee
+        if(cryptoPrice > 0.0) {
+            if(network.equals("ERC20")) {
+                fee += ERC20FEE / cryptoPrice;
+            } else if(network.equals("BEP20")) {
+                fee += BEP20FEE / cryptoPrice;
+            } else {
+                throw new BalanceException("Not supported withdrawal.", "amount");
+            }
+        }
+
         double withdrawAmount = amount - fee;
 
         var m = new CryptoWithdraw(userId, withdrawAmount, fee, sourceToken, cryptoPrice, amount, network, des); 
@@ -102,40 +133,46 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @Transactional
     public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
-        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
+        
         var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
+        if(request.getStatus() != 0) {
+            throw new BalanceException("Already processed.", "amount");
+        }
+        
+        var result = cryptoWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
         var tokenSymbol = request.getSourceToken();
         var tokenAmount = request.getTokenAmount();
 
         if(result == 1 && status == 1) {
-            // transfer funds
-            if(tokenSymbol.equals("NDB")) {
-                String transactionHash = ndbCoinService.transferNDB(request.getUserId(), request.getDestination(), request.getWithdrawAmount());
-                if(transactionHash == null) {
-                    // cannot transfer NDB
-                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
-                    throw new UnauthorizedException(msg, "id"); 
-                }
-            }
             
-            // success
             var balance = internalBalanceService.getBalance(request.getUserId(), tokenSymbol);
             if(balance.getFree() < tokenAmount) {
                 String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
                 throw new BalanceException(msg, "amount");
             }
+            
+            var transactionHash = "";
+            if(tokenSymbol.equals("NDB")) {
+                transactionHash = ndbCoinService.transferNDB(request.getUserId(), request.getDestination(), request.getWithdrawAmount());
+                if(transactionHash == null) {
+                    // cannot transfer NDB
+                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                    throw new UnauthorizedException(msg, "id"); 
+                }
+            } else {
+                // transfer
+                transactionHash = adminWalletService.withdrawToken(
+                    request.getNetwork(), 
+                    request.getSourceToken(), 
+                    request.getDestination(), 
+                    request.getWithdrawAmount());
+                if(transactionHash.equals("Failed")) {
+                    String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
+                    throw new UnauthorizedException(msg, "id"); 
+                }
+            }            
 
-            // transfer
-            var hash = adminWalletService.withdrawToken(
-                request.getNetwork(), 
-                request.getSourceToken(), 
-                request.getDestination(), 
-                request.getWithdrawAmount());
-            if(hash.equals("Failed")) {
-                String msg = messageSource.getMessage("cannot_crypto_transfer", null, Locale.ENGLISH);
-                throw new UnauthorizedException(msg, "id"); 
-            }
-            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), hash);
+            cryptoWithdrawService.updateCryptoWithdrawTxHash(request.getId(), transactionHash);
             internalBalanceService.deductFree(request.getUserId(), tokenSymbol, tokenAmount);
 
             notificationService.sendNotification(

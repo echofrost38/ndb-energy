@@ -1,7 +1,6 @@
 package com.ndb.auction.controllers;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,7 +32,7 @@ public class PdfController extends BaseController {
 
     // download transaction content pdf
     @GetMapping(value="/transactions")
-    public ResponseEntity<byte[]> downloadTransactionsAsPDF (HttpServletRequest request) throws WriterException, IOException, URISyntaxException {
+    public ResponseEntity<byte[]> downloadTransactionsAsPDF (HttpServletRequest request) throws WriterException, IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
 
@@ -48,17 +47,14 @@ public class PdfController extends BaseController {
         try {
             var content = new byte[(int)file.contentLength()];
             IOUtils.read(file.getInputStream(), content);
-            var response = ResponseEntity.ok()
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION, 
-                String.format("attachment; filename=\"%s\"", pdfPath)
+            return ResponseEntity.ok()
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION, 
+                    String.format("attachment; filename=\"%s\"", pdfPath)
                 )
                 .contentLength(file.contentLength())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(content);
-            var pdfFile = new java.io.File(pdfPath);
-            pdfFile.delete();
-            return response;
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -80,26 +76,23 @@ public class PdfController extends BaseController {
             e1.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        
+
         try {
             var file = new FileSystemResource(pdfPath);
             var content = new byte[(int)file.contentLength()];
             IOUtils.read(file.getInputStream(), content);
-            var response = ResponseEntity.ok()
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION, 
-                String.format("attachment; filename=\"%s\"", pdfPath)
+            return ResponseEntity.ok()
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION, 
+                    String.format("attachment; filename=\"%s\"", pdfPath)
                 )
                 .contentLength(file.contentLength())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(content);
-            var pdfFile = new java.io.File(pdfPath);
-            pdfFile.delete();
-            return response;
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } 
+        }
     }
 
 }

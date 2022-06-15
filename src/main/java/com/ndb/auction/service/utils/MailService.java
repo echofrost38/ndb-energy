@@ -188,31 +188,4 @@ public class MailService {
         javaMailSender.send(mimeMessage);
     }
 
-    public void sendPurchase(int round, String email, String avatarName, String gateway, String fiatType, double ndb, double paid, List<User> admins) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException, MessagingException {
-        // fill mail content
-        var stringWriter = new StringWriter();
-        var model = new HashMap<String, Object>();
-
-        model.put("admin", "ADMIN");
-        model.put("round", round);
-        model.put("avatarName", avatarName);
-        model.put("email", email);
-        model.put("ndbAmount", ndb);
-        model.put("paid", paid);
-        model.put("fiatType", fiatType);
-        model.put("payType", gateway);
-
-        configuration.getTemplate("presale.ftlh").process(model, stringWriter);
-        var mailContents = stringWriter.getBuffer().toString();
-        
-        // send
-        var mimeMessage = javaMailSender.createMimeMessage();
-        var helper = new MimeMessageHelper(mimeMessage);
-        helper.setSubject("Presale Purchase");
-        helper.setText(mailContents, true);
-        for (User admin : admins) {
-            helper.addTo(admin.getEmail());
-        }
-        javaMailSender.send(mimeMessage);
-    }
 }

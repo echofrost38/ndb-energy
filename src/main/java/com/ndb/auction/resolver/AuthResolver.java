@@ -36,8 +36,8 @@ public class AuthResolver extends BaseResolver
 		return email.toLowerCase();
 	}
 	
-	public String signup(String email, String password, String country) {
-		return userService.createUser(lowerEmail(email), password, country);
+	public String signup(String email, String password, String country,String referredByCode) {
+		return userService.createUser(lowerEmail(email), password, country,referredByCode);
 	}
 
 	public String verifyAccount(String email, String code) {

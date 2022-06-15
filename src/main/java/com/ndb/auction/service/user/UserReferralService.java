@@ -57,9 +57,15 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String wallet,String referredByCode){
         try {
             User user = userDao.selectById(userId) ;
+            
             if (!ndbCoinService.isActiveReferrer(wallet)){
+                // if wallet is not registered as referrer
                 int rate = tierRate[user.getTierLevel()];
+
+                // active referrer
                 ndbCoinService.activeReferrer(wallet, (double) rate);
+                
+                // update database
                 UserReferral referral = new UserReferral();
                 referral.setId(userId);
                 referral.setWalletConnect(wallet);

@@ -69,6 +69,8 @@ public class NDBCoinService {
     private final BigInteger decimals = new BigInteger("1000000000000");
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private final String emptyAddress = "0x0000000000000000000000000000000000000000";
+    
+    @SuppressWarnings("deprecation")
     @PostConstruct
     public void init()  {
         try {
@@ -158,6 +160,7 @@ public class NDBCoinService {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isActiveReferrer(String referrer) throws ExecutionException, InterruptedException {
         Tuple2<BigInteger, BigInteger> result = ndbReferral.referredUsers(referrer).sendAsync().get();
         if (result.getValue1().intValue()>0)
@@ -181,7 +184,6 @@ public class NDBCoinService {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         String responseBody = response.body();
-        int responseStatusCode = response.statusCode();
         JSONObject json = new JSONObject(responseBody);
         Double price = Double.parseDouble(json.getJSONObject("data").getString("price"));
         if (price.equals(0.0))

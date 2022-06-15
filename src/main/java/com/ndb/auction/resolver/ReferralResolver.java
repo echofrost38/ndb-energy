@@ -1,7 +1,10 @@
 package com.ndb.auction.resolver;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -22,7 +25,7 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
                 .getPrincipal();
         int userId = userDetails.getId();
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        kycStatus=true; //only debug
+
         if (kycStatus)
             return referralService.updateReferrerAddress(userDetails.getId(),wallet);
         else
@@ -35,7 +38,6 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
                 .getPrincipal();
         int userId = userDetails.getId();
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        kycStatus=true ; //only debug
         if (kycStatus){
             UserReferral referrer = referralService.createNewReferrer(userId,wallet,"");
             return referrer.getReferralCode();
@@ -48,12 +50,13 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        
-        kycStatus = true;
-        if (kycStatus){
+
+        if (kycStatus)
             return referralService.selectById(userId);
+        else {
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
         }
-        return null;
     }
 
     @PreAuthorize("isAuthenticated()")

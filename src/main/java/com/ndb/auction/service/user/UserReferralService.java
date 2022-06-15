@@ -28,6 +28,7 @@ public class UserReferralService extends BaseService {
         User user = userDao.selectById(id);
         UserReferral referral = userReferralDao.selectById(id);
         referral.setRate(tierRate[user.getTierLevel()]);
+        referral.setCommissionRate(tierRate);
         return referral;
     }
 

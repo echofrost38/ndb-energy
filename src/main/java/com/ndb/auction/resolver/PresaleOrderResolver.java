@@ -63,6 +63,11 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
     }
 
     @PreAuthorize("isAuthenticated()")
+    public List<PreSaleOrder> getNewPresaleOrders(int presaleId, int lastOrderId) {
+        return presaleOrderService.getPresaleOrders(presaleId, lastOrderId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     public List<PreSaleOrder> getPresaleOrdersByUser() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();

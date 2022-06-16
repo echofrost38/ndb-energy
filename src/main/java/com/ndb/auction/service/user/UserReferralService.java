@@ -59,34 +59,27 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String wallet,String referredByCode){
         try {
             User user = userDao.selectById(userId) ;
-            if (!wallet.isEmpty()) {
-                if (!ndbCoinService.isActiveReferrer(wallet)){
-                    // if wallet is not registered as referrer
-                    int rate = tierRate[user.getTierLevel()];
+            
+            if (!ndbCoinService.isActiveReferrer(wallet)){
+                // if wallet is not registered as referrer
+                int rate = tierRate[user.getTierLevel()];
 
-                    // active referrer
-                    ndbCoinService.activeReferrer(wallet, (double) rate);
-
-                    //record referral for referrer
-                    if (!referredByCode.isEmpty()){
-                        UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
-                        if (referrer!=null){
-                            ndbCoinService.recordReferral(wallet,referrer.getWalletConnect());
-                        }
-                    }
-                }
+                // active referrer
+                ndbCoinService.activeReferrer(wallet, (double) rate);
+                
+                // update database
+                UserReferral referral = new UserReferral();
+                referral.setId(userId);
+                referral.setWalletConnect(wallet);
+                referral.setReferralCode(generateCode());
+                if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
+                    referral.setReferredByCode(referredByCode);
+                else
+                    referral.setReferredByCode("");
+                userReferralDao.insert(referral);
+                return referral;
             }
-            // update database
-            UserReferral referral = new UserReferral();
-            referral.setId(userId);
-            referral.setWalletConnect(wallet);
-            referral.setReferralCode(generateCode());
-            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
-                referral.setReferredByCode(referredByCode);
-            else
-                referral.setReferredByCode("");
-            userReferralDao.insert(referral);
-            return referral;
+            return null;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());
         }

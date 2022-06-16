@@ -2,5 +2,7 @@ type UserReferral {
     id: Int,
     referralCode: String,
     referredByCode: String,
-    rate: Int
+    walletConnect: String,
+    rate: Int,
+    commissionRate : [Int]
 }

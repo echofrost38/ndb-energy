@@ -1,6 +1,5 @@
 package com.ndb.auction.service.user;
 
-import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
@@ -59,27 +58,34 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String wallet,String referredByCode){
         try {
             User user = userDao.selectById(userId) ;
-            
-            if (!ndbCoinService.isActiveReferrer(wallet)){
-                // if wallet is not registered as referrer
-                int rate = tierRate[user.getTierLevel()];
+            if (!wallet.isEmpty()) {
+                if (!ndbCoinService.isActiveReferrer(wallet)){
+                    // if wallet is not registered as referrer
+                    int rate = tierRate[user.getTierLevel()];
 
-                // active referrer
-                ndbCoinService.activeReferrer(wallet, (double) rate);
-                
-                // update database
-                UserReferral referral = new UserReferral();
-                referral.setId(userId);
-                referral.setWalletConnect(wallet);
-                referral.setReferralCode(generateCode());
-                if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
-                    referral.setReferredByCode(referredByCode);
-                else
-                    referral.setReferredByCode("");
-                userReferralDao.insert(referral);
-                return referral;
+                    // active referrer
+                    ndbCoinService.activeReferrer(wallet, (double) rate);
+
+                    //record referral for referrer
+                    if (!referredByCode.isEmpty()){
+                        UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
+                        if (referrer!=null){
+                            ndbCoinService.recordReferral(wallet,referrer.getWalletConnect());
+                        }
+                    }
+                }
             }
-            return null;
+            // update database
+            UserReferral referral = new UserReferral();
+            referral.setId(userId);
+            referral.setWalletConnect(wallet);
+            referral.setReferralCode(generateCode());
+            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
+                referral.setReferredByCode(referredByCode);
+            else
+                referral.setReferredByCode("");
+            userReferralDao.insert(referral);
+            return referral;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());
         }

@@ -14,7 +14,6 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
-import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import lombok.extern.slf4j.Slf4j;
@@ -113,7 +112,8 @@ public class NDBCoinService {
             TransactionReceipt receipt = ndbReferral.activeReferrer(address,_rate).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -122,7 +122,8 @@ public class NDBCoinService {
             long earning= ndbReferral.getEarning(address).send().divide(decimals).longValue();
             return earning;
         } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -131,7 +132,8 @@ public class NDBCoinService {
             TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -141,7 +143,8 @@ public class NDBCoinService {
             TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer,_rate).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -150,7 +153,8 @@ public class NDBCoinService {
             TransactionReceipt receipt = ndbReferral.updateReferrer(old,current).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 

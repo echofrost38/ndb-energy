@@ -433,10 +433,10 @@ public class ScheduledTasks {
 		metadata.setContentLength(tar.length());
 
 		try {
-			// s3.putObject(bucketName, tarName, inputStream, metadata);
+			s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			// mailService.sendBackupEmail(superAdmins, userFileName);
+			mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

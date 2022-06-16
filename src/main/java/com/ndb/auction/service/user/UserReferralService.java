@@ -1,5 +1,6 @@
 package com.ndb.auction.service.user;
 
+import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
@@ -58,6 +59,7 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String wallet,String referredByCode){
         try {
             User user = userDao.selectById(userId) ;
+            referredByCode = (referredByCode!=null) ? referredByCode:"";
             if (!wallet.isEmpty()) {
                 if (!ndbCoinService.isActiveReferrer(wallet)){
                     // if wallet is not registered as referrer

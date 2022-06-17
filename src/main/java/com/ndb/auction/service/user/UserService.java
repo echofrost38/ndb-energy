@@ -404,6 +404,8 @@ public class UserService extends BaseService {
                 whitelistDao.insert(m);
             }
 		}
+		//update referral commission rate .
+		userReferralService.updateCommissionRate(id,tierLevel);
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 }

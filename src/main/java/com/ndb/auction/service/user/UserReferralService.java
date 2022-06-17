@@ -125,14 +125,16 @@ public class UserReferralService extends BaseService {
         }
     }
 
-    public boolean updateCommissionRate(int userId){
+    public boolean updateCommissionRate(int userId, int tierLevel){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
             User user = userDao.selectById(referrer.getId()) ;
-            int rate = tierRate[user.getTierLevel()];
-            if (!referrer.getWalletConnect().isEmpty() && rate > 0){
-                String hash = ndbCoinService.updateReferrerRate(referrer.getWalletConnect(), (double) rate);
-                if (!hash.isEmpty()) return true;
+            if (tierLevel > user.getTierLevel()) {
+                int rate = tierRate[tierLevel];
+                if (!referrer.getWalletConnect().isEmpty() && rate > 0) {
+                    String hash = ndbCoinService.updateReferrerRate(referrer.getWalletConnect(), (double) rate);
+                    if (!hash.isEmpty()) return true;
+                }
             }
             return false;
         }catch(Exception e){

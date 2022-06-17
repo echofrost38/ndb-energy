@@ -78,20 +78,23 @@ public class UserReferralService extends BaseService {
     public String activateReferralCode(int userId,String wallet) {
         try {
             UserReferral guestUser = userReferralDao.selectById(userId);
-            User user = userDao.selectById(guestUser.getId()) ;
-            //set active referrer
-            if (!ndbCoinService.isActiveReferrer(wallet)){
-                int rate = tierRate[user.getTierLevel()];
-                ndbCoinService.activeReferrer(wallet, (double) rate);
+            if (guestUser==null){
+                guestUser = new UserReferral();
+                //set active referrer
+                if (!ndbCoinService.isActiveReferrer(wallet)){
+                    User user = userDao.selectById(userId) ;
+                    int rate = tierRate[user.getTierLevel()];
+                    ndbCoinService.activeReferrer(wallet, (double) rate);
+                }
+                //update database
+                guestUser.setId(userId);
+                guestUser.setReferralCode(generateCode());
+                guestUser.setWalletConnect(wallet);
+                userReferralDao.insert(guestUser);
+
+                return guestUser.getReferralCode();
             }
-            //update database
-            userReferralDao.updateWalletConnect(userId, wallet);
-            //record referral
-            UserReferral referrerUser = userReferralDao.selectByReferralCode(guestUser.getReferredByCode());
-            if (!referrerUser.getWalletConnect().isEmpty()){
-                ndbCoinService.recordReferral(guestUser.getWalletConnect(),referrerUser.getWalletConnect());
-            }
-            return guestUser.getReferralCode();
+            return "";
         }catch (Exception e){
             throw new ReferralException(e.getMessage());
         }

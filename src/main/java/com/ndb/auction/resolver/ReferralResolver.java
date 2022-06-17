@@ -37,14 +37,9 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         int userId = userDetails.getId();
-        var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if (kycStatus){
-            String referralCode = referralService.activateReferralCode(userId,wallet);
-            return referralCode;
-        } else {
-            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "userId");
-        }
+        String referralCode = referralService.activateReferralCode(userId,wallet);
+        return referralCode;
+
     }
 
     @PreAuthorize("isAuthenticated()")

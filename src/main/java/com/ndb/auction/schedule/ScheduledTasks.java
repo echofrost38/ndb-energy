@@ -102,7 +102,7 @@ public class ScheduledTasks {
 	private Long readyPresaleCounter;
 
 	private final AmazonS3 s3;
-	private final static String bucketName = "nyyu-dev-backup";
+	private final static String bucketName = "nyyu-live-backup";
 	// check transaction
 	private Map<String, BigInteger> pendingTransactions;
 
@@ -322,7 +322,7 @@ public class ScheduledTasks {
 		}
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
+	@Scheduled(fixedRate = 1000 * 60 * 60)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");
@@ -433,10 +433,10 @@ public class ScheduledTasks {
 		metadata.setContentLength(tar.length());
 
 		try {
-			// s3.putObject(bucketName, tarName, inputStream, metadata);
+			s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			// mailService.sendBackupEmail(superAdmins, userFileName);
+			mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

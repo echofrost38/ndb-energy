@@ -62,7 +62,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class BaseService {
 
     private static final String HMAC_SHA_512 = "HmacSHA512";
-
     public static final String COINS_API_URL = "https://www.coinpayments.net/api.php";
 
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
@@ -337,4 +336,5 @@ public class BaseService {
 			"PAYMENT CONFIRMED",
 			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
+
 }

@@ -1,10 +1,6 @@
 package com.ndb.auction.exceptions;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import graphql.ErrorClassification;
 import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;

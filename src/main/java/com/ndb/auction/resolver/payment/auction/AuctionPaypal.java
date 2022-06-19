@@ -18,6 +18,7 @@ import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderStatus;
 import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
 
@@ -32,6 +33,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver{
+
+	@Autowired
+	private PaypalAuctionService paypalAuctionService;
 
     private final PaypalHttpClient payPalHttpClient;
 
@@ -66,10 +70,10 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		Double amount = 0.0;
 		if(bid.isPendingIncrease()) {
 			amount = bid.getDelta(); // usd
-			checkoutAmount = getPayPalTotalOrder(userId, amount);
+			checkoutAmount = paypalAuctionService.getPayPalTotalOrder(userId, amount);
 		} else {
 			amount = bid.getTotalAmount(); // usd
-			checkoutAmount = getPayPalTotalOrder(userId, amount); 
+			checkoutAmount = paypalAuctionService.getPayPalTotalOrder(userId, amount); 
 		}
 
 		if(currencyCode.equals("USD")) {

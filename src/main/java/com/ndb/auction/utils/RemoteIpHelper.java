@@ -3,6 +3,9 @@ package com.ndb.auction.utils;
 import static com.ndb.auction.utils.HttpHeader.*;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RemoteIpHelper {
 
     private static final String UNKNOWN = "unknown";
@@ -31,7 +34,7 @@ public class RemoteIpHelper {
                 default:
                     ip = request.getRemoteAddr();
             }
-
+            log.info("try count: {}", tryCount);
             tryCount++;
         }
 

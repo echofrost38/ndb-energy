@@ -82,9 +82,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                             locationMap.put(ip, location);
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        location = null;
-                    }
+                    } 
                 }
                 JsonObject errorObject;
                 if (location == null) {

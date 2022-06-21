@@ -3,22 +3,17 @@ package com.ndb.auction.utils;
 import static com.ndb.auction.utils.HttpHeader.*;
 import javax.servlet.http.HttpServletRequest;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class RemoteIpHelper {
 
     private static final String UNKNOWN = "unknown";
 
     public static String getRemoteIpFrom(HttpServletRequest request) {
         String ip = null;
-        int tryCount = 0;
+        int tryCount = 1;
 
         while (!isIpFound(ip) && tryCount <= 6) {
             switch (tryCount) {
-                case 0:
-                    ip = request.getHeader(REMOTE_ADDR.key());
-                    break;
                 case 1:
                     ip = request.getHeader(X_FORWARDED_FOR.key());
                     break;
@@ -39,9 +34,9 @@ public class RemoteIpHelper {
             }
             tryCount++;
         }
-        log.info("try count: {}", tryCount);
-        log.info("ip address: {}", ip);
-        return ip;
+        // check ip contains comma
+        var ipArr = ip.split(",");
+        return ipArr[0];
     }
 
     private static boolean isIpFound(String ip) {

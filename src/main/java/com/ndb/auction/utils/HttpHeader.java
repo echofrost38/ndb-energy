@@ -2,7 +2,6 @@ package com.ndb.auction.utils;
 
 public enum HttpHeader {
     
-    REMOTE_ADDR("Remote_addr"),
 	AUTHORIZATION("Authorization"),
     AUTHENTICATION_TYPE_BASIC("Basic"),
     X_AUTH_TOKEN("X-AUTH-TOKEN"),

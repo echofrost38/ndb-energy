@@ -12,10 +12,13 @@ public class RemoteIpHelper {
 
     public static String getRemoteIpFrom(HttpServletRequest request) {
         String ip = null;
-        int tryCount = 1;
+        int tryCount = 0;
 
         while (!isIpFound(ip) && tryCount <= 6) {
             switch (tryCount) {
+                case 0:
+                    ip = request.getHeader(REMOTE_ADDR.key());
+                    break;
                 case 1:
                     ip = request.getHeader(X_FORWARDED_FOR.key());
                     break;

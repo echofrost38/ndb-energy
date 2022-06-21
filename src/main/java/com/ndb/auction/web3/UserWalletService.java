@@ -2,8 +2,11 @@ package com.ndb.auction.web3;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.ndb.auction.contracts.UserWallet;
+import com.ndb.auction.models.Wallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +14,8 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-// import org.web3j.tuples.generated.Tuple2;
+import org.web3j.tuples.generated.Tuple2;
+import org.web3j.tuples.generated.Tuple3;
 
 @Service
 public class UserWalletService {
@@ -25,6 +29,7 @@ public class UserWalletService {
     private final BigInteger gasLimit = new BigInteger("300000");  
 
     private final int decimal = 12;
+    private final BigInteger bDecimal = new BigInteger("1000000000000");
 
     private UserWallet userWallet;
 
@@ -133,45 +138,47 @@ public class UserWalletService {
         return result;
     }
 
-    // public Wallet getWalletById(int id, String crypto) {
-    //     Wallet wallet = null;
-    //     try {
-    //         Tuple2<BigInteger, BigInteger> tuple2 = userWallet.getWalletById(id, crypto).send();
+    public Wallet getWalletById(int id, String crypto) {
+        Wallet wallet = null;
+        try {
+            Tuple2<BigInteger, BigInteger> tuple2 = userWallet.getWalletById(id, crypto).send();
             
-    //         BigInteger bFree = tuple2.component1();
+            BigInteger bFree = tuple2.component1();
+            int free = bFree.divide(bDecimal).intValue();
 
-    //         BigInteger bHold = tuple2.component2();
+            BigInteger bHold = tuple2.component2();
+            int hold = bHold.divide(bDecimal).intValue();
             
-    //         // wallet = new Wallet(crypto, free, hold);
-    //     } catch (Exception e) {
-    //         System.out.println(e.getMessage());
-    //     }
-    //     return wallet;
-    // }
+            // wallet = new Wallet(crypto, free, hold);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return wallet;
+    }
 
-    // public List<Wallet> getWallets(int id) {
-    //     List<Wallet> wallets = new ArrayList<>();
-    //     try {
-    //         Tuple3<List<String>, List<BigInteger>, List<BigInteger>> tuple3 = userWallet.getWallets(id).send();
-    //         List<String> keyList = tuple3.component1();
-    //         List<BigInteger> freeList = tuple3.component2();
-    //         List<BigInteger> holdList = tuple3.component3();
-    //         int len = keyList.size();
-    //         for(int i = 0; i < len; i++) {
-    //             BigInteger bFree = freeList.get(i);
-    //             int free = bFree.divide(bDecimal).intValue();
+    public List<Wallet> getWallets(int id) {
+        List<Wallet> wallets = new ArrayList<>();
+        try {
+            Tuple3<List<String>, List<BigInteger>, List<BigInteger>> tuple3 = userWallet.getWallets(id).send();
+            List<String> keyList = tuple3.component1();
+            List<BigInteger> freeList = tuple3.component2();
+            List<BigInteger> holdList = tuple3.component3();
+            int len = keyList.size();
+            for(int i = 0; i < len; i++) {
+                BigInteger bFree = freeList.get(i);
+                int free = bFree.divide(bDecimal).intValue();
 
-    //             BigInteger bHold = holdList.get(i);
-    //             int hold = bHold.divide(bDecimal).intValue();
+                BigInteger bHold = holdList.get(i);
+                int hold = bHold.divide(bDecimal).intValue();
 
-    //             // Wallet wallet = new Wallet(keyList.get(i), free, hold);
-    //             // wallets.add(wallet);
-    //         }
-    //     } catch (Exception e) {
-    //         System.out.println(e.getMessage());
-    //     }
-    //     return wallets;
-    // }
+                // Wallet wallet = new Wallet(keyList.get(i), free, hold);
+                // wallets.add(wallet);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return wallets;
+    }
 
     @SuppressWarnings("deprecation")
 	private UserWallet loadTraderContract(String _password) {

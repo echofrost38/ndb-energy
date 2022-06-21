@@ -3,19 +3,18 @@ package com.ndb.auction.resolver.payment.deposit;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.payment.stripe.StripeCustomerService;
 import com.ndb.auction.service.payment.stripe.StripeDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -24,12 +23,10 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class DepositStripe extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 
     private final StripeDepositService stripeDepositService;
-	private final StripeCustomerService stripeCustomerService;
 
     @Autowired
-    public DepositStripe(StripeDepositService stripeDepositService, StripeCustomerService stripeCustomerService) {
+    public DepositStripe(StripeDepositService stripeDepositService) {
         this.stripeDepositService = stripeDepositService;
-        this.stripeCustomerService = stripeCustomerService;
     }
 
     // Deposit with Stripe

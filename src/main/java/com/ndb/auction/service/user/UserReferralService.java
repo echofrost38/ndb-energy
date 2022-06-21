@@ -1,6 +1,5 @@
 package com.ndb.auction.service.user;
 
-import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
@@ -37,17 +36,15 @@ public class UserReferralService extends BaseService {
     public List<UserReferralEarning> earningByReferrer(int userId){
         List<UserReferralEarning> list =new ArrayList<>();
         UserReferral referrer = userReferralDao.selectById(userId);
-        if (referrer!=null) {
-            List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
-            for (UserReferral item : users) {
+        List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
+        for (UserReferral item : users){
+            String address = item.getWalletConnect();
+            String name = userDao.selectById(item.getId()).getName();
+            if (address!=null){
+                long amount = ndbCoinService.getUserEarning(address);
                 UserReferralEarning earning = new UserReferralEarning();
-                String name = userDao.selectById(item.getId()).getName();
-                String address = item.getWalletConnect();
-                if (address != null) {
-                    long amount = ndbCoinService.getUserEarning(address);
-                    earning.setAmount(amount);
-                }
                 earning.setName(name);
+                earning.setAmount(amount);
                 list.add(earning);
             }
         }

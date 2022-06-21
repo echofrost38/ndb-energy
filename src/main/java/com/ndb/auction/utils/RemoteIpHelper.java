@@ -34,10 +34,10 @@ public class RemoteIpHelper {
                 default:
                     ip = request.getRemoteAddr();
             }
-            log.info("try count: {}", tryCount);
             tryCount++;
         }
-
+        log.info("try count: {}", tryCount);
+        log.info("ip address: {}", ip);
         return ip;
     }
 

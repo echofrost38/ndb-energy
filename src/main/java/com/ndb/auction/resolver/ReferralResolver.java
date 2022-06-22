@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 import java.util.Locale;
 
+import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;

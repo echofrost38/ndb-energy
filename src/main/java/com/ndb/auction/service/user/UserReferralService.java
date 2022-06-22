@@ -1,6 +1,9 @@
 package com.ndb.auction.service.user;
 
+import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
@@ -36,15 +39,17 @@ public class UserReferralService extends BaseService {
     public List<UserReferralEarning> earningByReferrer(int userId){
         List<UserReferralEarning> list =new ArrayList<>();
         UserReferral referrer = userReferralDao.selectById(userId);
-        List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
-        for (UserReferral item : users){
-            String address = item.getWalletConnect();
-            String name = userDao.selectById(item.getId()).getName();
-            if (address!=null){
-                long amount = ndbCoinService.getUserEarning(address);
+        if (referrer!=null) {
+            List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
+            for (UserReferral item : users) {
                 UserReferralEarning earning = new UserReferralEarning();
+                String name = userDao.selectById(item.getId()).getName();
+                String address = item.getWalletConnect();
+                if (address != null) {
+                    long amount = ndbCoinService.getUserEarning(address);
+                    earning.setAmount(amount);
+                }
                 earning.setName(name);
-                earning.setAmount(amount);
                 list.add(earning);
             }
         }
@@ -150,5 +155,45 @@ public class UserReferralService extends BaseService {
         } while (userReferralDao.existsUserByReferralCode(generated)==1);
 
         return generated;
+    }
+
+    public void PayReferralCommission(int userId,PreSaleOrder order, double available){
+        // add referral commission bonus
+        int tokenId= tokenAssetService.getTokenIdBySymbol("NDB");
+        UserReferral invited = userReferralDao.selectById(userId);
+        if (invited!=null){
+            var referredByCode = invited.getReferredByCode();
+            if (referredByCode!=null){
+                UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
+                if (referrer!=null){
+                    User referrerUser = userDao.selectById(referrer.getId());
+                    if (order.getDestination()==PreSaleOrder.INTERNAL)
+                        balanceDao.addFreeBalance(referrer.getId(), tokenId, available*tierRate[referrerUser.getTierLevel()]/100);
+                    else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
+                        String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available*tierRate[referrerUser.getTierLevel()]/100);
+                        if(hash == null) {
+                            throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+                        }
+                    }
+                    List<PreSaleOrder> preSaleOrders = presaleOrderDao.selectAllByUserId(userId);
+                    int count = 0;
+                    for (PreSaleOrder item : preSaleOrders) {
+                        if (item.getStatus()>0) count++;
+                    }
+                    // add 10% referral commission to buyer (only first purchase) .
+                    if (count==0){
+                        if (order.getDestination()==PreSaleOrder.INTERNAL)
+                            balanceDao.addFreeBalance(userId, tokenId, available*10/100);
+                        else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
+                            String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available*10/100);
+                            if(hash == null) {
+                                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // end add referral commission bonus
     }
 }

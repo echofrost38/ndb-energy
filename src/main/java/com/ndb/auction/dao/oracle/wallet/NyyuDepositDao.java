@@ -24,7 +24,7 @@ public class NyyuDepositDao extends BaseOracleDao {
     }
     public int insert(NyyuDeposit m) {
         String sql = "INSERT INTO TBL_NYYU_DEPOSIT(ID,USER_ID,WALLET_ADDRESS,AMOUNT,TXN_HASH)" +
-                "VALUES(SEQ_NYYU_DEPOSIT,?,?,?,?)";
+                "VALUES(SEQ_NYYU_DEPOSIT.NEXTVAL,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(),m.getWalletAddress(),m.getAmount(),m.getTxnHash());
     }
 }

@@ -51,6 +51,7 @@ import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
+import com.ndb.auction.web3.NyyuWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,6 +201,9 @@ public class BaseService {
 
     @Autowired
     protected NDBCoinService ndbCoinService;
+
+    @Autowired
+    protected NyyuWalletService nyyuWalletService;
 
     @Autowired
     protected ThirdAPIUtils thirdAPI;

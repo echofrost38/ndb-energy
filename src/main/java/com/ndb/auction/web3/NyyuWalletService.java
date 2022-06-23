@@ -31,7 +31,7 @@ public class NyyuWalletService {
 
             NyyuWallet nyyuWallet = new NyyuWallet();
             nyyuWallet.setUserId(userId);
-            nyyuWallet.setPublicKey(wallet.getAddress());
+            nyyuWallet.setPublicKey("0x"+ wallet.getAddress());
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork(chainId);
             nyyuWalletDao.insert(nyyuWallet);

@@ -14,7 +14,11 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
+import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.models.wallet.NyyuDeposit;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +61,12 @@ public class NDBCoinService {
     @Autowired
     private ScheduledTasks schedule;
 
+    @Autowired
+    private NyyuWalletDao nyyuWalletDao;
+
+    @Autowired
+    private NyyuDepositDao nyyuDepositDao;
+
     private Credentials ndbCredential;
     private NDBcoinV4 ndbToken;
     private NDBReferral ndbReferral;
@@ -90,7 +100,6 @@ public class NDBCoinService {
                     }, error -> {
                         System.out.println("Error: " + error);
                     });
-
         } catch (Exception ex){
             System.out.println("INIT WEB3 : " + ex.getMessage());
         }
@@ -101,6 +110,15 @@ public class NDBCoinService {
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
         // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
+        NyyuWallet nyyuWallet= nyyuWalletDao.selectByAddress(event.to);
+        if (nyyuWallet!=null){
+            NyyuDeposit deposit = new NyyuDeposit();
+            deposit.setUserId(nyyuWallet.getUserId());
+            deposit.setTxnHash(event.log.getTransactionHash());
+            deposit.setAmount(event.value.divide(decimals).doubleValue());
+            deposit.setWalletAddress(event.to);
+            nyyuDepositDao.insert(deposit);
+        }
 
         // add to unconfirmed list
         schedule.addPendingTxn(txnHash, blockNumber);

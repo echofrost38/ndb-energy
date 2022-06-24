@@ -63,7 +63,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class BaseService {
 
     private static final String HMAC_SHA_512 = "HmacSHA512";
-
     public static final String COINS_API_URL = "https://www.coinpayments.net/api.php";
 
     public final static String VERIFY_TEMPLATE = "verify.ftlh";
@@ -85,7 +84,7 @@ public class BaseService {
     public String COINSPAYMENT_IPN_URL;
 
     protected static Gson gson = new Gson();
-    
+
     protected WebClient coinPaymentAPI;
 
     @Autowired
@@ -264,7 +263,7 @@ public class BaseService {
 		// processing order
 		double ndb = order.getNdbAmount();
 		Double fiatAmount = ndb * order.getNdbPrice();
-		
+
         // check balance and remaining
         var presale = presaleDao.selectById(order.getPresaleId());
         double remain = presale.getTokenAmount() - presale.getSold();
@@ -285,7 +284,6 @@ public class BaseService {
                 throw new BalanceException("Cannot transfer NDB Coin", "NDB");
             }
 		}
-        userReferralService.PayReferralCommission(userId,order,available);
 
         if(overflow) {
             // handle remained fiat into USDT

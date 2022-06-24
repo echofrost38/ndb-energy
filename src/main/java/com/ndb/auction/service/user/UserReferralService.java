@@ -43,7 +43,7 @@ public class UserReferralService extends BaseService {
             List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
             for (UserReferral item : users) {
                 UserReferralEarning earning = new UserReferralEarning();
-                String name = userDao.selectById(item.getId()).getName();
+                String name = userAvatarDao.selectById(item.getId()).getName();
                 String address = item.getWalletConnect();
                 if (address != null) {
                     long amount = ndbCoinService.getUserEarning(address);

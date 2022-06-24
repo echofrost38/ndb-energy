@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.avatar.AvatarComponent;
@@ -15,13 +20,9 @@ import com.ndb.auction.models.transactions.Statement;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.UserVerify;
+import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.user.UserAuthService;
 import com.ndb.auction.service.user.UserDetailsImpl;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -31,6 +32,9 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @Autowired
     private UserAuthService userAuthService;
+
+    @Autowired
+	private FinancialService financialService;
 
     @PreAuthorize("isAuthenticated()")
     public User getUser() {
@@ -109,7 +113,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user = new User(email, encoded, country);
+        user = new User(email, encoded, country.toUpperCase());
 
         UserAvatar userAvatar = new UserAvatar();
         userAvatar.setPrefix(avatarName);

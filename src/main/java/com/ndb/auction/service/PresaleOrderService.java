@@ -145,6 +145,10 @@ public class PresaleOrderService extends BaseService {
         return list;
     }
 
+    public List<PreSaleOrder> getPresaleOrders(int presaleId, int orderId) {
+        return presaleOrderDao.selectByPresaleId(presaleId, orderId);
+    }
+
     public List<PreSaleOrder> getPresaleOrdersByUserId(int userId) {
         return presaleOrderDao.selectAllByUserId(userId);
     }

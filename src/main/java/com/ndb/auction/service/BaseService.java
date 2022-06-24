@@ -51,7 +51,6 @@ import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
-import com.ndb.auction.web3.NyyuWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,7 @@ public class BaseService {
     public String COINSPAYMENT_IPN_URL;
 
     protected static Gson gson = new Gson();
-
+    
     protected WebClient coinPaymentAPI;
 
     @Autowired
@@ -202,9 +201,6 @@ public class BaseService {
     protected NDBCoinService ndbCoinService;
 
     @Autowired
-    protected NyyuWalletService nyyuWalletService;
-
-    @Autowired
     protected ThirdAPIUtils thirdAPI;
 
     @Autowired
@@ -263,7 +259,7 @@ public class BaseService {
 		// processing order
 		double ndb = order.getNdbAmount();
 		Double fiatAmount = ndb * order.getNdbPrice();
-
+		
         // check balance and remaining
         var presale = presaleDao.selectById(order.getPresaleId());
         double remain = presale.getTokenAmount() - presale.getSold();
@@ -340,4 +336,5 @@ public class BaseService {
 			"PAYMENT CONFIRMED",
 			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
+
 }

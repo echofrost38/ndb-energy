@@ -4,6 +4,7 @@ import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.utils.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,14 @@ public class UserReferralService extends BaseService {
             List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
             for (UserReferral item : users) {
                 UserReferralEarning earning = new UserReferralEarning();
-                String name = userDao.selectById(item.getId()).getName();
-                String address = item.getWalletConnect();
+                String name = userAvatarDao.selectById(item.getId()).getName();
+                String address= item.getWalletConnect();
+
+                if (address==null) {
+                    NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
+                    if (nyyuWallet!=null) address= nyyuWallet.getPublicKey();
+                }
+
                 if (address != null) {
                     long amount = ndbCoinService.getUserEarning(address);
                     earning.setAmount(amount);
@@ -60,16 +67,34 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String referredByCode){
         try {
             referredByCode = (referredByCode!=null) ? referredByCode: "";
+            String userWallet = nyyuWalletDao.selectByUserId(userId).getPublicKey();
+            //active referrer use nyyu wallet
+            if (!ndbCoinService.isActiveReferrer(userWallet)){
+                User user = userDao.selectById(userId) ;
+                int rate = tierRate[user.getTierLevel()];
+                ndbCoinService.activeReferrer(userWallet, (double) rate);
+            }
             // update database
             UserReferral referral = new UserReferral();
             referral.setId(userId);
             referral.setReferralCode(generateCode());
-            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
-                referral.setReferredByCode(referredByCode);
-            else
-                referral.setReferredByCode("");
-
+            referral.setReferredByCode(referredByCode);
             userReferralDao.insert(referral);
+            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1){
+                //record referral
+                String referrerWallet;
+                UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
+                if (referrer!=null){
+                    if (referrer.getWalletConnect()!=null)
+                        referrerWallet = referrer.getWalletConnect();
+                    else {
+                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+                        referrerWallet = nyyuWallet.getPublicKey();
+                    }
+                    ndbCoinService.recordReferral(userWallet,referrerWallet);
+                }
+            }
+
             return referral;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());
@@ -78,6 +103,14 @@ public class UserReferralService extends BaseService {
 
     public String activateReferralCode(int userId,String wallet) {
         try {
+            if (wallet=="0x0000000000000000000000000000000000000000")
+            {
+                NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+                if (nyyuWallet!=null)
+                    wallet = nyyuWallet.getPublicKey();
+                else
+                    wallet = nyyuWalletService.generateBEP20Address(userId);
+            }
             UserReferral guestUser = userReferralDao.selectById(userId);
             if (guestUser==null){
                 guestUser = new UserReferral();

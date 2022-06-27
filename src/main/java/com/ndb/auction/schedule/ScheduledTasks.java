@@ -224,6 +224,7 @@ public class ScheduledTasks {
 		this.startedPresale = presale;
 		this.startedPresaleCounter = presale.getEndedAt() - System.currentTimeMillis();
 		this.startedPresaleCounter /= 1000;
+		log.info("Started Presale Counter: {}", this.startedPresaleCounter);
 	}
 
 	@Scheduled(fixedRate = 1000)

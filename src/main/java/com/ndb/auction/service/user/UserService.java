@@ -57,8 +57,7 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-			
-			// userReferralService.createNewReferrer(user.getId(),"",referredByCode);
+			userReferralService.createNewReferrer(user.getId(),referredByCode);
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);
@@ -405,6 +404,8 @@ public class UserService extends BaseService {
                 whitelistDao.insert(m);
             }
 		}
+		//update referral commission rate .
+		userReferralService.updateCommissionRate(id,tierLevel);
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 }

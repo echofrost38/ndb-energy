@@ -4,7 +4,6 @@ import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
-import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.service.BaseService;
 import com.ndb.auction.utils.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,23 +36,15 @@ public class UserReferralService extends BaseService {
     public List<UserReferralEarning> earningByReferrer(int userId){
         List<UserReferralEarning> list =new ArrayList<>();
         UserReferral referrer = userReferralDao.selectById(userId);
-        if (referrer!=null) {
-            List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
-            for (UserReferral item : users) {
+        List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
+        for (UserReferral item : users){
+            String address = item.getWalletConnect();
+            String name = userDao.selectById(item.getId()).getName();
+            if (!address.isEmpty()){
+                long amount = ndbCoinService.getUserEarning(address);
                 UserReferralEarning earning = new UserReferralEarning();
-                String name = userAvatarDao.selectById(item.getId()).getName();
-                String address= item.getWalletConnect();
-
-                if (address==null) {
-                    NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
-                    if (nyyuWallet!=null) address= nyyuWallet.getPublicKey();
-                }
-
-                if (address != null) {
-                    long amount = ndbCoinService.getUserEarning(address);
-                    earning.setAmount(amount);
-                }
                 earning.setName(name);
+                earning.setAmount(amount);
                 list.add(earning);
             }
         }
@@ -64,71 +55,57 @@ public class UserReferralService extends BaseService {
         return userReferralDao.insert(m);
     }
 
-    public UserReferral createNewReferrer(int userId,String referredByCode){
+    public UserReferral createNewReferrer(int userId,String wallet,String referredByCode){
         try {
-            referredByCode = (referredByCode!=null) ? referredByCode: "";
-            String userWallet = nyyuWalletDao.selectByUserId(userId).getPublicKey();
-            //active referrer use nyyu wallet
-            if (!ndbCoinService.isActiveReferrer(userWallet)){
-                User user = userDao.selectById(userId) ;
-                int rate = tierRate[user.getTierLevel()];
-                ndbCoinService.activeReferrer(userWallet, (double) rate);
+            User user = userDao.selectById(userId) ;
+            if (!wallet.isEmpty()) {
+                if (!ndbCoinService.isActiveReferrer(wallet)){
+                    // if wallet is not registered as referrer
+                    int rate = tierRate[user.getTierLevel()];
+
+                    // active referrer
+                    ndbCoinService.activeReferrer(wallet, (double) rate);
+
+                    //record referral for referrer
+                    if (!referredByCode.isEmpty()){
+                        UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
+                        if (referrer!=null){
+                            ndbCoinService.recordReferral(wallet,referrer.getWalletConnect());
+                        }
+                    }
+                }
             }
             // update database
             UserReferral referral = new UserReferral();
             referral.setId(userId);
+            referral.setWalletConnect(wallet);
             referral.setReferralCode(generateCode());
-            referral.setReferredByCode(referredByCode);
+            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1)
+                referral.setReferredByCode(referredByCode);
+            else
+                referral.setReferredByCode("");
             userReferralDao.insert(referral);
-            if (!referredByCode.isEmpty() && userReferralDao.existsUserByReferralCode(referredByCode)==1){
-                //record referral
-                String referrerWallet;
-                UserReferral referrer = userReferralDao.selectByReferralCode(referredByCode);
-                if (referrer!=null){
-                    if (referrer.getWalletConnect()!=null)
-                        referrerWallet = referrer.getWalletConnect();
-                    else {
-                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
-                        referrerWallet = nyyuWallet.getPublicKey();
-                    }
-                    ndbCoinService.recordReferral(userWallet,referrerWallet);
-                }
-            }
-
             return referral;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public String activateReferralCode(int userId,String wallet) {
+    public boolean updateWalletByInvitedGuest(int userId,String wallet) throws Exception {
         try {
-            if (wallet=="0x0000000000000000000000000000000000000000")
-            {
-                NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
-                if (nyyuWallet!=null)
-                    wallet = nyyuWallet.getPublicKey();
-                else
-                    wallet = nyyuWalletService.generateBEP20Address(userId);
-            }
             UserReferral guestUser = userReferralDao.selectById(userId);
-            if (guestUser==null){
-                guestUser = new UserReferral();
-                //set active referrer
-                if (!ndbCoinService.isActiveReferrer(wallet)){
-                    User user = userDao.selectById(userId) ;
-                    int rate = tierRate[user.getTierLevel()];
-                    ndbCoinService.activeReferrer(wallet, (double) rate);
-                }
-                //update database
-                guestUser.setId(userId);
-                guestUser.setReferralCode(generateCode());
-                guestUser.setWalletConnect(wallet);
-                userReferralDao.insert(guestUser);
+            User user = userDao.selectById(guestUser.getId()) ;
 
-                return guestUser.getReferralCode();
+            if (!ndbCoinService.isActiveReferrer(wallet)){
+                int rate = tierRate[user.getTierLevel()];
+                ndbCoinService.activeReferrer(wallet, (double) rate);
             }
-            return "";
+            userReferralDao.updateWalletConnect(userId, wallet);
+            UserReferral referrerUser = userReferralDao.selectByReferralCode(guestUser.getReferredByCode());
+            if (!referrerUser.getWalletConnect().isEmpty()){
+                ndbCoinService.recordReferral(guestUser.getWalletConnect(),referrerUser.getWalletConnect());
+            }
+            return true;
         }catch (Exception e){
             throw new ReferralException(e.getMessage());
         }
@@ -138,40 +115,30 @@ public class UserReferralService extends BaseService {
     public boolean updateReferrerAddress(int userId, String current){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
-            if (referrer.getWalletConnect()==null){
-                User user = userDao.selectById(userId) ;
-                if (!ndbCoinService.isActiveReferrer(current)){
-                    int rate = tierRate[user.getTierLevel()];
-                    ndbCoinService.activeReferrer(current, (double) rate);
-                    referrer.setWalletConnect(current);
-                    userReferralDao.update(referrer);
-                    return true;
-                }
-            } else {
+            if (!referrer.getWalletConnect().equals(current)) {
                 String hash = ndbCoinService.updateReferrer(referrer.getWalletConnect(), current);
                 if (!hash.isEmpty()) {
                     referrer.setWalletConnect(current);
                     userReferralDao.update(referrer);
                     return true;
                 }
+            } else {
+                throw new ReferralException("Could not update same address !");
             }
-            return false;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());
-
         }
+        return false;
     }
 
-    public boolean updateCommissionRate(int userId, int tierLevel){
+    public boolean updateCommissionRate(int userId){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
             User user = userDao.selectById(referrer.getId()) ;
-            if (tierLevel > user.getTierLevel()) {
-                int rate = tierRate[tierLevel];
-                if (!referrer.getWalletConnect().isEmpty() && rate > 0) {
-                    String hash = ndbCoinService.updateReferrerRate(referrer.getWalletConnect(), (double) rate);
-                    if (!hash.isEmpty()) return true;
-                }
+            int rate = tierRate[user.getTierLevel()];
+            if (!referrer.getWalletConnect().isEmpty() && rate > 0){
+                String hash = ndbCoinService.updateReferrerRate(referrer.getWalletConnect(), (double) rate);
+                if (!hash.isEmpty()) return true;
             }
             return false;
         }catch(Exception e){

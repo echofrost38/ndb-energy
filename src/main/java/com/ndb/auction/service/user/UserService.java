@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
-import org.web3j.tuples.generated.Tuple2;
 
 @Service
 public class UserService extends BaseService {
@@ -58,11 +57,8 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-			// create BEP20 wallet
-			nyyuWalletService.generateBEP20Address(user.getId());
-			// create referral
-			userReferralService.createNewReferrer(user.getId(),referredByCode);
-
+			
+			// userReferralService.createNewReferrer(user.getId(),"",referredByCode);
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);
@@ -409,8 +405,6 @@ public class UserService extends BaseService {
                 whitelistDao.insert(m);
             }
 		}
-		//update referral commission rate .
-		userReferralService.updateCommissionRate(id,tierLevel);
 		return userDao.updateTier(id, tierLevel, tierPoint);
 	}
 }

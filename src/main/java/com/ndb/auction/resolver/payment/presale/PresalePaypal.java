@@ -16,7 +16,6 @@ import com.ndb.auction.payload.response.paypal.OrderResponseDTO;
 import com.ndb.auction.payload.response.paypal.OrderStatus;
 import com.ndb.auction.payload.response.paypal.PaymentLandingPage;
 import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.payment.paypal.PaypalPresaleService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
 
@@ -31,13 +30,11 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class PresalePaypal extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
-    private final PaypalPresaleService paypalPresaleService;
     private final PaypalHttpClient payPalHttpClient;
 
 	@Autowired
-	public PresalePaypal(PaypalHttpClient payPalHttpClient, PaypalPresaleService presaleService) {
+	public PresalePaypal(PaypalHttpClient payPalHttpClient) {
 		this.payPalHttpClient = payPalHttpClient;
-        this.paypalPresaleService = presaleService;
 	}
 
     @PreAuthorize("isAuthenticated()")
@@ -58,7 +55,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
 
         double amount = presaleOrder.getNdbAmount() * presaleOrder.getNdbPrice();
         
-        var checkoutAmount = paypalPresaleService.getPayPalTotalOrder(userId, amount);
+        var checkoutAmount = getPayPalTotalOrder(userId, amount);
         var fiatAmount = 0.0;
         if(currencyCode.equals("USD")) {
 			fiatAmount = checkoutAmount;

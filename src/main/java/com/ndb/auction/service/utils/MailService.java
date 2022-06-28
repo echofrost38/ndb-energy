@@ -93,7 +93,7 @@ public class MailService {
             var file = new java.io.File(path);
             helper.addAttachment(path, file);
         }
-        // javaMailSender.send(mimeMessage);
+        javaMailSender.send(mimeMessage);
     }
 
     private String fillWithdrawRequestEmail(String template, WithdrawRequest contents) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
@@ -105,9 +105,9 @@ public class MailService {
         model.put("fullName", contents.getFullName());
         model.put("address", contents.getAddress());
         model.put("country", contents.getCountry());
-        model.put("balance", String.format("%.8f", contents.getBalance()));
+        model.put("balance", contents.getBalance());
         model.put("sourceToken", contents.getCurrency());
-        model.put("requestAmount", String.format("%.8f", contents.getRequestAmount()));
+        model.put("requestAmount", contents.getRequestAmount());
         model.put("requestCurrency", contents.getRequestCurrency());
         model.put("typeMessage", contents.getTypeMessage());
         model.put("destination", contents.getDestination());

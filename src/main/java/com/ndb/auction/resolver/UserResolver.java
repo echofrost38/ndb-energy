@@ -113,7 +113,7 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
         String rPassword = userService.getRandomPassword(10);
         String encoded = userService.encodePassword(rPassword);
-        user = new User(email, encoded, country);
+        user = new User(email, encoded, country.toUpperCase());
 
         UserAvatar userAvatar = new UserAvatar();
         userAvatar.setPrefix(avatarName);

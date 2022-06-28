@@ -127,14 +127,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     @Transactional
-    private User registerNewUser(String provider, OAuth2UserInfo oAuth2UserInfo) {
+    protected User registerNewUser(String provider, OAuth2UserInfo oAuth2UserInfo) {
         User user = new User();
         UserVerify userVerify = new UserVerify();
         user.setProvider(provider);
         user.setProviderId(oAuth2UserInfo.getId());
         user.setName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
-        user.setCountry(oAuth2UserInfo.getLocale());
+        user.setCountry(oAuth2UserInfo.getLocale().toUpperCase());
         user.setNotifySetting(0xFFFF);
         Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");

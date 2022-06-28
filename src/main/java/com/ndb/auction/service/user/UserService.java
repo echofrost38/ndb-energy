@@ -51,7 +51,7 @@ public class UserService extends BaseService {
 				}
 			} else {}
 		} else {
-			user = new User(email, encoder.encode(password), country);
+			user = new User(email, encoder.encode(password), country.toUpperCase());
 			Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);

@@ -12,6 +12,10 @@ extend type Query {
     getPresaleOrders(
         presaleId: Int
     ) : [PreSaleOrder]
+    getNewPresaleOrders(
+        presaleId: Int,
+        lastOrderId: Int
+    ) : [PreSaleOrder]
     getPresaleOrdersByUser : [PreSaleOrder]
     getPresaleById(
         id: Int

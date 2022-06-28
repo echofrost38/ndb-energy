@@ -12,18 +12,11 @@ import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
 
 import com.ndb.auction.config.Web3jConfig;
-import com.ndb.auction.contracts.NDBreferral;
+import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
-import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
-import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
-import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.exceptions.ReferralException;
-import com.ndb.auction.models.balance.CryptoBalance;
-import com.ndb.auction.models.wallet.NyyuDeposit;
-import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.ScheduledTasks;
 
-import com.ndb.auction.service.TokenAssetService;
 import lombok.extern.slf4j.Slf4j;
 
 import org.json.JSONObject;
@@ -64,21 +57,9 @@ public class NDBCoinService {
     @Autowired
     private ScheduledTasks schedule;
 
-    @Autowired
-    private NyyuWalletDao nyyuWalletDao;
-
-    @Autowired
-    private CryptoBalanceDao balanceDao;
-
-    @Autowired
-    private NyyuDepositDao nyyuDepositDao;
-
-    @Autowired
-    public TokenAssetService tokenAssetService;
-
     private Credentials ndbCredential;
     private NDBcoinV4 ndbToken;
-    private NDBreferral ndbReferral;
+    private NDBReferral ndbReferral;
     private FastRawTransactionManager txMananger;
 
     private Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
@@ -87,7 +68,7 @@ public class NDBCoinService {
     private final BigInteger gasLimit = new BigInteger("800000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private final BigInteger m_decimals = new BigInteger("100000000");
-    private final String ZERO="0x0000000000000000000000000000000000000000";
+
     private final double multipler = 10000.0;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
@@ -102,25 +83,16 @@ public class NDBCoinService {
             ndbCredential = Credentials.create(ndbKey);
             txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
             ndbToken = NDBcoinV4.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
-            ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txMananger, gasPrice, gasLimit);
+            ndbReferral = NDBReferral.load(ndbReferralContract, BEP20NET, txMananger, gasPrice, gasLimit);
             ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
                     .subscribe(event -> {
                         handleEvent(event);
                     }, error -> {
                         System.out.println("Error: " + error);
                     });
+
         } catch (Exception ex){
             System.out.println("INIT WEB3 : " + ex.getMessage());
-        }
-    }
-
-    public double getBalanceOf(String wallet){
-        try{
-            BigInteger balance = ndbToken.balanceOf(wallet).send();
-            return balance.divide(decimals).doubleValue();
-        } catch (Exception e){
-            System.out.println("getBalance : " + e.getMessage());
-            return 0;
         }
     }
 
@@ -128,20 +100,7 @@ public class NDBCoinService {
         // create new withdraw transaction record
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
-        Double amount = event.value.divide(decimals).doubleValue();
         // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
-        NyyuWallet nyyuWallet= nyyuWalletDao.selectByAddress(event.to);
-        if (nyyuWallet!=null){
-            NyyuDeposit deposit = new NyyuDeposit();
-            deposit.setUserId(nyyuWallet.getUserId());
-            deposit.setTxnHash(event.log.getTransactionHash());
-            deposit.setAmount(amount);
-            deposit.setWalletAddress(event.to);
-            nyyuDepositDao.insert(deposit);
-            // Sync NDB balance between Nyyu wallet and NDB internal balance
-            int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-            CryptoBalance internalBalance = balanceDao.selectById(nyyuWallet.getUserId(),tokenId);
-        }
 
         // add to unconfirmed list
         schedule.addPendingTxn(txnHash, blockNumber);
@@ -176,15 +135,6 @@ public class NDBCoinService {
         }
     }
 
-    public int lockingTimeRemain(String userAddress){
-        try {
-            int lockingTime= ndbReferral.lockingTimeRemain(userAddress).send().intValue();
-            return lockingTime;
-        } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
-        }
-    }
-
     public String updateReferrerRate(String referrer , Double rate){
         try {
             BigInteger _rate = BigInteger.valueOf(rate.longValue());
@@ -211,16 +161,6 @@ public class NDBCoinService {
             return true;
         else
             return false;
-    }
-
-    public boolean isReferralRecorded(String userWallet,String referrerWallet) {
-        try {
-            String result = ndbReferral.referrers(userWallet).sendAsync().get();
-            if (result.equals(referrerWallet)) return true;
-            else return false;
-        } catch (Exception e){
-            throw new ReferralException(e.getMessage());
-        }
     }
 
     public String getTotalSupply() throws ExecutionException, InterruptedException {

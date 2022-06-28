@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/")
 public class ShuftiController extends BaseController {
-    
+
     @Value("${shufti.secret.key}")
     private String SECRET_KEY;
 
@@ -54,24 +55,24 @@ public class ShuftiController extends BaseController {
         this.shuftiDao = shuftiDao;
         this.userDao = userDao;
     }
-    
+
     @PostMapping("/shufti")
     @ResponseBody
     public Object ShuftiCallbackHandler(HttpServletRequest request) {
 
-   		String reqQuery;
-		try {
-			reqQuery = getBody(request);
+        String reqQuery;
+        try {
+            reqQuery = getBody(request);
             System.out.println("SHUFTI CALLBACK: " + reqQuery);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         String original = reqQuery + SECRET_KEY;
         String sha256hex = DigestUtils.sha256Hex(original);
         String signature = request.getHeader("Signature");
-        if(!sha256hex.equals(signature)) {
+        if (!sha256hex.equals(signature)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -79,9 +80,9 @@ public class ShuftiController extends BaseController {
         String reference = response.getReference();
         ShuftiReference ref = shuftiDao.selectByReference(reference);
 
-        if(ref == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (ref == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         int userId = ref.getUserId();
-        
+
         shuftiDao.updatePendingStatus(userId, false);
 
         switch (response.getEvent()) {
@@ -94,35 +95,35 @@ public class ShuftiController extends BaseController {
                         "Identity verification is pending."
                 );
                 break;
-            case "verification.status.changed": 
+            case "verification.status.changed":
                 // verification status!
                 ShuftiResponse statusResponse = shuftiService.checkShuftiStatus(reference);
-                if(statusResponse == null) {
+                if (statusResponse == null) {
                     System.out.println("Error for getting status: " + reference);
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
 
-                if(statusResponse.getEvent().equals("verification.accepted")) {
+                if (statusResponse.getEvent().equals("verification.accepted")) {
                     System.out.println("accepted case: ");
                     System.out.println(reqQuery);
-                    
+
                     // in some cases, we may not get user details from shufti pro
                     try {
                         handleAccepted(userId, statusResponse);
                     } catch (Exception e) {
                         System.out.println("Cannot get user details from shufti: " + reference);
                     }
-                    
-                } else if(statusResponse.getEvent().equals("verification.declined")) {
+
+                } else if (statusResponse.getEvent().equals("verification.declined")) {
                     System.out.println("declined case: ");
                     System.out.println(reqQuery);
                     handleDeclined(userId, statusResponse);
                 } else {
                     notificationService.sendNotification(
-                        userId,
-                        Notification.KYC_VERIFIED,
-                        "KYC VERIFICATION INVALID",
-                        "Identity verification is invalid."
+                            userId,
+                            Notification.KYC_VERIFIED,
+                            "KYC VERIFICATION INVALID",
+                            "Identity verification is invalid."
                     );
                 }
                 break;
@@ -152,13 +153,13 @@ public class ShuftiController extends BaseController {
 
     private void handleAccepted(int userId, ShuftiResponse response) {
         shuftiDao.passed(userId);
-       
+
         // update user tier!
         List<Tier> tierList = tierService.getUserTiers();
         TaskSetting taskSetting = taskSettingService.getTaskSetting();
         TierTask tierTask = tierTaskService.getTierTask(userId);
 
-        if(tierTask == null) {
+        if (tierTask == null) {
             tierTask = new TierTask(userId);
             tierTaskService.updateTierTask(tierTask);
         }
@@ -188,10 +189,10 @@ public class ShuftiController extends BaseController {
         System.out.println("Verification success.");
         System.out.println(response.getEvent());
 
-         //Insert user details after verification
-         UserDetail userDetail = generateUserDetailEntity(response);
-         userDetail.setUserId(userId);
-         userDetailDao.insert(userDetail);
+        //Insert user details after verification
+        UserDetail userDetail = generateUserDetailEntity(response);
+        userDetail.setUserId(userId);
+        userDetailDao.insert(userDetail);
     }
 
     private UserDetail generateUserDetailEntity(ShuftiResponse response) {
@@ -200,17 +201,17 @@ public class ShuftiController extends BaseController {
         Address userAddress = response.getVerification_data().getAddress();
 
         UserDetail userDetail = UserDetail.builder()
-                .firstName(userDocument.getName().getFirst_name())
-                .lastName(userDocument.getName().getLast_name())
+                .firstName(fixCase(userDocument.getName().getFirst_name()))
+                .lastName(fixCase(userDocument.getName().getLast_name()))
                 .issueDate(userDocument.getIssue_date())
                 .expiryDate(userDocument.getExpiry_date())
                 .dob(userDocument.getDob())
                 .age(userDocument.getAge())
                 .gender(userDocument.getGender())
-                .address(userAddress.getFull_address())
+                .address(fixCase(userAddress.getFull_address()))
                 .build();
 
-        if(response.getAdditional_data() != null &&
+        if (response.getAdditional_data() != null &&
                 response.getAdditional_data().getDocument() != null) {
 
             Proof additionalData = response.getAdditional_data().getDocument().getProof();
@@ -226,5 +227,15 @@ public class ShuftiController extends BaseController {
         }
 
         return userDetail;
+    }
+
+    private static String fixCase(String input) {
+        String[] array = input.split(" ");
+        StringBuilder builder = new StringBuilder();
+        for (String s : array) {
+            if (s.isEmpty()) continue;
+            builder.append(StringUtils.capitalize(s.trim()) + " ");
+        }
+        return builder.toString().trim();
     }
 }

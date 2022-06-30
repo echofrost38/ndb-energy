@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
+import org.web3j.tuples.generated.Tuple2;
 
 @Service
 public class UserService extends BaseService {
@@ -51,13 +52,17 @@ public class UserService extends BaseService {
 				}
 			} else {}
 		} else {
-			user = new User(email, encoder.encode(password), country.toUpperCase());
+			user = new User(email, encoder.encode(password), country);
 			Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
+			// create BEP20 wallet
+			nyyuWalletService.generateBEP20Address(user.getId());
+			// create referral
 			userReferralService.createNewReferrer(user.getId(),referredByCode);
+
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);

@@ -3,16 +3,14 @@ package com.ndb.auction.resolver.payment.auction;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
+import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.user.UserDetailsImpl;
+
 import org.springframework.expression.ParseException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -20,9 +18,6 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
-	@Autowired
-	protected CoinpaymentAuctionService coinpaymentAuctionService;
-
 	private static final String AUCTION = "AUCTION";
 
 	// for Coinpayments

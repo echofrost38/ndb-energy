@@ -3,38 +3,28 @@ package com.ndb.auction.resolver.payment.auction;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
-
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.payment.stripe.StripeAuctionService;
-import com.ndb.auction.service.payment.stripe.StripeCustomerService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class AuctionStripe extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-    
-    @Autowired
-    private StripeAuctionService stripeAuctionService;
-
-    @Autowired
-	protected StripeCustomerService stripeCustomerService;
-    
     // for stripe payment
     @PreAuthorize("isAuthenticated()")
     @CrossOrigin
     public String getStripePubKey() {
-        return stripeAuctionService.getPublicKey();
+        return stripeBaseService.getPublicKey();
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")

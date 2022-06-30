@@ -32,6 +32,8 @@ import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Notification;
@@ -40,7 +42,9 @@ import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
+import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.Whitelist;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
@@ -51,6 +55,7 @@ import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
+import com.ndb.auction.web3.NyyuWalletService;
 import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +88,7 @@ public class BaseService {
     public String COINSPAYMENT_IPN_URL;
 
     protected static Gson gson = new Gson();
-    
+
     protected WebClient coinPaymentAPI;
 
     @Autowired
@@ -103,6 +108,9 @@ public class BaseService {
 
     @Autowired
     public UserReferralDao userReferralDao;
+
+    @Autowired
+    public NyyuWalletDao nyyuWalletDao;
 
     @Autowired
     public UserAvatarDao userAvatarDao;
@@ -201,6 +209,12 @@ public class BaseService {
     protected NDBCoinService ndbCoinService;
 
     @Autowired
+    protected NyyuWalletService nyyuWalletService;
+
+    @Autowired
+    protected NyyuPayService nyyuPayService;
+
+    @Autowired
     protected ThirdAPIUtils thirdAPI;
 
     @Autowired
@@ -259,7 +273,7 @@ public class BaseService {
 		// processing order
 		double ndb = order.getNdbAmount();
 		Double fiatAmount = ndb * order.getNdbPrice();
-		
+
         // check balance and remaining
         var presale = presaleDao.selectById(order.getPresaleId());
         double remain = presale.getTokenAmount() - presale.getSold();
@@ -273,8 +287,15 @@ public class BaseService {
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
 			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-			balanceDao.addFreeBalance(userId, tokenId, available);
+            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+            userReferralService.handleReferralOnPreSaleOrder(userId,nyyuWallet.getPublicKey());
+            String hash = ndbCoinService.transferNDB(userId, nyyuWallet.getPublicKey(), available);
+            if(hash == null) {
+                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+            }
+            balanceDao.addFreeBalance(userId, tokenId, available);
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
+            userReferralService.handleReferralOnPreSaleOrder(userId,order.getExtAddr());
 			String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available);
             if(hash == null) {
                 throw new BalanceException("Cannot transfer NDB Coin", "NDB");
@@ -336,5 +357,4 @@ public class BaseService {
 			"PAYMENT CONFIRMED",
 			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
-
 }

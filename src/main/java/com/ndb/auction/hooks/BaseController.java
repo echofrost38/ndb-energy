@@ -81,6 +81,9 @@ public class BaseController {
     protected NDBCoinService ndbCoinService;
 
     @Autowired
+    protected NyyuPayService nyyuPayService;
+
+    @Autowired
     protected PresaleService presaleService;
 
     @Autowired

@@ -322,7 +322,6 @@ public class ScheduledTasks {
 		}
 	}
 
-	/**
 	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
@@ -434,10 +433,10 @@ public class ScheduledTasks {
 		metadata.setContentLength(tar.length());
 
 		try {
-			// s3.putObject(bucketName, tarName, inputStream, metadata);
+			s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			// mailService.sendBackupEmail(superAdmins, userFileName);
+			mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -448,6 +447,5 @@ public class ScheduledTasks {
 		// delete local files
 		log.info("Uploaded");
 	}
-	 */
 
 }

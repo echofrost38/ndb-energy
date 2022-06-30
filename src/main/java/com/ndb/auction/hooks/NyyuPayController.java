@@ -1,9 +1,8 @@
 package com.ndb.auction.hooks;
 
 import com.google.gson.Gson;
+import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.models.nyyupay.NyyuPayResponse;
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/")
@@ -25,8 +25,12 @@ public class NyyuPayController extends BaseController{
 
     @Value("${nyyupay.privKey}")
     private String PRIVATE_KEY;
+
+    CryptoBalanceDao balanceDao;
     @Autowired
-    public NyyuPayController(){}
+    public NyyuPayController(CryptoBalanceDao balanceDao){
+        this.balanceDao=balanceDao;
+    }
     @PostMapping("/nyyupay")
     @ResponseBody
     public Object NyyuPayCallbackHandler(HttpServletRequest request) {
@@ -43,8 +47,11 @@ public class NyyuPayController extends BaseController{
                 System.out.println("x-auth-key: " + reqHeader.get("x-auth-key"));
                 System.out.println("x-auth-token: " + reqHeader.get("x-auth-token"));
                 System.out.println("x-auth-token: " + reqHeader.get("x-auth-ts"));
-                //NewDeposit
-
+                //New deposit
+                int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
+                int userId = nyyuWalletService.selectByAddress(response.getAddress()).getUserId();
+                double amount = 100; // nyyu pay should be send deposit amount in payload body
+                balanceDao.addFreeBalance(userId, tokenId, amount);
                 System.out.println("Deposit detection : " + response.getAddress());
                 return response;
             } else

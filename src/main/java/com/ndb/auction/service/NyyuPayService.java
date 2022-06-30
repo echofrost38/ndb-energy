@@ -8,22 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Base64;
-
 @Service
 public class NyyuPayService extends BaseService{
     // NyyuPay URL
-    @Value("${nyyupay.baseUrl}")
-    private String BASE_URL;
+    private static final String BASE_URL = "http://localhost:3000/bep20";
 
     @Value("${nyyupay.pubKey}")
     private String PUBLIC_KEY;
 
     @Value("${nyyupay.privKey}")
     private String PRIVATE_KEY;
-
-    @Value("${nyyupay.callbackUrl}")
-    private String CALLBACK_URL;
 
     private WebClient nyyuPayAPI;
     protected CloseableHttpClient client;
@@ -34,10 +28,19 @@ public class NyyuPayService extends BaseService{
                 .build();
     }
 
+    // This function need improve ==> async
     public String sendAddressRequest(String address){
-        NyyuPayRequest request = new NyyuPayRequest();
-        request.setAddress(address);
-        sendNyyuPayRequest(request).subscribe();
+        try {
+            NyyuPayRequest request = new NyyuPayRequest();
+            request.setAddress(address);
+            sendNyyuPayRequest(request).subscribe(
+                    i -> System.out.println("Nyyu Pay response: " + i),
+                    error -> System.out.println("Request to Nyyu pay has error :" + error),
+                    () -> System.out.println("Done")
+            );
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
         return "sent request";
     }
 

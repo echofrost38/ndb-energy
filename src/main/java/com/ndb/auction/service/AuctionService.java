@@ -162,17 +162,7 @@ public class AuctionService extends BaseService {
 	}
 
 	public String checkRounds() {
-		List<Auction> auctions = auctionDao.getAuctionByStatus(Auction.COUNTDOWN);
-		if (auctions.size() != 0) {
-			Auction auction = auctions.get(0);
-			schedule.setNewCountdown(auction);
-		}
-
-		auctions = auctionDao.getAuctionByStatus(Auction.STARTED);
-		if (auctions.size() != 0) {
-			Auction auction = auctions.get(0);
-			schedule.setStartRound(auction);
-		}
+		schedule.checkAllRounds();
 		return "Checked";
 	}
 

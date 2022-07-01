@@ -50,8 +50,10 @@ public class NyyuPayController extends BaseController{
                 //New deposit
                 int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
                 int userId = nyyuWalletService.selectByAddress(response.getAddress()).getUserId();
-                double amount = 100; // nyyu pay should be send deposit amount in payload body
+                /* nyyu pay should be send deposit amount in payload body
+                double amount = 100;
                 balanceDao.addFreeBalance(userId, tokenId, amount);
+                */
                 System.out.println("Deposit detection : " + response.getAddress());
                 return response;
             } else

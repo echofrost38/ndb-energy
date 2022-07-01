@@ -1,6 +1,5 @@
 package com.ndb.auction.service.user;
 
-import com.ndb.auction.exceptions.AuctionException;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;

@@ -1,20 +1,14 @@
 package com.ndb.auction.web3;
 
 import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
-import com.ndb.auction.dao.oracle.withdraw.TokenDao;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.service.BaseService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.*;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tuples.generated.Tuple2;
 
 @Service
-@Slf4j
 public class NyyuWalletService extends BaseService {
     @Autowired
     private NyyuWalletDao nyyuWalletDao;
@@ -25,7 +19,6 @@ public class NyyuWalletService extends BaseService {
     @Value("${bsc.json.chainid}")
     private String chainId;
     public String generateBEP20Address(int userId) {
-        Web3j web3j = Web3j.build(new HttpService(bscNetwork));
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
             WalletFile wallet = Wallet.createStandard(password, keyPair);

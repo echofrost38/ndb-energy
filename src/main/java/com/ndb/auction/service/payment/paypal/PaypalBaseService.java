@@ -13,7 +13,7 @@ public class PaypalBaseService extends BaseService {
     @Value("${website.url}")
 	protected String WEBSITE_URL;
 
-    private final double PAYPAL_FEE = 5;
+    private final double PAYPAL_FEE = 3.49;
     
     // get order by OrderID
     public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
@@ -25,6 +25,6 @@ public class PaypalBaseService extends BaseService {
 		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         var white = whitelistDao.selectByUserId(userId);
 		if(white != null) tierFeeRate = 0.0;
-		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
+		return 100 * (amount + 0.49) / (100 - PAYPAL_FEE - tierFeeRate);
 	}
 }

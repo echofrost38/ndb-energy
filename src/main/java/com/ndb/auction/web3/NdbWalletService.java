@@ -10,7 +10,6 @@ import com.ndb.auction.contracts.NdbWallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.abi.EventEncoder;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -19,13 +18,8 @@ import org.web3j.crypto.Keys;
 import org.web3j.crypto.Wallet;
 import org.web3j.crypto.WalletFile;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameter;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.ClientTransactionManager;
-import org.web3j.tx.Contract;
 
 @Service
 public class NdbWalletService {  

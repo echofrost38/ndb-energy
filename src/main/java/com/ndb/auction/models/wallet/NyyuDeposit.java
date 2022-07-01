@@ -1,5 +1,4 @@
 package com.ndb.auction.models.wallet;
-import com.ndb.auction.dao.oracle.Table;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;

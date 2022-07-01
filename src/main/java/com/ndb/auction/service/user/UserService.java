@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import freemarker.template.TemplateException;
-import org.web3j.tuples.generated.Tuple2;
 
 @Service
 public class UserService extends BaseService {
@@ -52,7 +51,7 @@ public class UserService extends BaseService {
 				}
 			} else {}
 		} else {
-			user = new User(email, encoder.encode(password), country);
+			user = new User(email, encoder.encode(password), country.toUpperCase());
 			Set<String> roles = new HashSet<String>();
 			roles.add("ROLE_USER");
 			user.setRole(roles);

@@ -32,7 +32,6 @@ import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
-import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
 import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.exceptions.BalanceException;
@@ -42,7 +41,6 @@ import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
-import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.BroadcastNotification;
@@ -357,4 +355,5 @@ public class BaseService {
 			"PAYMENT CONFIRMED",
 			"Your purchase of " + available + "NDB" + " in the presale round was successful.");
 	}
+
 }

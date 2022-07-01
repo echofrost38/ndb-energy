@@ -10,29 +10,19 @@ import com.ndb.auction.service.AvatarService;
 import com.ndb.auction.service.BaseVerifyService;
 import com.ndb.auction.service.BidService;
 import com.ndb.auction.service.FiatAssetService;
-import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.InternalBalanceService;
 import com.ndb.auction.service.KYBService;
 import com.ndb.auction.service.NotificationService;
 import com.ndb.auction.service.OAuth2RegistrationService;
 import com.ndb.auction.service.PresaleOrderService;
 import com.ndb.auction.service.PresaleService;
-import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.ShuftiService;
 import com.ndb.auction.service.StatService;
 import com.ndb.auction.service.TierTaskService;
 import com.ndb.auction.service.TokenAssetService;
 import com.ndb.auction.service.payment.PlaidService;
 import com.ndb.auction.service.payment.TxnFeeService;
-import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
-import com.ndb.auction.service.payment.coinpayment.CoinpaymentPresaleService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentWalletService;
-import com.ndb.auction.service.payment.paypal.PaypalAuctionService;
-import com.ndb.auction.service.payment.paypal.PaypalPresaleService;
-import com.ndb.auction.service.payment.stripe.StripeAuctionService;
-import com.ndb.auction.service.payment.stripe.StripeBaseService;
-import com.ndb.auction.service.payment.stripe.StripeCustomerService;
-import com.ndb.auction.service.payment.stripe.StripePresaleService;
 import com.ndb.auction.service.user.UserReferralService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
@@ -88,9 +78,6 @@ public class BaseResolver {
 	protected AvatarService avatarService;
 
 	@Autowired
-	protected ProfileService profileService;
-
-	@Autowired
 	protected NotificationService notificationService;
 
 	@Autowired
@@ -98,9 +85,6 @@ public class BaseResolver {
 
 	@Autowired
 	protected OAuth2RegistrationService oAuth2RegistrationService;
-
-	@Autowired
-	protected FinancialService financialService;
 
 	@Autowired
 	protected UserWalletService userWalletService;
@@ -131,8 +115,7 @@ public class BaseResolver {
 	BaseVerifyService baseVerifyService;
 
 	@Autowired
-    protected
-	InternalBalanceService internalBalanceService;
+    protected InternalBalanceService internalBalanceService;
 
 	@Autowired
 	protected PresaleService presaleService;
@@ -153,22 +136,7 @@ public class BaseResolver {
 	protected PlaidService plaidService;
 
 	@Autowired
-	protected CoinpaymentAuctionService coinpaymentAuctionService;
-
-	@Autowired
-	protected CoinpaymentPresaleService	coinpaymentPresaleService;
-
-	@Autowired
 	protected CoinpaymentWalletService coinpaymentWalletService;
-
-	@Autowired
-	protected StripeAuctionService stripeAuctionService;
-
-	@Autowired
-	protected StripePresaleService stripePresaleService;
-
-	@Autowired
-	protected StripeBaseService stripeBaseService;
 
 	@Autowired
 	protected ThirdAPIUtils thirdAPIUtils;
@@ -177,27 +145,10 @@ public class BaseResolver {
 	protected TxnFeeService txnFeeService;
 
 	@Autowired
-	protected PaypalAuctionService paypalAuctionService;
-
-	@Autowired
-	protected StripeCustomerService stripeCustomerService;
-
-	@Autowired
-	protected PaypalPresaleService paypalPresaleService;
-
-	@Autowired
 	protected WhitelistService whitelistService;
 
 	@Autowired
 	protected MessageSource messageSource;
-
-	protected double getPayPalTotalOrder(int userId, double amount) {
-		User user = userService.getUserById(userId);
-		Double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-		var white = whitelistService.selectByUser(userId);
-		if(white != null) tierFeeRate = 0.0;
-		return 100 * (amount + 0.30) / (100 - PAYPAL_FEE - tierFeeRate);
-	}
 
 	protected double getPaypalFee(int userId, double amount) {
 		User user = userService.getUserById(userId);

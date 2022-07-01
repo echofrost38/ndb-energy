@@ -9,6 +9,12 @@ import java.util.UUID;
 
 import javax.servlet.http.Part;
 
+import org.apache.http.client.ClientProtocolException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -20,15 +26,9 @@ import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.payload.response.ShuftiRefPayload;
 import com.ndb.auction.service.NamePriceService;
+import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.service.utils.TotpService;
-
-import org.apache.http.client.ClientProtocolException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -37,13 +37,13 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 
     @Autowired
-    private MailService mailService;
-
-    @Autowired
-    private TotpService totpService;
-
-    @Autowired
     private NamePriceService namePriceService;
+
+	@Autowired
+	protected ProfileService profileService;
+
+    @Autowired
+    private MailService mailService;
 
     // select avatar profile
     // prefix means avatar name!!!

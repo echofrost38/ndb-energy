@@ -306,22 +306,23 @@ public class ScheduledTasks {
 		}
 	}
 
-	private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
-		try (OutputStream outputStream = Files.newOutputStream(outputFile);
-			GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
-			TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
+	// private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
+	// 	try (OutputStream outputStream = Files.newOutputStream(outputFile);
+	// 		GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
+	// 		TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
 	
-			for (Path inputFile : inputFiles) {
-				TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
-				tarOut.putArchiveEntry(entry);
-				Files.copy(inputFile, tarOut);
-				tarOut.closeArchiveEntry();
-			}
+	// 		for (Path inputFile : inputFiles) {
+	// 			TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
+	// 			tarOut.putArchiveEntry(entry);
+	// 			Files.copy(inputFile, tarOut);
+	// 			tarOut.closeArchiveEntry();
+	// 		}
 	
-			tarOut.finish();
-		}
-	}
+	// 		tarOut.finish();
+	// 	}
+	// }
 
+	/**
 	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
@@ -433,10 +434,10 @@ public class ScheduledTasks {
 		metadata.setContentLength(tar.length());
 
 		try {
-			s3.putObject(bucketName, tarName, inputStream, metadata);
+			// s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			mailService.sendBackupEmail(superAdmins, userFileName);
+			// mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -447,5 +448,6 @@ public class ScheduledTasks {
 		// delete local files
 		log.info("Uploaded");
 	}
+	 */
 
 }

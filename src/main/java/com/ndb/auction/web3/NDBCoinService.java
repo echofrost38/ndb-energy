@@ -14,11 +14,9 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBreferral;
 import com.ndb.auction.contracts.NDBcoinV4;
-import com.ndb.auction.dao.oracle.balance.CryptoBalanceDao;
 import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
 import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.exceptions.ReferralException;
-import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.models.wallet.NyyuDeposit;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.ScheduledTasks;
@@ -68,9 +66,6 @@ public class NDBCoinService {
     private NyyuWalletDao nyyuWalletDao;
 
     @Autowired
-    private CryptoBalanceDao balanceDao;
-
-    @Autowired
     private NyyuDepositDao nyyuDepositDao;
 
     @Autowired
@@ -87,7 +82,6 @@ public class NDBCoinService {
     private final BigInteger gasLimit = new BigInteger("800000");
     private final BigInteger decimals = new BigInteger("1000000000000");
     private final BigInteger m_decimals = new BigInteger("100000000");
-    private final String ZERO="0x0000000000000000000000000000000000000000";
     private final double multipler = 10000.0;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
@@ -139,8 +133,6 @@ public class NDBCoinService {
             deposit.setWalletAddress(event.to);
             nyyuDepositDao.insert(deposit);
             // Sync NDB balance between Nyyu wallet and NDB internal balance
-            int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-            CryptoBalance internalBalance = balanceDao.selectById(nyyuWallet.getUserId(),tokenId);
         }
 
         // add to unconfirmed list

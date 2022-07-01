@@ -10,11 +10,15 @@ import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleCondition;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PresaleService extends BaseService {
     
+    @Value("${mode}")
+    protected String devMode;
+
     // create new presale
     public int createNewPresale(PreSale presale) {
         
@@ -70,10 +74,13 @@ public class PresaleService extends BaseService {
     }
 
     public int startPresale(int presaleId) {
+        var message = devMode.equals("development") ? 
+            "A presale round just started(development server)." : 
+            "A presale round just started.";
         notificationService.broadcastNotification(
             Notification.NEW_ROUND_STARTED, 
             "NEW ROUND STARTED", 
-            "A presale round just started.");
+            message);
         return presaleDao.updateStatus(presaleId, PreSale.STARTED);
     }
 
@@ -82,10 +89,13 @@ public class PresaleService extends BaseService {
     }
 
     public int closePresale(int presaleId) {
+        var message = devMode.equals("development") ? 
+            "A presale round just finished(development server)." : 
+            "A presale round just finished.";
         notificationService.broadcastNotification(
             Notification.ROUND_FINISHED, 
             "ROUND CLOSED", 
-            "A presale round just finished.");
+            message);
         return presaleDao.updateStatus(presaleId, PreSale.ENDED);
     }
 

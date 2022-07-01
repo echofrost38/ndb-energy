@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class NyyuPayService extends BaseService{
     // NyyuPay URL
-    private static final String BASE_URL = "https://nyyu.pay/bep20";
+    private static final String BASE_URL = "https://api.dev.pay.nyyu.io/bep20";
 
     @Value("${nyyupay.pubKey}")
     private String PUBLIC_KEY;

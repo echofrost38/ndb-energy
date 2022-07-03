@@ -291,7 +291,6 @@ public class BaseService {
             if(hash == null) {
                 throw new BalanceException("Cannot transfer NDB Coin", "NDB");
             }
-            balanceDao.addFreeBalance(userId, tokenId, available);
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
             userReferralService.handleReferralOnPreSaleOrder(userId,order.getExtAddr());
 			String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available);

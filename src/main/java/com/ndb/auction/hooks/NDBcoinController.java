@@ -30,6 +30,7 @@ public class NDBcoinController extends BaseController {
         return new CirculatingSupply(ciculatingSupply);
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/marketcap", method = RequestMethod.GET)
     public Marketcap marketcap() throws Exception {
         ResponseEntity<Object> result = (ResponseEntity<Object>) priceController.getPriceData();

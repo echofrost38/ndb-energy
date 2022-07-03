@@ -54,7 +54,6 @@ import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.NyyuWalletService;
-import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -154,9 +153,6 @@ public class BaseService {
 
     @Autowired
     public UserReferralService userReferralService;
-
-    @Autowired
-    public UserWalletService userWalletService;
 
     @Autowired
     public NdbWalletService ndbWalletService;
@@ -284,7 +280,6 @@ public class BaseService {
         }
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
             NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
             userReferralService.handleReferralOnPreSaleOrder(userId,nyyuWallet.getPublicKey());
             String hash = ndbCoinService.transferNDB(userId, nyyuWallet.getPublicKey(), available);

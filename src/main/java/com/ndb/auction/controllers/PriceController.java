@@ -4,7 +4,6 @@ import com.ndb.auction.hooks.BaseController;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ import java.io.IOException;
 public class PriceController extends BaseController {
 
     static long lastTime;
-    static ResponseEntity lastResponse;
+    static ResponseEntity<Object> lastResponse;
 
 
     @GetMapping(value = "/price/ndb")

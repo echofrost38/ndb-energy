@@ -76,9 +76,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 var location = locationMap.get(ip);
                 if (location == null) {
                     // checking ip address ------> calling vpn api key
-                    location = locationLogService.buildLog(ip);
-                    if(location != null) 
-                        locationMap.put(ip, location);
+                    try {
+                        location = locationLogService.buildLog(ip);
+                        if(location != null) 
+                            locationMap.put(ip, location);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } 
                 }
                 JsonObject errorObject;
                 if (location == null) {

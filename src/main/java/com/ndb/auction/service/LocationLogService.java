@@ -7,6 +7,8 @@ import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.LocationLog;
 import com.ndb.auction.payload.VpnAPI;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
 
 @Service
+@Slf4j
 public class LocationLogService extends BaseService {
 
     @Value("${vpnapi.key}")
@@ -47,6 +50,7 @@ public class LocationLogService extends BaseService {
 
     public LocationLog buildLog(String ip) {
         try {
+            log.info("ip address: {}", ip);
             VpnAPI response = vpnAPI.get()
                     .uri(uriBuilder -> uriBuilder.path(ip)
                             .queryParam("key", apiKey)

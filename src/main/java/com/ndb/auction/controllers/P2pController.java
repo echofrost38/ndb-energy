@@ -61,7 +61,7 @@ public class P2pController extends BaseController {
                     .body(response.body().string());
             lastKlineTime = currentTime;
         }
-        return lastPriceResponse;
+        return lastKlineResponse;
     }
 
 }

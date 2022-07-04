@@ -3,7 +3,9 @@ package com.ndb.auction.utils;
 import static com.ndb.auction.utils.HttpHeader.*;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RemoteIpHelper {
 
     private static final String UNKNOWN = "unknown";
@@ -35,6 +37,7 @@ public class RemoteIpHelper {
             tryCount++;
         }
         // check ip contains comma
+        log.info("origin ip: {}", ip);
         var ipArr = ip.split(",");
         return ipArr[0];
     }

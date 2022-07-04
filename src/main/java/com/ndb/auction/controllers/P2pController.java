@@ -14,7 +14,7 @@ import java.io.IOException;
 
 
 @RestController
-public class NDBCoinController extends BaseController {
+public class P2pController extends BaseController {
 
     static long lastPriceTime;
     static ResponseEntity lastPriceResponse;

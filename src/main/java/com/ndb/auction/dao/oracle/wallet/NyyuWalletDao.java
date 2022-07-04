@@ -2,6 +2,7 @@ package com.ndb.auction.dao.oracle.wallet;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
+import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import lombok.NoArgsConstructor;
 import org.springframework.jdbc.core.ResultSetExtractor;

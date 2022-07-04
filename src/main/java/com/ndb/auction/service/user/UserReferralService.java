@@ -158,7 +158,8 @@ public class UserReferralService extends BaseService {
 
     public String activateReferralCode(int userId,String wallet) {
         try {
-            if (wallet.equals("0x0000000000000000000000000000000000000000"))
+            // wallet="0x0000000000000000000000000000000000000000"; //only debug
+            if (wallet=="0x0000000000000000000000000000000000000000")
             {
                 NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
                 if (nyyuWallet!=null)

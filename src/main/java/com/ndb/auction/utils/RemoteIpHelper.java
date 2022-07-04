@@ -3,7 +3,6 @@ package com.ndb.auction.utils;
 import static com.ndb.auction.utils.HttpHeader.*;
 import javax.servlet.http.HttpServletRequest;
 
-
 public class RemoteIpHelper {
 
     private static final String UNKNOWN = "unknown";
@@ -32,11 +31,11 @@ public class RemoteIpHelper {
                 default:
                     ip = request.getRemoteAddr();
             }
+
             tryCount++;
         }
-        // check ip contains comma
-        var ipArr = ip.split(",");
-        return ipArr[0];
+
+        return ip;
     }
 
     private static boolean isIpFound(String ip) {

@@ -38,6 +38,7 @@ public class RemoteIpHelper {
         }
         // check ip contains comma
         log.info("origin ip: {}", ip);
+        log.info("origin count: {}", tryCount);
         var ipArr = ip.split(",");
         return ipArr[0];
     }

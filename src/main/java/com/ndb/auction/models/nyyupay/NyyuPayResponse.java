@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -15,4 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NyyuPayResponse {
     protected String address;
+    protected String hash;
+    protected BigInteger amount;
 }

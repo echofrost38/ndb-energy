@@ -108,13 +108,13 @@ public class NDBCoinService {
         }
     }
 
-    public double getBalanceOf(String wallet){
+    public BigInteger getBalanceOf(String wallet){
         try{
             BigInteger balance = ndbToken.balanceOf(wallet).send();
-            return balance.divide(decimals).doubleValue();
+            return balance.divide(decimals);
         } catch (Exception e){
             System.out.println("getBalance : " + e.getMessage());
-            return 0;
+            return BigInteger.ZERO;
         }
     }
 
@@ -215,9 +215,9 @@ public class NDBCoinService {
         }
     }
 
-    public String getTotalSupply() throws ExecutionException, InterruptedException {
+    public double getTotalSupply() throws ExecutionException, InterruptedException {
         BigInteger total =  ndbToken.totalSupply().sendAsync().get();
-        return total.divide(decimals).toString();
+        return total.divide(decimals).doubleValue();
     }
 
     public String getMarketCap() throws ExecutionException, InterruptedException, URISyntaxException, IOException {

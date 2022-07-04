@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigInteger;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/")
 public class NyyuPayController extends BaseController{
+    private final BigInteger bDecimal = new BigInteger("1000000000000");
 
     @Value("${nyyupay.pubKey}")
     private String PUBLIC_KEY;
@@ -40,7 +40,7 @@ public class NyyuPayController extends BaseController{
             reqQuery = getBody(request);
             reqHeader= getHeadersInfo(request);
             NyyuPayResponse response = new Gson().fromJson(reqQuery, NyyuPayResponse.class);
-            String payload = reqHeader.get("x-auth-ts") +"POST"+"{\"address\":\""+response.getAddress()+"\"}";
+            String payload = reqHeader.get("x-auth-ts") +"POST"+reqQuery.toString();
             String hmac = buildHmacSignature(payload, PRIVATE_KEY);
             if (reqHeader.get("x-auth-key").equals(PUBLIC_KEY) && reqHeader.get("x-auth-token").equals(hmac)){
                 System.out.println("NYYU PAY CALLBACK BODY: " + reqQuery);
@@ -50,11 +50,9 @@ public class NyyuPayController extends BaseController{
                 //New deposit
                 int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
                 int userId = nyyuWalletService.selectByAddress(response.getAddress()).getUserId();
-                /* nyyu pay should be send deposit amount in payload body
-                double amount = 100;
+                double amount = response.getAmount().divide(bDecimal).doubleValue();
                 balanceDao.addFreeBalance(userId, tokenId, amount);
-                */
-                System.out.println("Deposit detection : " + response.getAddress());
+                System.out.println("Deposit detection : " + reqQuery.toString());
                 return response;
             } else
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

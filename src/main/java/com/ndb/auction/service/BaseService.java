@@ -281,6 +281,9 @@ public class BaseService {
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
             NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+            if (!nyyuWallet.getNyyuPayRegistered()){
+                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+            }
             userReferralService.handleReferralOnPreSaleOrder(userId,nyyuWallet.getPublicKey());
             String hash = ndbCoinService.transferNDB(userId, nyyuWallet.getPublicKey(), available);
             if(hash == null) {

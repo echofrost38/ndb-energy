@@ -2,6 +2,7 @@ package com.ndb.auction.dao.oracle.wallet;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
+import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import lombok.NoArgsConstructor;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -21,12 +22,21 @@ public class NyyuWalletDao extends BaseOracleDao {
         m.setNetwork(rs.getString("NETWORK"));
         m.setPrivateKey(rs.getString("PRIVATE_KEY"));
         m.setPublicKey(rs.getString("PUBLIC_KEY"));
+        m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));
         return m;
     }
     public int insert(NyyuWallet m) {
-        String sql = "INSERT INTO TBL_NYYU_WALLET(ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY)" +
-                "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?)";
+        String sql = "INSERT INTO TBL_NYYU_WALLET(ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY,NYYUPAY_REGISTERED)" +
+                "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?,?)";
         return jdbcTemplate.update(sql, m.getUserId(),m.getNetwork(),m.getPrivateKey(),m.getPublicKey());
+    }
+
+    public int insertOrUpdate(NyyuWallet m) {
+        String sql =  "MERGE INTO TBL_NYYU_WALLET USING DUAL ON (ID=?)"
+                + "WHEN MATCHED THEN UPDATE SET NYYUPAY_REGISTERED= ? "
+                + "WHEN NOT MATCHED THEN INSERT (ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY,NYYUPAY_REGISTERED)"
+                + "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?,?)";
+        return jdbcTemplate.update(sql,m.getId(),m.getNyyuPayRegistered(), m.getUserId(), m.getNetwork(),m.getPrivateKey(),m.getPublicKey(),m.getNyyuPayRegistered());
     }
 
     public int isInteralWallet(String address){

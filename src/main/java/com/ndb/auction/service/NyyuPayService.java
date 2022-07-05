@@ -30,10 +30,11 @@ public class NyyuPayService extends BaseService{
     }
 
     // This function need improve ==> async
-    public String sendAddressRequest(NyyuWallet nyyuWallet){
+    public String sendAddressRequest(String wallet){
         try {
             NyyuPayRequest request = new NyyuPayRequest();
-            request.setAddress(nyyuWallet.getPublicKey());
+            request.setAddress(wallet);
+            NyyuWallet nyyuWallet = nyyuWalletDao.selectByAddress(wallet);
             sendNyyuPayRequest(request).subscribe(
                     i -> {
                         nyyuWallet.setNyyuPayRegistered(true);

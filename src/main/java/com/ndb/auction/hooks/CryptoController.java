@@ -19,6 +19,7 @@ import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransac
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.service.user.WhitelistService;
+import com.ndb.auction.service.utils.MailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,9 @@ public class CryptoController extends BaseController {
 
     @Autowired
     private WhitelistService whitelistService;
+
+    @Autowired
+    private MailService mailService;
 
     private final double COINPAYMENT_FEE = 0.5;
 
@@ -404,7 +408,25 @@ public class CryptoController extends BaseController {
                 tierTask.setWallet(totalBalance);
                 tierTaskService.updateTierTask(tierTask);
             }
-    
+
+            // send to admins
+            var admins = userService.getUsersByRole("ROLE_SUPER");
+            try {
+                mailService.sendDeposit(
+                    user.getEmail(), 
+                    user.getAvatar().getPrefix() + " " + user.getAvatar().getName(),
+                    "Coinpayment", 
+                    cryptoType, 
+                    cryptoType, 
+                    amount, 
+                    deposited, 
+                    fee, 
+                    admins
+                );
+            } catch (Exception e) {
+                log.info("cannot send crypto deposit notification email to admin");
+            }
+
             notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS, 

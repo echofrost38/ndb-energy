@@ -157,7 +157,13 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public int approveBankWithdrawRequest(int id) {
+    public int approveBankWithdrawRequest(int id, String code) {
+
+        if(!totpService.checkWithdrawConfirmCode(code)) {
+            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+            throw new BalanceException(msg, "2FA");
+        }
+
         return bankWithdrawService.approveRequest(id);
     }
 

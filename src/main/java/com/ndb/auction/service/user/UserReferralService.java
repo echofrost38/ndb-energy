@@ -125,7 +125,6 @@ public class UserReferralService extends BaseService {
     public UserReferral createNewReferrer(int userId,String referredByCode, String walletAddress){
         try {
             referredByCode = (referredByCode!=null) ? referredByCode: "";
-
             //active referrer use NYYU wallet
             if (!ndbCoinService.isActiveReferrer(walletAddress)){
                 User user = userDao.selectById(userId) ;

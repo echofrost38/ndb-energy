@@ -35,7 +35,7 @@ public class UserAuthService extends BaseService {
 		}
 
 		if (!totpService.checkVerifyCode(email, code)) {
-			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
+			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
 			throw new UserNotFoundException(msg, "email");
 		}
 

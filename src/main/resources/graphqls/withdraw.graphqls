@@ -1,4 +1,6 @@
 extend type Mutation {
+    sendWithdrawConfirmCode : Int
+    
     # PayPal mutation
     generateWithdraw : String
     paypalWithdrawRequest(
@@ -11,7 +13,8 @@ extend type Mutation {
     confirmPaypalWithdraw(
         id: Int,
         status: Int,
-        deniedReason: String
+        deniedReason: String,
+        code: String
     ) : Int
     changePayPalWithdrawShowStatus(
         id: Int,
@@ -29,7 +32,8 @@ extend type Mutation {
     confirmCryptoWithdraw(
         id: Int,
         status: Int,
-        deniedReason: String
+        deniedReason: String,
+        code: String
     ) : Int
     changeCryptoWithdrawShowStatus(
         id: Int,
@@ -51,7 +55,8 @@ extend type Mutation {
         code: String
     ) : BankWithdrawRequest
     approveBankWithdrawRequest(
-        id: Int
+        id: Int,
+        code: String
     ) : Int
     denyBankWithdrawRequest(
         id: Int,

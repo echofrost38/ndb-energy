@@ -25,6 +25,7 @@ import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.payment.paypal.PaypalDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.utils.PaypalHttpClient;
 import com.ndb.auction.utils.ThirdAPIUtils;
 
@@ -52,6 +53,9 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
 
     @Autowired
     private TaskSettingService taskSettingService;
+
+    @Autowired
+    private MailService mailService;
 
 	@Autowired
 	public DepositPaypal(PaypalHttpClient payPalHttpClient) {
@@ -173,6 +177,17 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
                 var df = new DecimalFormat("#.00000000");
                 msg = "Your deposit of " + df.format(m.getDeposited()) + m.getCryptoType() + " was successful.";
             }
+
+            var admins = userService.getUsersByRole("ROLE_SUPER");
+            
+            try {
+                mailService.sendDeposit(user.getEmail(), 
+                user.getAvatar().getPrefix() + " " + user.getAvatar().getName(), 
+                "PayPal", m.getFiatType(), "USDT", m.getAmount(), m.getDeposited(), m.getFee(), admins);   
+            } catch (Exception e) {
+                
+            }
+
             notificationService.sendNotification(
                 userId,
                 Notification.PAYMENT_RESULT,

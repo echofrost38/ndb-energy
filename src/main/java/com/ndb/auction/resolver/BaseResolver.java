@@ -185,4 +185,9 @@ public class BaseResolver {
 
         return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
     }
+
+	// send super admin phone message
+	public void sendSuperAdminCode() {
+		
+	}
 }

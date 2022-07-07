@@ -150,9 +150,9 @@ public class NDBCoinService {
         }
     }
 
-    public double getUserEarning(String address){
+    public long getUserEarning(String address){
         try {
-            double earning= ndbReferral.getEarning(address).send().doubleValue() / Math.pow(10,12);
+            long earning= ndbReferral.getEarning(address).send().divide(decimals).longValue();
             return earning;
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());

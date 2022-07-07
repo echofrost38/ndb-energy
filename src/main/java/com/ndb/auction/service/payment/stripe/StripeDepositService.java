@@ -180,15 +180,6 @@ public class StripeDepositService extends StripeBaseService {
             df = new DecimalFormat("#.00000000");
         }
         formattedDeposit = df.format(deposited);
-
-        var admins = userDao.selectByRole("ROLE_SUPER");
-        try {
-            mailService.sendDeposit(user.getEmail(),    
-            user.getAvatar().getPrefix() + " " + user.getAvatar().getName(), 
-            "Stripe", m.getFiatType(), "USDT", m.getAmount(), m.getDeposited(), m.getFee(), admins);
-        } catch (Exception e) {
-        }
-
         notificationService.sendNotification(
                 userId,
                 Notification.DEPOSIT_SUCCESS,

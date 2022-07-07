@@ -1,7 +1,6 @@
 package com.ndb.auction.service;
 
 import com.ndb.auction.models.nyyupay.NyyuPayRequest;
-import com.ndb.auction.models.wallet.NyyuWallet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,22 +29,13 @@ public class NyyuPayService extends BaseService{
     }
 
     // This function need improve ==> async
-    public String sendAddressRequest(String wallet){
+    public String sendAddressRequest(String address){
         try {
             NyyuPayRequest request = new NyyuPayRequest();
-            request.setAddress(wallet);
-            NyyuWallet nyyuWallet = nyyuWalletDao.selectByAddress(wallet);
+            request.setAddress(address);
             sendNyyuPayRequest(request).subscribe(
-                    i -> {
-                        nyyuWallet.setNyyuPayRegistered(true);
-                        nyyuWalletDao.insertOrUpdate(nyyuWallet);
-                        System.out.println("Nyyu Pay response: " + i);
-                    },
-                    error -> {
-                        nyyuWallet.setNyyuPayRegistered(false);
-                        nyyuWalletDao.insertOrUpdate(nyyuWallet);
-                        System.out.println("Request to Nyyu pay has error :" + error +" from wallet " + nyyuWallet.getPublicKey()) ;
-                    },
+                    i -> System.out.println("Nyyu Pay response: " + i),
+                    error -> System.out.println("Request to Nyyu pay has error :" + error),
                     () -> System.out.println("Done")
             );
         } catch(Exception e){

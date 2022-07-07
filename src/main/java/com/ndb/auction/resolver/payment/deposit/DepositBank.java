@@ -3,7 +3,6 @@ package com.ndb.auction.resolver.payment.deposit;
 import java.util.List;
 import java.util.Locale;
 
-import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Notification;
@@ -74,12 +73,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public BankDepositTransaction confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType, String code) {
-
-        if(!totpService.checkWithdrawConfirmCode(code)) {
-            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "2FA");
-        }
+    public BankDepositTransaction confirmBankDeposit(int id, String currencyCode, double amount, String cryptoType) {
 
         // ignore show status
         var m = (BankDepositTransaction)bankDepositService.selectById(id, 1);

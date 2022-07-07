@@ -13,5 +13,5 @@ import org.springframework.stereotype.Component;
 public class UserReferralEarning extends BaseModel {
 
     private String name;
-    private double amount;
+    private long amount;
 }

@@ -14,7 +14,6 @@ import lombok.Setter;
 public class VpnAPI {
 
 	private String ip;
-	private String message;
 	private Map<String, Boolean> security;
 	private Map<String, String> location;
 	private Map<String, String> network;

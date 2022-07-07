@@ -15,5 +15,4 @@ public class NyyuWallet {
     protected String publicKey;
     protected String privateKey;
     protected String network;
-    protected Boolean nyyuPayRegistered;
 }

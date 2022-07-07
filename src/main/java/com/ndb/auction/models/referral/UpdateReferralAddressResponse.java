@@ -13,4 +13,6 @@ import org.springframework.stereotype.Component;
 public class UpdateReferralAddressResponse extends BaseModel {
     private Boolean status;
     private String referralWallet;
+    private int rate;
+    private int[] commissionRate;
 }

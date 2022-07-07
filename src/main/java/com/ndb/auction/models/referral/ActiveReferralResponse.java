@@ -13,4 +13,6 @@ import org.springframework.stereotype.Component;
 public class ActiveReferralResponse extends BaseModel {
     private String code;
     private String referralWallet;
+    private int rate;
+    private int[] commissionRate;
 }

@@ -176,19 +176,22 @@ public class UserReferralService extends BaseService {
                 guestUser.setId(userId);
                 guestUser.setReferralCode(generateCode());
             }
+            User user = userDao.selectById(userId) ;
+            int rate = tierRate[user.getTierLevel()];
             //set active referrer
             if (!ndbCoinService.isActiveReferrer(wallet)){
-                User user = userDao.selectById(userId) ;
-                int rate = tierRate[user.getTierLevel()];
                 ndbCoinService.activeReferrer(wallet, (double) rate);
             }
             //update database
 
             guestUser.setWalletConnect(wallet);
             userReferralDao.insertOrUpdate(guestUser);
+
             ActiveReferralResponse response = new ActiveReferralResponse();
             response.setCode(guestUser.getReferralCode());
             response.setReferralWallet(wallet);
+            response.setRate(rate);
+            response.setCommissionRate(tierRate);
             return response;
         }catch (Exception e){
             throw new ReferralException(e.getMessage());
@@ -222,6 +225,10 @@ public class UserReferralService extends BaseService {
                     return response;
                 }
             }
+
+            User user = userDao.selectById(userId);
+            response.setRate(tierRate[user.getTierLevel()]);
+            response.setCommissionRate(tierRate);
             response.setStatus(false);
             return response;
         } catch (Exception e){

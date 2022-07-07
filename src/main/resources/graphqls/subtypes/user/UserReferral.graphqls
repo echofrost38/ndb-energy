@@ -9,10 +9,14 @@ type UserReferral {
 
 type ActiveReferralResponse {
     code: String,
-    referralWallet: String
+    referralWallet: String,
+    rate: Int,
+    commissionRate : [Int]
 }
 
 type UpdateReferralAddressResponse {
     status: Boolean,
-    referralWallet: String
+    referralWallet: String,
+    rate: Int,
+    commissionRate : [Int]
 }

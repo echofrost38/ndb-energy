@@ -55,12 +55,15 @@ import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
 import com.ndb.auction.web3.NyyuWalletService;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 public class BaseService {
 
     private static final String HMAC_SHA_512 = "HmacSHA512";
@@ -342,6 +345,22 @@ public class BaseService {
 
 		userDao.updateTier(userId, tierLevel, newPoint);
 		tierTaskService.updateTierTask(tierTask);
+
+        // send purchase email
+        var avatar = userAvatarDao.selectById(order.getUserId());
+        var admins = userDao.selectByRole("ROLE_SUPER");
+        
+        try {
+            mailService.sendPurchase(
+                presale.getRound(), 
+                user.getEmail(), 
+                avatar.getPrefix() + avatar.getName(), 
+                paymentType, "USD", order.getNdbAmount(), paidAmount, admins);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("cannot send presale purchase email");
+        }
+
 		presaleOrderDao.updateStatus(order.getId(), paymentId, paidAmount, paymentType);
 		presaleDao.updateSold(order.getPresaleId(), ndb);
 

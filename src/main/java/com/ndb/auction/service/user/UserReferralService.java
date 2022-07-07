@@ -43,21 +43,19 @@ public class UserReferralService extends BaseService {
             for (UserReferral item : users) {
                 UserReferralEarning earning = new UserReferralEarning();
                 String name = userAvatarDao.selectById(item.getId()).getName();
-                if (name !=null) {
-                    String address= item.getWalletConnect();
+                String address= item.getWalletConnect();
 
-                    if (address==null) {
-                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
-                        if (nyyuWallet!=null) address= nyyuWallet.getPublicKey();
-                    }
-
-                    if (address != null) {
-                        double amount = ndbCoinService.getUserEarning(address);
-                        earning.setAmount(amount);
-                    }
-                    earning.setName(name);
-                    list.add(earning);
+                if (address==null) {
+                    NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
+                    if (nyyuWallet!=null) address= nyyuWallet.getPublicKey();
                 }
+
+                if (address != null) {
+                    long amount = ndbCoinService.getUserEarning(address);
+                    earning.setAmount(amount);
+                }
+                earning.setName(name);
+                list.add(earning);
             }
         }
         return list;

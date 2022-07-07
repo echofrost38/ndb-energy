@@ -79,14 +79,6 @@ public class UserReferralService extends BaseService {
             String oldWallet = newUser.getWalletConnect();
             if (oldWallet != null){
                 if (ndbCoinService.isReferralRecorded(oldWallet,referrer.getWalletConnect())) {
-                    int lockTime = ndbCoinService.lockingTimeRemain(oldWallet);
-                    if (lockTime > 0) {
-                        int p1 = lockTime % 60;
-                        int p2 = lockTime / 60;
-                        int p3 = p2 % 60;
-                        p2 = p2 / 60;
-                        throw new ReferralException("Lock in " + p2 + ":" + p3 + ":" + p1);
-                    }
                     userReferralService.updateReferrerAddress(userId, wallet);
                     return;
                 }
@@ -202,6 +194,14 @@ public class UserReferralService extends BaseService {
     public UpdateReferralAddressResponse updateReferrerAddress(int userId, String current){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
+            int lockTime = ndbCoinService.lockingTimeRemain(referrer.getWalletConnect());
+            if (lockTime > 0) {
+                int p1 = lockTime % 60;
+                int p2 = lockTime / 60;
+                int p3 = p2 % 60;
+                p2 = p2 / 60;
+                throw new ReferralException("Lock in " + p2 + ":" + p3 + ":" + p1);
+            }
             UpdateReferralAddressResponse response = new UpdateReferralAddressResponse();
             response.setReferralWallet(current);
             if (referrer.getWalletConnect()==null){

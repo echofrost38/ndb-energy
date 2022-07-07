@@ -6,3 +6,13 @@ type UserReferral {
     rate: Int,
     commissionRate : [Int]
 }
+
+type ActiveReferralResponse {
+    code: String,
+    referralWallet: String
+}
+
+type UpdateReferralAddressResponse {
+    status: Boolean,
+    referralWallet: String
+}

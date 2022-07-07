@@ -14,14 +14,12 @@ import com.ndb.auction.models.withdraw.Token;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 import com.ndb.auction.service.withdraw.TokenService;
 import com.ndb.auction.web3.WithdrawWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -34,9 +32,6 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 @Component
 public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
-    @Value("${super.phone}")
-    private String superPhone;
-
     private final double BEP20FEE = 1;
     private final double ERC20FEE = 20;
 
@@ -54,9 +49,6 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     @Autowired
     private MailService mailService;
-
-    @Autowired
-    private SMSService smsService;
 
     @Autowired
     private TokenService tokenService;
@@ -137,25 +129,11 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         return res;
     }
 
-    // send confirm withdraw SMS code
-    @PreAuthorize("hasRole('ROLE_SUPER')")
-    public int sendWithdrawConfirmCode() throws IOException, TemplateException {
-        // generate code 
-        String code = totpService.getWithdrawConfirmCode();
-        smsService.sendSMS(superPhone, code);
-        return 1;
-    }
-
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
     @Transactional
-    public int confirmCryptoWithdraw(int id, int status, String deniedReason, String code) throws Exception {
+    public int confirmCryptoWithdraw(int id, int status, String deniedReason) throws Exception {
         
-        if(!totpService.checkWithdrawConfirmCode(code)) {
-            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "2FA");
-        }
-
         var request = (CryptoWithdraw) cryptoWithdrawService.getWithdrawRequestById(id, 1);
         if(request.getStatus() != 0) {
             throw new BalanceException("Already processed.", "amount");

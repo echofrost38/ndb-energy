@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.referral.ActiveReferralResponse;
-import com.ndb.auction.models.referral.TimelockResponse;
 import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
@@ -59,7 +58,7 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public TimelockResponse checkTimeLock() {
+    public int checkTimeLock() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return  referralService.checkTimeLock(userId);

@@ -7,13 +7,6 @@ type UserReferral {
     commissionRate : [Int]
 }
 
-type TimelockResponse {
-    status: Boolean,
-    hours : Int,
-    minutes : Int,
-    seconds : Int
-}
-
 type ActiveReferralResponse {
     code: String,
     referralWallet: String,

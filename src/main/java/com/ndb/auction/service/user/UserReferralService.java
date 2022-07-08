@@ -2,7 +2,6 @@ package com.ndb.auction.service.user;
 
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.referral.ActiveReferralResponse;
-import com.ndb.auction.models.referral.TimelockResponse;
 import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserReferral;
@@ -278,22 +277,10 @@ public class UserReferralService extends BaseService {
         }
     }
 
-    public TimelockResponse checkTimeLock(int userId){
+    public int checkTimeLock(int userId){
         UserReferral referrer = userReferralDao.selectById(userId);
-        TimelockResponse response= new TimelockResponse();
-        response.setStatus(false);
         int lockTime = ndbCoinService.lockingTimeRemain(referrer.getWalletConnect());
-        if (lockTime > 0) {
-            int p1 = lockTime % 60;
-            int p2 = lockTime / 60;
-            int p3 = p2 % 60;
-            p2 = p2 / 60;
-            response.setStatus(true);
-            response.setHours(p2);
-            response.setMinutes(p3);
-            response.setSeconds(p1);
-        }
-        return  response;
+        return  lockTime;
     }
     private String generateCode() {
         String generated = "";

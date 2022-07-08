@@ -12,7 +12,6 @@ extend type Query {
     # Empty value mean referral unavailable .
 	getReferral : UserReferral
 	getReferredUsers : [UserReferralEarning]
-	checkTimeLock : Int
 }
 
 schema {

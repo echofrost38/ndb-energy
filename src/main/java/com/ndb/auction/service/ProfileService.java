@@ -136,7 +136,7 @@ public class ProfileService extends BaseService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set, String hairColor) {
+	public List<AvatarSet> updateAvatarSet(int userId, List<AvatarSet> set, String hairColor, String skinColor) {
 		User user = userDao.selectById(userId);
 		if (user == null) {
 			String msg = messageSource.getMessage("no_user", null, Locale.ENGLISH);
@@ -216,7 +216,10 @@ public class ProfileService extends BaseService {
 
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
-		userAvatar.setHairColor(hairColor);
+		if(!hairColor.isEmpty())
+			userAvatar.setHairColor(hairColor);
+		if(!skinColor.isEmpty()) 
+			userAvatar.setSkinColor(skinColor);
 		
 		userAvatarDao.insertOrUpdate(userAvatar);
 

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -26,7 +28,7 @@ public class LocationController extends BaseController {
     }
 
     @GetMapping("/location")
-    public Object getLocation(HttpServletRequest request) {
+    public Object getLocation(HttpServletRequest request) throws IOException {
         String ip = RemoteIpHelper.getRemoteIpFrom(request);
         HttpSession session = request.getSession(true);
         LocationLog location = (LocationLog) session.getAttribute(SESSION_LOCATION);

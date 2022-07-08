@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.models.referral.ActiveReferralResponse;
+import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -19,26 +21,26 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class ReferralResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
     @PreAuthorize("isAuthenticated()")
-    public boolean changeReferralCommissionWallet(String wallet) throws Exception {
+    public UpdateReferralAddressResponse changeReferralCommissionWallet(String wallet) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         int userId = userDetails.getId();
         var kycStatus = shuftiService.kycStatusCkeck(userId);
 
-        if (kycStatus)
-            return referralService.updateReferrerAddress(userDetails.getId(),wallet);
-        else
-            return false;
+        if(!kycStatus) {
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
+        }
+
+        return  referralService.updateReferrerAddress(userDetails.getId(),wallet);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public String activateReferralCode(String wallet) throws Exception {
+    public ActiveReferralResponse activateReferralCode(String wallet) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         int userId = userDetails.getId();
-        String referralCode = referralService.activateReferralCode(userId,wallet);
-        return referralCode;
-
+        return referralService.activateReferralCode(userId,wallet);
     }
 
     @PreAuthorize("isAuthenticated()")

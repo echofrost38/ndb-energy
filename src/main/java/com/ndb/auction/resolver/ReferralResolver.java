@@ -1,8 +1,11 @@
 package com.ndb.auction.resolver;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.referral.ActiveReferralResponse;
+import com.ndb.auction.models.referral.TimelockResponse;
 import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
 import com.ndb.auction.models.user.UserReferral;
 import com.ndb.auction.models.user.UserReferralEarning;
@@ -22,7 +25,15 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
     public UpdateReferralAddressResponse changeReferralCommissionWallet(String wallet) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return referralService.updateReferrerAddress(userDetails.getId(),wallet);
+        int userId = userDetails.getId();
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+
+        if(!kycStatus) {
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
+        }
+
+        return  referralService.updateReferrerAddress(userDetails.getId(),wallet);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -37,7 +48,21 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
     public UserReferral getReferral() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return referralService.selectById(userId);
+        var kycStatus = shuftiService.kycStatusCkeck(userId);
+
+        if (kycStatus)
+            return referralService.selectById(userId);
+        else {
+            String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
+            throw new UnauthorizedException(msg, "userId");
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public TimelockResponse checkTimeLock() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return  referralService.checkTimeLock(userId);
     }
 
     @PreAuthorize("isAuthenticated()")

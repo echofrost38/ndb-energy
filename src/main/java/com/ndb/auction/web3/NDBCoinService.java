@@ -208,7 +208,7 @@ public class NDBCoinService {
     public boolean isReferralRecorded(String userWallet,String referrerWallet) {
         try {
             String result = ndbReferral.referrers(userWallet).sendAsync().get();
-            if (result.equals(referrerWallet)) return true;
+            if (result.equals(referrerWallet.toLowerCase())) return true;
             else return false;
         } catch (Exception e){
             throw new ReferralException(e.getMessage());

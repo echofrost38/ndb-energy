@@ -199,6 +199,13 @@ public class UserReferralService extends BaseService {
                 String msg = messageSource.getMessage("no_referral", null, Locale.ENGLISH);
                 throw new ReferralException(msg);
             }
+            if (current.equals("0x0000000000000000000000000000000000000000")){
+                NyyuWallet  nyyuWallet =  nyyuWalletDao.selectByUserId(userId);
+                if (nyyuWallet == null )
+                    current = nyyuWalletService.generateBEP20Address(userId);
+                else
+                    current = nyyuWallet.getPublicKey();
+            }
             int lockTime = ndbCoinService.lockingTimeRemain(referrer.getWalletConnect());
             if (lockTime > 0) {
                 int p1 = lockTime % 60;

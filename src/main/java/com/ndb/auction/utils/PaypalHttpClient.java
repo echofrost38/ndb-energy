@@ -58,7 +58,7 @@ public class PaypalHttpClient {
         events.add(batchDenied);
         events.add(orderCompleted);
         Webhook webhook = new Webhook(url, events);
-        createWebhook(webhook);
+//        createWebhook(webhook);
     }
 
     public AccessTokenResponseDTO getAccessToken() throws Exception {

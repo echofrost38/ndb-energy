@@ -41,6 +41,13 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
     }
 
     @PreAuthorize("isAuthenticated()")
+    public int checkTimeLock() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return  referralService.checkTimeLock(userId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     public List<UserReferralEarning> getReferredUsers() {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();

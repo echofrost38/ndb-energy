@@ -50,7 +50,7 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public UserReferral selectByWalletConnect(String wallet) {
-        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=LOWER(?) AND DELETED=0";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;

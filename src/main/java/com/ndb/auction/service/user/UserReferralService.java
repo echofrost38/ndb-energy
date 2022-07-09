@@ -194,6 +194,13 @@ public class UserReferralService extends BaseService {
     public UpdateReferralAddressResponse updateReferrerAddress(int userId, String current){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
+            UserReferral existReferrer = userReferralDao.selectByWalletConnect(current);
+            if (existReferrer!=null){
+                if (existReferrer.getId()!=userId){
+                    String msg = messageSource.getMessage("exist_referral", null, Locale.ENGLISH);
+                    throw new ReferralException(msg);
+                }
+            }
             if (referrer == null){
                 String msg = messageSource.getMessage("no_referral", null, Locale.ENGLISH);
                 throw new ReferralException(msg);

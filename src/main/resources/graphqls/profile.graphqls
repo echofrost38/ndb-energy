@@ -22,7 +22,6 @@ extend type Mutation {
 	updateAvatarSet(
 		components: [AvatarSetInput],
 		hairColor: String
-		skinColor: String
 	) : [AvatarSet]
 	updateKYCSetting(
 		kind: String!,

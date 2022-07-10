@@ -50,22 +50,22 @@ public class UserReferralService extends BaseService {
             List<UserReferral> users = userReferralDao.getAllByReferredByCode(referrer.getReferralCode());
             for (UserReferral item : users) {
                 UserReferralEarning earning = new UserReferralEarning();
-                String name = userAvatarDao.selectById(item.getId()).getName();
-                String prefix = userAvatarDao.selectById(item.getId()).getPrefix();
-                if (name !=null) {
-                    String address= item.getWalletConnect();
+                if (userAvatarDao.selectById(item.getId())!=null) {
+                    String name = userAvatarDao.selectById(item.getId()).getName();
+                    String prefix = userAvatarDao.selectById(item.getId()).getPrefix();
+                        String address = item.getWalletConnect();
 
-                    if (address==null) {
-                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
-                        if (nyyuWallet!=null) address= nyyuWallet.getPublicKey();
-                    }
+                        if (address == null) {
+                            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
+                            if (nyyuWallet != null) address = nyyuWallet.getPublicKey();
+                        }
 
-                    if (address != null) {
-                        double amount = ndbCoinService.getUserEarning(address);
-                        earning.setAmount(amount);
-                    }
-                    earning.setName(String.join(".",prefix,name));
-                    list.add(earning);
+                        if (address != null) {
+                            double amount = ndbCoinService.getUserEarning(address);
+                            earning.setAmount(amount);
+                        }
+                        earning.setName(String.join(".", prefix, name));
+                        list.add(earning);
                 }
             }
         }

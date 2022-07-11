@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 import javax.annotation.PostConstruct;
 
 import com.ndb.auction.config.Web3jConfig;
-import com.ndb.auction.contracts.NDBreferral;
+import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.schedule.ScheduledTasks;
@@ -68,7 +68,7 @@ public class NDBCoinService {
 
     private Credentials ndbCredential;
     private NDBcoinV4 ndbToken;
-    private NDBreferral ndbReferral;
+    private NDBReferral ndbReferral;
     private FastRawTransactionManager txMananger;
 
     private Web3j BEP20NET = Web3j.build(new HttpService(bscNetwork));
@@ -114,7 +114,7 @@ public class NDBCoinService {
         Credentials credentialReferral = Credentials.create(dynamicKey);
         referralKeyQueue.add(dynamicKey);
         FastRawTransactionManager txManangerReferral = new FastRawTransactionManager(BEP20NET, credentialReferral, bscChainId);
-        ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txManangerReferral, gasPrice, gasLimit);
+        ndbReferral = NDBReferral.load(ndbReferralContract, BEP20NET, txManangerReferral, gasPrice, gasLimit);
     }
 
     public BigInteger getBalanceOf(String wallet){
@@ -200,7 +200,7 @@ public class NDBCoinService {
 
     @SuppressWarnings("deprecation")
     public boolean isActiveReferrer(String referrer) throws ExecutionException, InterruptedException {
-        Tuple2<BigInteger, BigInteger> result = ndbReferral.referredUsers(referrer).sendAsync().get();
+        Tuple2<BigInteger, BigInteger> result = ndbReferral.referrerDetails(referrer).sendAsync().get();
         if (result.getValue1().intValue() > 0)
             return true;
         else
@@ -209,7 +209,7 @@ public class NDBCoinService {
 
     public boolean isReferralRecorded(String userWallet,String referrerWallet) {
         try {
-            String result = ndbReferral.referrers(userWallet).sendAsync().get();
+            String result = ndbReferral.referrersByUser(userWallet).sendAsync().get();
             if (result.equals(referrerWallet.toLowerCase())) return true;
             else return false;
         } catch (Exception e){

@@ -19,5 +19,4 @@ public class UserReferral extends BaseModel {
     private int[] commissionRate;
     private String paidTxn;
     private boolean active;
-    private boolean record;
 }

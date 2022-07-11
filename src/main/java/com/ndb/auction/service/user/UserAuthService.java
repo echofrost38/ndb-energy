@@ -27,7 +27,7 @@ public class UserAuthService extends BaseService {
 	@Autowired
 	PasswordEncoder encoder;
 	
-    public boolean verifyAccount(String email, String code) {
+    public boolean verifyAccount(String email, String code,String referredByCode) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
 			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
@@ -44,6 +44,11 @@ public class UserAuthService extends BaseService {
 			userVerify.setId(user.getId());
 			userVerify.setEmailVerified(true);
 			userVerifyDao.insert(userVerify);
+
+			// create BEP20 wallet
+			var nyyuWallet = nyyuWalletService.generateBEP20Address(user.getId());
+			// create referral
+			userReferralService.createNewReferrer(user.getId(), referredByCode, nyyuWallet);
 
 			if (devMode.equals("development")) {
 				int usdtId = tokenAssetService.getTokenIdBySymbol("USDT");

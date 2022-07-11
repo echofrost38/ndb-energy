@@ -216,8 +216,10 @@ public class ProfileService extends BaseService {
 
 		userAvatar.setPurchased(gson.toJson(purchasedMap));
 		userAvatar.setSelected(gson.toJson(set));
-		userAvatar.setHairColor(hairColor);
-		userAvatar.setSkinColor(skinColor);
+		if(!hairColor.isEmpty())
+			userAvatar.setHairColor(hairColor);
+		if(!skinColor.isEmpty()) 
+			userAvatar.setSkinColor(skinColor);
 		
 		userAvatarDao.insertOrUpdate(userAvatar);
 

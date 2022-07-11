@@ -7,8 +7,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +14,11 @@ import javax.annotation.PostConstruct;
 import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBreferral;
 import com.ndb.auction.contracts.NDBcoinV4;
+import com.ndb.auction.dao.oracle.wallet.NyyuDepositDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.models.wallet.NyyuDeposit;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import com.ndb.auction.service.TokenAssetService;
@@ -57,11 +59,14 @@ public class NDBCoinService {
     @Value("${pancakev2.rpc}")
     private String pancakev2RPC;
 
-    @Value("${ndb.referral.privKey}")
-    private String[] referralPrivKey;
-
     @Autowired
     private ScheduledTasks schedule;
+
+    @Autowired
+    private NyyuWalletDao nyyuWalletDao;
+
+    @Autowired
+    private NyyuDepositDao nyyuDepositDao;
 
     @Autowired
     public TokenAssetService tokenAssetService;
@@ -80,8 +85,7 @@ public class NDBCoinService {
     private final double multipler = 10000.0;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    Queue<String> referralKeyQueue = new LinkedList<>();
-
+    
     @SuppressWarnings("deprecation")
     @PostConstruct
     public void init()  {
@@ -92,11 +96,7 @@ public class NDBCoinService {
             ndbCredential = Credentials.create(ndbKey);
             txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
             ndbToken = NDBcoinV4.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
-
-            for (String item : referralPrivKey){
-                referralKeyQueue.add(item);
-            }
-            setKeyBeforeExcuteTransaction();
+            ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txMananger, gasPrice, gasLimit);
             ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
                     .subscribe(event -> {
                         handleEvent(event);
@@ -106,15 +106,6 @@ public class NDBCoinService {
         } catch (Exception ex){
             System.out.println("INIT WEB3 : " + ex.getMessage());
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    private void setKeyBeforeExcuteTransaction(){
-        var dynamicKey= referralKeyQueue.poll();
-        Credentials credentialReferral = Credentials.create(dynamicKey);
-        referralKeyQueue.add(dynamicKey);
-        FastRawTransactionManager txManangerReferral = new FastRawTransactionManager(BEP20NET, credentialReferral, bscChainId);
-        ndbReferral = NDBreferral.load(ndbReferralContract, BEP20NET, txManangerReferral, gasPrice, gasLimit);
     }
 
     public BigInteger getBalanceOf(String wallet){
@@ -131,6 +122,18 @@ public class NDBCoinService {
         // create new withdraw transaction record
         BigInteger blockNumber = event.log.getBlockNumber();
         String txnHash = event.log.getTransactionHash();
+        Double amount = event.value.divide(decimals).doubleValue();
+        // withdrawService.updateTxn(from, to, value, blockNumber.toString(), txnHash);
+        NyyuWallet nyyuWallet= nyyuWalletDao.selectByAddress(event.to);
+        if (nyyuWallet!=null){
+            NyyuDeposit deposit = new NyyuDeposit();
+            deposit.setUserId(nyyuWallet.getUserId());
+            deposit.setTxnHash(event.log.getTransactionHash());
+            deposit.setAmount(amount);
+            deposit.setWalletAddress(event.to);
+            nyyuDepositDao.insert(deposit);
+            // Sync NDB balance between Nyyu wallet and NDB internal balance
+        }
 
         // add to unconfirmed list
         schedule.addPendingTxn(txnHash, blockNumber);
@@ -139,7 +142,6 @@ public class NDBCoinService {
 
     public String activeReferrer(String address , Double rate){
         try {
-            setKeyBeforeExcuteTransaction();
             BigInteger _rate = BigInteger.valueOf(rate.longValue());
             TransactionReceipt receipt = ndbReferral.activeReferrer(address,_rate).send();
             return receipt.getTransactionHash();
@@ -159,7 +161,6 @@ public class NDBCoinService {
 
     public String recordReferral(String user , String referrer){
         try {
-            setKeyBeforeExcuteTransaction();
             TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
@@ -169,7 +170,7 @@ public class NDBCoinService {
 
     public int lockingTimeRemain(String userAddress){
         try {
-            int lockingTime = ndbReferral.lockingTimeRemain(userAddress).send().intValue();
+            int lockingTime= ndbReferral.lockingTimeRemain(userAddress).send().intValue();
             return lockingTime;
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
@@ -178,7 +179,6 @@ public class NDBCoinService {
 
     public String updateReferrerRate(String referrer , Double rate){
         try {
-            setKeyBeforeExcuteTransaction();
             BigInteger _rate = BigInteger.valueOf(rate.longValue());
             TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer,_rate).send();
             return receipt.getTransactionHash();
@@ -187,11 +187,9 @@ public class NDBCoinService {
         }
     }
 
-    public String updateReferrer(String old, String current){
+    public String updateReferrer(String old , String current){
         try {
-            setKeyBeforeExcuteTransaction();
-            TransactionReceipt receipt = ndbReferral.updateReferrer(old, current).send();
-            System.out.println(referralKeyQueue);
+            TransactionReceipt receipt = ndbReferral.updateReferrer(old,current).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
@@ -201,7 +199,7 @@ public class NDBCoinService {
     @SuppressWarnings("deprecation")
     public boolean isActiveReferrer(String referrer) throws ExecutionException, InterruptedException {
         Tuple2<BigInteger, BigInteger> result = ndbReferral.referredUsers(referrer).sendAsync().get();
-        if (result.getValue1().intValue() > 0)
+        if (result.getValue1().intValue()>0)
             return true;
         else
             return false;

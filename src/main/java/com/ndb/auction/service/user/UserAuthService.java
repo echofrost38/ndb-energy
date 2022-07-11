@@ -14,6 +14,7 @@ import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.service.BaseService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,12 @@ import freemarker.template.TemplateException;
 
 @Service
 public class UserAuthService extends BaseService {
-	
+	@Value("${mode}")
+	protected String devMode;
 	@Autowired
 	PasswordEncoder encoder;
 	
-    public boolean verifyAccount(String email, String code) {
+    public boolean verifyAccount(String email, String code,String referredByCode) {
 		User user = userDao.selectByEmail(email);
 		if (user == null) {
 			String msg = messageSource.getMessage("unregistered_email", null, Locale.ENGLISH);
@@ -42,6 +44,16 @@ public class UserAuthService extends BaseService {
 			userVerify.setId(user.getId());
 			userVerify.setEmailVerified(true);
 			userVerifyDao.insert(userVerify);
+
+			// create BEP20 wallet
+			var nyyuWallet = nyyuWalletService.generateBEP20Address(user.getId());
+			// create referral
+			userReferralService.createNewReferrer(user.getId(), referredByCode, nyyuWallet);
+
+			if (devMode.equals("development")) {
+				int usdtId = tokenAssetService.getTokenIdBySymbol("USDT");
+				balanceDao.addFreeBalance(user.getId(), usdtId, 2000);
+			}
 
 			// add internal balance
 			int ndbId = tokenAssetService.getTokenIdBySymbol("NDB");

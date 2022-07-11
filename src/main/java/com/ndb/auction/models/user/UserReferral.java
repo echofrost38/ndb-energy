@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Builder
 public class UserReferral extends BaseModel {
+
     private String referralCode;
     private String referredByCode;
     private String walletConnect;
@@ -18,5 +19,4 @@ public class UserReferral extends BaseModel {
     private int[] commissionRate;
     private String paidTxn;
     private boolean active;
-    private boolean record;
 }

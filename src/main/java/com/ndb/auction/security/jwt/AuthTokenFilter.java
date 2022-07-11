@@ -29,6 +29,8 @@ import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserDetailsServiceImpl;
 import com.ndb.auction.utils.RemoteIpHelper;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -70,6 +72,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             HttpSession session = request.getSession(false);
             String ipFromSession;
             String ip = RemoteIpHelper.getRemoteIpFrom(request);
+            log.info("ip address: {}", ip);
             if (session == null || (ipFromSession = (String) session.getAttribute(SESSION_IP)) == null
                     || !ip.equals(ipFromSession)) {
 

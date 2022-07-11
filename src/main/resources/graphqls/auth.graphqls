@@ -1,6 +1,6 @@
 type Mutation {
   signup(email: String!, password: String!, country: String!,referredByCode: String): String!
-  verifyAccount(email: String!, code: String!, referredByCode: String!): String!
+  verifyAccount(email: String!, code: String!): String!
   resendVerifyCode(email: String): String!
   request2FA(email: String!, method: String!, phone: String): String!
   disable2FA(method: String!): String!

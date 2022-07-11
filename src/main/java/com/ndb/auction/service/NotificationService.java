@@ -14,7 +14,6 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -50,12 +49,9 @@ public class NotificationService {
     @Autowired
     public MailService mailService;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
     public Map<String, Integer> getTypeMap() {
         return this.typeMap;
-    }
+    } 
 
     public Notification setNotificationRead(int nId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
@@ -75,12 +71,11 @@ public class NotificationService {
     public void sendNotification(int userId, int type, String title, String msg) {
         User user = userDao.selectById(userId);
 
-        if ((user.getNotifySetting() & (0x01 << type)) == 0) {
+        if((user.getNotifySetting() & (0x01 << type)) == 0) {
             return;
         }
 
         addNewNotification(userId, type, title, msg);
-
         // send SMS, Email, Notification here
         try {
             smsService.sendNormalSMS(user.getPhone(), title + "\n" + msg);
@@ -94,15 +89,13 @@ public class NotificationService {
     }
 
     public void broadcastNotification(int type, String title, String msg) {
-        Notification m = new Notification(0, type, title, msg);
+        Notification m = new Notification( 0, type, title, msg);
         broadcastNotification.addNotification(m);
     }
 
     public Notification addNewNotification(int userId, int type, String title, String msg) {
         Notification notification = new Notification(userId, type, title, msg);
-        var result = notificationDao.addNewNotification(notification);
-        simpMessagingTemplate.convertAndSend("/ws/notify/" + userId, result);
-        return result;
+        return notificationDao.addNewNotification(notification);
     }
 
     public List<Notification> getPaginatedNotifications(int userId, Integer offset, Integer limit) {

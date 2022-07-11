@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigInteger;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/")
 public class NyyuPayController extends BaseController{
-    private final BigInteger bDecimal = new BigInteger("1000000000000");
 
     @Value("${nyyupay.pubKey}")
     private String PUBLIC_KEY;
@@ -44,9 +42,7 @@ public class NyyuPayController extends BaseController{
             String hmac = buildHmacSignature(payload, PRIVATE_KEY);
             if (reqHeader.get("x-auth-key").equals(PUBLIC_KEY) && reqHeader.get("x-auth-token").equals(hmac)){
                 System.out.println("NYYU PAY CALLBACK BODY: " + reqQuery);
-                System.out.println("x-auth-key: " + reqHeader.get("x-auth-key"));
-                System.out.println("x-auth-token: " + reqHeader.get("x-auth-token"));
-                System.out.println("x-auth-token: " + reqHeader.get("x-auth-ts"));
+                
                 //New deposit
                 int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
                 int userId = nyyuWalletService.selectByAddress(response.getAddress()).getUserId();

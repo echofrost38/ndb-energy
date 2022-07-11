@@ -23,7 +23,7 @@ public class UserReferralDao extends BaseOracleDao {
         m.setReferralCode(rs.getString("REFERRAL_CODE"));
         m.setReferredByCode(rs.getString("REFERRED_BY_CODE"));
         m.setWalletConnect(rs.getString("WALLET_CONNECT"));
-        m.setPaidTxn(rs.getString("PAID_TXN"));
+        m.setRecord(rs.getBoolean("RECORD"));
         m.setActive(rs.getBoolean("ACTIVE"));
         m.setDeleted(rs.getInt("DELETED"));
         m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
@@ -50,7 +50,7 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public UserReferral selectByWalletConnect(String wallet) {
-        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=LOWER(?) AND DELETED=0";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
@@ -67,9 +67,9 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public int insert(UserReferral m) {
-        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect());
+        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(),m.isActive());
     }
 
     public int insertOrUpdate(UserReferral m) {
@@ -85,13 +85,8 @@ public class UserReferralDao extends BaseOracleDao {
         return jdbcTemplate.update(sql, walletConnect, id);
     }
 
-    public int updatePaidCommissionTxn(String txn, String referralCode,String referredByCode) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET PAID_TXN=? WHERE REFERRAL_CODE=? AND REFERRED_BY_CODE=?";
-        return jdbcTemplate.update(sql, txn, referralCode,referredByCode);
-    }
-
-    public int setReferralStatus(int id ,boolean status) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET ACTIVE=? WHERE ID=?";
+    public int setReferralRecordOnchain(int id ,boolean status) {
+        String sql = "UPDATE TBL_USER_REFERRAL SET RECORD=? WHERE ID=?";
         return jdbcTemplate.update(sql, status, id);
     }
 
@@ -126,7 +121,7 @@ public class UserReferralDao extends BaseOracleDao {
 //    }
 
     public List<UserReferral> getAllByReferredByCode(String referredByCode) {
-        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND RECORD=1 AND DELETED=0";
         return jdbcTemplate.query(sql, new RowMapper<UserReferral>() {
             @Override
             public UserReferral mapRow(ResultSet rs, int rownumber) throws SQLException {

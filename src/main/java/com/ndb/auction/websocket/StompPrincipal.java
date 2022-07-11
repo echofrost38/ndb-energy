@@ -9,20 +9,10 @@ import java.util.Map;
 
 public class StompPrincipal implements Principal {
 
-    @Getter
     private String name;
-
-    @Getter
-    @Setter
-    private String email;
 
     public StompPrincipal(String name) {
         this.name = name;
-    }
-
-    public StompPrincipal(String name, String email) {
-        this.name = name;
-        this.email = email;
     }
 
     @Override

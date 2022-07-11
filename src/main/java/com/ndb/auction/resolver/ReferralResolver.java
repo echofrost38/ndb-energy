@@ -22,7 +22,7 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
     public UpdateReferralAddressResponse changeReferralCommissionWallet(String wallet) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return referralService.updateReferrerAddress(userDetails.getId(),wallet);
+        return referralService.updateReferrerAddress(userDetails.getId(), wallet);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -30,7 +30,7 @@ public class ReferralResolver extends BaseResolver implements GraphQLQueryResolv
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         int userId = userDetails.getId();
-        return referralService.activateReferralCode(userId,wallet);
+        return referralService.activateReferralCode(userId, wallet);
     }
 
     @PreAuthorize("isAuthenticated()")

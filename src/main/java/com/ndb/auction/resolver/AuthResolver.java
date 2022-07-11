@@ -40,8 +40,8 @@ public class AuthResolver extends BaseResolver
 		return userService.createUser(lowerEmail(email), password, country,referredByCode);
 	}
 
-	public String verifyAccount(String email, String code, String referredByCode) {
-		if (userAuthService.verifyAccount(lowerEmail(email), code,referredByCode)) {
+	public String verifyAccount(String email, String code) {
+		if (userAuthService.verifyAccount(lowerEmail(email), code)) {
 			return "Success";
 		}
 		return "Failed";

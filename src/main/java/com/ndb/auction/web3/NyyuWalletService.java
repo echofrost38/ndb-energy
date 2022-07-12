@@ -6,6 +6,7 @@ import com.ndb.auction.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.*;
 
 @Service
@@ -18,6 +19,8 @@ public class NyyuWalletService extends BaseService {
     private  String password;
     @Value("${bsc.json.chainid}")
     private String chainId;
+
+    @Transactional
     public String generateBEP20Address(int userId) {
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
@@ -29,12 +32,12 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setPublicKey(address);
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork(chainId);
+            nyyuWalletDao.insertOrUpdate(nyyuWallet);
             
             nyyuPayService.sendAddressRequest(nyyuWallet.getPublicKey());
             
             System.out.println("Private key: " + keyPair.getPrivateKey().toString(16));
             System.out.println("Account: " + address);
-            nyyuWalletDao.insertOrUpdate(nyyuWallet);
             return address;
         } catch(Exception e) {
             System.err.println("Error: " + e.getMessage());

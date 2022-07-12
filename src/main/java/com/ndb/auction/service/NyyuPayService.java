@@ -3,8 +3,9 @@ package com.ndb.auction.service;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.nyyupay.NyyuPayRequest;
 import com.ndb.auction.models.wallet.NyyuWallet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,12 +24,18 @@ public class NyyuPayService extends BaseService{
     private String PRIVATE_KEY;
 
     private WebClient nyyuPayAPI;
-    protected CloseableHttpClient client;
+    protected WebClient.Builder client;
+    
+    
     public NyyuPayService(WebClient.Builder webClientBuilder) {
-        client = HttpClients.createDefault();
-        this.nyyuPayAPI = webClientBuilder
-                .baseUrl(BASE_URL)
-                .build();
+        this.client = webClientBuilder;                
+    }
+
+    @PostConstruct
+    public void init() {
+        this.nyyuPayAPI = this.client
+            .baseUrl(BASE_URL)
+            .build();
     }
 
     // This function need improve ==> async
@@ -37,28 +44,26 @@ public class NyyuPayService extends BaseService{
             NyyuPayRequest request = new NyyuPayRequest();
             request.setAddress(wallet);
             NyyuWallet nyyuWallet = nyyuWalletDao.selectByAddress(wallet);
-            sendNyyuPayRequest(request).subscribe(
-                    i -> {
-                        nyyuWallet.setNyyuPayRegistered(true);
-                        nyyuWalletDao.insertOrUpdate(nyyuWallet);
-                        System.out.println("Nyyu Pay response: " + i);
-                    },
-                    error -> {
-                        nyyuWallet.setNyyuPayRegistered(false);
-                        nyyuWalletDao.insertOrUpdate(nyyuWallet);
-                        System.out.println("Request to Nyyu pay has error :" + error +" from wallet " + nyyuWallet.getPublicKey()) ;
-                        throw new ReferralException("Cannot register wallet address");
-                    },
-                    () -> System.out.println("Done")
-            );
+            var response = sendNyyuPayRequest(request); 
+            if(response == null) {
+                nyyuWallet.setNyyuPayRegistered(false);
+                nyyuWalletDao.insertOrUpdate(nyyuWallet);
+                System.out.println("Request to Nyyu pay has error");
+                throw new ReferralException("Cannot register wallet address");
+            } else {
+                nyyuWallet.setNyyuPayRegistered(true);
+                nyyuWalletDao.insertOrUpdate(nyyuWallet);
+                System.out.println("Nyyu Pay response: " + response);
+            }
         } catch(Exception e){
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw new ReferralException("Cannot register wallet address");
         }
         return "sent request";
     }
 
     //// WebClient
-    private Mono<String> sendNyyuPayRequest(NyyuPayRequest request) {
+    private String sendNyyuPayRequest(NyyuPayRequest request) {
         long ts = System.currentTimeMillis() / 1000L;
         String payload = String.valueOf(ts) +"POST"+"{\"address\":\""+request.getAddress()+"\"}";
         String hmac = buildHmacSignature(payload, PRIVATE_KEY);
@@ -70,6 +75,7 @@ public class NyyuPayService extends BaseService{
                 .header("X-Auth-Ts",  String.valueOf(ts))
                 .body(Mono.just(request), NyyuPayRequest.class)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .block();
     }
 }

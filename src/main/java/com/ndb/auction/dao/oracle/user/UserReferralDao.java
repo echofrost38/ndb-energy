@@ -68,7 +68,7 @@ public class UserReferralDao extends BaseOracleDao {
 
     public int insert(UserReferral m) {
         String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, RECORD, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,?,0,SYSDATE,SYSDATE)";
+                + "VALUES(?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
         return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(),m.isActive(), m.isRecord());
     }
 

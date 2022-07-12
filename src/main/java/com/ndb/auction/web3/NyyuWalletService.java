@@ -29,10 +29,12 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setPublicKey(address);
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork(chainId);
-            nyyuWalletDao.insertOrUpdate(nyyuWallet);
+            
             nyyuPayService.sendAddressRequest(nyyuWallet.getPublicKey());
+            
             System.out.println("Private key: " + keyPair.getPrivateKey().toString(16));
             System.out.println("Account: " + address);
+            nyyuWalletDao.insertOrUpdate(nyyuWallet);
             return address;
         } catch(Exception e) {
             System.err.println("Error: " + e.getMessage());

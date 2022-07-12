@@ -1,5 +1,6 @@
 package com.ndb.auction.service;
 
+import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.nyyupay.NyyuPayRequest;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -12,7 +13,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class NyyuPayService extends BaseService{
     // NyyuPay URL
-    private static final String BASE_URL = "https://api.dev.pay.nyyu.io/bep20";
+    @Value("${nyyupay.base}")
+    private String BASE_URL;
 
     @Value("${nyyupay.pubKey}")
     private String PUBLIC_KEY;
@@ -45,6 +47,7 @@ public class NyyuPayService extends BaseService{
                         nyyuWallet.setNyyuPayRegistered(false);
                         nyyuWalletDao.insertOrUpdate(nyyuWallet);
                         System.out.println("Request to Nyyu pay has error :" + error +" from wallet " + nyyuWallet.getPublicKey()) ;
+                        throw new ReferralException("Cannot register wallet address");
                     },
                     () -> System.out.println("Done")
             );

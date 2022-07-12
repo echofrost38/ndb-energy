@@ -47,11 +47,11 @@ public class NotificationDao extends BaseOracleDao {
 		}, userId);
 	}
 
-	public void pushNewNotifications(List<Notification> list) {
-		for (Notification m : list) {
-			addNewNotification(m);
-		}
-	}
+//	public void pushNewNotifications(List<Notification> list) {
+//		for (Notification m : list) {
+//			addNewNotification(m);
+//		}
+//	}
 
 	public Notification addNewNotification(Notification m) {
 		String sql = "INSERT INTO TBL_NOTIFICATION(ID, USER_ID, TIMESTAMP, N_TYPE, READ, TITLE, MSG)"

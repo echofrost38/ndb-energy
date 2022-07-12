@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;

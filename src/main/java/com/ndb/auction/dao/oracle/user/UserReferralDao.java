@@ -75,9 +75,9 @@ public class UserReferralDao extends BaseOracleDao {
     public int insertOrUpdate(UserReferral m) {
         String sql =  "MERGE INTO TBL_USER_REFERRAL USING DUAL ON (ID=?)"
                 + "WHEN MATCHED THEN UPDATE SET WALLET_CONNECT= ? "
-                + "WHEN NOT MATCHED THEN INSERT (ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(),m.getWalletConnect(),m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect());
+                + "WHEN NOT MATCHED THEN INSERT (ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(),m.getWalletConnect(),m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(), m.isActive());
     }
 
     public int updateWalletConnect(int id, String walletConnect) {

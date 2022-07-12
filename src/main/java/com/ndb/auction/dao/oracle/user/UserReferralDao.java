@@ -67,9 +67,9 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public int insert(UserReferral m) {
-        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
+        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, RECORD, DELETED, REG_DATE, UPDATE_DATE)"
                 + "VALUES(?,?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(),m.isActive());
+        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(),m.isActive(), m.isRecord());
     }
 
     public int insertOrUpdate(UserReferral m) {
@@ -94,31 +94,6 @@ public class UserReferralDao extends BaseOracleDao {
         String sql = "UPDATE TBL_USER_REFERRAL SET REFERRAL_CODE = ?, REFERRED_BY_CODE = ?, WALLET_CONNECT= ? WHERE ID = ?";
         return jdbcTemplate.update(sql, m.getReferralCode(), m.getReferredByCode(), m.getWalletConnect(),m.getId());
     }
-//    public int insertOrUpdate(UserAvatar m) {
-//        String sql = "MERGE INTO TBL_USER_REFERRAL USING DUAL ON (ID=?)"
-//                + "WHEN MATCHED THEN UPDATE SET PURCHASED=?, HAIR_COLOR=?,SKIN_COLOR=?, SELECTED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE "
-//                + "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, HAIR_COLOR,SKIN_COLOR, SELECTED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
-//                + "VALUES(?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-//        return jdbcTemplate.update(sql, m.getId(), m.getPurchased(),m.getHairColor(), m.getSkinColor(), m.getSelected(), m.getPrefix(), m.getName(), m.getId(),
-//                m.getPurchased(),m.getHairColor(), m.getSkinColor(), m.getSelected(), m.getPrefix(), m.getName());
-//    }
-
-//    public int insert(UserReferral m) {
-//        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, USER_ID, REFERRAL_CODE, REFERRED_BY_CODE, DELETED, REG_DATE, UPDATE_DATE)"
-//                + "VALUES(SEQ_USER_DETAIL.NEXTVAL,?,?,0,SYSDATE,SYSDATE)";
-//        KeyHolder keyHolder = new GeneratedKeyHolder();
-//        jdbcTemplate.update(
-//                connection -> {
-//                    PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
-//                    int i = 1;
-//                    ps.setLong(i++, m.getUserId());
-//                    ps.setString(i++, m.getReferralCode());
-//                    ps.setString(i++, m.getReferredByCode());
-//                    return ps;
-//                }, keyHolder);
-//        m.setId(keyHolder.getKey().intValue());
-//        return m;
-//    }
 
     public List<UserReferral> getAllByReferredByCode(String referredByCode) {
         String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND RECORD=1 AND DELETED=0";

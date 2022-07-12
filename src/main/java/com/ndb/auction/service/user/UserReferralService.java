@@ -115,6 +115,7 @@ public class UserReferralService extends BaseService {
             referral.setWalletConnect(walletAddress);
             referral.setReferralCode("");
             referral.setReferredByCode(referredByCode);
+            referral.setRecord(true);   
             userReferralDao.insert(referral);
             return referral;
         } catch (Exception e){
@@ -143,6 +144,8 @@ public class UserReferralService extends BaseService {
                 referral.setReferralCode(generateCode());
                 referral.setReferredByCode("");
                 referral.setWalletConnect(wallet);
+            } else if ( referral.isRecord() ) {
+                referral.setReferralCode(generateCode());
             }
             
             User user = userDao.selectById(userId) ;
@@ -155,7 +158,7 @@ public class UserReferralService extends BaseService {
                     referral.setActive(true);
                     userReferralDao.insertOrUpdate(referral);
                 }
-            }
+            } 
            
             return ActiveReferralResponse.builder()
                 .code(referral.getReferralCode())

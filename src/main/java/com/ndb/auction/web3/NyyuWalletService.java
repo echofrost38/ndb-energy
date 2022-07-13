@@ -45,6 +45,10 @@ public class NyyuWalletService extends BaseService {
         }
     }
 
+    public NyyuWallet selectByUserId(int userId) {
+        return nyyuWalletDao.selectByUserId(userId);
+    }
+
     public NyyuWallet selectByAddress(String address){
         return nyyuWalletDao.selectByAddress(address);
     }

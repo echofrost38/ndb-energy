@@ -16,6 +16,7 @@ import com.ndb.auction.models.presale.PresaleOrderPayments;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserReferralService;
 import com.ndb.auction.utils.Utilities;
+import com.ndb.auction.web3.NyyuWalletService;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -25,6 +26,9 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
     
     @Autowired
     private UserReferralService userReferralService;
+
+    @Autowired
+    private NyyuWalletService nyyuWalletService;
     
     /*
      * @params
@@ -65,8 +69,6 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         // it is applied only for invited users
         var referral = userReferralService.selectById(userId);
         if(referral != null && referral.getReferredByCode() != null) {
-            var referredCode = referral.getReferredByCode();
-            
             
             // check destination wallet
             if(referral.getTarget() != destination) {
@@ -80,7 +82,14 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
                 }
 
                 // change wallet
-                
+                var currentAddr = referral.getWalletConnect();
+                var newAddr = extAddr;
+                if(destination == 1) {
+                    // get Nyyu wallet
+                    var nyyuWallet = nyyuWalletService.selectByUserId(userId);
+                    newAddr = nyyuWallet.getPublicKey();
+                } 
+                userReferralService.changeReferralWallet(userId, destination, currentAddr, newAddr);
             }
         }
 

@@ -1,7 +1,6 @@
 package com.ndb.auction.websocket;
 
 import com.ndb.auction.service.PresaleOrderService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;

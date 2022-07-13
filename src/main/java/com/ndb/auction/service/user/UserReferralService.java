@@ -1,5 +1,6 @@
 package com.ndb.auction.service.user;
 
+import com.ndb.auction.exceptions.PreSaleException;
 import com.ndb.auction.exceptions.ReferralException;
 import com.ndb.auction.models.referral.ActiveReferralResponse;
 import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
@@ -78,21 +79,6 @@ public class UserReferralService extends BaseService {
 
     public int insert(UserReferral m) {
         return userReferralDao.insert(m);
-    }
-
-    public void handleReferralOnPreSaleOrder(int userId,String wallet){
-        try {
-            UserReferral buyerReferral = userReferralDao.selectById(userId);
-            if (buyerReferral==null) return;
-            String referredByCode = buyerReferral.getReferredByCode();
-            if (referredByCode == null) return;
-            String oldWallet = buyerReferral.getWalletConnect();
-            if (oldWallet.equals(wallet)) return ;
-
-            userReferralService.updateReferrerAddress(userId, wallet);
-        } catch(Exception ex){
-            throw new ReferralException(ex.getMessage());
-        }
     }
 
     public UserReferral createNewReferrer(int userId,String referredByCode, String walletAddress){
@@ -229,6 +215,14 @@ public class UserReferralService extends BaseService {
             throw new ReferralException(e.getMessage());
 
         }
+    }
+
+    public int changeReferralWallet(int userId, int target, String prevAddr, String newAddr) {
+        var hash = ndbCoinService.updateReferrer(prevAddr, newAddr);
+        if(hash == null) {
+            throw new PreSaleException("Cannot use current wallet as destination", "destination");
+        }
+        return userReferralDao.updateWalletConnect(userId, target, newAddr);
     }
 
     public boolean updateCommissionRate(int userId, int tierLevel){

@@ -21,7 +21,7 @@ import freemarker.template.TemplateException;
 
 @Service
 public class UserAuthService extends BaseService {
-	
+
 	@Autowired
 	PasswordEncoder encoder;
 	
@@ -33,7 +33,7 @@ public class UserAuthService extends BaseService {
 		}
 
 		if (!totpService.checkVerifyCode(email, code)) {
-			String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
+			String msg = messageSource.getMessage("not_verified", null, Locale.ENGLISH);
 			throw new UserNotFoundException(msg, "email");
 		}
 

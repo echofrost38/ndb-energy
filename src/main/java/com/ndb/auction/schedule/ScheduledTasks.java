@@ -37,6 +37,12 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -96,7 +102,7 @@ public class ScheduledTasks {
 	private Long readyPresaleCounter;
 
 	private final AmazonS3 s3;
-	private final static String bucketName = "nyyu-dev-backup";
+	private final static String bucketName = "nyyu-live-backup";
 	// check transaction
 	private Map<String, BigInteger> pendingTransactions;
 
@@ -218,6 +224,7 @@ public class ScheduledTasks {
 		this.startedPresale = presale;
 		this.startedPresaleCounter = presale.getEndedAt() - System.currentTimeMillis();
 		this.startedPresaleCounter /= 1000;
+		log.info("Started Presale Counter: {}", this.startedPresaleCounter);
 	}
 
 	@Scheduled(fixedRate = 1000)
@@ -300,24 +307,23 @@ public class ScheduledTasks {
 		}
 	}
 
-	// private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
-	// 	try (OutputStream outputStream = Files.newOutputStream(outputFile);
-	// 		GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
-	// 		TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
+	private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
+		try (OutputStream outputStream = Files.newOutputStream(outputFile);
+			GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
+			TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
 	
-	// 		for (Path inputFile : inputFiles) {
-	// 			TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
-	// 			tarOut.putArchiveEntry(entry);
-	// 			Files.copy(inputFile, tarOut);
-	// 			tarOut.closeArchiveEntry();
-	// 		}
+			for (Path inputFile : inputFiles) {
+				TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
+				tarOut.putArchiveEntry(entry);
+				Files.copy(inputFile, tarOut);
+				tarOut.closeArchiveEntry();
+			}
 	
-	// 		tarOut.finish();
-	// 	}
-	// }
+			tarOut.finish();
+		}
+	}
 
-	/**
-	@Scheduled(fixedRate = 1000 * 60 * 60 * 6)
+	@Scheduled(fixedRate = 1000 * 60 * 60)
 	public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
 		// get ready for datetime
 		log.info("Started backup..");
@@ -428,10 +434,10 @@ public class ScheduledTasks {
 		metadata.setContentLength(tar.length());
 
 		try {
-			// s3.putObject(bucketName, tarName, inputStream, metadata);
+			s3.putObject(bucketName, tarName, inputStream, metadata);
 			
 			// sending email
-			// mailService.sendBackupEmail(superAdmins, userFileName);
+			mailService.sendBackupEmail(superAdmins, userFileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -442,6 +448,6 @@ public class ScheduledTasks {
 		// delete local files
 		log.info("Uploaded");
 	}
-	 */
+	 
 
 }

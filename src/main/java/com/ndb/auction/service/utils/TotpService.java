@@ -98,34 +98,6 @@ public class TotpService {
 		 return code;
 	 }
 
-	 public String getWithdrawConfirmCode() {
-		String key = "WITHDRAW_CONFIRM";
-		String code = generateOTP(key);
-		try {
-			String existing = withdrawCache.get(key);	
-			if(existing == null) {
-				withdrawCache.put(key, code);
-			} else {
-				withdrawCache.invalidate(key);
-				withdrawCache.put(key, code);
-			}
-		} catch (Exception e) {
-		}
-		return code;
-	 }
-
-	 public boolean checkWithdrawConfirmCode(String code) {
-		try {
-			String _code = withdrawCache.get("WITHDRAW_CONFIRM");
-			if(_code.equals(code)) {
-				withdrawCache.invalidate("WITHDRAW_CONFIRM");
-				return true;
-			}	
-		} catch (Exception e) {
-		}
-		return false;
-	 }
-
 	 public boolean checkWithdrawCode(String key, String code) {
 		try{
 			String existing = withdrawCache.get(key);

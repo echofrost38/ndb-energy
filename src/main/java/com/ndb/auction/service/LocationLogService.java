@@ -57,7 +57,6 @@ public class LocationLogService extends BaseService {
             if (response == null)
                 return null;
             LocationLog log = new LocationLog();
-            if(response.getSecurity() == null) return null;
             log.setIpAddress(response.getIp());
             log.setVpn(response.getSecurity().getOrDefault("vpn", false));
             log.setProxy(response.getSecurity().getOrDefault("proxy", false));

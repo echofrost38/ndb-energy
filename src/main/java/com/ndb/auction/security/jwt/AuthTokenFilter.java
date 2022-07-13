@@ -76,13 +76,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 var location = locationMap.get(ip);
                 if (location == null) {
                     // checking ip address ------> calling vpn api key
-                    try {
-                        location = locationLogService.buildLog(ip);
-                        if(location != null) 
-                            locationMap.put(ip, location);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } 
+                    location = locationLogService.buildLog(ip);
+                    if(location != null) 
+                        locationMap.put(ip, location);
                 }
                 JsonObject errorObject;
                 if (location == null) {
@@ -142,9 +138,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 matcher.match("/shufti", request.getServletPath()) ||
                 matcher.match("/stripe", request.getServletPath()) ||
                 matcher.match("/ipn/**", request.getServletPath()) ||
-                matcher.match("/nyyupay/**", request.getServletPath()) ||
-                matcher.match("/totalsupply/**", request.getServletPath()) ||
-                matcher.match("/ndbcoin/**", request.getServletPath()) ||
                 matcher.match("/paypal/**", request.getServletPath());
     }
 

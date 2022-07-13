@@ -41,10 +41,10 @@ import com.ndb.auction.service.user.UserDetailsServiceImpl;
 //Enabling security checking at the method level with annotation support
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
-
+	
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
 
@@ -62,35 +62,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
-	@Bean
+	@Bean 
 	public ClientRegistrationRepository clientRegistrationRepository() {
 		return new CustomClientRegistrationRepository();
 	}
-
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
+	
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
-
+	
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		return super.authenticationManagerBean();
 	}
-
+	
 	@Override
 	public void configure(AuthenticationManagerBuilder builder) throws Exception {
 		builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
-
+	
 	@Override
     public void configure(HttpSecurity http) throws Exception {
-
+ 
 		http
 			.cors().configurationSource(corsConfig()).and()
 			.csrf().disable()
@@ -100,9 +100,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/graphql/**").permitAll()
 				.antMatchers("/graphiql/**").permitAll()
 				.antMatchers("/vendor/**").permitAll()
-				.antMatchers("/playground/**").permitAll()
-				// .antMatchers("/subscriptions/**").permitAll()
-				// .antMatchers("/coinbase/**").permitAll()
 				.antMatchers("/auth/**", "/oauth2/**").permitAll()
 				.antMatchers("/shufti/**").permitAll()
 				.antMatchers("/stripe/**").permitAll()
@@ -114,9 +111,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/totalsupply/**").permitAll()
 				.antMatchers("/circulatingsupply/**").permitAll()
 				.antMatchers("/marketcap/**").permitAll()
-				.antMatchers("/nyyupay/**").permitAll()
-				.antMatchers("/ndbcoin/**").permitAll()
-				.antMatchers("/ws/**").permitAll()
         	.anyRequest().authenticated()
 			.and()
 			.oauth2Login()
@@ -137,7 +131,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.failureHandler(oAuth2AuthenticationFailureHandler);
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-
+	
 	private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
 		OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
 				new OAuth2AccessTokenResponseHttpMessageConverter();
@@ -152,7 +146,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		return tokenResponseClient;
 	}
-
+	
 	private CorsConfigurationSource corsConfig() {
 	    CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowedOrigins(Arrays.asList("*"));

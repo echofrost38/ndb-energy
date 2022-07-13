@@ -2,17 +2,16 @@ extend type Mutation {
     # Update referral
     changeReferralCommissionWallet(
         wallet: String!,
-    ) : UpdateReferralAddressResponse
+    ) : Boolean
 
     activateReferralCode(
-        wallet: String!,
-    ) : ActiveReferralResponse
+        wallet: String!
+    ) : String
 }
 extend type Query {
     # Empty value mean referral unavailable .
 	getReferral : UserReferral
 	getReferredUsers : [UserReferralEarning]
-	checkTimeLock : Int
 }
 
 schema {

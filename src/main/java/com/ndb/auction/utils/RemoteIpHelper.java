@@ -1,15 +1,13 @@
 package com.ndb.auction.utils;
 
 import static com.ndb.auction.utils.HttpHeader.*;
-
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 public class RemoteIpHelper {
 
     private static final String UNKNOWN = "unknown";
 
-    public static String getRemoteIpFrom(HttpServletRequest request) throws IOException {
+    public static String getRemoteIpFrom(HttpServletRequest request) {
         String ip = null;
         int tryCount = 1;
 
@@ -33,14 +31,14 @@ public class RemoteIpHelper {
                 default:
                     ip = request.getRemoteAddr();
             }
+
             tryCount++;
         }
-        var ipArr = ip.split(",");
-        return ipArr[0];
+
+        return ip;
     }
 
     private static boolean isIpFound(String ip) {
         return ip != null && ip.length() > 0 && !UNKNOWN.equalsIgnoreCase(ip);
     }
-
 }

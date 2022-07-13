@@ -93,7 +93,7 @@ public class MailService {
             var file = new java.io.File(path);
             helper.addAttachment(path, file);
         }
-        // javaMailSender.send(mimeMessage);
+        javaMailSender.send(mimeMessage);
     }
 
     private String fillWithdrawRequestEmail(String template, WithdrawRequest contents) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
@@ -212,34 +212,6 @@ public class MailService {
         helper.setText(mailContents, true);
         for (User admin : admins) {
             helper.addTo(admin.getEmail());
-        }
-        javaMailSender.send(mimeMessage);
-    }
-
-    public void sendDeposit(String email, String avatarName, String gateway, String paidType, String depositType, double paid, double deposited, double fee, List<User> admins) 
-        throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, MessagingException 
-    {
-        var stringWriter = new StringWriter();
-        var model = new HashMap<String, Object>();
-
-        model.put("avatarName", avatarName);
-        model.put("email", email);
-        model.put("currency", paidType);
-        model.put("depositType", depositType);
-        model.put("payType", gateway);
-        model.put("paid", paid);
-        model.put("deposit", deposited);
-        model.put("fee", fee);
-
-        configuration.getTemplate("deposit.ftlh");
-        var mailContents = stringWriter.getBuffer().toString();
-
-        var mimeMessage = javaMailSender.createMimeMessage();
-        var helper = new MimeMessageHelper(mimeMessage);
-        helper.setText(mailContents, true);
-
-        for (User user : admins) {
-            helper.addTo(user.getEmail());
         }
         javaMailSender.send(mimeMessage);
     }

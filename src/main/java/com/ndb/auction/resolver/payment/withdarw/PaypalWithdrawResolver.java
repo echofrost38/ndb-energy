@@ -130,11 +130,7 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     // confirm paypal withdraw
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public int confirmPaypalWithdraw(int id, int status, String deniedReason, String code) throws Exception {
-        if(!totpService.checkWithdrawConfirmCode(code)) {
-            String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
-            throw new BalanceException(msg, "2FA");
-        }
+    public int confirmPaypalWithdraw(int id, int status, String deniedReason) throws Exception {
         return paypalWithdrawService.confirmWithdrawRequest(id, status, deniedReason);
     }
 

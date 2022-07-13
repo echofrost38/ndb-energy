@@ -39,13 +39,7 @@ public class UserReferralService extends BaseService {
 
         referral.setRate(tierRate[user.getTierLevel()]);
         referral.setCommissionRate(tierRate);
-        if (referral.isActive()){
-            if (referral.getReferredByCode() == null)
-                return referral;
-            else if (referral.isRecord())
-                return referral;
-        }
-        return null;
+        return referral;
     }
 
     public List<UserReferralEarning> earningByReferrer(int userId){

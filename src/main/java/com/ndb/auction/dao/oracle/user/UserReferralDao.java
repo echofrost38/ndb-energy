@@ -84,7 +84,7 @@ public class UserReferralDao extends BaseOracleDao {
 
     public int updateWalletConnect(int id, int target, String walletConnect) {
         String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=?, TARGET = ? WHERE ID=?";
-        return jdbcTemplate.update(sql, walletConnect, id);
+        return jdbcTemplate.update(sql, walletConnect, target, id);
     }
 
     public int setReferralRecordOnchain(int id ,boolean status) {

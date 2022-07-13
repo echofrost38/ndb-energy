@@ -62,8 +62,12 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         }
 
         // check timelock if target wallet is changed
+        // it is applied only for invited users
         var referral = userReferralService.selectById(userId);
         if(referral != null && referral.getReferredByCode() != null) {
+            var referredCode = referral.getReferredByCode();
+            
+            
             // check destination wallet
             if(referral.getTarget() != destination) {
                 // check timelock

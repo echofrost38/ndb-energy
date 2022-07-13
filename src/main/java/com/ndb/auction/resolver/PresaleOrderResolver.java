@@ -15,6 +15,7 @@ import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.presale.PresaleOrderPayments;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserReferralService;
+import com.ndb.auction.utils.Utilities;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
@@ -62,7 +63,7 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
 
         // check timelock if target wallet is changed
         var referral = userReferralService.selectById(userId);
-        if(referral != null) {
+        if(referral != null && referral.getReferredByCode() != null) {
             // check destination wallet
             if(referral.getTarget() != destination) {
                 // check timelock
@@ -70,8 +71,12 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
 
                 if(lockedTime > 0) {
                     // throw wallet exception
-                    throw new PreSaleException("You can change destination wallet after", "destination");
+                    var formattedTime = Utilities.lockTimeFormat(lockedTime);
+                    throw new PreSaleException("You can change destination wallet after " + formattedTime, "destination");
                 }
+
+                // change wallet
+                
             }
         }
 

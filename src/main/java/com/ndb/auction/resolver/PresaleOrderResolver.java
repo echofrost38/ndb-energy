@@ -3,6 +3,7 @@ package com.ndb.auction.resolver;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -13,13 +14,21 @@ import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.presale.PresaleOrderPayments;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.service.user.UserReferralService;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
-    /// PreSaleOrder
+    
+    @Autowired
+    private UserReferralService userReferralService;
+    
+    /*
+     * @params
+     * destination: 1 - internal wallet, 2 - external wallet
+     */
     @PreAuthorize("isAuthenticated()")
     public PreSaleOrder placePreSaleOrder(int presaleId, Long ndbAmount, int destination, String extAddr) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -49,6 +58,21 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         if(presale.getStatus() != PreSale.STARTED) {
             String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
             throw new PreSaleException(msg, "presaleId");
+        }
+
+        // check timelock if target wallet is changed
+        var referral = userReferralService.selectById(userId);
+        if(referral != null) {
+            // check destination wallet
+            if(referral.getTarget() != destination) {
+                // check timelock
+                int lockedTime = userReferralService.checkTimeLock(userId);
+
+                if(lockedTime > 0) {
+                    // throw wallet exception
+                    throw new PreSaleException("You can change destination wallet after", "destination");
+                }
+            }
         }
 
         // create new Presale order

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class UserReferral extends BaseModel {
     private String referralCode;
     private String referredByCode;
+    private int target; // 1 - internal Nyyu, 2 - external 
     private String walletConnect;
     private int rate;
     private int[] commissionRate;

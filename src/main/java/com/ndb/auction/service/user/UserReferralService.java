@@ -112,6 +112,7 @@ public class UserReferralService extends BaseService {
             // update database
             UserReferral referral = new UserReferral();
             referral.setId(userId);
+            referral.setTarget(1); // default internal nyyu wallet
             referral.setWalletConnect(walletAddress);
             referral.setReferralCode("");
             referral.setReferredByCode(referredByCode);
@@ -125,15 +126,19 @@ public class UserReferralService extends BaseService {
 
     public ActiveReferralResponse activateReferralCode(int userId, String wallet) {
         try {
+            int target = 0;
             // check wallet exists or not.
             if (wallet.equals(ZERO_ADDRESS))
             {
+                target = 1; // internal
                 // Nyyu wallet case
                 NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
                 if (nyyuWallet != null) 
                     wallet = nyyuWallet.getPublicKey();
                 else // old users who has no nyyu wallet address
                     wallet = nyyuWalletService.generateBEP20Address(userId);
+            } else {
+                target = 2; // external wallet
             }
 
             // referral recode from database
@@ -156,6 +161,7 @@ public class UserReferralService extends BaseService {
                 String hash = ndbCoinService.activeReferrer(wallet, (double) rate);
                 if (hash != null) {
                     referral.setActive(true);
+                    referral.setTarget(target);
                     userReferralDao.insertOrUpdate(referral);
                 }
             } 
@@ -193,12 +199,16 @@ public class UserReferralService extends BaseService {
                 throw new ReferralException(msg);
             }
 
+            int target = 0;
             if (newAddress.equals(ZERO_ADDRESS)) {
+                target = 1;
                 NyyuWallet  nyyuWallet =  nyyuWalletDao.selectByUserId(userId);
                 if (nyyuWallet == null )
                     newAddress = nyyuWalletService.generateBEP20Address(userId);
                 else
                     newAddress = nyyuWallet.getPublicKey();
+            } else {
+                target = 2;
             }
             
             UpdateReferralAddressResponse response = new UpdateReferralAddressResponse();
@@ -207,8 +217,7 @@ public class UserReferralService extends BaseService {
             {
                 String hash = ndbCoinService.updateReferrer(referrer.getWalletConnect(), newAddress);
                 if (hash != null) {
-                    referrer.setWalletConnect(newAddress);
-                    userReferralDao.insertOrUpdate(referrer);
+                    userReferralDao.updateWalletConnect(userId, target, newAddress);
                     response.setStatus(true);
                     return response;
                 }
@@ -239,6 +248,9 @@ public class UserReferralService extends BaseService {
         }
     }
 
+    /*
+     * return remaining time in seconds
+     */
     public int checkTimeLock(int userId){
         UserReferral referrer = userReferralDao.selectById(userId);
         int lockTime = ndbCoinService.lockingTimeRemain(referrer.getWalletConnect());

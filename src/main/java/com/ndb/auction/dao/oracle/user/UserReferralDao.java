@@ -22,6 +22,7 @@ public class UserReferralDao extends BaseOracleDao {
         m.setId(rs.getInt("ID"));
         m.setReferralCode(rs.getString("REFERRAL_CODE"));
         m.setReferredByCode(rs.getString("REFERRED_BY_CODE"));
+        m.setTarget(rs.getInt("TARGET"));
         m.setWalletConnect(rs.getString("WALLET_CONNECT"));
         m.setRecord(rs.getBoolean("RECORD"));
         m.setActive(rs.getBoolean("ACTIVE"));
@@ -67,21 +68,22 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public int insert(UserReferral m) {
-        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, RECORD, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(),m.isActive(), m.isRecord());
+        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,TARGET, WALLET_CONNECT, ACTIVE, RECORD, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getTarget(), m.getWalletConnect(),m.isActive(), m.isRecord());
     }
 
     public int insertOrUpdate(UserReferral m) {
         String sql =  "MERGE INTO TBL_USER_REFERRAL USING DUAL ON (ID=?)"
-                + "WHEN MATCHED THEN UPDATE SET WALLET_CONNECT= ? "
-                + "WHEN NOT MATCHED THEN INSERT (ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(),m.getWalletConnect(),m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect(), m.isActive());
+                + "WHEN MATCHED THEN UPDATE SET WALLET_CONNECT= ?, TARGET=?, REFERRAL_CODE=?, ACTIVE=? "
+                + "WHEN NOT MATCHED THEN INSERT (ID, REFERRAL_CODE, REFERRED_BY_CODE,TARGET,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(),m.getWalletConnect(),m.getTarget(), m.getReferralCode(), m.isActive(), 
+            m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getTarget(), m.getWalletConnect(), m.isActive());
     }
 
-    public int updateWalletConnect(int id, String walletConnect) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=? WHERE ID=?";
+    public int updateWalletConnect(int id, int target, String walletConnect) {
+        String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=?, TARGET = ? WHERE ID=?";
         return jdbcTemplate.update(sql, walletConnect, id);
     }
 

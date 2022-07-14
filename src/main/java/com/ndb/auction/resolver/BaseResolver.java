@@ -33,7 +33,6 @@ import com.ndb.auction.utils.IPChecking;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
-import com.ndb.auction.web3.UserWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,9 +84,6 @@ public class BaseResolver {
 
 	@Autowired
 	protected OAuth2RegistrationService oAuth2RegistrationService;
-
-	@Autowired
-	protected UserWalletService userWalletService;
 
 	@Autowired
 	protected NdbWalletService ndbWalletService;
@@ -189,4 +185,9 @@ public class BaseResolver {
 
         return 100 * totalPrice / (100 - COINPAYMENT_FEE - tierFeeRate);
     }
+
+	// send super admin phone message
+	public void sendSuperAdminCode() {
+		
+	}
 }

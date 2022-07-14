@@ -28,7 +28,7 @@ import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
-import com.ndb.auction.web3.UserWalletService;
+import com.ndb.auction.web3.NyyuWalletService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,9 +57,6 @@ public class BaseController {
     NotificationService notificationService;
 
     @Autowired
-    UserWalletService userWalletService;
-
-    @Autowired
     TierService tierService;
 
     @Autowired
@@ -79,6 +76,12 @@ public class BaseController {
 
     @Autowired
     protected NDBCoinService ndbCoinService;
+
+    @Autowired
+    protected NyyuWalletService nyyuWalletService;
+
+    @Autowired
+    protected NyyuPayService nyyuPayService;
 
     @Autowired
     protected PresaleService presaleService;

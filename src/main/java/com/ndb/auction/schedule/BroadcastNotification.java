@@ -12,12 +12,13 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BroadcastNotification {
-    
+
     private final int QUEUE_SIZE = 20;
 
     @Autowired
@@ -32,6 +33,9 @@ public class BroadcastNotification {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
     private Queue<Notification> notifications;
 
     public BroadcastNotification() {
@@ -45,34 +49,35 @@ public class BroadcastNotification {
 
     @Scheduled(fixedDelay = 60000)
     public void broadcast() {
-        
-        if(notifications.size() == 0)
+
+        if (notifications.size() == 0)
             return;
         System.out.println("In schedule...");
-        
+
         for (Notification notification : notifications) {
             List<User> userList = userDao.selectAll(null);
-            
+
             String title = notification.getTitle();
             String msg = notification.getMsg();
-            
+
             for (User user : userList) {
-                if((user.getNotifySetting() & 0x01 << notification.getNType()) == 0)
+                if ((user.getNotifySetting() & 0x01 << notification.getNType()) == 0)
                     continue;
                 notification.setUserId(user.getId());
                 notificationDao.addNewNotification(notification);
-                
+                simpMessagingTemplate.convertAndSend("/ws/notify/" + user.getId(), notification);
+
                 // send SMS, Email, Notification here
                 try {
                     smsService.sendNormalSMS(user.getPhone(), title + "\n" + msg);
                 } catch (Exception e) {
                 }
-    
+
                 try {
                     mailService.sendNormalEmail(user, title, msg);
                 } catch (Exception e) {
                 }
-    
+
             }
             notifications.remove(notification);
         }

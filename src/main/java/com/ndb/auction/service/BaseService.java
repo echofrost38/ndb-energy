@@ -32,6 +32,7 @@ import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Notification;
@@ -41,6 +42,7 @@ import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.Whitelist;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.schedule.ScheduledTasks;
 import com.ndb.auction.service.payment.TxnFeeService;
@@ -51,7 +53,9 @@ import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NdbWalletService;
-import com.ndb.auction.web3.UserWalletService;
+import com.ndb.auction.web3.NyyuWalletService;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +63,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 public class BaseService {
 
     private static final String HMAC_SHA_512 = "HmacSHA512";
@@ -83,7 +88,7 @@ public class BaseService {
     public String COINSPAYMENT_IPN_URL;
 
     protected static Gson gson = new Gson();
-    
+
     protected WebClient coinPaymentAPI;
 
     @Autowired
@@ -103,6 +108,9 @@ public class BaseService {
 
     @Autowired
     public UserReferralDao userReferralDao;
+
+    @Autowired
+    public NyyuWalletDao nyyuWalletDao;
 
     @Autowired
     public UserAvatarDao userAvatarDao;
@@ -148,9 +156,6 @@ public class BaseService {
 
     @Autowired
     public UserReferralService userReferralService;
-
-    @Autowired
-    public UserWalletService userWalletService;
 
     @Autowired
     public NdbWalletService ndbWalletService;
@@ -199,6 +204,12 @@ public class BaseService {
 
     @Autowired
     protected NDBCoinService ndbCoinService;
+
+    @Autowired
+    protected NyyuWalletService nyyuWalletService;
+
+    @Autowired
+    protected NyyuPayService nyyuPayService;
 
     @Autowired
     protected ThirdAPIUtils thirdAPI;
@@ -259,7 +270,7 @@ public class BaseService {
 		// processing order
 		double ndb = order.getNdbAmount();
 		Double fiatAmount = ndb * order.getNdbPrice();
-		
+
         // check balance and remaining
         var presale = presaleDao.selectById(order.getPresaleId());
         double remain = presale.getTokenAmount() - presale.getSold();
@@ -272,8 +283,14 @@ public class BaseService {
         }
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-			int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
-			balanceDao.addFreeBalance(userId, tokenId, available);
+            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+            if (!nyyuWallet.getNyyuPayRegistered()){
+                throw new BalanceException("Cannot transfer NDB Coin. Nyyu wallet is not registered.", "NDB");
+            }
+            String hash = ndbCoinService.transferNDB(userId, nyyuWallet.getPublicKey(), available);
+            if(hash == null) {
+                throw new BalanceException("Cannot transfer NDB Coin", "NDB");
+            }
 		} else if (order.getDestination() == PreSaleOrder.EXTERNAL) {
 			String hash = ndbCoinService.transferNDB(userId, order.getExtAddr(), available);
             if(hash == null) {
@@ -326,6 +343,22 @@ public class BaseService {
 
 		userDao.updateTier(userId, tierLevel, newPoint);
 		tierTaskService.updateTierTask(tierTask);
+
+        // send purchase email
+        var avatar = userAvatarDao.selectById(order.getUserId());
+        var admins = userDao.selectByRole("ROLE_SUPER");
+        
+        try {
+            mailService.sendPurchase(
+                presale.getRound(), 
+                user.getEmail(), 
+                avatar.getPrefix() + avatar.getName(), 
+                paymentType, "USD", order.getNdbAmount(), paidAmount, admins);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("cannot send presale purchase email");
+        }
+
 		presaleOrderDao.updateStatus(order.getId(), paymentId, paidAmount, paymentType);
 		presaleDao.updateSold(order.getPresaleId(), ndb);
 

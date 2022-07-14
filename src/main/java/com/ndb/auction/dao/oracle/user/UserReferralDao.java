@@ -22,8 +22,9 @@ public class UserReferralDao extends BaseOracleDao {
         m.setId(rs.getInt("ID"));
         m.setReferralCode(rs.getString("REFERRAL_CODE"));
         m.setReferredByCode(rs.getString("REFERRED_BY_CODE"));
+        m.setTarget(rs.getInt("TARGET"));
         m.setWalletConnect(rs.getString("WALLET_CONNECT"));
-        m.setPaidTxn(rs.getString("PAID_TXN"));
+        m.setRecord(rs.getBoolean("RECORD"));
         m.setActive(rs.getBoolean("ACTIVE"));
         m.setDeleted(rs.getInt("DELETED"));
         m.setRegDate(rs.getTimestamp("REG_DATE").getTime());
@@ -50,7 +51,7 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public UserReferral selectByWalletConnect(String wallet) {
-        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE LOWER(WALLET_CONNECT)=LOWER(?) AND DELETED=0";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
@@ -67,23 +68,27 @@ public class UserReferralDao extends BaseOracleDao {
     }
 
     public int insert(UserReferral m) {
-        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,WALLET_CONNECT, DELETED, REG_DATE, UPDATE_DATE)"
-                + "VALUES(?,?,?,?,0,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getWalletConnect());
+        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, REFERRAL_CODE, REFERRED_BY_CODE,TARGET, WALLET_CONNECT, ACTIVE, RECORD, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getTarget(), m.getWalletConnect(),m.isActive(), m.isRecord());
     }
 
-    public int updateWalletConnect(int id, String walletConnect) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=? WHERE ID=?";
-        return jdbcTemplate.update(sql, walletConnect, id);
+    public int insertOrUpdate(UserReferral m) {
+        String sql =  "MERGE INTO TBL_USER_REFERRAL USING DUAL ON (ID=?)"
+                + "WHEN MATCHED THEN UPDATE SET WALLET_CONNECT= ?, TARGET=?, REFERRAL_CODE=?, ACTIVE=? "
+                + "WHEN NOT MATCHED THEN INSERT (ID, REFERRAL_CODE, REFERRED_BY_CODE,TARGET,WALLET_CONNECT, ACTIVE, DELETED, REG_DATE, UPDATE_DATE)"
+                + "VALUES(?,?,?,?,?,?,0,SYSDATE,SYSDATE)";
+        return jdbcTemplate.update(sql,m.getId(),m.getWalletConnect(),m.getTarget(), m.getReferralCode(), m.isActive(), 
+            m.getId(), m.getReferralCode(), m.getReferredByCode(),m.getTarget(), m.getWalletConnect(), m.isActive());
     }
 
-    public int updatePaidCommissionTxn(String txn, String referralCode,String referredByCode) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET PAID_TXN=? WHERE REFERRAL_CODE=? AND REFERRED_BY_CODE=?";
-        return jdbcTemplate.update(sql, txn, referralCode,referredByCode);
+    public int updateWalletConnect(int id, int target, String walletConnect) {
+        String sql = "UPDATE TBL_USER_REFERRAL SET WALLET_CONNECT=?, TARGET = ? WHERE ID=?";
+        return jdbcTemplate.update(sql, walletConnect, target, id);
     }
 
-    public int setReferralStatus(int id ,boolean status) {
-        String sql = "UPDATE TBL_USER_REFERRAL SET ACTIVE=? WHERE ID=?";
+    public int setReferralRecordOnchain(int id ,boolean status) {
+        String sql = "UPDATE TBL_USER_REFERRAL SET RECORD=? WHERE ID=?";
         return jdbcTemplate.update(sql, status, id);
     }
 
@@ -91,34 +96,9 @@ public class UserReferralDao extends BaseOracleDao {
         String sql = "UPDATE TBL_USER_REFERRAL SET REFERRAL_CODE = ?, REFERRED_BY_CODE = ?, WALLET_CONNECT= ? WHERE ID = ?";
         return jdbcTemplate.update(sql, m.getReferralCode(), m.getReferredByCode(), m.getWalletConnect(),m.getId());
     }
-//    public int insertOrUpdate(UserAvatar m) {
-//        String sql = "MERGE INTO TBL_USER_REFERRAL USING DUAL ON (ID=?)"
-//                + "WHEN MATCHED THEN UPDATE SET PURCHASED=?, HAIR_COLOR=?,SKIN_COLOR=?, SELECTED=?, PREFIX=?, NAME=?, UPDATE_DATE=SYSDATE "
-//                + "WHEN NOT MATCHED THEN INSERT(ID, PURCHASED, HAIR_COLOR,SKIN_COLOR, SELECTED, PREFIX, NAME, REG_DATE, UPDATE_DATE)"
-//                + "VALUES(?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-//        return jdbcTemplate.update(sql, m.getId(), m.getPurchased(),m.getHairColor(), m.getSkinColor(), m.getSelected(), m.getPrefix(), m.getName(), m.getId(),
-//                m.getPurchased(),m.getHairColor(), m.getSkinColor(), m.getSelected(), m.getPrefix(), m.getName());
-//    }
-
-//    public int insert(UserReferral m) {
-//        String sql = "INSERT INTO TBL_USER_REFERRAL(ID, USER_ID, REFERRAL_CODE, REFERRED_BY_CODE, DELETED, REG_DATE, UPDATE_DATE)"
-//                + "VALUES(SEQ_USER_DETAIL.NEXTVAL,?,?,0,SYSDATE,SYSDATE)";
-//        KeyHolder keyHolder = new GeneratedKeyHolder();
-//        jdbcTemplate.update(
-//                connection -> {
-//                    PreparedStatement ps = connection.prepareStatement(sql, new String[] { "ID" });
-//                    int i = 1;
-//                    ps.setLong(i++, m.getUserId());
-//                    ps.setString(i++, m.getReferralCode());
-//                    ps.setString(i++, m.getReferredByCode());
-//                    return ps;
-//                }, keyHolder);
-//        m.setId(keyHolder.getKey().intValue());
-//        return m;
-//    }
 
     public List<UserReferral> getAllByReferredByCode(String referredByCode) {
-        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND DELETED=0";
+        String sql = "SELECT * FROM TBL_USER_REFERRAL WHERE REFERRED_BY_CODE=? AND RECORD=1 AND DELETED=0";
         return jdbcTemplate.query(sql, new RowMapper<UserReferral>() {
             @Override
             public UserReferral mapRow(ResultSet rs, int rownumber) throws SQLException {

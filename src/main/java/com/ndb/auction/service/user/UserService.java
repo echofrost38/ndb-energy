@@ -57,8 +57,13 @@ public class UserService extends BaseService {
 			user.setRole(roles);
 			user.setProvider("email");
 			userDao.insert(user);
-			
-			// userReferralService.createNewReferrer(user.getId(),"",referredByCode);
+
+			// create BEP20 wallet
+			var nyyuWallet = nyyuWalletService.generateBEP20Address(user.getId());
+			// create referral
+			if(referredByCode != null && !referredByCode.equals(""))
+				userReferralService.createNewReferrer(user.getId(), referredByCode, nyyuWallet);
+
 			// create Tier Task
 			TierTask tierTask = new TierTask(user.getId());
 			tierTaskService.updateTierTask(tierTask);

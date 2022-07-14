@@ -1,4 +1,4 @@
 type UserReferralEarning {
     name: String,
-    amount: Int
+    amount: Float
 }

@@ -1,15 +1,10 @@
-package com.ndb.auction.websocket;
+package com.ndb.auction.stomp;
 
-import com.ndb.auction.service.NotificationService;
-import com.ndb.auction.service.user.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
-import java.util.Map;
 
 @Controller
 public class NotificationController {

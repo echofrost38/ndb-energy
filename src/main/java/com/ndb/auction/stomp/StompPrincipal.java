@@ -1,4 +1,4 @@
-package com.ndb.auction.websocket;
+package com.ndb.auction.stomp;
 
 import lombok.Getter;
 import lombok.Setter;

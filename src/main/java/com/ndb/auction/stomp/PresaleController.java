@@ -1,4 +1,4 @@
-package com.ndb.auction.websocket;
+package com.ndb.auction.stomp;
 
 import com.ndb.auction.service.PresaleOrderService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

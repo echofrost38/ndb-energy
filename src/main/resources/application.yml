@@ -14,3 +14,23 @@ app:
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
       - https://www.nyyu.io/oauth2/redirect   
+
+
+# netty-socketio configuration
+socketio:
+  host: 127.0.0.1
+  port: 8888
+  # Set the maximum length of processing data per frame to prevent others from using large data to attack the server
+  maxFramePayloadLength: 1048576
+  # Set maximum content length for http interaction
+  maxHttpContentLength: 1048576
+  # Size of socket connections (e.g., listening on only one port box thread group is 1)
+  bossCount: 1
+  workCount: 100
+  allowCustomRequests: true
+  # Protocol upgrade timeout (milliseconds), default 10 seconds.HTTP handshake upgrade to ws protocol timeout
+  upgradeTimeout: 1000000
+  # Ping message timeout (milliseconds), default 60 seconds, within which a timeout event is sent if no heartbeat message is received
+  pingTimeout: 6000000
+  # Ping message interval (milliseconds), default 25 seconds.Client sends a heartbeat message interval to server
+  pingInterval: 25000

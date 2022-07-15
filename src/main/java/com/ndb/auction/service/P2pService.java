@@ -4,9 +4,12 @@ package com.ndb.auction.service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.ndb.auction.socketio.SocketIOService;
+import com.ndb.auction.stomp.StompSendMessageService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,13 +19,13 @@ import java.io.IOException;
 @Service
 public class P2pService {
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private StompSendMessageService stompSendMessageService;
 
-    public P2pService(SimpMessagingTemplate simpMessagingTemplate) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
-    }
+    @Autowired
+    private SocketIOService socketIOService;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 1000L * 60 * 5)
     public void sendMessage() throws IOException {
         JsonObject resultObject = new JsonObject();
         String tickerText = null;
@@ -31,7 +34,7 @@ public class P2pService {
             Request request = new Request.Builder()
                     .url("https://api.p2pb2b.com/api/v2/public/ticker?market=NDB_USDT")
                     .build();
-            Response response = new  OkHttpClient().newCall(request).execute();
+            Response response = new OkHttpClient().newCall(request).execute();
             tickerText = response.body().string();
             JsonObject root = JsonParser.parseString(tickerText).getAsJsonObject();
             resultObject.add("ticker", root.get("result"));
@@ -53,7 +56,9 @@ public class P2pService {
         } catch (Exception e) {
             resultObject.addProperty("kline", e.toString());
         }
-        simpMessagingTemplate.convertAndSend("/ws/ndbcoin", resultObject.toString());
+        String resultString = resultObject.toString();
+        stompSendMessageService.sendMessage("/ws/ndbcoin", resultString);
+        socketIOService.broadcastMessage("ndbcoin", resultString);
     }
 
 }

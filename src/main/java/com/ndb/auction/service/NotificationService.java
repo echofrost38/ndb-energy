@@ -13,6 +13,8 @@ import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
 
+import com.ndb.auction.socketio.SocketIOService;
+import com.ndb.auction.stomp.StompSendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,7 +53,10 @@ public class NotificationService {
     public MailService mailService;
 
     @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private StompSendMessageService stompSendMessageService;
+
+    @Autowired
+    private SocketIOService socketIOService;
 
     public Map<String, Integer> getTypeMap() {
         return this.typeMap;
@@ -79,7 +84,7 @@ public class NotificationService {
             return;
         }
 
-        addNewNotification(userId, type, title, msg);
+        addNewNotification(userId, user.getEmail(), type, title, msg);
 
         // send SMS, Email, Notification here
         try {
@@ -98,10 +103,11 @@ public class NotificationService {
         broadcastNotification.addNotification(m);
     }
 
-    public Notification addNewNotification(int userId, int type, String title, String msg) {
+    public Notification addNewNotification(int userId, String email, int type, String title, String msg) {
         Notification notification = new Notification(userId, type, title, msg);
         var result = notificationDao.addNewNotification(notification);
-        simpMessagingTemplate.convertAndSend("/ws/notify/" + userId, result);
+        stompSendMessageService.sendMessage("/ws/notify/" + userId, result);
+        socketIOService.pushMessageToUser(email, "notification", result);
         return result;
     }
 

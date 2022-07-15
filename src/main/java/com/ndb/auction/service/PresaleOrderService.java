@@ -1,13 +1,5 @@
 package com.ndb.auction.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-
 import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
@@ -18,8 +10,15 @@ import com.ndb.auction.service.payment.paypal.PaypalBaseService;
 import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.user.WhitelistService;
 import com.ndb.auction.service.utils.MailService;
-
+import com.ndb.auction.socketio.SocketIOService;
+import com.ndb.auction.stomp.StompSendMessageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -52,7 +51,10 @@ public class PresaleOrderService extends BaseService {
     private MailService mailService;
 
     @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private StompSendMessageService stompSendMessageService;
+
+    @Autowired
+    private SocketIOService socketIOService;
 
     protected CloseableHttpClient client;
 
@@ -65,7 +67,8 @@ public class PresaleOrderService extends BaseService {
 
     // create new presale order
     public PreSaleOrder placePresaleOrder(PreSaleOrder order) {
-        simpMessagingTemplate.convertAndSend("/ws/presale_orders/" + order.getPresaleId(), order);
+        stompSendMessageService.sendMessage("/ws/presale_orders/" + order.getPresaleId(), order);
+        socketIOService.broadcastMessage("presale_order", order);
         return presaleOrderDao.insert(order);
     }
 

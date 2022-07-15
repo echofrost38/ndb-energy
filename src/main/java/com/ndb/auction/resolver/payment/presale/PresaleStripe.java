@@ -47,9 +47,10 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         }
 
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
+        var totalUsdAmount = stripePresaleService.getTotalAmount(userId, usdAmount);
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = usdAmount * fiatPrice;
-        StripePresaleTransaction m = new StripePresaleTransaction(id, userId, presaleId, orderId, usdAmount, _fiatAmount, fiatType, paymentIntentId, paymentMethodId);
+        StripePresaleTransaction m = new StripePresaleTransaction(id, userId, presaleId, orderId, totalUsdAmount, _fiatAmount, fiatType, paymentIntentId, paymentMethodId);
         return stripePresaleService.createNewTransaction(m, isSaveCard);
     }
 

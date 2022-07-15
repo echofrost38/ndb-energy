@@ -93,6 +93,18 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
             }
         }
 
+        // check nyyu wallet 
+        if(destination == PreSaleOrder.INTERNAL) {
+            // for the old users
+            var nyyuWallet = nyyuWalletService.selectByUserId(userId);
+            if(nyyuWallet == null) {
+                var generatedAddr = nyyuWalletService.generateBEP20Address(userId);
+                if(generatedAddr == null) {
+                    throw new PreSaleException("You cannot place a presale order because of Nyyu internal wallet", "destination");
+                }
+            }
+        }
+
         // create new Presale order
         Double ndbPrice = presale.getTokenPrice();
         PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, extAddr);

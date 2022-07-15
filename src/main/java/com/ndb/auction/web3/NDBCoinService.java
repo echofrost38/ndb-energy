@@ -8,20 +8,27 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 
+import com.google.gson.Gson;
 import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
 import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.models.digifinex.DigiFinex;
+import com.ndb.auction.models.p2pb2b.P2PB2BResponse;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import com.ndb.auction.service.TokenAssetService;
 import lombok.extern.slf4j.Slf4j;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +37,8 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthBlockNumber;
+import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
@@ -222,26 +231,26 @@ public class NDBCoinService {
         return total.divide(decimals).doubleValue();
     }
 
-    public String getMarketCap() throws ExecutionException, InterruptedException, URISyntaxException, IOException {
-        BigInteger total =  ndbToken.getCirculatingSupply().sendAsync().get();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .version(HttpClient.Version.HTTP_2)
-                .uri(URI.create(pancakev2RPC+ndbTokenContract))
+    public double getMarketCap() throws Exception {
+        Request p2pRequest = new Request.Builder()
+                .url("https://api.p2pb2b.com/api/v2/public/ticker?market=NDB_USDT")
                 .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        Response p2pResponse = new OkHttpClient().newCall(p2pRequest).execute();
+        P2PB2BResponse p2pData = new Gson().fromJson(p2pResponse.body().string(), P2PB2BResponse.class);
 
-        String responseBody = response.body();
-        JSONObject json = new JSONObject(responseBody);
-        Double price = Double.parseDouble(json.getJSONObject("data").getString("price"));
-        if (price.equals(0.0))
-            price=0.01; //ICO price
-        Double marketcap = total.divide(decimals).doubleValue()*price;
-        return df.format(marketcap).toString();
+        Request digiFinexRequest = new Request.Builder()
+                .url("https://openapi.digifinex.com/v3/ticker?symbol=NDB_USDT")
+                .build();
+        Response digiFinexResponse =  new OkHttpClient().newCall(digiFinexRequest).execute();
+        DigiFinex digiFinexData= new Gson().fromJson(digiFinexResponse.body().string(), DigiFinex.class);
+
+        double ciculatingSupply = this.getCirculatingSupply();
+        double price = (Double.parseDouble(p2pData.result.last) + digiFinexData.ticker.get(0).last)/2;
+        double marketcap = ciculatingSupply * price;
+        return marketcap;
     }
-    public String getCirculatingSupply() throws ExecutionException, InterruptedException {
-        BigInteger total =  ndbToken.getCirculatingSupply().sendAsync().get();
-        return total.divide(decimals).toString();
+    public double getCirculatingSupply() throws Exception {
+        return  ndbToken.getCirculatingSupply().send().divide(decimals).doubleValue();
     }
 
     public NDBCoinService() {

@@ -2,11 +2,6 @@ package com.ndb.auction.web3;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -170,6 +165,16 @@ public class NDBCoinService {
         try {
             setKeyBeforeExcuteTransaction();
             TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
+            return receipt.getTransactionHash();
+        } catch (Exception e) {
+            throw new ReferralException(e.getMessage());
+        }
+    }
+
+    public String deleteReferrer(String referrer,List<String> users){
+        try {
+            setKeyBeforeExcuteTransaction();
+            TransactionReceipt receipt = ndbReferral.deleteReferrer(referrer,users).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());

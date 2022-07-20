@@ -16,7 +16,6 @@ import com.ndb.auction.service.utils.SMSService;
 import com.ndb.auction.socketio.SocketIOService;
 import com.ndb.auction.stomp.StompSendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 

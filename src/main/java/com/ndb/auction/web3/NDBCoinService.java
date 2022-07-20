@@ -2,13 +2,7 @@ package com.ndb.auction.web3;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
@@ -29,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,13 +30,10 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.FastRawTransactionManager;
-import java.text.DecimalFormat;
 
 @Service
 @Slf4j
@@ -88,7 +78,6 @@ public class NDBCoinService {
     private final BigInteger m_decimals = new BigInteger("100000000");
     private final double multipler = 10000.0;
 
-    private static final DecimalFormat df = new DecimalFormat("0.00");
     Queue<String> referralKeyQueue = new LinkedList<>();
 
     @SuppressWarnings("deprecation")

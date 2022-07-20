@@ -19,8 +19,8 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import java.security.Principal;
 import java.util.Map;
 
-// @Configuration
-// @EnableWebSocketMessageBroker
+@Configuration
+@EnableWebSocketMessageBroker
 public class WebSocketStompConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketStompConfig.class);

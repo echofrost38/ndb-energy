@@ -264,7 +264,7 @@ public class CryptoController extends BaseController {
                     Notification.DEPOSIT_SUCCESS, 
                     "PAYMENT CONFIRMED", 
                     "Your purchase of " + ndbToken + "NDB" + " in the presale round was successful.");
-                var price = apiUtil.getCryptoPriceBySymbol(cryptoType);
+                var price = apiUtil.getCryptoPriceBySymbol("USDT");
                 log.info("added free balance: {}", fiatAmount / price);
                 balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, fiatAmount / price);
                 return new ResponseEntity<>(HttpStatus.OK); 

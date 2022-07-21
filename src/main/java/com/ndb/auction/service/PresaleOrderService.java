@@ -11,6 +11,7 @@ import com.ndb.auction.service.payment.stripe.StripeBaseService;
 import com.ndb.auction.service.user.WhitelistService;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.socketio.SocketIOService;
+import com.ndb.auction.stomp.StompSendMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class PresaleOrderService extends BaseService {
     private MailService mailService;
 
     @Autowired
+    private StompSendMessageService stompSendMessageService;
+
+    @Autowired
     private SocketIOService socketIOService;
 
     protected CloseableHttpClient client;
@@ -63,6 +67,7 @@ public class PresaleOrderService extends BaseService {
 
     // create new presale order
     public PreSaleOrder placePresaleOrder(PreSaleOrder order) {
+        stompSendMessageService.sendMessage("/ws/presale_orders/" + order.getPresaleId(), order);
         socketIOService.broadcastMessage("presale_order", order);
         return presaleOrderDao.insert(order);
     }

@@ -5,10 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.ndb.auction.socketio.SocketIOService;
+import com.ndb.auction.stomp.StompSendMessageService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ import java.io.IOException;
 
 @Service
 public class P2pService {
+
+    @Autowired
+    private StompSendMessageService stompSendMessageService;
 
     @Autowired
     private SocketIOService socketIOService;
@@ -52,6 +57,7 @@ public class P2pService {
             resultObject.addProperty("kline", e.toString());
         }
         String resultString = resultObject.toString();
+        stompSendMessageService.sendMessage("/ws/ndbcoin", resultString);
         socketIOService.broadcastMessage("ndbcoin", resultString);
     }
 

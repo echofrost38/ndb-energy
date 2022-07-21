@@ -1,11 +1,11 @@
 package com.ndb.auction.models;
 
 public class CirculatingSupply {
-    private final double circulatingSupply;
-    public CirculatingSupply(double _circulatingSupply) {
+    private final String circulatingSupply;
+    public CirculatingSupply(String _circulatingSupply) {
         this.circulatingSupply = _circulatingSupply;
     }
-    public double getCirculatingSupply() {
+    public String getCirculatingSupply() {
         return circulatingSupply;
     }
 }

@@ -1,11 +1,11 @@
 package com.ndb.auction.models;
 
 public class Marketcap {
-    private final double marketcap;
-    public Marketcap(double _marketcap) {
+    private final String marketcap;
+    public Marketcap(String _marketcap) {
         this.marketcap = _marketcap;
     }
-    public double getMarketcap() {
+    public String getMarketcap() {
         return marketcap;
     }
 }

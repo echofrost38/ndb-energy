@@ -5,30 +5,34 @@ import com.ndb.auction.models.CirculatingSupply;
 import com.ndb.auction.models.Marketcap;
 import com.ndb.auction.models.TotalSupply;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import java.text.DecimalFormat;
 
 @RestController
 public class NDBcoinController extends BaseController {
     @Autowired
     P2pController p2pController;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
-    @RequestMapping(value = "/totalsupply", method = RequestMethod.GET)
+    @RequestMapping(value = "/totalsupply", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public TotalSupply totalSupply() throws Exception {
         double totalSupply = ndbCoinService.getTotalSupply();
-        return new TotalSupply(totalSupply);
+        return new TotalSupply(df.format(totalSupply));
     }
 
-    @RequestMapping(value = "/circulatingsupply", method = RequestMethod.GET)
+    @RequestMapping(value = "/circulatingsupply", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public CirculatingSupply circulatingSupply() throws Exception {
         double circulatingSupply = ndbCoinService.getCirculatingSupply();
-        return new CirculatingSupply(circulatingSupply);
+        return new CirculatingSupply(df.format(circulatingSupply));
     }
 
-    @RequestMapping(value = "/marketcap", method = RequestMethod.GET)
-    public Marketcap marketcap() throws Exception {
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/marketcap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Object marketcap() throws Exception {
         double marketcap = ndbCoinService.getMarketCap();
-        return new Marketcap(marketcap);
+        return new Marketcap(df.format(marketcap));
     }
-
 }

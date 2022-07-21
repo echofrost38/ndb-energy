@@ -18,5 +18,6 @@ import java.math.BigInteger;
 public class NyyuPayResponse {
     protected String address;
     protected String hash;
+    protected String token;
     protected BigInteger amount;
 }

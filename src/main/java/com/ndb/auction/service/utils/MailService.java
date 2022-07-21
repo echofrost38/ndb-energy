@@ -93,7 +93,7 @@ public class MailService {
             var file = new java.io.File(path);
             helper.addAttachment(path, file);
         }
-        // javaMailSender.send(mimeMessage);
+        javaMailSender.send(mimeMessage);
     }
 
     private String fillWithdrawRequestEmail(String template, WithdrawRequest contents) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {

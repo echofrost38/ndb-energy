@@ -1,9 +1,5 @@
 package com.ndb.auction.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.Notification;
@@ -12,13 +8,14 @@ import com.ndb.auction.schedule.BroadcastNotification;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
-
 import com.ndb.auction.socketio.SocketIOService;
-import com.ndb.auction.stomp.StompSendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class NotificationService {
@@ -51,9 +48,6 @@ public class NotificationService {
 
     @Autowired
     public MailService mailService;
-
-    @Autowired
-    private StompSendMessageService stompSendMessageService;
 
     @Autowired
     private SocketIOService socketIOService;
@@ -106,7 +100,6 @@ public class NotificationService {
     public Notification addNewNotification(int userId, String email, int type, String title, String msg) {
         Notification notification = new Notification(userId, type, title, msg);
         var result = notificationDao.addNewNotification(notification);
-        stompSendMessageService.sendMessage("/ws/notify/" + userId, result);
         socketIOService.pushMessageToUser(email, "notification", result);
         return result;
     }

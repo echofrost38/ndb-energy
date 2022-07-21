@@ -1,21 +1,19 @@
 package com.ndb.auction.schedule;
 
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import com.ndb.auction.dao.oracle.other.NotificationDao;
 import com.ndb.auction.dao.oracle.user.UserDao;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.SMSService;
-
 import com.ndb.auction.socketio.SocketIOService;
-import com.ndb.auction.stomp.StompSendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 @Component
 public class BroadcastNotification {
@@ -33,9 +31,6 @@ public class BroadcastNotification {
 
     @Autowired
     private MailService mailService;
-
-    @Autowired
-    private StompSendMessageService stompSendMessageService;
 
     @Autowired
     private SocketIOService socketIOService;
@@ -71,7 +66,6 @@ public class BroadcastNotification {
                     continue;
                 notification.setUserId(user.getId());
                 notificationDao.addNewNotification(notification);
-                stompSendMessageService.sendMessage("/ws/notify/" + user.getId(), notification);
 
                 // send SMS, Email, Notification here
                 try {

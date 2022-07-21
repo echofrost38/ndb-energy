@@ -237,9 +237,8 @@ public class UserService extends BaseService {
 
 	public String deleteUser(int id) {
 		// if (userDao.updateDeleted(id) > 0)
-		if (userDao.deleteById(id) > 0 && !userReferralService.deleteReferrer(id).isEmpty() ){
+		if (userDao.deleteById(id) > 0)
 			return "Success";
-		}
 		return "Failed";
 	}
 

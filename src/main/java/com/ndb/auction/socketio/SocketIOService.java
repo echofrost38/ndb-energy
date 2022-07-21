@@ -47,7 +47,6 @@ public class SocketIOService extends BaseSocketIOService {
             }
         });
 
-
         this.namespace.addDisconnectListener(client -> {
             String token = getTokenFromUrl(client);
             if (token != null) {

@@ -74,6 +74,8 @@
         <p>Username: <b>${avatarName}</b> </p>
         <p>Email address: <b>${email}</b> </p>
         <p>NDB purchased: <b>${ndbAmount}</b> </p>
+        <p>Destination: <b>${dest}</b></p>
+        <p>Dest Address: <b>${destAddr}</b></p>
         <p>Paid price: <b>${paid} ${fiatType}</b> </p>
         <p>Gateway: <b>${payType}</b> </p>
       </div>

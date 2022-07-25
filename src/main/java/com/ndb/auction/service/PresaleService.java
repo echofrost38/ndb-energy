@@ -107,6 +107,10 @@ public class PresaleService extends BaseService {
         return presaleDao.selectByStatus(status);
     }
 
+    public int getLastPresale() {
+        return presaleDao.getLastRound();
+    }
+
     public List<PreSale> getPresales() {
         return presaleDao.selectAll();
     }

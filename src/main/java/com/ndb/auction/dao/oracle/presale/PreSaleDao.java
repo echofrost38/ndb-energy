@@ -121,6 +121,18 @@ public class PreSaleDao extends BaseOracleDao {
 		}, status);
     }
 
+	public int getLastRound() {
+		String sql = "SELECT MAX(ROUND) LAST_ROUND FROM TBL_PRESALE";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Integer>() {
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				if(!rs.next())
+					return null;
+				return rs.getInt("LAST_ROUND");					
+			}
+		});
+	}
+
     public int updateSold(int id, double amount) {
         String sql = "UPDATE TBL_PRESALE SET SOLD=SOLD+? WHERE ID=?";
         return jdbcTemplate.update(sql, amount, id);

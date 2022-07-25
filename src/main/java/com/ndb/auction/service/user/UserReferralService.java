@@ -236,6 +236,16 @@ public class UserReferralService extends BaseService {
         }
     }
 
+    public String deleteReferrer(int userId){
+        UserReferral referrer = userReferralDao.selectById(userId);
+        List<UserReferral> listUserReferral= userReferralDao.getAllByReferredByCode(referrer.getReferralCode()) ;
+        List<String> listUserWallet = new ArrayList<>();
+        for (UserReferral u : listUserReferral){
+            listUserWallet.add(u.getWalletConnect());
+        }
+        return ndbCoinService.deleteReferrer(referrer.getWalletConnect(),listUserWallet);
+    }
+
     /*
      * return remaining time in seconds
      */

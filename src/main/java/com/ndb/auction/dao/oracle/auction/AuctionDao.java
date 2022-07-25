@@ -56,6 +56,18 @@ public class AuctionDao extends BaseOracleDao {
 		});
 	}
 
+	public int getCountRounds() {
+		var sql = "SELECT MAX(ROUND) LAST_ROUND FROM TBL_AUCTION";
+		return jdbcTemplate.query(sql, new ResultSetExtractor<Integer>() {
+			@Override
+			public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+				if(!rs.next())
+					return null;
+				return rs.getInt("LAST_ROUND");					
+			}
+		});
+	}
+
 	public Auction createNewAuction(Auction m) {
 		String sql = "INSERT INTO TBL_AUCTION(ID, ROUND, START_DATE, END_DATE, TOTAL_TOKEN, MIN_PRICE, SOLD, QTY, WIN, FAIL, TOKEN, STATUS)"
 				+ "VALUES(SEQ_AUCTION.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?)";

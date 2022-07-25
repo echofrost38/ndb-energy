@@ -170,4 +170,8 @@ public class AuctionService extends BaseService {
 		return auctionDao.getNewRound();
 	}
 
+	public int getLastAuction() {
+		return auctionDao.getCountRounds();
+	}
+
 }

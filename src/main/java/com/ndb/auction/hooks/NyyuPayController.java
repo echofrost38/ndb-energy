@@ -42,9 +42,8 @@ public class NyyuPayController extends BaseController{
             String hmac = buildHmacSignature(payload, PRIVATE_KEY);
             if (reqHeader.get("x-auth-key").equals(PUBLIC_KEY) && reqHeader.get("x-auth-token").equals(hmac)){
                 System.out.println("NYYU PAY CALLBACK BODY: " + reqQuery);
-                
                 //New deposit
-                int tokenId = tokenAssetService.getTokenIdBySymbol("NDB");
+                int tokenId = tokenAssetService.getTokenIdBySymbol(response.getToken());
                 int userId = nyyuWalletService.selectByAddress(response.getAddress()).getUserId();
                 double amount = response.getAmount().doubleValue()/Math.pow(10,12);
                 balanceDao.addFreeBalance(userId, tokenId, amount);

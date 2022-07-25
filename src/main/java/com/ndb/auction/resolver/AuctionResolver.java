@@ -49,6 +49,12 @@ public class AuctionResolver extends BaseResolver implements GraphQLMutationReso
 		return currentRound;
 	}
 
+	public int getLastRound() {
+		int auctionLastRound = auctionService.getLastAuction();
+		int presaleLastRound = presaleService.getLastPresale();
+		return auctionLastRound > presaleLastRound ? auctionLastRound : presaleLastRound;
+	}
+
 	// start time / duration / total amount / min price 
 	// not sure => % of total amount for all rounds, previous min price!!
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

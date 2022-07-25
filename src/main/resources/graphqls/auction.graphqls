@@ -10,6 +10,7 @@ extend type Query {
 	) : Auction
 	getNewRound : Int
 	getCurrentRound : CurrentRound
+	getLastRound : Int
 }
 
 extend type Mutation {

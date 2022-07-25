@@ -2,11 +2,11 @@ package com.ndb.auction.models;
 
 public class TotalSupply {
 
-	private final double totalsupply;
-	public TotalSupply(double totalsupply) {
+	private final String totalsupply;
+	public TotalSupply(String totalsupply) {
 		this.totalsupply = totalsupply;
 	}
-	public double getTotalSupply() {
+	public String getTotalSupply() {
 		return totalsupply;
 	}
 }

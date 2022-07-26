@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
@@ -14,11 +15,13 @@ import com.ndb.auction.config.Web3jConfig;
 import com.ndb.auction.contracts.NDBReferral;
 import com.ndb.auction.contracts.NDBcoinV4;
 import com.ndb.auction.exceptions.ReferralException;
+import com.ndb.auction.models.SlackMessage;
 import com.ndb.auction.models.digifinex.DigiFinex;
 import com.ndb.auction.models.p2pb2b.P2PB2BResponse;
 import com.ndb.auction.schedule.ScheduledTasks;
 
 import com.ndb.auction.service.TokenAssetService;
+import com.ndb.auction.utils.SlackUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import okhttp3.OkHttpClient;
@@ -131,14 +134,34 @@ public class NDBCoinService {
         }
     }
 
-    private void handleEvent(NDBcoinV4.TransferEventResponse event) throws IOException {
-        // create new withdraw transaction record
-        BigInteger blockNumber = event.log.getBlockNumber();
-        String txnHash = event.log.getTransactionHash();
+    private void handleEvent(NDBcoinV4.TransferEventResponse event) {
+        try {
+            // create new withdraw transaction record
+            BigInteger blockNumber = event.log.getBlockNumber();
+            String txnHash = event.log.getTransactionHash();
 
-        // add to unconfirmed list
-        schedule.addPendingTxn(txnHash, blockNumber);
-        System.out.println("Pending: " + txnHash);
+            // add to unconfirmed list
+            schedule.addPendingTxn(txnHash, blockNumber);
+            System.out.println("Pending: " + txnHash);
+            // Send notify to NDB slack
+            String transferMessage= "*NDBtoken transfer "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
+                    + "\n*From:* " + event.from +
+                      (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? "Presale wallet"   : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? "DigiFinex wallet" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? "P2pB2b wallet" : "")
+                    + "\n*To:* " + event.to
+                    + "\n*Amount:* " + event.value.divide(decimals) +" NDB"
+                    + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
+
+            SlackMessage slackMessage = SlackMessage.builder()
+                    .username("user1")
+                    .text(transferMessage)
+                    .icon_emoji(":twice:")
+                    .build();
+            SlackUtils.sendMessage(slackMessage);
+        } catch (Exception e){
+            System.out.println(e.getStackTrace());
+        }
     }
 
     public String activeReferrer(String address , Double rate){

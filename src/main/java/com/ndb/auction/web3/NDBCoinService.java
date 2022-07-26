@@ -68,6 +68,9 @@ public class NDBCoinService {
     private String[] referralPrivKey;
 
     @Autowired
+    private SlackUtils slackUtils;
+
+    @Autowired
     private ScheduledTasks schedule;
 
     @Autowired
@@ -158,7 +161,7 @@ public class NDBCoinService {
                     .text(transferMessage)
                     .icon_emoji(":twice:")
                     .build();
-            SlackUtils.sendMessage(slackMessage);
+            slackUtils.sendMessage(slackMessage);
         } catch (Exception e){
             System.out.println(e.getStackTrace());
         }

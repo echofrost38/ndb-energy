@@ -222,6 +222,7 @@ public class UserReferralService extends BaseService {
     public boolean updateCommissionRate(int userId, int tierLevel){
         try {
             UserReferral referrer = userReferralDao.selectById(userId);
+            if (referrer == null) return false;
             User user = userDao.selectById(referrer.getId()) ;
             if (tierLevel > user.getTierLevel()) {
                 int rate = tierRate[tierLevel];

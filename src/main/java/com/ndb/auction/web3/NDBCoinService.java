@@ -148,19 +148,20 @@ public class NDBCoinService {
             System.out.println("Pending: " + txnHash);
             // Send notify to NDB slack
             String transferMessage= "*NDBtoken transfer "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
-                    + "\n*From:* " + event.from +
-                      (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? "Presale wallet"   : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? "DigiFinex wallet" : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? "P2pB2b wallet" : "")
+                    + "\n*From "
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet:*"   : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? " DigiFinex wallet:*" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? " P2pB2b wallet:*" : "")
+                    + ":* " + event.from
                     + "\n*To:* " + event.to
                     + "\n*Amount:* " + event.value.doubleValue()/Math.pow(10,12) +" NDB"
                     + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
 
             SlackMessage slackMessage = SlackMessage.builder()
-                    .channel((bscChainId== 56 ? "ndbtoken" : "ndb-testnet"))
+                    .channel((bscChainId== 56 ? "C03K6BANS7P" : "C03RS06B324"))
                     .username("ndbBot")
                     .text(transferMessage)
-                    .icon_emoji(":twice:")
+                    .icon_emoji(":bell:")
                     .build();
             slackUtils.sendMessage(slackMessage);
         } catch (Exception e){

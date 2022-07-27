@@ -15,30 +15,14 @@ public class SlackUtils {
 
     @Value("${bsc.json.chainid}")
     private long bscChainId;
-    @Value("${slack.webhook.ndbtoken}")
-    private String[] slackWebhookToken;
+    @Value("${slack.webhook}")
+    private String[] slackWebhookUrl;
 
-    @Value("${slack.webhook.referral}")
-    private String[] slackWebhookReferral;
+    public void sendMessage(SlackMessage message) {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost((bscChainId == 56 ? slackWebhookUrl[0] : slackWebhookUrl[1]));
 
-    public enum SlackChannel {
-        TOKEN,
-        REFERRAL
-    }
-
-    public void sendMessage(SlackMessage message,SlackChannel channel) {
         try {
-            CloseableHttpClient client = HttpClients.createDefault();
-            HttpPost httpPost = null;
-            switch (channel) {
-                case TOKEN:
-                    httpPost = new HttpPost((bscChainId == 56 ? slackWebhookToken[0] : slackWebhookToken[1]));
-                    break;
-                case REFERRAL:
-                    httpPost = new HttpPost((bscChainId == 56 ? slackWebhookReferral[0] : slackWebhookReferral[1]));
-                    break;
-            }
-
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(message);
 

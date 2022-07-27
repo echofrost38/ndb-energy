@@ -28,8 +28,10 @@ import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class DepositBank extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     @Autowired
@@ -81,6 +83,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             throw new BalanceException(msg, "2FA");
         }
 
+        log.info("BANK DEPOSIT CODE CHECKED");
+
         // ignore show status
         var m = (BankDepositTransaction)bankDepositService.selectById(id, 1);
         if(m == null) {
@@ -112,6 +116,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         double fee = getTierFee(userId, cryptoAmount);
         double deposited = cryptoAmount - fee;
 
+        log.info("BANK DEPOSIT PRICE FETCHED");
+
         // update user balance and tier
         internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
         List<BalancePayload> balances = balanceService.getInternalBalances(userId);
@@ -123,6 +129,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             double _balance = _price * (balance.getFree() + balance.getHold());
             totalBalance += _balance;
         }
+
+        log.info("ADDED BALANCE");
 
         // update user tier points
         User user = userService.getUserById(userId);
@@ -162,14 +170,19 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             tierTaskService.updateTierTask(tierTask);
         }
 
+        log.info("TIER LEVEL CHECKED");
+
         notificationService.sendNotification(
             userId,
             Notification.DEPOSIT_SUCCESS, 
             "PAYMENT CONFIRMED", 
             String.format("Your deposit of %f %s was successful.", deposited, cryptoType));
 
+        log.info("SENT NOTIFY");
         
         bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
+
+        log.info("UPDATED DEPOSIT REQUEST");
         // ignore for admin
         return (BankDepositTransaction) bankDepositService.selectById(id, 1);
     }

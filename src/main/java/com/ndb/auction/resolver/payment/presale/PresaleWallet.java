@@ -70,8 +70,8 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         }
 
         // deduct free balance
-        internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
         internalBalanceService.handlePresaleOrder(userId, 0, totalOrder, "NYYU", order);
+        internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
 
         return "Success";
     }

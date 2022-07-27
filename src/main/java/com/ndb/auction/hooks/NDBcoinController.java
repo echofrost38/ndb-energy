@@ -5,16 +5,17 @@ import com.ndb.auction.models.CirculatingSupply;
 import com.ndb.auction.models.Marketcap;
 import com.ndb.auction.models.TotalSupply;
 
-import org.json.JSONObject;
+import java.text.DecimalFormat;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import java.text.DecimalFormat;
 
 @RestController
 public class NDBcoinController extends BaseController {
     @Autowired
     P2pController p2pController;
+
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @RequestMapping(value = "/totalsupply", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -29,7 +30,6 @@ public class NDBcoinController extends BaseController {
         return new CirculatingSupply(df.format(circulatingSupply));
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/marketcap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Object marketcap() throws Exception {
         double marketcap = ndbCoinService.getMarketCap();

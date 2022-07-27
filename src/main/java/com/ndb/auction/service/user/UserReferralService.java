@@ -225,13 +225,14 @@ public class UserReferralService extends BaseService {
             User user = userDao.selectById(referrer.getId()) ;
             if (tierLevel > user.getTierLevel()) {
                 int rate = tierRate[tierLevel];
-                if (!referrer.getWalletConnect().isEmpty() && rate > 0) {
+                if (referrer.getWalletConnect() != null && rate > 0) {
                     String hash = ndbCoinService.updateReferrerRate(referrer.getWalletConnect(), (double) rate);
                     if (!hash.isEmpty()) return true;
                 }
             }
             return false;
         }catch(Exception e){
+            System.out.println(e.getStackTrace());
             throw new ReferralException(e.getMessage());
         }
     }

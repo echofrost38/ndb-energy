@@ -84,11 +84,7 @@ public class PresaleOrderService extends BaseService {
                     presale.getRound(),
                     user.getEmail(),
                     avatar.getPrefix() + avatar.getName(),
-                    paymentType, "USD", order.getNdbAmount(), 
-                    paidAmount, 
-                    order.getDestination() == PreSaleOrder.INTERNAL ? "Nyyu wallet" : "External wallet",
-                    order.getExtAddr(),
-                    admins);
+                    paymentType, "USD", order.getNdbAmount(), paidAmount, admins);
         } catch (Exception e) {
             e.printStackTrace();
             log.info("cannot send presale purchase email");

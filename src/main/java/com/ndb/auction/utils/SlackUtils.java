@@ -12,15 +12,12 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 @Service
 public class SlackUtils {
-
-    @Value("${bsc.json.chainid}")
-    private long bscChainId;
     @Value("${slack.webhook}")
-    private String[] slackWebhookUrl;
+    private String slackWebhookUrl;
 
     public void sendMessage(SlackMessage message) {
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost((bscChainId == 56 ? slackWebhookUrl[0] : slackWebhookUrl[1]));
+        HttpPost httpPost = new HttpPost(slackWebhookUrl);
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();

@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class SlackMessage implements Serializable {
-    private String channel;
+
     private String username;
     private String text;
     private String icon_emoji;

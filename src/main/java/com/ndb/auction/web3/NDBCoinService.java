@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,13 +34,10 @@ import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlockNumber;
-import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.FastRawTransactionManager;
-import java.text.DecimalFormat;
 
 @Service
 @Slf4j
@@ -89,7 +85,6 @@ public class NDBCoinService {
     private final BigInteger m_decimals = new BigInteger("100000000");
     private final double multipler = 10000.0;
 
-    private static final DecimalFormat df = new DecimalFormat("0.00");
     Queue<String> referralKeyQueue = new LinkedList<>();
 
     @SuppressWarnings("deprecation")
@@ -148,20 +143,18 @@ public class NDBCoinService {
             System.out.println("Pending: " + txnHash);
             // Send notify to NDB slack
             String transferMessage= "*NDBtoken transfer "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
-                    + "\n*From "
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet:*"   : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? " DigiFinex wallet:*" : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? " P2pB2b wallet:*" : "")
-                    + ":* " + event.from
+                    + "\n*From:* " + event.from +
+                      (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? "Presale wallet"   : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? "DigiFinex wallet" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? "P2pB2b wallet" : "")
                     + "\n*To:* " + event.to
-                    + "\n*Amount:* " + event.value.doubleValue()/Math.pow(10,12) +" NDB"
+                    + "\n*Amount:* " + event.value.divide(decimals) +" NDB"
                     + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
 
             SlackMessage slackMessage = SlackMessage.builder()
-                    .channel((bscChainId== 56 ? "C03K6BANS7P" : "C03RS06B324"))
-                    .username("ndbBot")
+                    .username("user1")
                     .text(transferMessage)
-                    .icon_emoji(":bell:")
+                    .icon_emoji(":twice:")
                     .build();
             slackUtils.sendMessage(slackMessage);
         } catch (Exception e){

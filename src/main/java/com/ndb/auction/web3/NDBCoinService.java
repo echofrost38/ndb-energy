@@ -38,6 +38,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.FastRawTransactionManager;
+import java.text.DecimalFormat;
 
 @Service
 @Slf4j
@@ -85,6 +86,7 @@ public class NDBCoinService {
     private final BigInteger m_decimals = new BigInteger("100000000");
     private final double multipler = 10000.0;
 
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     Queue<String> referralKeyQueue = new LinkedList<>();
 
     @SuppressWarnings("deprecation")
@@ -102,6 +104,7 @@ public class NDBCoinService {
                 referralKeyQueue.add(item);
             }
             setKeyBeforeExcuteTransaction();
+
             ndbToken.transferEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
                     .subscribe(event -> {
                         handleEvent(event);
@@ -113,6 +116,47 @@ public class NDBCoinService {
         }
     }
 
+    private void handleActiveReferrer(NDBReferral.ReferrerActiveEventResponse event) {
+        try {
+            String txnHash = event.log.getTransactionHash();
+            String transferMessage = "*ActiveReferrer " + (bscChainId == 56 ? "(mainnet)*" : "(testnet)*")
+                    + "\n*Referrer:* " + event.referrer
+                    + "\n*Rate:* " + event.rate
+                    + "\n*Bscscan:* " + (bscChainId == 56 ? "https://bscscan.com/tx/" + txnHash : "https://testnet.bscscan.com/tx/" + txnHash);
+
+            SlackMessage slackMessage = SlackMessage.builder()
+                    .channel((bscChainId == 56 ? "C03K6BANS7P" : "C03RS06B324"))
+                    .username("ndbBot")
+                    .text(transferMessage)
+                    .icon_emoji(":bell:")
+                    .build();
+            slackUtils.sendMessage(slackMessage, SlackUtils.SlackChannel.REFERRAL);
+        } catch (Exception e){
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    private void handleRecordReferralEvent(NDBReferral.ReferralRecordedEventResponse event) {
+        try {
+        System.out.println(event.referrer);
+        String txnHash = event.log.getTransactionHash();
+        String transferMessage= "*RecordReferral "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
+                + "\n*Referrer:* " + event.referrer
+                + "\n*User:* " + event.user
+                + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
+
+        SlackMessage slackMessage = SlackMessage.builder()
+                .channel((bscChainId== 56 ? "C03K6BANS7P" : "C03RS06B324"))
+                .username("ndbBot")
+                .text(transferMessage)
+                .icon_emoji(":bell:")
+                .build();
+        slackUtils.sendMessage(slackMessage,SlackUtils.SlackChannel.REFERRAL);
+        } catch (Exception e){
+            System.out.println(e.getStackTrace());
+        }
+    }
+
     @SuppressWarnings("deprecation")
     private void setKeyBeforeExcuteTransaction(){
         var dynamicKey= referralKeyQueue.poll();
@@ -120,6 +164,19 @@ public class NDBCoinService {
         referralKeyQueue.add(dynamicKey);
         FastRawTransactionManager txManangerReferral = new FastRawTransactionManager(BEP20NET, credentialReferral, bscChainId);
         ndbReferral = NDBReferral.load(ndbReferralContract, BEP20NET, txManangerReferral, gasPrice, gasLimit);
+        ndbReferral.referrerActiveEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+                .subscribe(event -> {
+                    handleActiveReferrer(event);
+                }, error -> {
+                    System.out.println("referrerActiveEventFlowable error : " + error);
+                });
+
+        ndbReferral.referralRecordedEventFlowable(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST)
+                .subscribe(event -> {
+                    handleRecordReferralEvent(event);
+                }, error -> {
+                    System.out.println("referrerActiveEventFlowable error : " + error);
+                });
     }
 
     public BigInteger getBalanceOf(String wallet){
@@ -144,9 +201,9 @@ public class NDBCoinService {
             // Send notify to NDB slack
             String transferMessage= "*NDBtoken transfer "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
                     + "\n*From "
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet:*"   : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? " DigiFinex wallet:*" : "")
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? " P2pB2b wallet:*" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet"   : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? " DigiFinex wallet" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? " P2pB2b wallet" : "")
                     + ":* " + event.from
                     + "\n*To:* " + event.to
                     + "\n*Amount:* " + event.value.doubleValue()/Math.pow(10,12) +" NDB"
@@ -158,7 +215,7 @@ public class NDBCoinService {
                     .text(transferMessage)
                     .icon_emoji(":bell:")
                     .build();
-            slackUtils.sendMessage(slackMessage);
+            slackUtils.sendMessage(slackMessage, SlackUtils.SlackChannel.TOKEN);
         } catch (Exception e){
             System.out.println(e.getStackTrace());
         }

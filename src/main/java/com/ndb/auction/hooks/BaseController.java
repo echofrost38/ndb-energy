@@ -161,7 +161,7 @@ public class BaseController {
         return body;
     }
 
-    public String buildHmacSignature(String value, String secret) {
+    public static String buildHmacSignature(String value, String secret) {
         String result;
         try {
             Mac hmacSHA512 = Mac.getInstance(HMAC_SHA_512);

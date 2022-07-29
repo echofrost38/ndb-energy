@@ -4,7 +4,8 @@ type UserReferral {
     referredByCode: String,
     walletConnect: String,
     rate: Int,
-    commissionRate : [Int]
+    commissionRate : [Int],
+    firstPurchase : Boolean
 }
 
 type ActiveReferralResponse {

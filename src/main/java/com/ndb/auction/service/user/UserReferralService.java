@@ -39,7 +39,6 @@ public class UserReferralService extends BaseService {
 
         referral.setRate(tierRate[user.getTierLevel()]);
         referral.setCommissionRate(tierRate);
-        referral.setFirstPurchase(ndbCoinService.firstPurchase(referral.getWalletConnect()));
         return referral;
     }
 
@@ -145,7 +144,7 @@ public class UserReferralService extends BaseService {
                     referral.setTarget(target);
                     userReferralDao.insertOrUpdate(referral);
                 }
-            }
+            } 
            
             return ActiveReferralResponse.builder()
                 .code(referral.getReferralCode())
@@ -264,10 +263,5 @@ public class UserReferralService extends BaseService {
         } while (userReferralDao.existsUserByReferralCode(generated)==1);
 
         return generated;
-    }
-
-    public boolean isFirstPurchase(int userId) {
-        UserReferral referrer = userReferralDao.selectById(userId);
-        return ndbCoinService.firstPurchase(referrer.getWalletConnect());
     }
 }

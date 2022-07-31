@@ -270,14 +270,6 @@ public class NDBCoinService {
         }
     }
 
-    public boolean firstPurchase(String userAddress){
-        try {
-            return ndbReferral.firstPurchase(userAddress).send().booleanValue();
-        } catch (Exception e) {
-            throw new ReferralException(e.getMessage());
-        }
-    }
-
     public String updateReferrerRate(String referrer , Double rate){
         try {
             setKeyBeforeExcuteTransaction();

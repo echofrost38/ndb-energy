@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
@@ -24,10 +23,9 @@ import com.ndb.auction.web3.WithdrawWalletService;
 
 import graphql.kickstart.servlet.context.GraphQLServletContext;
 import graphql.schema.DataFetchingEnvironment;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -38,10 +36,17 @@ import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
+@RequiredArgsConstructor
 public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
     @Value("${super.phone}")
     private String superPhone;
+
+    @Value("${withdraw.check.pub}")
+    private String PUBLIC_KEY;
+
+    @Value("${withdraw.check.priv}")
+    private String PRIVATE_KEY;
 
     private final double BEP20FEE = 1;
     private final double ERC20FEE = 20;
@@ -49,29 +54,17 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     private final double MIN_WITHDRAW_BEP20 = 10;
     private final double MIN_WITHDRAW_ERC20 = 30;
 
-    @Autowired
-    protected CryptoWithdrawService cryptoWithdrawService;
+    private final CryptoWithdrawService cryptoWithdrawService;
 
-    @Autowired
-    protected WithdrawWalletService adminWalletService;
+    private final WithdrawWalletService adminWalletService;
 
-    @Autowired
-    private TotpService totpService;
+    private final TotpService totpService;
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
 
-    @Autowired
-    private SMSService smsService;
+    private final SMSService smsService;
 
-    @Autowired
-    private TokenService tokenService;
-
-    @Value("publicfEIFJaFJEIF324KJ34Jfji93fjDF849DeifEfjaZ")
-    private String PUBLIC_KEY;
-
-    @Value("privateEfji3499dfEf03jfDeifjaF2349f9fjlAFEr93R")
-    private String PRIVATE_KEY;
+    private final TokenService tokenService;
 
     @PreAuthorize("isAuthenticated()")
     public CryptoWithdraw cryptoWithdrawRequest(
@@ -82,6 +75,18 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
             String code,
             DataFetchingEnvironment env
     ) throws MessagingException {
+        
+        GraphQLServletContext context = env.getContext();
+        var request = context.getHttpServletRequest();
+        String token = request.getHeader("x-auth-token");
+        String key = request.getHeader("x-auth-key");
+        String ts = request.getHeader("x-auth-ts");
+        String payload = ts + "." + sourceToken + "." + network + "." + des + "." + code;
+        String hmac = BaseController.buildHmacSignature(payload, PRIVATE_KEY);
+        if (!key.equals(PUBLIC_KEY) || !token.equals(hmac))
+            throw new UnauthorizedException("something went wrong", "signature");
+
+        
         var userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
@@ -135,16 +140,6 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
                 throw new BalanceException("Not supported withdrawal.", "amount");
             }
         }
-
-        GraphQLServletContext context = env.getContext();
-        HttpServletRequest request = context.getHttpServletRequest();
-        String token = request.getHeader("x-auth-token");
-        String key = request.getHeader("x-auth-key");
-        String ts = request.getHeader("x-auth-ts");
-        String payload = ts + "." + sourceToken + "." + network + "." + des + "." + code;
-        String hmac = BaseController.buildHmacSignature(payload, PRIVATE_KEY);
-        if (!key.equals(PUBLIC_KEY) || !token.equals(hmac))
-            throw new UnauthorizedException("something went wrong", "signature");
 
         double withdrawAmount = amount - fee;
 

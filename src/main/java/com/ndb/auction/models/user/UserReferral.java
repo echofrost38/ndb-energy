@@ -20,4 +20,5 @@ public class UserReferral extends BaseModel {
     private String paidTxn;
     private boolean active;
     private boolean record;
+    private boolean firstPurchase;
 }

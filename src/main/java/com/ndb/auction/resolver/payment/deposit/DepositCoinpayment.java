@@ -6,10 +6,13 @@ import java.util.Locale;
 
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
+import com.ndb.auction.web3.NyyuWalletService;
 import org.apache.http.client.ClientProtocolException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,7 +22,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class DepositCoinpayment extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
-    
+
+    @Autowired
+    NyyuWalletService nyyuWalletService;
     private static final String DEPOSIT = "DEPOSIT";
     // get deposit address 
     @PreAuthorize("isAuthenticated()")
@@ -32,9 +37,22 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
-
-        CoinpaymentDepositTransaction m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
-        return coinpaymentWalletService.createNewTransaction(m);
+        CoinpaymentDepositTransaction m;
+        switch (network){
+            case "BEP20":
+                m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
+                NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId);
+                if (nyyuWallet != null){
+                    m.setDepositAddress(nyyuWallet.getPublicKey());
+                } else {
+                    String address = nyyuWalletService.generateBEP20Address(userId);
+                    m.setDepositAddress(address);
+                }
+                return m;
+            default:
+                m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
+                return coinpaymentWalletService.createNewTransaction(m);
+        }
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")

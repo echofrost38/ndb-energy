@@ -7,6 +7,7 @@ import java.util.Locale;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
+import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
 
@@ -48,26 +49,42 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         post.addHeader("Accept-Language", "en-US");
         
         m = coinpaymentTransactionDao.insert(m);
+        switch (m.getNetwork()){
+            case "BEP20" :
+                NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId());
+                long ts = System.currentTimeMillis() / 1000L;
+                String nyyuPayload = String.valueOf(ts) +"POST"+"{\"address\":\""+nyyuWallet.getPublicKey()+"\"}";
+                String nyyuHmac = buildHmacSignature(nyyuPayload, NYYU_PRIV_KEY);
+                post.addHeader("X-Auth-Token",  nyyuHmac);
+                post.addHeader("X-Auth-Key",  NYYU_PRIV_KEY);
+                post.addHeader("X-Auth-Ts",  String.valueOf(ts));
+                post.setEntity(new StringEntity(nyyuPayload));
+                CloseableHttpResponse nyyuPayResponse = client.execute(post);
+                String nyyuPayContent = EntityUtils.toString(nyyuPayResponse.getEntity());
+                log.info("Coinpayment Get Callback address response: {}", nyyuPayContent);
+                coinpaymentTransactionDao.updateDepositAddress(m.getId(), nyyuWallet.getPublicKey());
+            default:
+                // get address
+                String ipnUrl = COINSPAYMENT_IPN_URL + "/presale/" + m.getId();
+                CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(m.getCoin(), ipnUrl);
 
-        // get address
-        String ipnUrl = COINSPAYMENT_IPN_URL + "/presale/" + m.getId();
-        CoinPaymentsGetCallbackRequest request = new CoinPaymentsGetCallbackRequest(m.getCoin(), ipnUrl);
-        
-        String payload = request.toString();
-        payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";
-        String hmac = buildHmacSignature(payload, COINSPAYMENT_PRIV_KEY);
-        
-        post.addHeader("HMAC", hmac);
-        post.setEntity(new StringEntity(payload));
-        CloseableHttpResponse response = client.execute(post);
-        
-        String content = EntityUtils.toString(response.getEntity());
-        log.info("Coinpayment Get Callback address response: {}", content);
-        
-        AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
-        if(!addressResponse.getError().equals("ok")) return null;
-        String address = addressResponse.getResult().getAddress();
-        coinpaymentTransactionDao.updateDepositAddress(m.getId(), address);
+                String payload = request.toString();
+                payload += "&version=1&key=" + COINSPAYMENT_PUB_KEY + "&format-json";
+                String hmac = buildHmacSignature(payload, COINSPAYMENT_PRIV_KEY);
+
+                post.addHeader("HMAC", hmac);
+                post.setEntity(new StringEntity(payload));
+                CloseableHttpResponse response = client.execute(post);
+
+                String content = EntityUtils.toString(response.getEntity());
+                log.info("Coinpayment Get Callback address response: {}", content);
+
+                AddressResponse addressResponse = gson.fromJson(content, AddressResponse.class);
+                if(!addressResponse.getError().equals("ok")) return null;
+                String address = addressResponse.getResult().getAddress();
+                coinpaymentTransactionDao.updateDepositAddress(m.getId(), address);
+        }
+
         return coinpaymentTransactionDao.selectById(m.getId());
     }
         

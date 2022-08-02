@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-
 @RestController
 public class P2pController extends BaseController {
 

@@ -75,6 +75,9 @@ public class BaseService {
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
 
+    @Value("${nyyupay.callback}")
+    public String NYYU_CALLBACK;
+
     @Value("${nyyupay.request}")
     public String NYYU_API_URL;
 

@@ -11,6 +11,7 @@ import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransac
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
+import com.ndb.auction.payload.response.PendingRequestResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,17 +20,28 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
+    @Value("${nyyupay.pubKey}")
+    public String NYYU_PUB_KEY;
+
+    @Value("${nyyupay.privKey}")
+    public String NYYU_PRIV_KEY;
+
+    @Value("${nyyupay.base}")
+    public String NYYU_BASE_URL;
+
+    @Value("${api.base}")
+    public String API_BASE;
+
     public CoinpaymentDepositTransaction createNewTransaction(CoinpaymentDepositTransaction m)
             throws UnsupportedEncodingException, ClientProtocolException, IOException {
         
-        // round existing
-        // check bid
         var presaleOrder = presaleOrderDao.selectById(m.getOrderId());
         if(presaleOrder == null || presaleOrder.getStatus() == 1) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
@@ -45,7 +57,8 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         m = coinpaymentTransactionDao.insert(m);
         switch (m.getNetwork()){
             case "BEP20" :
-                post = new HttpPost(NYYU_API_URL);
+                // send pending request
+                post = new HttpPost(NYYU_BASE_URL + "/pending-requests");
                 post.addHeader("Connection", "close");
                 post.addHeader("Content-Type", "application/json; charset=utf-8");
 
@@ -53,20 +66,27 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 long ts = System.currentTimeMillis() / 1000L;
                 var nyyuPayPendingRequest= NyyuPayPendingRequest.builder()
                         .address(nyyuWallet.getPublicKey())
-                        .callback(NYYU_CALLBACK)
+                        .callback(API_BASE + "/nyyupay/presale/" + m.getId())
                         .network("BEP20")
+                        .cryptoType(m.getCryptoType())
                         .build();
 
-                String nyyuPayload = String.valueOf(ts) +"POST"+gson.toJson(nyyuPayPendingRequest);
+                String nyyuPayload = String.valueOf(ts) + "POST" + gson.toJson(nyyuPayPendingRequest);
                 String nyyuHmac = buildHmacSignature(nyyuPayload, NYYU_PRIV_KEY);
-                post.addHeader("x-auth-token",  nyyuHmac);
-                post.addHeader("x-auth-key",  NYYU_PUB_KEY);
-                post.addHeader("x-auth-ts",  String.valueOf(ts));
+                post.addHeader("x-auth-token", nyyuHmac);
+                post.addHeader("x-auth-key", NYYU_PUB_KEY);
+                post.addHeader("x-auth-ts", String.valueOf(ts));
                 post.setEntity(new StringEntity(gson.toJson(nyyuPayPendingRequest)));
+                
                 CloseableHttpResponse nyyuPayResponse = client.execute(post);
                 String nyyuPayContent = EntityUtils.toString(nyyuPayResponse.getEntity());
                 log.info("Nyyupay pending-requests response: {}", nyyuPayContent);
+
+                var res = gson.fromJson(nyyuPayContent, PendingRequestResponse.class);
+                if(!res.getStatus().equals("PENDING")) return null;
+
                 coinpaymentTransactionDao.updateDepositAddress(m.getId(), nyyuWallet.getPublicKey());
+                m.setDepositAddress(nyyuWallet.getPublicKey());
                 break;
             default:
                 post = new HttpPost(COINS_API_URL);
@@ -94,10 +114,10 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 if(!addressResponse.getError().equals("ok")) return null;
                 String address = addressResponse.getResult().getAddress();
                 coinpaymentTransactionDao.updateDepositAddress(m.getId(), address);
+                m.setDepositAddress(address);
                 break;
         }
-
-        return coinpaymentTransactionDao.selectById(m.getId());
+        return m;
     }
         
 }

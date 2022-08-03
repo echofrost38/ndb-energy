@@ -75,18 +75,6 @@ public class BaseService {
     public final static String RESET_TEMPLATE = "reset.ftlh";
     public final static String NEW_USER_CREATED = "new_user.ftlh";
 
-    @Value("${nyyupay.callback}")
-    public String NYYU_CALLBACK;
-
-    @Value("${nyyupay.request}")
-    public String NYYU_API_URL;
-
-    @Value("${nyyupay.pubKey}")
-    public String NYYU_PUB_KEY;
-
-    @Value("${nyyupay.privKey}")
-    public String NYYU_PRIV_KEY;
-
     @Value("${coinspayment.public.key}")
     public String COINSPAYMENT_PUB_KEY;
 

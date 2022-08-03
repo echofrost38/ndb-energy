@@ -258,15 +258,16 @@ public class CryptoController extends BaseController {
             var totalOrder = getTotalOrder(presaleOrder.getUserId(), totalPrice);
 
             if(totalOrder > fiatAmount) {
-                log.info("total order: {}", totalPrice);
+                // insufficient funds case
                 notificationService.sendNotification(
                     presaleOrder.getUserId(),
                     Notification.DEPOSIT_SUCCESS, 
                     "PAYMENT CONFIRMED", 
-                    "Your purchase of " + ndbToken + "NDB" + " in the presale round was successful.");
+                    "Your purchase of " + ndbToken + "NDB" + " in the presale round was failed.");
                 var price = apiUtil.getCryptoPriceBySymbol("USDT");
                 log.info("added free balance: {}", fiatAmount / price);
-                balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, fiatAmount / price);
+                
+                balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", fiatAmount / price);
                 return new ResponseEntity<>(HttpStatus.OK); 
             }
 

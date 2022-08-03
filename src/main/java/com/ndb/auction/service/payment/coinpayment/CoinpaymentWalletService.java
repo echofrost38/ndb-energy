@@ -51,6 +51,10 @@ public class CoinpaymentWalletService extends CoinpaymentBaseService {
         return m;
     }
 
+    public CoinpaymentDepositTransaction createNewDepositTxn(CoinpaymentDepositTransaction m) {
+        return coinpaymentTransactionDao.insert(m);
+    }
+
     public int updateStatus(int id, double amount, double deposited, double fee, String cryptoType) {
         return coinpaymentTransactionDao.updateStatus(id, 1, amount, deposited, fee, cryptoType);
     }

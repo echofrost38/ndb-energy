@@ -15,6 +15,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
+import com.ndb.auction.models.user.User;
 import com.ndb.auction.service.*;
 import com.ndb.auction.service.payment.TxnFeeService;
 import com.ndb.auction.service.payment.coinpayment.CoinpaymentAuctionService;
@@ -26,6 +27,7 @@ import com.ndb.auction.service.user.UserKybService;
 import com.ndb.auction.service.user.UserSecurityService;
 import com.ndb.auction.service.user.UserService;
 import com.ndb.auction.service.user.UserVerifyService;
+import com.ndb.auction.service.user.WhitelistService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 import com.ndb.auction.web3.NyyuWalletService;
@@ -106,6 +108,9 @@ public class BaseController {
 
     @Autowired
     protected LocationLogService locationLogService;
+
+    @Autowired
+    protected WhitelistService whitelistService;
 
     public static final String SHARED_SECRET = "a2282529-0865-4dbf-b837-d6f31db0e057";
 
@@ -258,5 +263,20 @@ public class BaseController {
         }
         return map;
     }
+
+    protected double getTierFee(int userId, double amount) {
+		var user = userService.getUserById(userId);
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
+		return amount * tierFeeRate / 100;
+	}
+
+    protected double getTierFee(User user, double amount) {
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+		var white = whitelistService.selectByUser(user.getId());
+		if(white != null) tierFeeRate = 0.0;
+		return amount * tierFeeRate / 100;
+	}
 
 }

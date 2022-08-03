@@ -4,7 +4,6 @@ import com.ndb.auction.hooks.BaseController;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+
 
 @RestController
 public class P2pController extends BaseController {
@@ -62,35 +62,6 @@ public class P2pController extends BaseController {
             lastKlineTime = currentTime;
         }
         return lastKlineResponse;
-    }
-
-
-    @Value("${cmc.api_key}")
-    private String CMC_API_KEY;
-
-    static long lastPriceCMCTime;
-    static ResponseEntity lastPriceCMCResponse;
-
-    @GetMapping(value = "/ndbcoin/cmc")
-    public Object getNdbCmc() throws IOException {
-        long currentTime = System.currentTimeMillis();
-        if (lastPriceCMCResponse == null || currentTime - lastPriceCMCTime > 600000) {
-            Request request = new Request.Builder()
-                    .url("https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=NDB")
-                    .header("X-CMC_PRO_API_KEY", CMC_API_KEY)
-                    .build();
-            Response response = new OkHttpClient().newCall(request).execute();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", response.header("content-type"));
-
-            lastPriceCMCResponse = ResponseEntity
-                    .status(HttpStatus.OK)
-                    .headers(headers)
-                    .body(response.body().string());
-            lastPriceCMCTime = currentTime;
-        }
-        return lastPriceCMCResponse;
     }
 
 }

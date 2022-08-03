@@ -11,13 +11,13 @@ import lombok.Setter;
 @Configuration
 public class PaypalConfig {
 
-	@Value("${paypal.client.id}")
-	private String clientId;
-	@Value("${paypal.client.secret}")
-	private String clientSecret;
-	@Value("${paypal.mode}")
-	private String mode;
-	@Value("${paypal.baseUrl}")
-	private String baseUrl;
+	// @Value("${paypal.client.id}")
+	// private String clientId;
+	// @Value("${paypal.client.secret}")
+	// private String clientSecret;
+	// @Value("${paypal.mode}")
+	// private String mode;
+	// @Value("${paypal.baseUrl}")
+	// private String baseUrl;
 
 }

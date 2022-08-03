@@ -53,7 +53,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 long ts = System.currentTimeMillis() / 1000L;
                 var nyyuPayPendingRequest= NyyuPayPendingRequest.builder()
                         .address(nyyuWallet.getPublicKey())
-                        .callback(NYYU_CALLBACK+m.getId())
+                        .callback(NYYU_CALLBACK)
                         .network("BEP20")
                         .build();
 

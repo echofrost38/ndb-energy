@@ -62,94 +62,101 @@ public class PaypalHttpClient {
     }
 
     public AccessTokenResponseDTO getAccessToken() throws Exception {
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), GET_ACCESS_TOKEN)))
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, encodeBasicCredentials())
-                .header(HttpHeaders.ACCEPT_LANGUAGE, "en_US")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials"))
-                .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-        return objectMapper.readValue(content, AccessTokenResponseDTO.class);
+        // var request = HttpRequest.newBuilder()
+        //         .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), GET_ACCESS_TOKEN)))
+        //         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+        //         .header(HttpHeaders.AUTHORIZATION, encodeBasicCredentials())
+        //         .header(HttpHeaders.ACCEPT_LANGUAGE, "en_US")
+        //         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        //         .POST(HttpRequest.BodyPublishers.ofString("grant_type=client_credentials"))
+        //         .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
+        // return objectMapper.readValue(content, AccessTokenResponseDTO.class);
+        return null;
     }
 
     public ClientTokenDTO getClientToken() throws Exception {
-        var accessTokenDto = getAccessToken();
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), GET_CLIENT_TOKEN)))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
-                .header(HttpHeaders.ACCEPT_LANGUAGE, "en_US")
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
+        // var accessTokenDto = getAccessToken();
+        // var request = HttpRequest.newBuilder()
+        //         .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), GET_CLIENT_TOKEN)))
+        //         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+        //         .header(HttpHeaders.ACCEPT_LANGUAGE, "en_US")
+        //         .POST(HttpRequest.BodyPublishers.noBody())
+        //         .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
 
-        return objectMapper.readValue(content, ClientTokenDTO.class);
+        // return objectMapper.readValue(content, ClientTokenDTO.class);
+        return null;
     }
 
     public OrderResponseDTO createOrder(OrderDTO orderDTO) throws Exception {
-        var accessTokenDto = getAccessToken();
-        var payload = objectMapper.writeValueAsString(orderDTO);
+        // var accessTokenDto = getAccessToken();
+        // var payload = objectMapper.writeValueAsString(orderDTO);
 
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), ORDER_CHECKOUT)))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
-                .POST(HttpRequest.BodyPublishers.ofString(payload))
-                .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-        return objectMapper.readValue(content, OrderResponseDTO.class);
+        // var request = HttpRequest.newBuilder()
+        //         .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), ORDER_CHECKOUT)))
+        //         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+        //         .POST(HttpRequest.BodyPublishers.ofString(payload))
+        //         .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
+        // return objectMapper.readValue(content, OrderResponseDTO.class);
+        return null;
     }
 
     public PayoutResponseDTO createPayout(PayoutsDTO payoutDTO) throws Exception {
-        var accessTokenDto = getAccessToken();
-        var payload = objectMapper.writeValueAsString(payoutDTO);
-        var request = HttpRequest.newBuilder()
-            .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CREATE_PAYOUTS)))
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-        return objectMapper.readValue(content, PayoutResponseDTO.class);
+        // var accessTokenDto = getAccessToken();
+        // var payload = objectMapper.writeValueAsString(payoutDTO);
+        // var request = HttpRequest.newBuilder()
+        //     .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CREATE_PAYOUTS)))
+        //     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+        //     .POST(HttpRequest.BodyPublishers.ofString(payload))
+        //     .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
+        // return objectMapper.readValue(content, PayoutResponseDTO.class);
+        return null;
     }
 
     public Object createWebhook(Webhook webhook) throws Exception {
-        var accessTokenDto = getAccessToken();
-        var payload = objectMapper.writeValueAsString(webhook);
-        var request = HttpRequest.newBuilder()
-            .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CREATE_WEBHOOK)))
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-        return objectMapper.readValue(content, Object.class);
+        // var accessTokenDto = getAccessToken();
+        // var payload = objectMapper.writeValueAsString(webhook);
+        // var request = HttpRequest.newBuilder()
+        //     .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CREATE_WEBHOOK)))
+        //     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+        //     .POST(HttpRequest.BodyPublishers.ofString(payload))
+        //     .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
+        // return objectMapper.readValue(content, Object.class);
+        return null;
     }
 
     public CaptureOrderResponseDTO captureOrder(String id) throws Exception {
-        var accessTokenDto = getAccessToken();
-        var payload = "";
-        var request = HttpRequest.newBuilder()
-            .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CAPTURE_ORDER, id)))
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
-            .POST(HttpRequest.BodyPublishers.ofString(payload))
-            .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-        return objectMapper.readValue(content, CaptureOrderResponseDTO.class);
+        // var accessTokenDto = getAccessToken();
+        // var payload = "";
+        // var request = HttpRequest.newBuilder()
+        //     .uri(URI.create(createUrl(paypalConfig.getBaseUrl(), CAPTURE_ORDER, id)))
+        //     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        //     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenDto.getAccessToken())
+        //     .POST(HttpRequest.BodyPublishers.ofString(payload))
+        //     .build();
+        // var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        // var content = response.body();
+        // return objectMapper.readValue(content, CaptureOrderResponseDTO.class);
+        return null;
     }
 
 
     private String encodeBasicCredentials() {
-        var input = paypalConfig.getClientId() + ":" + paypalConfig.getClientSecret();
-        return "Basic " + Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
+        // var input = paypalConfig.getClientId() + ":" + paypalConfig.getClientSecret();
+        // return "Basic " + Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
+        return null;
     }
 }

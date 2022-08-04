@@ -78,7 +78,7 @@ public class NyyuPayController extends BaseController{
             var nyyuWallet = nyyuWalletService.selectByAddress(depositAddress);
             if(nyyuWallet == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-            int userId = nyyuWallet.getId();
+            int userId = nyyuWallet.getUserId();
             var user = userService.getUserById(userId);
             // deposited crypto amount
             double cryptoAmount = response.getAmount().doubleValue()/Math.pow(10,decimal);
@@ -195,7 +195,7 @@ public class NyyuPayController extends BaseController{
             var fiatAmount = cryptoAmount * cryptoPrice; // calculator fiatAmount based amount
 
             var txn = coinpaymentPresaleService.selectById(id);
-            if(txn == null || txn.getStatus()) new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+            if(txn == null || txn.getDepositStatus() != 0) new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 
             var presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
 
@@ -218,7 +218,7 @@ public class NyyuPayController extends BaseController{
             }
 
             var overflow = (fiatAmount - totalOrder) / cryptoPrice;
-            balanceService.addFreeBalance(presaleOrder.getUserId(), cryptoType, overflow);
+            balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", overflow);
 
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), id, totalOrder, "CRYPTO", presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);

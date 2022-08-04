@@ -62,7 +62,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 post.addHeader("Connection", "close");
                 post.addHeader("Content-Type", "application/json; charset=utf-8");
 
-                NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId());
+                var nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId());
                 long ts = System.currentTimeMillis() / 1000L;
                 var nyyuPayPendingRequest= NyyuPayPendingRequest.builder()
                         .address(nyyuWallet.getPublicKey())

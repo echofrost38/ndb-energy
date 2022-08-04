@@ -217,7 +217,7 @@ public class MailService {
     }
 
     public void sendDeposit(String email, String avatarName, String gateway, String paidType, String depositType, double paid, double deposited, double fee, List<User> admins) 
-        throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, MessagingException 
+        throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, MessagingException, TemplateException 
     {
         var stringWriter = new StringWriter();
         var model = new HashMap<String, Object>();
@@ -231,11 +231,12 @@ public class MailService {
         model.put("deposit", deposited);
         model.put("fee", fee);
 
-        configuration.getTemplate("deposit.ftlh");
+        configuration.getTemplate("deposit.ftlh").process(model, stringWriter);
         var mailContents = stringWriter.getBuffer().toString();
 
         var mimeMessage = javaMailSender.createMimeMessage();
         var helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject("Deposit confirmed");
         helper.setText(mailContents, true);
 
         for (User user : admins) {

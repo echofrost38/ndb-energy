@@ -141,24 +141,24 @@ public class NyyuPayController extends BaseController{
             balanceService.addFreeBalance(userId, cryptoType, deposited);
             log.info("Deposit detection : " + reqQuery.toString());
 
-            var admins = userService.getUsersByRole("ROLE_SUPER");
-            try {
-                mailService.sendDeposit(
-                    user.getEmail(), 
-                    user.getAvatar().getPrefix() + " " + user.getAvatar().getName(),
-                    "Coinpayment", 
-                    cryptoType, 
-                    cryptoType, 
-                    amount, 
-                    deposited, 
-                    fee, 
-                    admins
-                );
-            } catch (Exception e) {
-                log.info("cannot send crypto deposit notification email to admin");
-            }
-
             if(!cryptoType.equals("NDB")) {
+                var admins = userService.getUsersByRole("ROLE_SUPER");
+                try {
+                    mailService.sendDeposit(
+                        user.getEmail(), 
+                        user.getAvatar().getPrefix() + " " + user.getAvatar().getName(),
+                        "Coinpayment", 
+                        cryptoType, 
+                        cryptoType, 
+                        amount, 
+                        deposited, 
+                        fee, 
+                        admins
+                    );
+                } catch (Exception e) {
+                    log.info("cannot send crypto deposit notification email to admin");
+                }
+
                 notificationService.sendNotification(
                     userId,
                     Notification.DEPOSIT_SUCCESS, 

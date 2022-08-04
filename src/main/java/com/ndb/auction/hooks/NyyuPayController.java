@@ -158,11 +158,13 @@ public class NyyuPayController extends BaseController{
                 log.info("cannot send crypto deposit notification email to admin");
             }
 
-            notificationService.sendNotification(
-                userId,
-                Notification.DEPOSIT_SUCCESS, 
-                "PAYMENT CONFIRMED", 
-                String.format("Your deposit of %f %s was successful.", amount, cryptoType));
+            if(!cryptoType.equals("NDB")) {
+                notificationService.sendNotification(
+                    userId,
+                    Notification.DEPOSIT_SUCCESS, 
+                    "PAYMENT CONFIRMED", 
+                    String.format("Your deposit of %f %s was successful.", amount, cryptoType));
+            }
     
             return new ResponseEntity<>(HttpStatus.OK); 
                 

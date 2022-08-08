@@ -149,12 +149,12 @@ public class P2pController extends BaseController {
 
     @RequestMapping(value = "/ndbcoin/info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Object ndb_usdt() {
-        long now = System.currentTimeMillis();
-        if (lastNdbUsdtResult == null || now - lastNdbUsdtTime > 10 * 60000) {
+        long currentTime = System.currentTimeMillis();
+        if (lastNdbUsdtResult == null || currentTime - lastNdbUsdtTime > 10 * 60000) {
             var newResult = ndbCoinService.getAll();
             if (newResult != null) {
                 lastNdbUsdtResult = newResult;
-                lastNdbUsdtTime = now;
+                lastNdbUsdtTime = currentTime;
             }
         }
         return lastNdbUsdtResult;

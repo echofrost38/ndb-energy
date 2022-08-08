@@ -67,7 +67,6 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
                 // check nyyuWallet is registered or not
                 if (nyyuWallet != null){
-                    // check it is registered or not
                     if(nyyuWallet.getNyyuPayRegistered()) {
                         walletAddress = nyyuWallet.getPublicKey();
                     } else {

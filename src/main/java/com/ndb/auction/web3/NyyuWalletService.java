@@ -6,7 +6,6 @@ import com.ndb.auction.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.web3j.crypto.*;
 
 @Service
@@ -20,7 +19,6 @@ public class NyyuWalletService extends BaseService {
     @Value("${bsc.json.chainid}")
     private String chainId;
 
-    @Transactional
     public String generateBEP20Address(int userId) {
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
@@ -32,17 +30,33 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setPublicKey(address);
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork(chainId);
+            
+            var registered = nyyuPayService.sendNyyuPayRequest("/bep20", nyyuWallet.getPublicKey());
+            nyyuWallet.setNyyuPayRegistered(registered);
             nyyuWalletDao.insertOrUpdate(nyyuWallet);
             
-            nyyuPayService.sendAddressRequest(nyyuWallet.getPublicKey());
-            
-            System.out.println("Private key: " + keyPair.getPrivateKey().toString(16));
-            System.out.println("Account: " + address);
-            return address;
+            if(registered) {
+                return address;
+            }
         } catch(Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            return null;
+            e.printStackTrace();
         }
+        return null;
+    }
+
+    public String registerNyyuWallet(NyyuWallet wallet) {
+        try {
+            var registered = nyyuPayService.sendNyyuPayRequest("/bep20", wallet.getPublicKey());
+            wallet.setNyyuPayRegistered(registered);
+            nyyuWalletDao.insertOrUpdate(wallet);
+            
+            if(registered) {
+                return wallet.getPublicKey();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public NyyuWallet selectByUserId(int userId) {

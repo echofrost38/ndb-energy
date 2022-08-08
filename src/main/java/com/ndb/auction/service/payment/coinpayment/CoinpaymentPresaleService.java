@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
+import com.ndb.auction.exceptions.PaymentException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.nyyupay.NyyuPayPendingRequest;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
-import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.payload.request.CoinPaymentsGetCallbackRequest;
 import com.ndb.auction.payload.response.AddressResponse;
 import com.ndb.auction.payload.response.PendingRequestResponse;
@@ -55,6 +55,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         }
         HttpPost post;
         m = coinpaymentTransactionDao.insert(m);
+        var walletAddress = "";
         switch (m.getNetwork()){
             case "BEP20" :
                 // send pending request
@@ -63,9 +64,32 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 post.addHeader("Content-Type", "application/json; charset=utf-8");
 
                 var nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId());
+
+                // check nyyuWallet is registered or not
+                if (nyyuWallet != null){
+                    // check it is registered or not
+                    if(nyyuWallet.getNyyuPayRegistered()) {
+                        walletAddress = nyyuWallet.getPublicKey();
+                    } else {
+                        var address = nyyuWalletService.registerNyyuWallet(nyyuWallet);
+                        if(address == null) {
+                            String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
+                            throw new PaymentException(msg, "cryptoType");
+                        }
+                        walletAddress = address;
+                    }
+                } else {
+                    var address = nyyuWalletService.generateBEP20Address(m.getUserId());
+                    if(address == null) {
+                        String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
+                        throw new PaymentException(msg, "cryptoType");
+                    }
+                    walletAddress = address;
+                }
+
                 long ts = System.currentTimeMillis() / 1000L;
-                var nyyuPayPendingRequest= NyyuPayPendingRequest.builder()
-                        .address(nyyuWallet.getPublicKey())
+                var nyyuPayPendingRequest = NyyuPayPendingRequest.builder()
+                        .address(walletAddress)
                         .callback(API_BASE + "/nyyupay/presale/" + m.getId())
                         .network("BEP20")
                         .cryptoType(m.getCryptoType())
@@ -85,8 +109,8 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                 var res = gson.fromJson(nyyuPayContent, PendingRequestResponse.class);
                 if(!res.getStatus().equals("PENDING")) return null;
 
-                coinpaymentTransactionDao.updateDepositAddress(m.getId(), nyyuWallet.getPublicKey());
-                m.setDepositAddress(nyyuWallet.getPublicKey());
+                coinpaymentTransactionDao.updateDepositAddress(m.getId(), walletAddress);
+                m.setDepositAddress(walletAddress);
                 break;
             default:
                 post = new HttpPost(COINS_API_URL);

@@ -2,7 +2,10 @@ package com.ndb.auction.web3;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +38,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.FastRawTransactionManager;
-
 import java.text.DecimalFormat;
 
 @Service
@@ -89,7 +91,7 @@ public class NDBCoinService {
 
     @SuppressWarnings("deprecation")
     @PostConstruct
-    public void init() {
+    public void init()  {
         try {
             Web3jConfig web3jConfig = new Web3jConfig();
             BEP20NET = Web3j.build(web3jConfig.buildService(bscNetwork));
@@ -98,7 +100,7 @@ public class NDBCoinService {
             txMananger = new FastRawTransactionManager(BEP20NET, ndbCredential, bscChainId);
             ndbToken = NDBcoinV4.load(ndbTokenContract, BEP20NET, txMananger, gasPrice, gasLimit);
 
-            for (String item : referralPrivKey) {
+            for (String item : referralPrivKey){
                 referralKeyQueue.add(item);
             }
             setKeyBeforeExcuteTransaction();
@@ -109,7 +111,7 @@ public class NDBCoinService {
                     }, error -> {
                         System.out.println("Error: " + error);
                     });
-        } catch (Exception ex) {
+        } catch (Exception ex){
             System.out.println("INIT WEB3 : " + ex.getMessage());
         }
     }
@@ -129,35 +131,35 @@ public class NDBCoinService {
                     .icon_emoji(":bell:")
                     .build();
             slackUtils.sendMessage(slackMessage, SlackUtils.SlackChannel.REFERRAL);
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println(e.getStackTrace());
         }
     }
 
     private void handleRecordReferralEvent(NDBReferral.ReferralRecordedEventResponse event) {
         try {
-            System.out.println(event.referrer);
-            String txnHash = event.log.getTransactionHash();
-            String transferMessage = "*RecordReferral " + (bscChainId == 56 ? "(mainnet)*" : "(testnet)*")
-                    + "\n*Referrer:* " + event.referrer
-                    + "\n*User:* " + event.user
-                    + "\n*Bscscan:* " + (bscChainId == 56 ? "https://bscscan.com/tx/" + txnHash : "https://testnet.bscscan.com/tx/" + txnHash);
+        System.out.println(event.referrer);
+        String txnHash = event.log.getTransactionHash();
+        String transferMessage= "*RecordReferral "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
+                + "\n*Referrer:* " + event.referrer
+                + "\n*User:* " + event.user
+                + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
 
-            SlackMessage slackMessage = SlackMessage.builder()
-                    .channel((bscChainId == 56 ? "C03K6BANS7P" : "C03RS06B324"))
-                    .username("ndbBot")
-                    .text(transferMessage)
-                    .icon_emoji(":bell:")
-                    .build();
-            slackUtils.sendMessage(slackMessage, SlackUtils.SlackChannel.REFERRAL);
-        } catch (Exception e) {
+        SlackMessage slackMessage = SlackMessage.builder()
+                .channel((bscChainId== 56 ? "C03K6BANS7P" : "C03RS06B324"))
+                .username("ndbBot")
+                .text(transferMessage)
+                .icon_emoji(":bell:")
+                .build();
+        slackUtils.sendMessage(slackMessage,SlackUtils.SlackChannel.REFERRAL);
+        } catch (Exception e){
             System.out.println(e.getStackTrace());
         }
     }
 
     @SuppressWarnings("deprecation")
-    private void setKeyBeforeExcuteTransaction() {
-        var dynamicKey = referralKeyQueue.poll();
+    private void setKeyBeforeExcuteTransaction(){
+        var dynamicKey= referralKeyQueue.poll();
         Credentials credentialReferral = Credentials.create(dynamicKey);
         referralKeyQueue.add(dynamicKey);
         FastRawTransactionManager txManangerReferral = new FastRawTransactionManager(BEP20NET, credentialReferral, bscChainId);
@@ -177,11 +179,11 @@ public class NDBCoinService {
                 });
     }
 
-    public BigInteger getBalanceOf(String wallet) {
-        try {
+    public BigInteger getBalanceOf(String wallet){
+        try{
             BigInteger balance = ndbToken.balanceOf(wallet).send();
             return balance.divide(decimals);
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println("getBalance : " + e.getMessage());
             return BigInteger.ZERO;
         }
@@ -197,69 +199,69 @@ public class NDBCoinService {
             schedule.addPendingTxn(txnHash, blockNumber);
             System.out.println("Pending: " + txnHash);
             // Send notify to NDB slack
-            String transferMessage = "*NDBtoken transfer " + (bscChainId == 56 ? "(mainnet)*" : "(testnet)*")
+            String transferMessage= "*NDBtoken transfer "+ (bscChainId== 56? "(mainnet)*": "(testnet)*")
                     + "\n*From "
-                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet" : "")
+                    + (event.from.toLowerCase(Locale.ROOT).equals("0x2aba4f5683b765a6be05e037162164b8d02532b7") ? " Presale wallet"   : "")
                     + (event.from.toLowerCase(Locale.ROOT).equals("0xffefe959d8baea028b1697abfc4285028d6ceb10") ? " DigiFinex wallet" : "")
                     + (event.from.toLowerCase(Locale.ROOT).equals("0x5be909e0d204a94cc93fc9d7940584b5ec59e618") ? " P2pB2b wallet" : "")
                     + ":* " + event.from
                     + "\n*To:* " + event.to
-                    + "\n*Amount:* " + event.value.doubleValue() / Math.pow(10, 12) + " NDB"
-                    + "\n*Bscscan:* " + (bscChainId == 56 ? "https://bscscan.com/tx/" + txnHash : "https://testnet.bscscan.com/tx/" + txnHash);
+                    + "\n*Amount:* " + event.value.doubleValue()/Math.pow(10,12) +" NDB"
+                    + "\n*Bscscan:* "+ (bscChainId== 56 ? "https://bscscan.com/tx/"+txnHash : "https://testnet.bscscan.com/tx/"+txnHash);
 
             SlackMessage slackMessage = SlackMessage.builder()
-                    .channel((bscChainId == 56 ? "C03K6BANS7P" : "C03RS06B324"))
+                    .channel((bscChainId== 56 ? "C03K6BANS7P" : "C03RS06B324"))
                     .username("ndbBot")
                     .text(transferMessage)
                     .icon_emoji(":bell:")
                     .build();
             slackUtils.sendMessage(slackMessage, SlackUtils.SlackChannel.TOKEN);
-        } catch (Exception e) {
+        } catch (Exception e){
             System.out.println(e.getStackTrace());
         }
     }
 
-    public String activeReferrer(String address, Double rate) {
+    public String activeReferrer(String address , Double rate){
         try {
             setKeyBeforeExcuteTransaction();
             BigInteger _rate = BigInteger.valueOf(rate.longValue());
-            TransactionReceipt receipt = ndbReferral.activeReferrer(address, _rate).send();
+            TransactionReceipt receipt = ndbReferral.activeReferrer(address,_rate).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public double getUserEarning(String address) {
+    public double getUserEarning(String address){
         try {
-            double earning = ndbReferral.getEarning(address).send().doubleValue() / Math.pow(10, 12);
+            double earning= ndbReferral.getEarning(address).send().doubleValue() / Math.pow(10,12);
             return earning;
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public String recordReferral(String user, String referrer) {
+    public String recordReferral(String user , String referrer){
         try {
             setKeyBeforeExcuteTransaction();
-            TransactionReceipt receipt = ndbReferral.recordReferral(user, referrer).send();
+            TransactionReceipt receipt = ndbReferral.recordReferral(user,referrer).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public String deleteReferrer(String referrer, List<String> users) {
+    public String deleteReferrer(String referrer,List<String> users){
         try {
             setKeyBeforeExcuteTransaction();
-            TransactionReceipt receipt = ndbReferral.deleteReferrer(referrer, users).send();
+            TransactionReceipt receipt = ndbReferral.deleteReferrer(referrer,users).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public int lockingTimeRemain(String userAddress) {
+    public int lockingTimeRemain(String userAddress){
         try {
             int lockingTime = ndbReferral.lockingTimeRemain(userAddress).send().intValue();
             return lockingTime;
@@ -268,7 +270,7 @@ public class NDBCoinService {
         }
     }
 
-    public boolean firstPurchase(String userAddress) {
+    public boolean firstPurchase(String userAddress){
         try {
             return ndbReferral.firstPurchase(userAddress).send().booleanValue();
         } catch (Exception e) {
@@ -276,18 +278,18 @@ public class NDBCoinService {
         }
     }
 
-    public String updateReferrerRate(String referrer, Double rate) {
+    public String updateReferrerRate(String referrer , Double rate){
         try {
             setKeyBeforeExcuteTransaction();
             BigInteger _rate = BigInteger.valueOf(rate.longValue());
-            TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer, _rate).send();
+            TransactionReceipt receipt = ndbReferral.updateReferrerRate(referrer,_rate).send();
             return receipt.getTransactionHash();
         } catch (Exception e) {
             throw new ReferralException(e.getMessage());
         }
     }
 
-    public String updateReferrer(String old, String current) {
+    public String updateReferrer(String old, String current){
         try {
             setKeyBeforeExcuteTransaction();
             TransactionReceipt receipt = ndbReferral.updateReferrer(old, current).send();
@@ -307,18 +309,18 @@ public class NDBCoinService {
             return false;
     }
 
-    public boolean isReferralRecorded(String userWallet, String referrerWallet) {
+    public boolean isReferralRecorded(String userWallet,String referrerWallet) {
         try {
             String result = ndbReferral.referrersByUser(userWallet).sendAsync().get();
             if (result.equals(referrerWallet.toLowerCase())) return true;
             else return false;
-        } catch (Exception e) {
+        } catch (Exception e){
             throw new ReferralException(e.getMessage());
         }
     }
 
     public double getTotalSupply() throws ExecutionException, InterruptedException {
-        BigInteger total = ndbToken.totalSupply().sendAsync().get();
+        BigInteger total =  ndbToken.totalSupply().sendAsync().get();
         return total.divide(decimals).doubleValue();
     }
 
@@ -332,76 +334,16 @@ public class NDBCoinService {
         Request digiFinexRequest = new Request.Builder()
                 .url("https://openapi.digifinex.com/v3/ticker?symbol=NDB_USDT")
                 .build();
-        Response digiFinexResponse = new OkHttpClient().newCall(digiFinexRequest).execute();
-        DigiFinex digiFinexData = new Gson().fromJson(digiFinexResponse.body().string(), DigiFinex.class);
+        Response digiFinexResponse =  new OkHttpClient().newCall(digiFinexRequest).execute();
+        DigiFinex digiFinexData= new Gson().fromJson(digiFinexResponse.body().string(), DigiFinex.class);
 
         double ciculatingSupply = this.getCirculatingSupply();
-        double price = (Double.parseDouble(p2pData.result.last) + digiFinexData.ticker.get(0).last) / 2;
+        double price = (Double.parseDouble(p2pData.result.last) + digiFinexData.ticker.get(0).last)/2;
         double marketcap = ciculatingSupply * price;
         return marketcap;
     }
-
     public double getCirculatingSupply() throws Exception {
-        return ndbToken.getCirculatingSupply().send().divide(decimals).doubleValue();
-    }
-
-    public Map<String, Object> getAll() {
-        List<Double> priceList = new ArrayList<>();
-        List<Double> changeList = new ArrayList<>();
-        List<Double> volumeList = new ArrayList<>();
-        try {
-            Request p2pRequest = new Request.Builder()
-                    .url("https://api.p2pb2b.com/api/v2/public/ticker?market=NDB_USDT")
-                    .build();
-            Response response = new OkHttpClient().newCall(p2pRequest).execute();
-            if (response.code() != 200) throw new RuntimeException("RspCode=" + response.code());
-            P2PB2BResponse p2pData = new Gson().fromJson(response.body().string(), P2PB2BResponse.class);
-            priceList.add(Double.parseDouble(p2pData.result.last));
-            changeList.add(Double.parseDouble(p2pData.result.change));
-            volumeList.add(Double.parseDouble(p2pData.result.volume));
-        } catch (Exception ex) {
-            log.info("failed to get response from p2pb2b: {}", ex.getMessage());
-        }
-        try {
-            Request digiFinexRequest = new Request.Builder()
-                    .url("https://openapi.digifinex.com/v3/ticker?symbol=NDB_USDT")
-                    .build();
-            Response response = new OkHttpClient().newCall(digiFinexRequest).execute();
-            if (response.code() != 200) throw new RuntimeException("RspCode=" + response.code());
-            DigiFinex digiFinexData = new Gson().fromJson(response.body().string(), DigiFinex.class);
-            priceList.add(digiFinexData.ticker.get(0).last);
-            changeList.add(digiFinexData.ticker.get(0).change);
-            volumeList.add(digiFinexData.ticker.get(0).vol);
-        } catch (Exception ex) {
-            log.info("failed to get response from digifinex: {}", ex.getMessage());
-        }
-        if (priceList.size() > 0) {
-            double price = priceList.stream()
-                    .mapToDouble(d -> d)
-                    .average()
-                    .orElse(0.0);
-            double change = changeList.stream()
-                    .mapToDouble(d -> d)
-                    .average()
-                    .orElse(0.0);
-            double volume = volumeList.stream()
-                    .mapToDouble(d -> d)
-                    .sum();
-            Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("price", price);
-            resultMap.put("change", change);
-            resultMap.put("volume", volume);
-            try {
-                double ciculatingSupply = this.getCirculatingSupply();
-                double marketCap = ciculatingSupply * price;
-                resultMap.put("ciculatingSupply", ciculatingSupply);
-                resultMap.put("marketCap", marketCap);
-            } catch (Exception ex) {
-                log.info("failed to get circulating supply: {}", ex.getMessage());
-            }
-            return resultMap;
-        }
-        return null;
+        return  ndbToken.getCirculatingSupply().send().divide(decimals).doubleValue();
     }
 
     public NDBCoinService() {
@@ -412,7 +354,7 @@ public class NDBCoinService {
         try {
             //Web3j web3j = Web3j.build(new HttpService(bscNetwork));
             BigInteger latestNumber = BEP20NET.ethGetBlockByNumber(DefaultBlockParameterName.LATEST, false).send().getBlock().getNumber();
-            if (latestNumber.subtract(targetNumber).longValue() > 12L) {
+            if(latestNumber.subtract(targetNumber).longValue() > 12L) {
                 return true;
             }
         } catch (IOException e) {
@@ -430,7 +372,7 @@ public class NDBCoinService {
             ndbCredential = Credentials.create(ndbKey);
             @SuppressWarnings("deprecation")
             ERC20 ndbToken = ERC20.load(ndbTokenContract, web3j, ndbCredential, gasPrice, gasLimit);
-
+            
             // avoid decimals
             amount *= multipler;
             BigInteger _amount = BigInteger.valueOf(amount.longValue());

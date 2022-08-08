@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import com.ndb.auction.exceptions.PaymentException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.transactions.coinpayment.CoinpaymentDepositTransaction;
 import com.ndb.auction.models.wallet.NyyuWallet;
@@ -11,6 +12,7 @@ import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 
 import com.ndb.auction.web3.NyyuWalletService;
+
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +28,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
     @Autowired
     NyyuWalletService nyyuWalletService;
     private static final String DEPOSIT = "DEPOSIT";
+    
     // get deposit address 
     @PreAuthorize("isAuthenticated()")
     public CoinpaymentDepositTransaction createChargeForDeposit(String coin, String network, String cryptoType) throws ClientProtocolException, IOException {
@@ -43,9 +46,23 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
                 m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
                 NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId);
                 if (nyyuWallet != null){
-                    m.setDepositAddress(nyyuWallet.getPublicKey());
+                    // check it is registered or not
+                    if(nyyuWallet.getNyyuPayRegistered()) {
+                        m.setDepositAddress(nyyuWallet.getPublicKey());
+                    } else {
+                        var address = nyyuWalletService.registerNyyuWallet(nyyuWallet);
+                        if(address == null) {
+                            String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
+                            throw new PaymentException(msg, "cryptoType");
+                        }
+                        m.setDepositAddress(address);
+                    }
                 } else {
-                    String address = nyyuWalletService.generateBEP20Address(userId);
+                    var address = nyyuWalletService.generateBEP20Address(userId);
+                    if(address == null) {
+                        String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
+                        throw new PaymentException(msg, "cryptoType");
+                    }
                     m.setDepositAddress(address);
                 }
                 return m;

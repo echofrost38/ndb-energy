@@ -347,6 +347,7 @@ public class NDBCoinService {
 
     public Map<String, Object> getAll() {
         List<Double> priceList = new ArrayList<>();
+        List<Double> changeList = new ArrayList<>();
         List<Double> volumeList = new ArrayList<>();
         try {
             Request p2pRequest = new Request.Builder()
@@ -356,6 +357,7 @@ public class NDBCoinService {
             if (response.code() != 200) throw new RuntimeException("RspCode=" + response.code());
             P2PB2BResponse p2pData = new Gson().fromJson(response.body().string(), P2PB2BResponse.class);
             priceList.add(Double.parseDouble(p2pData.result.last));
+            changeList.add(Double.parseDouble(p2pData.result.change));
             volumeList.add(Double.parseDouble(p2pData.result.volume));
         } catch (Exception ex) {
             log.info("failed to get response from p2pb2b: {}", ex.getMessage());
@@ -368,6 +370,7 @@ public class NDBCoinService {
             if (response.code() != 200) throw new RuntimeException("RspCode=" + response.code());
             DigiFinex digiFinexData = new Gson().fromJson(response.body().string(), DigiFinex.class);
             priceList.add(digiFinexData.ticker.get(0).last);
+            changeList.add(digiFinexData.ticker.get(0).change);
             volumeList.add(digiFinexData.ticker.get(0).vol);
         } catch (Exception ex) {
             log.info("failed to get response from digifinex: {}", ex.getMessage());
@@ -377,11 +380,16 @@ public class NDBCoinService {
                     .mapToDouble(d -> d)
                     .average()
                     .orElse(0.0);
+            double change = changeList.stream()
+                    .mapToDouble(d -> d)
+                    .average()
+                    .orElse(0.0);
             double volume = volumeList.stream()
                     .mapToDouble(d -> d)
                     .sum();
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("price", price);
+            resultMap.put("change", change);
             resultMap.put("volume", volume);
             try {
                 double ciculatingSupply = this.getCirculatingSupply();

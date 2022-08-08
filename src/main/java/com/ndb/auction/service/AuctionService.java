@@ -3,8 +3,6 @@ package com.ndb.auction.service;
 import java.util.List;
 import java.util.Locale;
 
-import javax.annotation.PostConstruct;
-
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Notification;
@@ -19,10 +17,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuctionService extends BaseService {
 
-	@PostConstruct
-	public void init() {
-		schedule.checkAllRounds();
-	}
+	// @PostConstruct
+	// public void init() {
+	// 	schedule.checkAllRounds();
+	// }
 
 	public Auction createNewAuction(Auction auction) {
 

@@ -17,8 +17,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableAsync
 public class AppConfig {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+//    @Autowired
+//    private ApplicationContext applicationContext;
 
     public static boolean appStartUp;
     public static ServerMaintenance maintenanceMessage;

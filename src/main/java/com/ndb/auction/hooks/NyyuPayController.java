@@ -84,8 +84,8 @@ public class NyyuPayController extends BaseController{
             double cryptoAmount = response.getAmount().doubleValue()/Math.pow(10,decimal);
             
             // fee
-            var fee = getTierFee(user, cryptoAmount);
-            var cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+            var fee = cryptoType.equals("NDB") ? 0 : getTierFee(user, cryptoAmount);
+            var cryptoPrice = cryptoType.equals("NDB") ? 0 : thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
             var deposited = cryptoAmount - fee;
             var amount = deposited * cryptoPrice;
 

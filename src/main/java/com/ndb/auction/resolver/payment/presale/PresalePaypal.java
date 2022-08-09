@@ -110,7 +110,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
             }
 
             // process order
-            presaleService.handlePresaleOrder(userId, m.getId(), m.getAmount(), "PAYPAL", presaleOrder);
+            presaleService.handlePresaleOrder(userId, m.getId(), m.getFiatAmount(), "PAYPAL", presaleOrder);
             paypalPresaleService.updateOrderStatus(m.getId(), OrderStatus.COMPLETED.toString());
 			return true;
 		} else return false;

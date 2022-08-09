@@ -40,35 +40,36 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
+        
         CoinpaymentDepositTransaction m;
-        switch (network){
-            case "BEP20":
-                m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
-                NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId);
-                if (nyyuWallet != null){
-                    // check it is registered or not
-                    if(nyyuWallet.getNyyuPayRegistered()) {
-                        m.setDepositAddress(nyyuWallet.getPublicKey());
-                    } else {
-                        var address = nyyuWalletService.registerNyyuWallet(nyyuWallet);
-                        if(address == null) {
-                            String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
-                            throw new PaymentException(msg, "cryptoType");
-                        }
-                        m.setDepositAddress(address);
-                    }
+        
+        if(network.equals("BEP20") || network.equals("ERC20")) {
+            m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
+            NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId);
+            if (nyyuWallet != null){
+                // check it is registered or not
+                if(nyyuWallet.getNyyuPayRegistered()) {
+                    m.setDepositAddress(nyyuWallet.getPublicKey());
                 } else {
-                    var address = nyyuWalletService.generateBEP20Address(userId);
+                    var address = nyyuWalletService.registerNyyuWallet(nyyuWallet);
                     if(address == null) {
                         String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
                         throw new PaymentException(msg, "cryptoType");
                     }
                     m.setDepositAddress(address);
                 }
-                return m;
-            default:
-                m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
-                return coinpaymentWalletService.createNewTransaction(m);
+            } else {
+                var address = nyyuWalletService.generateBEP20Address(userId);
+                if(address == null) {
+                    String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
+                    throw new PaymentException(msg, "cryptoType");
+                }
+                m.setDepositAddress(address);
+            }
+            return m;
+        } else {
+            m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
+            return coinpaymentWalletService.createNewTransaction(m);
         }
     }
 

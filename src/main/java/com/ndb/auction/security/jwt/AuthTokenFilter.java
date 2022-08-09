@@ -71,7 +71,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             JsonArray errorsArray = new JsonArray();
             JsonObject errorObject = new JsonObject();
             errorObject.addProperty("isUnderMaintenance", true);
-            errorObject.addProperty("message", AppConfig.maintenanceMessage);
+            String message = AppConfig.maintenanceMessage.getMessage();
+            if (message != null && !message.isEmpty())
+                errorObject.addProperty("message", AppConfig.maintenanceMessage.getMessage());
             errorsArray.add(errorObject);
             JsonObject responseObject = new JsonObject();
             responseObject.add("errors", errorsArray);

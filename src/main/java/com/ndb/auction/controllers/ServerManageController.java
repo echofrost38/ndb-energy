@@ -2,6 +2,7 @@ package com.ndb.auction.controllers;
 
 import com.ndb.auction.config.AppConfig;
 import com.ndb.auction.hooks.BaseController;
+import com.ndb.auction.models.ServerMaintenance;
 import com.ndb.auction.service.ServerManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,12 @@ public class ServerManageController extends BaseController {
 
     @GetMapping(value = "/admin/refresh", produces = MediaType.TEXT_PLAIN_VALUE)
     public Object refresh() {
-        AppConfig.maintenanceMessage = serverManageService.checkMaintenance();
-        if (AppConfig.maintenanceMessage == null)
+        ServerMaintenance serverMaintenance = serverManageService.checkMaintenance();
+        AppConfig.maintenanceMessage = serverMaintenance;
+        if (serverMaintenance == null)
             return "Maintenance Mode is OFF.";
         else
-            return "Maintenance Mode is ON.\nMessage = " + AppConfig.maintenanceMessage;
+            return "Maintenance Mode is ON.\nMessage = " + serverMaintenance.getMessage() + "\nExpire = " + serverMaintenance.getExpireDate();
     }
 
 }

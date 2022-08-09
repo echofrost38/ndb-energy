@@ -1,5 +1,6 @@
 package com.ndb.auction.config;
 
+import com.ndb.auction.models.ServerMaintenance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +21,7 @@ public class AppConfig {
     private ApplicationContext applicationContext;
 
     public static boolean appStartUp;
-    public static String maintenanceMessage;
+    public static ServerMaintenance maintenanceMessage;
 
     @EventListener(ApplicationReadyEvent.class)
     public void startup() {

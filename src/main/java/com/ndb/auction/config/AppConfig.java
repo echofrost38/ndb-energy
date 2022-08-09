@@ -20,6 +20,7 @@ public class AppConfig {
     private ApplicationContext applicationContext;
 
     public static boolean appStartUp;
+    public static String maintenanceMessage;
 
     @EventListener(ApplicationReadyEvent.class)
     public void startup() {

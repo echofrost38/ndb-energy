@@ -116,6 +116,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/marketcap/**").permitAll()
 				.antMatchers("/nyyupay/**").permitAll()
 				.antMatchers("/ndbcoin/**").permitAll()
+				.antMatchers("/admin/**").permitAll()
 				.antMatchers("/ws/**").permitAll()
         	.anyRequest().authenticated()
 			.and()

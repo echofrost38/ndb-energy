@@ -96,7 +96,7 @@ public class SocketIOService extends BaseSocketIOService {
         try {
             this.namespace.getBroadcastOperations().sendEvent(namespace, msgContent);
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error("broadcast error: {}", e.toString());
         }
     }
 
@@ -110,7 +110,7 @@ public class SocketIOService extends BaseSocketIOService {
                 logger.info("SocketIO {} sent send message to {}: {}", namespace, email, msgContent);
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error("socketio message error: {}", e.toString());
         }
     }
 

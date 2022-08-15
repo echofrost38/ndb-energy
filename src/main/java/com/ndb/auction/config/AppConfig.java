@@ -1,5 +1,6 @@
 package com.ndb.auction.config;
 
+import com.ndb.auction.models.ServerMaintenance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
@@ -16,10 +17,11 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableAsync
 public class AppConfig {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+//    @Autowired
+//    private ApplicationContext applicationContext;
 
     public static boolean appStartUp;
+    public static ServerMaintenance maintenanceMessage;
 
     @EventListener(ApplicationReadyEvent.class)
     public void startup() {

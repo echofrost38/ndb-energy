@@ -1,0 +1,6 @@
+type BalancePerUser {
+    userId: Int,
+    email: String,
+    avatarName: String,
+    balances: [BalancePayload]
+}

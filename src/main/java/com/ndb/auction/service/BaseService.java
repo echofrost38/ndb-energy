@@ -283,7 +283,7 @@ public class BaseService {
         }
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId, "BEP20");
             if (!nyyuWallet.getNyyuPayRegistered()){
                 throw new BalanceException("Cannot transfer NDB Coin. Nyyu wallet is not registered.", "NDB");
             }

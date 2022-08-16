@@ -63,7 +63,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
             post.addHeader("Connection", "close");
             post.addHeader("Content-Type", "application/json; charset=utf-8");
 
-            var nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId());
+            var nyyuWallet = nyyuWalletService.selectByUserId(m.getUserId(), "BEP20");
 
             // check nyyuWallet is registered or not
             if (nyyuWallet != null){
@@ -78,7 +78,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
                     walletAddress = address;
                 }
             } else {
-                var address = nyyuWalletService.generateBEP20Address(m.getUserId());
+                var address = nyyuWalletService.generateNyyuWallet("BEP20", m.getUserId());
                 if(address == null) {
                     String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
                     throw new PaymentException(msg, "cryptoType");

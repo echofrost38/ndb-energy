@@ -33,9 +33,9 @@ public class NyyuWalletDao extends BaseOracleDao {
     public int insertOrUpdate(NyyuWallet m) {
         String sql =  "MERGE INTO TBL_NYYU_WALLET USING DUAL ON (ID=?)"
                 + "WHEN MATCHED THEN UPDATE SET NYYUPAY_REGISTERED= ? "
-                + "WHEN NOT MATCHED THEN INSERT (ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY)"
-                + "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?)";
-        return jdbcTemplate.update(sql,m.getId(),m.getNyyuPayRegistered(), m.getUserId(), m.getNetwork(),m.getPrivateKey(),m.getPublicKey());
+                + "WHEN NOT MATCHED THEN INSERT (ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY,NYYUPAY_REGISTERED)"
+                + "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?,?)";
+        return jdbcTemplate.update(sql,m.getId(),m.getNyyuPayRegistered(), m.getUserId(), m.getNetwork(),m.getPrivateKey(),m.getPublicKey(), m.getNyyuPayRegistered());
     }
 
     public int isInteralWallet(String address){
@@ -59,13 +59,13 @@ public class NyyuWalletDao extends BaseOracleDao {
         }, address);
     }
 
-    public NyyuWallet selectByUserId(int userId) {
-        String sql = "SELECT * FROM TBL_NYYU_WALLET WHERE USER_ID=?";
+    public NyyuWallet selectByUserId(int userId, String network) {
+        String sql = "SELECT * FROM TBL_NYYU_WALLET WHERE USER_ID=? AND NETWORK = ?";
         return jdbcTemplate.query(sql, rs -> {
             if (!rs.next())
                 return null;
             return extract(rs);
-        }, userId);
+        }, userId, network);
     }
 
 }

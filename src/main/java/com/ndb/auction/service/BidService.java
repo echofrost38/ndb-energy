@@ -477,11 +477,15 @@ public class BidService extends BaseService {
 		double _tokenPrice = originalBid.getTokenPrice();
 
 		// check amount & price
-		if ((_tokenAmount > tokenAmount) ||
-				(_tokenPrice > tokenPrice) ||
-				(_tokenPrice == tokenPrice && _tokenAmount == tokenAmount)) {
-					String msg = messageSource.getMessage("invalid_increase", null, Locale.ENGLISH);
-					throw new AuctionException(msg, "tokenPrice");
+		if (_tokenAmount > tokenAmount){
+			String msg = messageSource.getMessage("invalid_increase_amount", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "tokenAmount");
+		}else if (_tokenPrice > tokenPrice){
+			String msg = messageSource.getMessage("invalid_increase_price", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "tokenPrice");
+		}else if (_tokenPrice == tokenPrice && _tokenAmount == tokenAmount){
+			String msg = messageSource.getMessage("invalid_increase", null, Locale.ENGLISH);
+			throw new AuctionException(msg, "tokenPrice");
 		}
 
 		// previous total amount!

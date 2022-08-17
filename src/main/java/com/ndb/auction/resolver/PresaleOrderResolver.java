@@ -86,7 +86,7 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
                 var newAddr = extAddr;
                 if(destination == 1) {
                     // get Nyyu wallet
-                    var nyyuWallet = nyyuWalletService.selectByUserId(userId, "BEP20");
+                    var nyyuWallet = nyyuWalletService.selectByUserId(userId);
                     newAddr = nyyuWallet.getPublicKey();
                 } 
                 userReferralService.changeReferralWallet(userId, destination, currentAddr, newAddr);
@@ -96,9 +96,9 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         // check nyyu wallet 
         if(destination == PreSaleOrder.INTERNAL) {
             // for the old users
-            var nyyuWallet = nyyuWalletService.selectByUserId(userId, "BEP20");
+            var nyyuWallet = nyyuWalletService.selectByUserId(userId);
             if(nyyuWallet == null) {
-                var generatedAddr = nyyuWalletService.generateNyyuWallet("BEP20", userId);
+                var generatedAddr = nyyuWalletService.generateBEP20Address(userId);
                 if(generatedAddr == null) {
                     throw new PreSaleException("You cannot place a presale order because of Nyyu internal wallet", "destination");
                 }

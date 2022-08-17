@@ -42,10 +42,10 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
         }
         
         CoinpaymentDepositTransaction m;
-        network = network.equals("ERC20") ? "BEP20" : network;
-        if(network.equals("BEP20") || network.equals("TRC20")) {
+        
+        if(network.equals("BEP20") || network.equals("ERC20")) {
             m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
-            NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId, network);
+            NyyuWallet nyyuWallet = nyyuWalletService.selectByUserId(userId);
             if (nyyuWallet != null){
                 // check it is registered or not
                 if(nyyuWallet.getNyyuPayRegistered()) {
@@ -59,7 +59,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
                     m.setDepositAddress(address);
                 }
             } else {
-                var address = nyyuWalletService.generateNyyuWallet(network, userId);
+                var address = nyyuWalletService.generateBEP20Address(userId);
                 if(address == null) {
                     String msg = messageSource.getMessage("no_registered_wallet", null, Locale.ENGLISH);
                     throw new PaymentException(msg, "cryptoType");

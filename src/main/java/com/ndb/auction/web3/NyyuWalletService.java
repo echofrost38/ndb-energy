@@ -6,7 +6,6 @@ import com.ndb.auction.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.tron.trident.core.key.KeyPair;
 import org.web3j.crypto.*;
 
 @Service
@@ -17,8 +16,10 @@ public class NyyuWalletService extends BaseService {
     private String bscNetwork;
     @Value("${nyyu.wallet.password}")
     private  String password;
+    @Value("${bsc.json.chainid}")
+    private String chainId;
 
-    private String generateBEP20Address(int userId) {
+    public String generateBEP20Address(int userId) {
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
             WalletFile wallet = Wallet.createStandard(password, keyPair);
@@ -28,7 +29,7 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setUserId(userId);
             nyyuWallet.setPublicKey(address);
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
-            nyyuWallet.setNetwork("BEP20");
+            nyyuWallet.setNetwork(chainId);
             
             var registered = nyyuPayService.sendNyyuPayRequest("/bep20", nyyuWallet.getPublicKey());
             nyyuWallet.setNyyuPayRegistered(registered);
@@ -41,34 +42,6 @@ public class NyyuWalletService extends BaseService {
             e.printStackTrace();
         }
         return null;
-    }
-
-    // generate TRON wallet 
-    private String generateTronWallet(int userId) {
-        // create new tron wallet key pair
-        KeyPair keyPair = KeyPair.generate();
-        var nyyuWallet = NyyuWallet.builder()
-            .userId(userId)
-            .publicKey(keyPair.toBase58CheckAddress())
-            .privateKey(keyPair.toPrivateKey())
-            .network("TRC20")
-            .build();
-        var registered = nyyuPayService.sendNyyuPayRequest("/bep20", nyyuWallet.getPublicKey());
-        nyyuWallet.setNyyuPayRegistered(registered);
-        nyyuWalletDao.insertOrUpdate(nyyuWallet);
-
-        if(registered) return keyPair.toBase58CheckAddress();
-        return null;
-    }
-
-    public String generateNyyuWallet(String network, int userId) {
-        switch(network) {
-            case "BEP20": 
-                return generateBEP20Address(userId);
-            case "TRC20": 
-                return generateTronWallet(userId);
-        }
-        return "";
     }
 
     public String registerNyyuWallet(NyyuWallet wallet) {
@@ -86,8 +59,8 @@ public class NyyuWalletService extends BaseService {
         return null;
     }
 
-    public NyyuWallet selectByUserId(int userId, String network) {
-        return nyyuWalletDao.selectByUserId(userId, network);
+    public NyyuWallet selectByUserId(int userId) {
+        return nyyuWalletDao.selectByUserId(userId);
     }
 
     public NyyuWallet selectByAddress(String address){

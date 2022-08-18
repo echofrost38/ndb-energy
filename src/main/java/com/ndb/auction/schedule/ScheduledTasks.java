@@ -37,6 +37,8 @@ import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import com.ndb.auction.web3.NDBCoinService;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -83,16 +85,24 @@ public class ScheduledTasks {
     @Autowired
     ThirdAPIUtils apiUtils;
 
+    @Getter
     private Auction startedRound;
+    @Getter
     private Long startedCounter;
 
+    @Getter
     private Auction readyRound;
+    @Getter
     private Long readyCounter;
 
+    @Getter
     private PreSale startedPresale;
+    @Getter
     private Long startedPresaleCounter;
 
+    @Getter
     private PreSale readyPresale;
+    @Getter
     private Long readyPresaleCounter;
 
     private final AmazonS3 s3;
@@ -135,6 +145,9 @@ public class ScheduledTasks {
                 return;
             } else {
                 auctionService.endAuction(auction.getId());
+                bidService.closeBid(startedRound.getId());
+                statService.updateRoundCache(startedRound.getId());
+                startedRound = null;
                 return;
             }
         }
@@ -149,6 +162,9 @@ public class ScheduledTasks {
                 return;
             } else {
                 auctionService.endAuction(auction.getId());
+                bidService.closeBid(startedRound.getId());
+                statService.updateRoundCache(startedRound.getId());
+                startedRound = null;
                 return;
             }
         }

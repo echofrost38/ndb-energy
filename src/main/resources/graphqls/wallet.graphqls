@@ -1,5 +1,8 @@
 extend type Query {
     getBalances : [BalancePayload]
+    getBalancesByUserIdByAdmin(
+        userId: Int
+    ) : [BalancePayload]
     getBalancesByAdmin : [BalancePerUser]
     
     # Get Coinpayment Transaction for Deposit

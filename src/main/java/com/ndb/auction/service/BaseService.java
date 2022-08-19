@@ -283,7 +283,7 @@ public class BaseService {
         }
 
 		if(order.getDestination() == PreSaleOrder.INTERNAL) {
-            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
+            NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId, "BEP20");
             if (!nyyuWallet.getNyyuPayRegistered()){
                 throw new BalanceException("Cannot transfer NDB Coin. Nyyu wallet is not registered.", "NDB");
             }
@@ -353,10 +353,7 @@ public class BaseService {
                 presale.getRound(), 
                 user.getEmail(), 
                 avatar.getPrefix() + avatar.getName(), 
-                paymentType, "USD", order.getNdbAmount(), paidAmount, 
-                order.getDestination() == PreSaleOrder.INTERNAL ? "Nyyu wallet" : "External wallet",
-                order.getExtAddr(),
-                admins);
+                paymentType, "USD", order.getNdbAmount(), paidAmount, admins);
         } catch (Exception e) {
             e.printStackTrace();
             log.info("cannot send presale purchase email");

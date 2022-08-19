@@ -5,13 +5,14 @@ import java.util.List;
 
 import com.ndb.auction.models.TokenAsset;
 import com.ndb.auction.models.balance.CryptoBalance;
+import com.ndb.auction.payload.BalancePerUser;
 import com.ndb.auction.payload.BalancePayload;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class InternalBalanceService extends BaseService {
-    
+
     // getting balances
     public List<BalancePayload> getInternalBalances(int userId) {
         List<CryptoBalance> iBalances = balanceDao.selectByUserId(userId, null);
@@ -22,7 +23,11 @@ public class InternalBalanceService extends BaseService {
             balanceList.add(b);
         }
         return balanceList;
-    } 
+    }
+
+    public List<BalancePerUser> getInternalBalancesAllUsers() {
+        return balanceDao.selectAll();
+    }
 
     public CryptoBalance getBalance(int userId, String symbol) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(symbol);
@@ -32,7 +37,7 @@ public class InternalBalanceService extends BaseService {
     public double getFreeBalance(int userId, String symbol) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(symbol);
         CryptoBalance balance = balanceDao.selectById(userId, tokenId);
-        if(balance == null) return 0.0;
+        if (balance == null) return 0.0;
         return balance.getFree();
     }
 

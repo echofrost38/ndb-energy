@@ -17,9 +17,8 @@ public class UserSocialResolver extends BaseResolver implements GraphQLQueryReso
 
     @PreAuthorize("isAuthenticated()")
     public Boolean addDiscord(String username) {
-//        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-//                .getPrincipal();
-//        return  socialService.addDiscord(userDetails.getId(),username);
-        return  socialService.addDiscord(1622,username);
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return  socialService.addDiscord(userDetails.getId(),username);
     }
 }

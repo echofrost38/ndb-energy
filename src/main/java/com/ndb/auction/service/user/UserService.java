@@ -59,7 +59,7 @@ public class UserService extends BaseService {
 			userDao.insert(user);
 
 			// create BEP20 wallet
-			var nyyuWallet = nyyuWalletService.generateNyyuWallet("BEP20", user.getId());
+			var nyyuWallet = nyyuWalletService.generateBEP20Address(user.getId());
 			// create referral
 			if(referredByCode != null && !referredByCode.equals(""))
 				userReferralService.createNewReferrer(user.getId(), referredByCode, nyyuWallet);

@@ -347,43 +347,6 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>3.21.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.tron.trident</groupId>
-            <artifactId>abi</artifactId>
-            <version>0.3.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/lib/abi-0.3.0.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.tron.trident</groupId>
-            <artifactId>utils</artifactId>
-            <version>0.3.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/lib/utils-0.3.0.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.tron.trident</groupId>
-            <artifactId>core</artifactId>
-            <version>0.3.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/resources/lib/core-0.3.0.jar</systemPath>
-        </dependency>
-
-
     </dependencies>
 
     <build>

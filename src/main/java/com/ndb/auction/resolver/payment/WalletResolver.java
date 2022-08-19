@@ -3,7 +3,6 @@ package com.ndb.auction.resolver.payment;
 import java.io.IOException;
 import java.util.List;
 
-import com.ndb.auction.payload.BalancePerUser;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
@@ -24,11 +23,6 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int id = userDetails.getId();
         return internalBalanceService.getInternalBalances(id);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<BalancePerUser> getBalancesByAdmin() {
-        return internalBalanceService.getInternalBalancesAllUsers();
     }
 
     // Add favorite token 

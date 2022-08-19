@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.ndb.auction.config.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,22 +66,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
-        if (AppConfig.maintenanceMessage != null) {
-            JsonArray errorsArray = new JsonArray();
-            JsonObject errorObject = new JsonObject();
-            errorObject.addProperty("isUnderMaintenance", true);
-            String message = AppConfig.maintenanceMessage.getMessage();
-            if (message != null && !message.isEmpty())
-                errorObject.addProperty("message", AppConfig.maintenanceMessage.getMessage());
-            errorsArray.add(errorObject);
-            JsonObject responseObject = new JsonObject();
-            responseObject.add("errors", errorsArray);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(responseObject.toString());
-            return;
-        }
-        block_ipcheck:
-        {
+        block_ipcheck: {
             HttpSession session = request.getSession(false);
             String ipFromSession;
             String ip = RemoteIpHelper.getRemoteIpFrom(request);
@@ -94,11 +78,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     // checking ip address ------> calling vpn api key
                     try {
                         location = locationLogService.buildLog(ip);
-                        if (location != null)
+                        if(location != null) 
                             locationMap.put(ip, location);
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
+                    } 
                 }
                 JsonObject errorObject;
                 if (location == null) {
@@ -161,8 +145,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 matcher.match("/nyyupay/**", request.getServletPath()) ||
                 matcher.match("/totalsupply/**", request.getServletPath()) ||
                 matcher.match("/ndbcoin/**", request.getServletPath()) ||
-                matcher.match("/paypal/**", request.getServletPath()) ||
-                matcher.match("/admin/**", request.getServletPath());
+                matcher.match("/paypal/**", request.getServletPath());
     }
 
     private String parseJwt(HttpServletRequest request) {

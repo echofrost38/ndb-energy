@@ -56,7 +56,7 @@ public class UserReferralService extends BaseService {
                     String address = item.getWalletConnect();
 
                     if (address == null) {
-                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId(), "BEP20");
+                        NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(item.getId());
                         if (nyyuWallet != null) address = nyyuWallet.getPublicKey();
                     }
 
@@ -113,11 +113,11 @@ public class UserReferralService extends BaseService {
             {
                 target = 1; // internal
                 // Nyyu wallet case
-                NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId, "BEP20");
+                NyyuWallet nyyuWallet = nyyuWalletDao.selectByUserId(userId);
                 if (nyyuWallet != null) 
                     wallet = nyyuWallet.getPublicKey();
                 else // old users who has no nyyu wallet address
-                    wallet = nyyuWalletService.generateNyyuWallet("BEP20", userId);
+                    wallet = nyyuWalletService.generateBEP20Address(userId);
             } else {
                 target = 2; // external wallet
             }
@@ -183,9 +183,9 @@ public class UserReferralService extends BaseService {
             int target = 0;
             if (newAddress.equals(ZERO_ADDRESS)) {
                 target = 1;
-                NyyuWallet  nyyuWallet =  nyyuWalletDao.selectByUserId(userId, "BEP20");
+                NyyuWallet  nyyuWallet =  nyyuWalletDao.selectByUserId(userId);
                 if (nyyuWallet == null )
-                    newAddress = nyyuWalletService.generateNyyuWallet("BEP20", userId);
+                    newAddress = nyyuWalletService.generateBEP20Address(userId);
                 else
                     newAddress = nyyuWallet.getPublicKey();
             } else {

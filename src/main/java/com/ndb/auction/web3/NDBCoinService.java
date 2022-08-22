@@ -84,6 +84,7 @@ public class NDBCoinService {
     private final BigInteger m_decimals = new BigInteger("100000000");
     private final double multipler = 10000.0;
 
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     Queue<String> referralKeyQueue = new LinkedList<>();
 
     @SuppressWarnings("deprecation")

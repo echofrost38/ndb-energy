@@ -94,7 +94,6 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         }
 
         // check nyyu wallet 
-        String targetAddress = "";
         if(destination == PreSaleOrder.INTERNAL) {
             // for the old users
             var nyyuWallet = nyyuWalletService.selectByUserId(userId, "BEP20");
@@ -103,18 +102,12 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
                 if(generatedAddr == null) {
                     throw new PreSaleException("You cannot place a presale order because of Nyyu internal wallet", "destination");
                 }
-                targetAddress = generatedAddr;
             }
-            targetAddress = nyyuWallet.getPublicKey();
-        } else {
-            targetAddress = extAddr;
         }
-
-        
 
         // create new Presale order
         Double ndbPrice = presale.getTokenPrice();
-        PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, targetAddress);
+        PreSaleOrder presaleOrder = new PreSaleOrder(userId, presaleId, ndbAmount, ndbPrice, destination, extAddr);
         return presaleOrderService.placePresaleOrder(presaleOrder);
     }
 

@@ -28,7 +28,7 @@ public class AvatarService extends BaseService {
 	private final AmazonS3 s3;
 
 	@Value("${avatar.s3.bucket}")
-	private static String bucketName;
+	private String bucketName;
 
 	public AvatarService (AmazonS3 s3) {
 		this.s3 = s3;

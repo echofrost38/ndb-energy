@@ -1,18 +1,16 @@
 package com.ndb.auction.models.user;
 
+import com.ndb.auction.models.BaseModel;
+import com.ndb.auction.models.Notification;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.ndb.auction.models.BaseModel;
-import com.ndb.auction.models.Notification;
-
-import org.springframework.stereotype.Component;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Component
 @Getter
@@ -40,6 +38,8 @@ public class User extends BaseModel {
 	private List<UserSecurity> security;
 	private UserVerify verify;
 	private UserReferral referral;
+
+	private Boolean suspended;
 
 	public User(String email, String encodedPass, String country) {
 		this.email = email;

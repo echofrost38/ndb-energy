@@ -1,16 +1,5 @@
 package com.ndb.auction.resolver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.avatar.AvatarComponent;
@@ -23,9 +12,14 @@ import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.service.FinancialService;
 import com.ndb.auction.service.user.UserAuthService;
 import com.ndb.auction.service.user.UserDetailsImpl;
-
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class UserResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
@@ -191,9 +185,21 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
 
     @PreAuthorize("isAuthenticated()")
     public Statement getStatement(long from, long to) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         return financialService.selectStatements(userId, from, to);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String suspendUser(String email) {
+        int response = userService.updateSuspended(email, true);
+        return response > 0 ? "User suspended." : "Failed.";
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String releaseUser(String email) {
+        int response = userService.updateSuspended(email, false);
+        return response > 0 ? "User suspension removed." : "Failed.";
     }
 
 }

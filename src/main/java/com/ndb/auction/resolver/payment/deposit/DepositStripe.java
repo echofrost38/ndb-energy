@@ -1,14 +1,7 @@
 package com.ndb.auction.resolver.payment.deposit;
 
-import java.util.List;
-import java.util.Locale;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
@@ -16,9 +9,15 @@ import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.payment.stripe.StripeCustomerService;
 import com.ndb.auction.service.payment.stripe.StripeDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
-
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Locale;
 
 @Component
 public class DepositStripe extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
@@ -35,11 +34,14 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
     public PayResponse stripeForDeposit(Double amount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        if (userService.isUserSuspended(userId)) {
+            throw new UserSuspendedException("User is suspended!");
+        }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if(!kycStatus) {
+        if (!kycStatus) {
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
@@ -50,17 +52,20 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     @PreAuthorize("isAuthenticated()")
     public PayResponse stripeForDepositWithSavedCard(Double amount, Double fiatAmount, String fiatType, String cryptoType, int cardId, String paymentIntentId) {
-        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
+        if (userService.isUserSuspended(userId)) {
+            throw new UserSuspendedException("User is suspended!");
+        }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if(!kycStatus) {
+        if (!kycStatus) {
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
 
         StripeCustomer customer = stripeCustomerService.getSavedCard(cardId);
-        if(userId != customer.getUserId()){
+        if (userId != customer.getUserId()) {
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }

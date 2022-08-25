@@ -1,13 +1,8 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import javax.mail.MessagingException;
-
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.hooks.BaseController;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.withdraw.CryptoWithdraw;
@@ -20,20 +15,22 @@ import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.CryptoWithdrawService;
 import com.ndb.auction.service.withdraw.TokenService;
 import com.ndb.auction.web3.WithdrawWalletService;
-
+import freemarker.template.TemplateException;
 import graphql.kickstart.servlet.context.GraphQLServletContext;
+import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import freemarker.template.TemplateException;
-import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
@@ -86,11 +83,14 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         if (!key.equals(PUBLIC_KEY) || !token.equals(hmac))
             throw new UnauthorizedException("something went wrong", "signature");
 
-        
+
         var userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
         var user = userService.getUserById(userId);
+        if (user.getSuspended()) {
+            throw new UserSuspendedException("User is suspended!");
+        }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
         if (!kycStatus) {

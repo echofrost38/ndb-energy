@@ -1,28 +1,26 @@
 package com.ndb.auction.resolver.payment.withdarw;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import javax.mail.MessagingException;
-
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.withdraw.PaypalWithdraw;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.service.utils.TotpService;
 import com.ndb.auction.service.withdraw.PaypalWithdrawService;
-
+import freemarker.template.TemplateException;
+import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import freemarker.template.TemplateException;
-import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 @Component
 public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
@@ -71,20 +69,23 @@ public class PaypalWithdrawResolver extends BaseResolver implements GraphQLQuery
         String sourceToken, 
         String code
     ) throws MessagingException {
-        var userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
         var user = userService.getUserById(userId);
+        if (user.getSuspended()) {
+            throw new UserSuspendedException("User is suspended!");
+        }
 
         // check withdraw code
-        if(!totpService.checkWithdrawCode(userEmail, code)) {
+        if (!totpService.checkWithdrawCode(userEmail, code)) {
             String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
             throw new BalanceException(msg, "code");
         }
 
         // check source token balance
         double sourceBalance = internalBalanceService.getFreeBalance(userId, sourceToken);
-        if(sourceBalance < amount) {
+        if (sourceBalance < amount) {
             String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
             throw new BalanceException(msg, "amount");
         }

@@ -4,19 +4,22 @@ import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.service.BaseService;
 
+import lombok.RequiredArgsConstructor;
+
 import java.nio.charset.StandardCharsets;
 
 import org.p2p.solanaj.core.Account;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tron.trident.core.key.KeyPair;
 import org.web3j.crypto.*;
 
 @Service
+@RequiredArgsConstructor
 public class NyyuWalletService extends BaseService {
-    @Autowired
-    private NyyuWalletDao nyyuWalletDao;
+    
+    private final NyyuWalletDao nyyuWalletDao;
+    
     @Value("${bsc.json.rpc}")
     private String bscNetwork;
     @Value("${nyyu.wallet.password}")
@@ -31,6 +34,8 @@ public class NyyuWalletService extends BaseService {
             NyyuWallet nyyuWallet = new NyyuWallet();
             nyyuWallet.setUserId(userId);
             nyyuWallet.setPublicKey(address);
+
+            // encrypt private key!!
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork("BEP20");
             

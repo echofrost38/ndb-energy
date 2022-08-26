@@ -44,8 +44,6 @@ extend type Mutation {
   removeFromWhitelist(
     userId: Int
   ) : Int
-  suspendUser(email: String): String
-  releaseUser(email: String): String
 }
 
 schema {

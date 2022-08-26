@@ -1,5 +1,17 @@
 package com.ndb.auction.service.user;
 
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.mail.MessagingException;
+
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.GeoLocation;
 import com.ndb.auction.models.tier.TierTask;
@@ -8,17 +20,14 @@ import com.ndb.auction.models.user.UserSecurity;
 import com.ndb.auction.models.user.UserVerify;
 import com.ndb.auction.models.user.Whitelist;
 import com.ndb.auction.service.BaseService;
-import freemarker.template.TemplateException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.*;
+import freemarker.template.TemplateException;
 
 @Service
 public class UserService extends BaseService {
@@ -397,25 +406,13 @@ public class UserService extends BaseService {
 		var tier = tierDao.selectByLevel(tierLevel);
 		if(tier.getName().equals("Diamond")) {
 			var m = whitelistDao.selectByUserId(id);
-			if (m != null) {
-				m = new Whitelist(id, "Diamond Level");
-				whitelistDao.insert(m);
-			}
+            if(m != null) {
+                m = new Whitelist(id, "Diamond Level");
+                whitelistDao.insert(m);
+            }
 		}
 		//update referral commission rate .
-		userReferralService.updateCommissionRate(id, tierLevel);
+		userReferralService.updateCommissionRate(id,tierLevel);
 		return userDao.updateTier(id, tierLevel, tierPoint);
-	}
-
-	public boolean isUserSuspended(int userId) {
-		return getUserById(userId).getSuspended();
-	}
-
-	public int updateSuspended(String email, Boolean suspended) {
-		User user = userDao.selectByEmail(email);
-		if (user == null)
-			throw new UserNotFoundException(String.format("Can not find user with the email %s", email), "email");
-
-		return userDao.updateSuspended(email, suspended);
 	}
 }

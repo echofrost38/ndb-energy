@@ -1,8 +1,15 @@
 package com.ndb.auction.resolver;
 
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
 import com.ndb.auction.exceptions.PreSaleException;
 import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
 import com.ndb.auction.models.presale.PresaleOrderPayments;
@@ -10,15 +17,9 @@ import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserReferralService;
 import com.ndb.auction.utils.Utilities;
 import com.ndb.auction.web3.NyyuWalletService;
+
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Locale;
 
 @Component
 public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
@@ -35,21 +36,18 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
      */
     @PreAuthorize("isAuthenticated()")
     public PreSaleOrder placePreSaleOrder(int presaleId, Long ndbAmount, int destination, String extAddr) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        if (userService.isUserSuspended(userId)) {
-            throw new UserSuspendedException("User is suspended!");
-        }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if (!kycStatus) {
+        if(!kycStatus) {
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
 
         // check presale status
         PreSale presale = presaleService.getPresaleById(presaleId);
-        if (presale == null) {
+        if(presale == null) {
             String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
             throw new PreSaleException(msg, "presaleId");
         }

@@ -1,8 +1,11 @@
 package com.ndb.auction.resolver.payment.deposit;
 
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Locale;
+
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.tier.Tier;
@@ -25,16 +28,14 @@ import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
 import com.ndb.auction.utils.PaypalHttpClient;
 import com.ndb.auction.utils.ThirdAPIUtils;
-import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.Locale;
+import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
 public class DepositPaypal extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
@@ -63,21 +64,18 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
 
     @PreAuthorize("isAuthenticated()")
     public OrderResponseDTO paypalForDeposit(Double amount, String currencyCode, String cryptoType) throws Exception {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        if (userService.isUserSuspended(userId)) {
-            throw new UserSuspendedException("User is suspended!");
-        }
-
+        
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if (!kycStatus) {
+        if(!kycStatus) {
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg, "userId");
         }
 
         // amount to usd value
         double usdAmount = 0.0;
-        if (currencyCode.equals("USD")) {
+        if(currencyCode.equals("USD")) {
             usdAmount = amount;
         } else {
             usdAmount = apiUtil.currencyConvert(currencyCode, "USD", amount);

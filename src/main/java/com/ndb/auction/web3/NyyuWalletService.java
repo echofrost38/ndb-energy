@@ -1,8 +1,10 @@
 package com.ndb.auction.web3;
 
 import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
+import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.service.BaseService;
+import com.ndb.auction.utils.Utilities;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +40,14 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setPublicKey(address);
 
             // encrypt private key!!
-            nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
+            var plainPrivKey = keyPair.getPrivateKey().toString(16);
+            var encryptedPrivKey = Utilities.encrypt(plainPrivKey);
+            if(encryptedPrivKey == null) {
+                // failed to encrypt
+                throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+            }
+
+            nyyuWallet.setPrivateKey(encryptedPrivKey);
             nyyuWallet.setNetwork("BEP20");
             
             var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());

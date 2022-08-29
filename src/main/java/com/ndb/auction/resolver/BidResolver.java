@@ -25,8 +25,7 @@ public class BidResolver extends BaseResolver implements GraphQLMutationResolver
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		int userId = userDetails.getId();
 		if (userService.isUserSuspended(userId)) {
-			String msg = messageSource.getMessage("user_suspended", null, Locale.ENGLISH);
-			throw new UserSuspendedException(msg);
+			throw new UserSuspendedException("User is suspended!");
 		}
 
 		// check KYC status!

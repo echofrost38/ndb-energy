@@ -408,7 +408,7 @@ public class UserService extends BaseService {
 	}
 
 	public boolean isUserSuspended(int userId) {
-		return getUserById(userId).getIsSuspended();
+		return getUserById(userId).getSuspended();
 	}
 
 	public int updateSuspended(String email, Boolean suspended) {

@@ -191,15 +191,15 @@ public class UserResolver extends BaseResolver implements GraphQLQueryResolver, 
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String suspendUserByAdmin(String email) {
+    public String suspendUser(String email) {
         int response = userService.updateSuspended(email, true);
-        return response > 0 ? "User has been suspended." : "Failed to suspend user.";
+        return response > 0 ? "User suspended." : "Failed.";
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String releaseUserByAdmin(String email) {
+    public String releaseUser(String email) {
         int response = userService.updateSuspended(email, false);
-        return response > 0 ? "User has been released." : "Failed to release user.";
+        return response > 0 ? "User suspension removed." : "Failed.";
     }
 
 }

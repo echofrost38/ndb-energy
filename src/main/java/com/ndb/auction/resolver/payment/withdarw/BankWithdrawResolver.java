@@ -55,9 +55,8 @@ public class BankWithdrawResolver extends BaseResolver implements GraphQLMutatio
         int userId = userDetails.getId();
         var userEmail = userDetails.getEmail();
         var user = userService.getUserById(userId);
-        if (user.getIsSuspended()) {
-            String msg = messageSource.getMessage("user_suspended", null, Locale.ENGLISH);
-            throw new UserSuspendedException(msg);
+        if (user.getSuspended()) {
+            throw new UserSuspendedException("User is suspended!");
         }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);

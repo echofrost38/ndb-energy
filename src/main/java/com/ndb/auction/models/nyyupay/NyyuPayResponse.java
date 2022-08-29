@@ -1,6 +1,5 @@
 package com.ndb.auction.models.nyyupay;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -16,12 +15,10 @@ import java.math.BigInteger;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class NyyuPayResponse {
     protected String address;
     protected String hash;
     protected String token;
     protected BigInteger amount;
-    @JsonIgnore
     protected int decimal;
 }

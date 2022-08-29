@@ -19,9 +19,6 @@ public class NyyuWalletDao extends BaseOracleDao {
         m.setId(rs.getInt("ID"));
         m.setUserId(rs.getInt("USER_ID"));
         m.setNetwork(rs.getString("NETWORK"));
-
-        // decrypt wallet key
-        
         m.setPrivateKey(rs.getString("PRIVATE_KEY"));
         m.setPublicKey(rs.getString("PUBLIC_KEY"));
         m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));

@@ -39,7 +39,7 @@ public class User extends BaseModel {
 	private UserVerify verify;
 	private UserReferral referral;
 
-	private Boolean suspended;
+	private Boolean isSuspended;
 
 	public User(String email, String encodedPass, String country) {
 		this.email = email;

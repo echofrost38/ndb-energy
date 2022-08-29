@@ -25,6 +25,8 @@ public class NyyuWalletService extends BaseService {
     @Value("${nyyu.wallet.password}")
     private  String password;
 
+    private String walletRegisterEndpoint = "/bep20";
+
     private String generateBEP20Address(int userId) {
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
@@ -39,7 +41,7 @@ public class NyyuWalletService extends BaseService {
             nyyuWallet.setPrivateKey(keyPair.getPrivateKey().toString(16));
             nyyuWallet.setNetwork("BEP20");
             
-            var registered = nyyuPayService.sendNyyuPayRequest("/bep20", nyyuWallet.getPublicKey());
+            var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());
             nyyuWallet.setNyyuPayRegistered(registered);
             nyyuWalletDao.insertOrUpdate(nyyuWallet);
             
@@ -62,7 +64,7 @@ public class NyyuWalletService extends BaseService {
             .privateKey(keyPair.toPrivateKey())
             .network("TRC20")
             .build();
-        var registered = nyyuPayService.sendNyyuPayRequest("/bep20", nyyuWallet.getPublicKey());
+        var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());
         nyyuWallet.setNyyuPayRegistered(registered);
         nyyuWalletDao.insertOrUpdate(nyyuWallet);
 
@@ -80,7 +82,7 @@ public class NyyuWalletService extends BaseService {
             .privateKey(new String(account.getSecretKey(), StandardCharsets.UTF_8))
             .network("SOL")
             .build();
-        var registered = nyyuPayService.sendNyyuPayRequest("/bep20", base58addr);
+        var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, base58addr);
         nyyuWallet.setNyyuPayRegistered(registered);
         nyyuWalletDao.insertOrUpdate(nyyuWallet);
 
@@ -103,7 +105,7 @@ public class NyyuWalletService extends BaseService {
 
     public String registerNyyuWallet(NyyuWallet wallet) {
         try {
-            var registered = nyyuPayService.sendNyyuPayRequest("/bep20", wallet.getPublicKey());
+            var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, wallet.getPublicKey());
             wallet.setNyyuPayRegistered(registered);
             nyyuWalletDao.insertOrUpdate(wallet);
             

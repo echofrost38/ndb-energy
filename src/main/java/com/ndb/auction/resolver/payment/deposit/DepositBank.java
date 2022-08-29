@@ -48,7 +48,8 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         if (userService.isUserSuspended(userId)) {
-            throw new UserSuspendedException("User is suspended!");
+            String msg = messageSource.getMessage("user_suspended", null, Locale.ENGLISH);
+            throw new UserSuspendedException(msg);
         }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);

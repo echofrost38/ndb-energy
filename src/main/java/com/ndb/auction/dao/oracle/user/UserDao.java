@@ -47,7 +47,7 @@ public class UserDao extends BaseOracleDao {
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
 		m.setDeleted(rs.getInt("DELETED"));
 		m.setRoleString(rs.getString("ROLE"));
-		m.setSuspended(rs.getBoolean("SUSPENDED"));
+		m.setIsSuspended(rs.getBoolean("SUSPENDED"));
 		return m;
 	}
 

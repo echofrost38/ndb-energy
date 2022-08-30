@@ -1,9 +1,16 @@
 package com.ndb.auction.dao.oracle.user;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
 import com.ndb.auction.dao.oracle.BaseOracleDao;
 import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.user.User;
-import lombok.NoArgsConstructor;
+
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -12,12 +19,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
+import lombok.NoArgsConstructor;
 
 /* TODOs 
 	1. User ROLE
@@ -47,7 +49,6 @@ public class UserDao extends BaseOracleDao {
 		m.setNotifySetting(rs.getInt("NOTIFY_SETTING"));
 		m.setDeleted(rs.getInt("DELETED"));
 		m.setRoleString(rs.getString("ROLE"));
-		m.setIsSuspended(rs.getBoolean("SUSPENDED"));
 		return m;
 	}
 
@@ -250,10 +251,5 @@ public class UserDao extends BaseOracleDao {
 	public int updateDeleted(int id) {
 		String sql = "UPDATE TBL_USER SET DELETED=1 WHERE ID=?";
 		return jdbcTemplate.update(sql, id);
-	}
-
-	public int updateSuspended(String email, Boolean suspended) {
-		String sql = "UPDATE TBL_USER SET SUSPENDED=? WHERE EMAIL=?";
-		return jdbcTemplate.update(sql, suspended, email);
 	}
 }

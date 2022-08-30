@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.servlet.http.Part;
 
 import org.apache.http.client.ClientProtocolException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,20 +29,21 @@ import com.ndb.auction.service.NamePriceService;
 import com.ndb.auction.service.ProfileService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.utils.MailService;
-import com.ndb.auction.web3.NyyuWalletService;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class ProfileResolver extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 
-    private final NamePriceService namePriceService;
-	private final ProfileService profileService;
-    private final MailService mailService;
-    private final NyyuWalletService nyyuWalletService;
+    @Autowired
+    private NamePriceService namePriceService;
+
+	@Autowired
+	protected ProfileService profileService;
+
+    @Autowired
+    private MailService mailService;
 
     // select avatar profile
     // prefix means avatar name!!!
@@ -247,12 +249,6 @@ public class ProfileResolver extends BaseResolver implements GraphQLMutationReso
             return internalBalanceService.deductFree(userId, "NDB", ndbOrder);
         }
         return 0;
-    }
-
-    // temporary use
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public int updatePrivateKeys() {
-        return nyyuWalletService.updatePrivateKeys();
     }
 
 }

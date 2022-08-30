@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -27,8 +26,7 @@ public class AvatarService extends BaseService {
 
 	private final AmazonS3 s3;
 
-	@Value("${avatar.s3.bucket}")
-	private String bucketName;
+	private static final String bucketName = "nyyu-avatars";
 
 	public AvatarService (AmazonS3 s3) {
 		this.s3 = s3;

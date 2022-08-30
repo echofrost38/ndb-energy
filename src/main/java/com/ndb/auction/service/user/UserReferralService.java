@@ -154,7 +154,7 @@ public class UserReferralService extends BaseService {
                 .commissionRate(tierRate)
                 .build();
         }catch (Exception e){
-            throw new ReferralException("Cannot activate your refeferral code.");
+            throw new ReferralException(e.getMessage());
         }
     }
 

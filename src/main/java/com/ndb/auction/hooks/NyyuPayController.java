@@ -90,7 +90,6 @@ public class NyyuPayController extends BaseController{
             var amount = deposited * cryptoPrice;
 
             var m = new CoinpaymentDepositTransaction(0, userId, amount, cryptoAmount, fee, "DEPOSIT", cryptoType, "BEP20", "Nyyu.pay");
-            m.setDepositStatus(1);
             coinpaymentWalletService.createNewDepositTxn(m);
 
             var balances = balanceService.getInternalBalances(userId);
@@ -148,10 +147,10 @@ public class NyyuPayController extends BaseController{
                     mailService.sendDeposit(
                         user.getEmail(), 
                         user.getAvatar().getPrefix() + " " + user.getAvatar().getName(),
-                        "Nyyu payments", 
+                        "Coinpayment", 
                         cryptoType, 
                         cryptoType, 
-                        cryptoAmount, 
+                        amount, 
                         deposited, 
                         fee, 
                         admins
@@ -164,7 +163,7 @@ public class NyyuPayController extends BaseController{
                     userId,
                     Notification.DEPOSIT_SUCCESS, 
                     "PAYMENT CONFIRMED", 
-                    String.format("Your deposit of %f %s was successful.", cryptoAmount, cryptoType));
+                    String.format("Your deposit of %f %s was successful.", amount, cryptoType));
             }
     
             return new ResponseEntity<>(HttpStatus.OK); 

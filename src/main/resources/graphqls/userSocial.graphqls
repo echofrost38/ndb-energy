@@ -1,0 +1,14 @@
+    extend type Query {
+        getDiscord : String
+    }
+
+    extend type Mutation {
+        addDiscord(
+            username: String!
+        ) : Boolean
+    }
+
+schema {
+    query: Query,
+    mutation: Mutation
+}

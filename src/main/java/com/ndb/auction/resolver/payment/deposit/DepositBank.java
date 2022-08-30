@@ -1,9 +1,11 @@
 package com.ndb.auction.resolver.payment.deposit;
 
+import java.util.List;
+import java.util.Locale;
+
 import com.ndb.auction.exceptions.BalanceException;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.tier.Tier;
@@ -18,21 +20,16 @@ import com.ndb.auction.service.TaskSettingService;
 import com.ndb.auction.service.TierService;
 import com.ndb.auction.service.payment.bank.BankDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
-import graphql.kickstart.tools.GraphQLMutationResolver;
-import graphql.kickstart.tools.GraphQLQueryResolver;
-
-import java.util.List;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
+import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 
 @Component
-@Slf4j
 public class DepositBank extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     @Autowired
@@ -49,17 +46,13 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
 
     @PreAuthorize("isAuthenticated()")
     public String bankForDeposit() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        if (userService.isUserSuspended(userId)) {
-            String msg = messageSource.getMessage("user_suspended", null, Locale.ENGLISH);
-            throw new UserSuspendedException(msg);
-        }
 
         var kycStatus = shuftiService.kycStatusCkeck(userId);
-        if (!kycStatus) {
+        if(!kycStatus) {
             String msg = messageSource.getMessage("no_kyc", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "userId");
+            new UnauthorizedException(msg, "userId");
         }
 
         // generate UID for new bank transfer
@@ -87,8 +80,6 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             String msg = messageSource.getMessage("invalid_twostep", null, Locale.ENGLISH);
             throw new BalanceException(msg, "2FA");
         }
-
-        log.info("BANK DEPOSIT CODE CHECKED");
 
         // ignore show status
         var m = (BankDepositTransaction)bankDepositService.selectById(id, 1);
@@ -121,8 +112,6 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         double fee = getTierFee(userId, cryptoAmount);
         double deposited = cryptoAmount - fee;
 
-        log.info("BANK DEPOSIT PRICE FETCHED");
-
         // update user balance and tier
         internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
         List<BalancePayload> balances = balanceService.getInternalBalances(userId);
@@ -134,8 +123,6 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             double _balance = _price * (balance.getFree() + balance.getHold());
             totalBalance += _balance;
         }
-
-        log.info("ADDED BALANCE");
 
         // update user tier points
         User user = userService.getUserById(userId);
@@ -175,19 +162,14 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
             tierTaskService.updateTierTask(tierTask);
         }
 
-        log.info("TIER LEVEL CHECKED");
-
         notificationService.sendNotification(
             userId,
             Notification.DEPOSIT_SUCCESS, 
             "PAYMENT CONFIRMED", 
             String.format("Your deposit of %f %s was successful.", deposited, cryptoType));
 
-        log.info("SENT NOTIFY");
         
         bankDepositService.update(id, currencyCode, amount, usdAmount, deposited, fee, cryptoType, cryptoPrice);
-
-        log.info("UPDATED DEPOSIT REQUEST");
         // ignore for admin
         return (BankDepositTransaction) bankDepositService.selectById(id, 1);
     }

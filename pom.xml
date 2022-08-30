@@ -383,11 +383,6 @@
             <systemPath>${basedir}/src/main/resources/lib/core-0.3.0.jar</systemPath>
         </dependency>
 
-        <dependency>
-            <groupId>com.mmorrell</groupId>
-            <artifactId>solanaj</artifactId>
-            <version>1.10</version>
-        </dependency>
 
     </dependencies>
 

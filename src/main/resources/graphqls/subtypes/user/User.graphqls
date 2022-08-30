@@ -18,6 +18,5 @@ type User {
    avatar: UserAvatar,
    security: [UserSecurity],
    verify: UserVerify,
-   referral: UserReferral,
-   isSuspended: Boolean
+   referral: UserReferral
 }

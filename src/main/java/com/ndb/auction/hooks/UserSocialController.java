@@ -29,7 +29,7 @@ public class UserSocialController extends BaseController {
 
     @PostMapping("/social/discord")
     @ResponseBody
-    public Object NyyuPayCallbackHandler(HttpServletRequest request) {
+    public Object DiscordBotCallbackHandler(HttpServletRequest request) {
         try {
             String reqQuery =  getBody(request);
             UserSocial response = new Gson().fromJson(reqQuery, UserSocial.class);

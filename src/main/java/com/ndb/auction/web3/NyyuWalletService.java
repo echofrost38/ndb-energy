@@ -73,6 +73,14 @@ public class NyyuWalletService extends BaseService {
             .privateKey(keyPair.toPrivateKey())
             .network("TRC20")
             .build();
+
+        var encryptedKey = Utilities.encrypt(nyyuWallet.getPrivateKey());
+        if(encryptedKey == null) {
+            // failed to encrypt
+            throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+        }
+        nyyuWallet.setPrivateKey(encryptedKey);
+
         var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());
         nyyuWallet.setNyyuPayRegistered(registered);
         nyyuWalletDao.insertOrUpdate(nyyuWallet);
@@ -91,6 +99,13 @@ public class NyyuWalletService extends BaseService {
             .privateKey(new String(account.getSecretKey(), StandardCharsets.UTF_8))
             .network("SOL")
             .build();
+        var encryptedKey = Utilities.encrypt(nyyuWallet.getPrivateKey());
+        if(encryptedKey == null) {
+            // failed to encrypt
+            throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+        }
+        nyyuWallet.setPrivateKey(encryptedKey);
+
         var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, base58addr);
         nyyuWallet.setNyyuPayRegistered(registered);
         nyyuWalletDao.insertOrUpdate(nyyuWallet);

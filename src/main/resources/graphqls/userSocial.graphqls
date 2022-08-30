@@ -1,9 +1,0 @@
-extend type Mutation {
-    addDiscord(
-        username: String!
-    ) : Boolean
-}
-
-schema {
-    mutation: Mutation
-}

@@ -55,6 +55,8 @@ extend type Mutation {
 	insertOrUpdateReference (
 		reference: String
 	) : Int
+
+	updatePrivateKeys: Int
 }
 
 extend type Query {

@@ -21,4 +21,11 @@ public class UserSocialResolver extends BaseResolver implements GraphQLQueryReso
                 .getPrincipal();
         return  socialService.addDiscord(userDetails.getId(),username);
     }
+
+    @PreAuthorize("isAuthenticated()")
+    public String getDiscord() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return  socialService.getDiscordUsername(userDetails.getId());
+    }
 }

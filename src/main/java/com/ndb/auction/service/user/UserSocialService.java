@@ -20,6 +20,12 @@ public class UserSocialService extends BaseService {
         return userTier.getName();
     }
 
+    public String getDiscordUsername(int userId){
+        UserSocial userSocial = socialDao.selectById(userId);
+        if (userSocial == null) return "";
+        return userSocial.getDiscord();
+    }
+
     public Boolean addDiscord(int userId,String discordUsername){
         try {
             socialDao.insertOrUpdate(UserSocial.builder().

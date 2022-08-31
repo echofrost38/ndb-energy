@@ -23,7 +23,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 public class AuctionWallet extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     // NDB Wallet
 	@PreAuthorize("isAuthenticated()")
-	public String payWalletForAuction(int roundId, String cryptoType) {
+	public int payWalletForAuction(int roundId, String cryptoType) {
 		// Auction auction = auctionService.getAuctionById(roundId);
 		// if(auction == null) {
         //     String msg = messageSource.getMessage("no_auction", null, Locale.ENGLISH);
@@ -98,6 +98,6 @@ public class AuctionWallet extends BaseResolver implements GraphQLMutationResolv
 		// }
 		// bid.setPayType(Bid.WALLET);
 		// bidService.updateBidRanking(bid);
-		return "SUCCESS";
+		return 1;
 	}
 }

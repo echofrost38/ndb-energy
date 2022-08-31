@@ -85,7 +85,7 @@ extend type Mutation {
 	payWalletForAuction(
 		roundId: Int,
 		cryptoType: String
-	) : String
+	) : Int
 }
 
 schema {

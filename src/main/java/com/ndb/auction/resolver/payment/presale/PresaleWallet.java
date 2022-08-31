@@ -50,24 +50,24 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
             throw new BidException(msg, "order");
         }
 
-        // // get amount 
-        // double totalOrder = 0.0;
-		// double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-        // double payAmount = order.getNdbAmount() * order.getNdbPrice();
+        // get amount 
+        double totalOrder = 0.0;
+		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        double payAmount = order.getNdbAmount() * order.getNdbPrice();
 
-        // var white = whitelistService.selectByUser(userId);
-		// if(white != null) tierFeeRate = 0.0;
+        var white = whitelistService.selectByUser(userId);
+		if(white != null) tierFeeRate = 0.0;
 
-        // totalOrder = 100 * payAmount / (100 - tierFeeRate);
+        totalOrder = 100 * payAmount / (100 - tierFeeRate);
         
-        // // check crypto Type balance
-        // double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
-        // double cryptoAmount = totalOrder / cryptoPrice; // required amount!
-        // double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
-        // if(freeBalance < cryptoAmount) {
-        //     String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-        //     throw new AuctionException(msg, "amount");
-        // }
+        // check crypto Type balance
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        double cryptoAmount = totalOrder / cryptoPrice; // required amount!
+        double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
+        if(freeBalance < cryptoAmount) {
+            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "amount");
+        }
 
         // // deduct free balance
         // internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);

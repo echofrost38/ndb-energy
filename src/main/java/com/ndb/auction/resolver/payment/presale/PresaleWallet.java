@@ -27,28 +27,28 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         User user = userService.getUserById(userId);
 
         // getting presale 
-        // PreSale presale = presaleService.getPresaleById(presaleId);
-        // if(presale == null) {
-        //     String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
-        //     throw new AuctionException(msg, "presaleId");
-        // }
+        PreSale presale = presaleService.getPresaleById(presaleId);
+        if(presale == null) {
+            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
+        }
 
-        // if(presale.getStatus() != PreSale.STARTED) {
-        //     String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
-        //     throw new AuctionException(msg, "presaleId");
-        // }
+        if(presale.getStatus() != PreSale.STARTED) {
+            String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
+        }
 
-        // // get presale order
-        // PreSaleOrder order = presaleOrderService.getPresaleById(orderId);
-        // if(order == null) {
-        //     String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
-        //     throw new AuctionException(msg, "presaleId");
-        // }
+        // get presale order
+        PreSaleOrder order = presaleOrderService.getPresaleById(orderId);
+        if(order == null) {
+            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+            throw new AuctionException(msg, "presaleId");
+        }
 
-        // if(order.getStatus() != 0) {
-        //     String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
-        //     throw new BidException(msg, "order");
-        // }
+        if(order.getStatus() != 0) {
+            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+            throw new BidException(msg, "order");
+        }
 
         // // get amount 
         // double totalOrder = 0.0;

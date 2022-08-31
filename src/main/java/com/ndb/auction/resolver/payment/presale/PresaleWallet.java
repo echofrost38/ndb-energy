@@ -27,51 +27,51 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         User user = userService.getUserById(userId);
 
         // getting presale 
-        PreSale presale = presaleService.getPresaleById(presaleId);
-        if(presale == null) {
-            String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
-            throw new AuctionException(msg, "presaleId");
-        }
+        // PreSale presale = presaleService.getPresaleById(presaleId);
+        // if(presale == null) {
+        //     String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
+        //     throw new AuctionException(msg, "presaleId");
+        // }
 
-        if(presale.getStatus() != PreSale.STARTED) {
-            String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
-            throw new AuctionException(msg, "presaleId");
-        }
+        // if(presale.getStatus() != PreSale.STARTED) {
+        //     String msg = messageSource.getMessage("not_started", null, Locale.ENGLISH);
+        //     throw new AuctionException(msg, "presaleId");
+        // }
 
-        // get presale order
-        PreSaleOrder order = presaleOrderService.getPresaleById(orderId);
-        if(order == null) {
-            String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
-            throw new AuctionException(msg, "presaleId");
-        }
+        // // get presale order
+        // PreSaleOrder order = presaleOrderService.getPresaleById(orderId);
+        // if(order == null) {
+        //     String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
+        //     throw new AuctionException(msg, "presaleId");
+        // }
 
-        if(order.getStatus() != 0) {
-            String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
-            throw new BidException(msg, "order");
-        }
+        // if(order.getStatus() != 0) {
+        //     String msg = messageSource.getMessage("presale_processed", null, Locale.ENGLISH);
+        //     throw new BidException(msg, "order");
+        // }
 
-        // get amount 
-        double totalOrder = 0.0;
-		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
-        double payAmount = order.getNdbAmount() * order.getNdbPrice();
+        // // get amount 
+        // double totalOrder = 0.0;
+		// double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
+        // double payAmount = order.getNdbAmount() * order.getNdbPrice();
 
-        var white = whitelistService.selectByUser(userId);
-		if(white != null) tierFeeRate = 0.0;
+        // var white = whitelistService.selectByUser(userId);
+		// if(white != null) tierFeeRate = 0.0;
 
-        totalOrder = 100 * payAmount / (100 - tierFeeRate);
+        // totalOrder = 100 * payAmount / (100 - tierFeeRate);
         
-        // check crypto Type balance
-        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
-        double cryptoAmount = totalOrder / cryptoPrice; // required amount!
-        double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
-        if(freeBalance < cryptoAmount) {
-            String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
-            throw new AuctionException(msg, "amount");
-        }
+        // // check crypto Type balance
+        // double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        // double cryptoAmount = totalOrder / cryptoPrice; // required amount!
+        // double freeBalance = internalBalanceService.getFreeBalance(userId, cryptoType);
+        // if(freeBalance < cryptoAmount) {
+        //     String msg = messageSource.getMessage("insufficient", null, Locale.ENGLISH);
+        //     throw new AuctionException(msg, "amount");
+        // }
 
-        // deduct free balance
-        internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
-        internalBalanceService.handlePresaleOrder(userId, 0, totalOrder, "NYYU", order);
+        // // deduct free balance
+        // internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
+        // internalBalanceService.handlePresaleOrder(userId, 0, totalOrder, "NYYU", order);
 
         return "Success";
     }

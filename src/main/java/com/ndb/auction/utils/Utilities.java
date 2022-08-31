@@ -1,22 +1,27 @@
 package com.ndb.auction.utils;
 
+import java.security.MessageDigest;
+import java.util.Arrays;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 public class Utilities {
     
     @Value("${encrypt.key}")
-    private static String key;
+    private String key;
 
     @Value("${encrypt.initVector}")
-    private static String initVector;
+    private String initVector;
 
     // locktime format
     public static String lockTimeFormat(int seconds) {
@@ -30,9 +35,9 @@ public class Utilities {
         return formatted;
     }
 
-    public static String encrypt(final String strToEncrypt) {
+    public String encrypt(final String strToEncrypt) {
         try {
-            var iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            var iv = new IvParameterSpec(Arrays.copyOf(initVector.getBytes("UTF-8"), 16));
             var skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
 
             var cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
@@ -47,7 +52,28 @@ public class Utilities {
         return null;
     }
 
-    public static String decrypt(String strToDecrypt) {
+    public String encrypt(final byte[] byteToEncrypt) {
+        MessageDigest sha = null;
+        try {
+            var key1 = key.getBytes("UTF-8");
+            sha = MessageDigest.getInstance("SHA-1");
+            key1 = sha.digest(key1);
+            key1 = Arrays.copyOf(key1, 16);
+            var secret = new SecretKeySpec(key1, "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+
+            byte[] encrypted = cipher.doFinal(byteToEncrypt);    
+            
+            return Base64.encodeBase64String(encrypted);
+        } catch (Exception e) {
+            log.info("Error while encrypting: " + e.toString());
+        } 
+        return null;
+    }
+
+    public String decrypt(String strToDecrypt) {
         try {
             IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
             SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");

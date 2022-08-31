@@ -16,7 +16,7 @@
     <name>auction</name>
     <description>NYYU Auction</description>
     <properties>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -375,6 +375,7 @@
             <scope>system</scope>
             <systemPath>${basedir}/src/main/resources/lib/utils-0.3.0.jar</systemPath>
         </dependency>
+        
         <dependency>
             <groupId>org.tron.trident</groupId>
             <artifactId>core</artifactId>
@@ -387,6 +388,8 @@
             <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
             <version>1.10</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/solanaj.jar</systemPath>
         </dependency>
 
         <dependency>

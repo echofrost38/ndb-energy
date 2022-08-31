@@ -17,6 +17,9 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "TBL_NYYU_WALLET")
 public class NyyuWalletDao extends BaseOracleDao {
+    
+    private static Utilities util = new Utilities();
+
     private static NyyuWallet extract(ResultSet rs) throws SQLException {
         NyyuWallet m = new NyyuWallet();
         m.setId(rs.getInt("ID"));
@@ -24,7 +27,7 @@ public class NyyuWalletDao extends BaseOracleDao {
         m.setNetwork(rs.getString("NETWORK"));
 
         // decrypt wallet key
-        var decryptedKey = Utilities.decrypt(rs.getString("PRIVATE_KEY"));
+        var decryptedKey = util.decrypt(rs.getString("PRIVATE_KEY"));
         m.setPrivateKey(decryptedKey);
         m.setPublicKey(rs.getString("PUBLIC_KEY"));
         m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));

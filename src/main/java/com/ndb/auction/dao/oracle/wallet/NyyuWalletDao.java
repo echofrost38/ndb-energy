@@ -33,6 +33,20 @@ public class NyyuWalletDao extends BaseOracleDao {
         m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));
         return m;
     }
+
+    private static NyyuWallet extract1(ResultSet rs) throws SQLException {
+        NyyuWallet m = new NyyuWallet();
+        m.setId(rs.getInt("ID"));
+        m.setUserId(rs.getInt("USER_ID"));
+        m.setNetwork(rs.getString("NETWORK"));
+
+        // decrypt wallet key
+        m.setPrivateKey(rs.getString("PRIVATE_KEY"));
+        m.setPublicKey(rs.getString("PUBLIC_KEY"));
+        m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));
+        return m;
+    }
+
     public int insert(NyyuWallet m) {
         String sql = "INSERT INTO TBL_NYYU_WALLET(ID, USER_ID,NETWORK,PRIVATE_KEY,PUBLIC_KEY,NYYUPAY_REGISTERED)" +
                 "VALUES(SEQ_NYYU_WALLET.NEXTVAL,?,?,?,?,?)";
@@ -83,7 +97,7 @@ public class NyyuWalletDao extends BaseOracleDao {
     }
     public List<NyyuWallet> selectAll() {
         var sql = "SELECT * FROM TBL_NYYU_WALLET";
-        return jdbcTemplate.query(sql, (rs, rownumber) -> extract(rs));
+        return jdbcTemplate.query(sql, (rs, rownumber) -> extract1(rs));
     }
 
 }

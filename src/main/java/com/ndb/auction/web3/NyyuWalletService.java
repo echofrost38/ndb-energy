@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 import com.paymennt.solanaj.data.SolanaAccount;
 
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tron.trident.core.key.KeyPair;
@@ -145,6 +143,7 @@ public class NyyuWalletService extends BaseService {
     }
 
     public NyyuWallet selectByUserId(int userId, String network) {
+        network = network.equals("ERC20") ? "BEP20" : network;
         return nyyuWalletDao.selectByUserId(userId, network);
     }
 

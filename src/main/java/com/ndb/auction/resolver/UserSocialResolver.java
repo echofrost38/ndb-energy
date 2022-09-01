@@ -1,6 +1,5 @@
 package com.ndb.auction.resolver;
 
-import com.ndb.auction.models.referral.UpdateReferralAddressResponse;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.service.user.UserSocialService;
 import graphql.kickstart.tools.GraphQLMutationResolver;

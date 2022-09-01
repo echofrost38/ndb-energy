@@ -36,13 +36,16 @@ public class Utilities {
     }
 
     public String encrypt(final String strToEncrypt) {
+        MessageDigest sha = null;
         try {
-            var iv = new IvParameterSpec(Arrays.copyOf(initVector.getBytes("UTF-8"), 16));
-            var skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+            var key1 = key.getBytes("UTF-8");
+            sha = MessageDigest.getInstance("SHA-1");
+            key1 = sha.digest(key1);
+            key1 = Arrays.copyOf(key1, 16);
+            var secret = new SecretKeySpec(key1, "AES");
 
-            var cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
             byte[] encrypted = cipher.doFinal(strToEncrypt.getBytes());    
             
             return Base64.encodeBase64String(encrypted);
@@ -74,12 +77,16 @@ public class Utilities {
     }
 
     public String decrypt(String strToDecrypt) {
+        MessageDigest sha = null;
         try {
-            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
-            SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+            var key1 = key.getBytes("UTF-8");
+            sha = MessageDigest.getInstance("SHA-1");
+            key1 = sha.digest(key1);
+            key1 = Arrays.copyOf(key1, 16);
+            var secret = new SecretKeySpec(key1, "AES");
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secret);
 
             byte[] original = cipher.doFinal(Base64.decodeBase64(strToDecrypt));
 

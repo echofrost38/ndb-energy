@@ -38,6 +38,9 @@ public class NyyuPayService extends BaseService{
 
     //// WebClient
     public boolean sendNyyuPayRequest(String network, String walletAddress) {
+        if(network.equals("ERC20") || network.equals("BEP20")) {
+            walletAddress = walletAddress.toLowerCase();
+        }
         long ts = System.currentTimeMillis() / 1000L;
         var request = new NyyuPayRequest(walletAddress);
         String payload = String.valueOf(ts) +"POST"+"{\"address\":\""+request.getAddress()+"\"}";

@@ -75,7 +75,7 @@ public class NyyuPayController extends BaseController{
             var depositAddress = response.getAddress();
             if(depositAddress == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-            var nyyuWallet = nyyuWalletService.selectByAddress(depositAddress);
+            var nyyuWallet = nyyuWalletService.selectByAddress(depositAddress.toLowerCase());
             if(nyyuWallet == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
             int userId = nyyuWallet.getUserId();
@@ -92,6 +92,7 @@ public class NyyuPayController extends BaseController{
             var m = new CoinpaymentDepositTransaction(0, userId, amount, cryptoAmount, fee, "DEPOSIT", cryptoType, "BEP20", "Nyyu.pay");
             m.setDepositStatus(1);
             coinpaymentWalletService.createNewDepositTxn(m);
+            balanceService.addFreeBalance(userId, cryptoType, deposited);
 
             var balances = balanceService.getInternalBalances(userId);
 
@@ -139,7 +140,7 @@ public class NyyuPayController extends BaseController{
                 tierTaskService.updateTierTask(tierTask);
             }
 
-            balanceService.addFreeBalance(userId, cryptoType, deposited);
+            
             log.info("Deposit detection : " + reqQuery.toString());
 
             if(!cryptoType.equals("NDB")) {

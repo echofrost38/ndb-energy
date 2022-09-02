@@ -37,7 +37,7 @@
           padding-bottom: 20px;
         "
       >
-        Dear ${admin}.
+        Dear ADMIN!
       </div>
       <div
         style="

@@ -385,9 +385,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.mmorrell</groupId>
+            <groupId>com.paymennt</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.10</version>
+            <version>0.0.7</version>
             <scope>system</scope>
             <systemPath>${basedir}/src/main/resources/lib/solanaj.jar</systemPath>
         </dependency>

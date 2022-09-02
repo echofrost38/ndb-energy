@@ -8,7 +8,7 @@ import com.ndb.auction.utils.Utilities;
 
 import lombok.RequiredArgsConstructor;
 
-import com.paymennt.solanaj.data.SolanaAccount;
+import com.ndb.auction.solanaj.data.SolanaAccount;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -188,7 +188,18 @@ public class MailService {
         javaMailSender.send(mimeMessage);
     }
 
-    public void sendPurchase(int round, String email, String avatarName, String gateway, String fiatType, double ndb, double paid, List<User> admins) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException, MessagingException {
+    public void sendPurchase(
+        int round, 
+        String email, 
+        String avatarName, 
+        String gateway, 
+        String fiatType, 
+        double ndb, 
+        double paid, 
+        String destination,
+        String address,
+        List<User> admins
+    ) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException, MessagingException {
         // fill mail content
         var stringWriter = new StringWriter();
         var model = new HashMap<String, Object>();
@@ -201,6 +212,8 @@ public class MailService {
         model.put("paid", paid);
         model.put("fiatType", fiatType);
         model.put("payType", gateway);
+        model.put("dest", destination);
+        model.put("destAddr", address);
 
         configuration.getTemplate("presale.ftlh").process(model, stringWriter);
         var mailContents = stringWriter.getBuffer().toString();

@@ -33,7 +33,7 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
         int userId = userDetails.getId();
         User user = userService.getUserById(userId);
 
-        // getting presale 
+        // getting presale
         PreSale presale = presaleService.getPresaleById(presaleId);
         if(presale == null) {
             String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
@@ -57,7 +57,7 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
             throw new BidException(msg, "order");
         }
 
-        // get amount 
+        // get amount
         double totalOrder = 0.0;
 		double tierFeeRate = txnFeeService.getFee(user.getTierLevel());
         double payAmount = order.getNdbAmount() * order.getNdbPrice();
@@ -66,7 +66,7 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
 		if(white != null) tierFeeRate = 0.0;
 
         totalOrder = 100 * payAmount / (100 - tierFeeRate);
-        
+
         // check crypto Type balance
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
         double cryptoAmount = totalOrder / cryptoPrice; // required amount!

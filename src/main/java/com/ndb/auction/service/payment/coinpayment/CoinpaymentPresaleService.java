@@ -41,7 +41,7 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
     public CoinpaymentDepositTransaction createNewTransaction(CoinpaymentDepositTransaction m)
             throws UnsupportedEncodingException, ClientProtocolException, IOException {
-        
+
         var presaleOrder = presaleOrderDao.selectById(m.getOrderId());
         if(presaleOrder == null || presaleOrder.getStatus() == 1) {
             String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
@@ -56,9 +56,9 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
         HttpPost post;
         m = coinpaymentTransactionDao.insert(m);
         var walletAddress = "";
-        
+
         var network = m.getNetwork().equals("ERC20") ? "BEP20" : m.getNetwork();
-        if(network.equals("BEP20") || network.equals("TRC20")) {
+        if(network.equals("BEP20") || network.equals("SOL")) {
             // send pending request
             post = new HttpPost(NYYU_BASE_URL + "/pending-requests");
             post.addHeader("Connection", "close");
@@ -142,5 +142,5 @@ public class CoinpaymentPresaleService extends CoinpaymentBaseService {
 
         return m;
     }
-        
+
 }

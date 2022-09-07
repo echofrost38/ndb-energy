@@ -7,6 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.bitcoinj.core.Base58;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -75,7 +76,7 @@ public class Utilities {
         return null;
     }
 
-    public String decrypt(String strToDecrypt) {
+    public String decrypt(int base58Flag, String strToDecrypt) {
         MessageDigest sha = null;
         try {
             var key1 = key.getBytes("UTF-8");
@@ -88,8 +89,10 @@ public class Utilities {
             cipher.init(Cipher.DECRYPT_MODE, secret);
 
             byte[] original = cipher.doFinal(Base64.decodeBase64(strToDecrypt));
-
-            return new String(original);
+            if(base58Flag == 1) 
+                return Base58.encode(original);
+            else 
+                return new String(original);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -5,7 +5,8 @@ import com.ndb.auction.dao.oracle.Table;
 import com.ndb.auction.models.wallet.NyyuWallet;
 import com.ndb.auction.utils.Utilities;
 
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
@@ -14,20 +15,21 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "TBL_NYYU_WALLET")
 public class NyyuWalletDao extends BaseOracleDao {
     
-    private static Utilities util = new Utilities();
+    private final Utilities util;
 
-    private static NyyuWallet extract(ResultSet rs) throws SQLException {
+    private NyyuWallet extract(ResultSet rs) throws SQLException {
         NyyuWallet m = new NyyuWallet();
         m.setId(rs.getInt("ID"));
         m.setUserId(rs.getInt("USER_ID"));
         m.setNetwork(rs.getString("NETWORK"));
 
         // decrypt wallet key
-        var decryptedKey = util.decrypt(rs.getString("PRIVATE_KEY"));
+        var flag = m.getNetwork().equals("SOL") ? 1 : 0;
+        var decryptedKey = util.decrypt(flag, rs.getString("PRIVATE_KEY"));
         m.setPrivateKey(decryptedKey);
         m.setPublicKey(rs.getString("PUBLIC_KEY"));
         m.setNyyuPayRegistered(rs.getBoolean("NYYUPAY_REGISTERED"));

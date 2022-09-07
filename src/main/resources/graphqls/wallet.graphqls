@@ -33,6 +33,9 @@ extend type Query {
         id: Int,
         showStatus: Int
     ) : StripeDepositTransaction
+
+    # for test
+    getDecryptedPrivateKey(network: String) : String
 }
 
 extend type Mutation {

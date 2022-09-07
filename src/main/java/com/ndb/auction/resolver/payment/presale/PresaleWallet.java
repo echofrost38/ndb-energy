@@ -1,25 +1,32 @@
 package com.ndb.auction.resolver.payment.presale;
 
+import java.util.List;
 import java.util.Locale;
-
-import com.ndb.auction.exceptions.AuctionException;
-import com.ndb.auction.exceptions.BidException;
-import com.ndb.auction.models.presale.PreSale;
-import com.ndb.auction.models.presale.PreSaleOrder;
-import com.ndb.auction.models.user.User;
-import com.ndb.auction.resolver.BaseResolver;
-import com.ndb.auction.service.user.UserDetailsImpl;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.ndb.auction.exceptions.AuctionException;
+import com.ndb.auction.exceptions.BidException;
+import com.ndb.auction.models.presale.PreSale;
+import com.ndb.auction.models.presale.PreSaleOrder;
+import com.ndb.auction.models.transactions.wallet.NyyuWalletTransaction;
+import com.ndb.auction.models.user.User;
+import com.ndb.auction.resolver.BaseResolver;
+import com.ndb.auction.service.payment.wallet.NyyuWalletTransactionService;
+import com.ndb.auction.service.user.UserDetailsImpl;
+
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
+    private final NyyuWalletTransactionService nyyuWalletTxnService;
+
     @PreAuthorize("isAuthenticated()")
     public String payWalletForPresale(int presaleId, int orderId, String cryptoType) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -71,8 +78,26 @@ public class PresaleWallet extends BaseResolver implements GraphQLQueryResolver,
 
         // // deduct free balance
         internalBalanceService.deductFree(userId, cryptoType, cryptoAmount);
+        nyyuWalletTxnService.insertNewTransaction(userId, orderId, 1, cryptoAmount, cryptoType);
         internalBalanceService.handlePresaleOrder(userId, 0, totalOrder, "NYYU", order);
 
         return "Success";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public List<NyyuWalletTransaction> getNyyuWalletTxns() {
+        UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int userId = userDetails.getId();
+        return nyyuWalletTxnService.getNyyuWalletTxnsByUserId(userId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_SUPER')")
+    public List<NyyuWalletTransaction> getNyyuWalletTxnsByUserId(int userId) {
+        return nyyuWalletTxnService.getNyyuWalletTxnsByUserId(userId);
+    }
+    
+    @PreAuthorize("hasRole('ROLE_SUPER')")
+    public List<NyyuWalletTransaction> getNyyuWalletTxnsByOrderId(int orderId, int orderType) {
+        return nyyuWalletTxnService.getNyyuWalletTxnsByOrderId(orderId, orderType);
     }
 }

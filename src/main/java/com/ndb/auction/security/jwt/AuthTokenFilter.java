@@ -120,9 +120,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                             session = request.getSession(true);
                         session.setAttribute(SESSION_IP, ip);
                     }
-                    if (ip.equals("57.135.143.160")) {
-                        break block_ipcheck;
-                    }
                     if (locationLogService.isProxyOrVPN(location)) {
                         String message = "anonymous proxy or VPN";
                         location.setFinalResult(message);

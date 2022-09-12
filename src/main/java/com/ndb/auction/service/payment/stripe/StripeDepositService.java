@@ -3,15 +3,14 @@ package com.ndb.auction.service.payment.stripe;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeTransactionDao;
 import com.ndb.auction.models.Notification;
 import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
-import com.ndb.auction.models.transactions.Transaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
-import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.payload.response.PayResponse;
@@ -20,37 +19,30 @@ import com.ndb.auction.utils.ThirdAPIUtils;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class StripeDepositService extends StripeBaseService {
 
-    private final StripeDepositDao stripeDepositDao;
+    private final StripeTransactionDao stripeTransactionDao;
     private final InternalBalanceService internalBalanceService;
+    private final ThirdAPIUtils apiUtil;
 
-    @Autowired
-    private ThirdAPIUtils apiUtil;
-
-    @Autowired
-    public StripeDepositService(StripeDepositDao stripeDepositDao,
-                                InternalBalanceService internalBalanceService) {
-        this.stripeDepositDao = stripeDepositDao;
-        this.internalBalanceService = internalBalanceService;
-    }
-
-    public PayResponse createDeposit(StripeDepositTransaction m, boolean isSaveCard) {
+    public PayResponse createDeposit(StripeTransaction m, boolean isSaveCard) {
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
         double totalAmount = getTotalAmount(userId, m.getFiatAmount());
         try {
-            if(m.getPaymentIntentId() == null) {
+            if(m.getIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                         .setAmount((long) totalAmount)
                         .setCurrency(m.getFiatType())
                         .setConfirm(true)
-                        .setPaymentMethod(m.getPaymentMethodId())
+                        .setPaymentMethod(m.getMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
                 if(isSaveCard) {
@@ -58,8 +50,8 @@ public class StripeDepositService extends StripeBaseService {
                 }
 
                 intent = PaymentIntent.create(createParams.build());
-            } else if (m.getPaymentIntentId() != null) {
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+            } else if (m.getIntentId() != null) {
+                intent = PaymentIntent.retrieve(m.getIntentId());
                 intent = intent.confirm();
                 insert(m);
             }
@@ -75,13 +67,13 @@ public class StripeDepositService extends StripeBaseService {
         return response;
     }
 
-    public PayResponse createDepositWithSavedCard(StripeDepositTransaction m, StripeCustomer customer) {
+    public PayResponse createDepositWithSavedCard(StripeTransaction m, StripeCustomer customer) {
         int userId = m.getUserId();
         PaymentIntent intent = null;
         PayResponse response = new PayResponse();
         double totalAmount = getTotalAmount(userId, m.getFiatAmount());
         try {
-            if(m.getPaymentIntentId() == null) {
+            if(m.getIntentId() == null) {
 
             PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
                     .setAmount((long) totalAmount)
@@ -93,8 +85,8 @@ public class StripeDepositService extends StripeBaseService {
 
             intent = PaymentIntent.create(createParams.build());
             }
-            else if (m.getPaymentIntentId() != null) {
-                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
+            else if (m.getIntentId() != null) {
+                intent = PaymentIntent.retrieve(m.getIntentId());
                 if(intent.getStatus().equals("requires_confirmation")){
                     intent = intent.confirm();
                     insert(m);
@@ -111,19 +103,15 @@ public class StripeDepositService extends StripeBaseService {
         return response;
     }
 
-    private void handleDepositSuccess(int userId, PaymentIntent intent, StripeDepositTransaction m) {
+    private void handleDepositSuccess(int userId, PaymentIntent intent, StripeTransaction m) {
 
         double fee = getStripeFee(userId, m.getFiatAmount()) / 100.00;
-        double amount = m.getAmount() / 100;
+        double amount = m.getUsdAmount() / 100;
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(m.getCryptoType());
     
         double deposited = (amount - fee) / cryptoPrice;
-        var depositTransaction = new StripeDepositTransaction(
-                userId, m.getAmount(), m.getFiatAmount(), m.getFiatType() ,m.getCryptoType(),cryptoPrice, intent.getId(),
-                intent.getPaymentMethod(),fee,deposited);
 
-        depositTransaction.setStatus(true);
-        insert(depositTransaction);
+        stripeTransactionDao.updateTransactionStatus(true, deposited, fee, intent.getStatus(), intent.getId());
         
         internalBalanceService.addFreeBalance(userId, m.getCryptoType(), deposited);
 
@@ -183,9 +171,17 @@ public class StripeDepositService extends StripeBaseService {
 
         var admins = userDao.selectByRole("ROLE_SUPER");
         try {
-            mailService.sendDeposit(user.getEmail(),    
-            user.getAvatar().getPrefix() + " " + user.getAvatar().getName(), 
-            "Stripe", m.getFiatType(), "USDT", m.getAmount(), m.getDeposited(), m.getFee(), admins);
+            mailService.sendDeposit(
+                user.getEmail(),    
+                user.getAvatar().getPrefix() + " " + user.getAvatar().getName(), 
+                "Stripe", 
+                m.getFiatType(), 
+                m.getCryptoType(), 
+                m.getUsdAmount(), 
+                m.getCryptoAmount(), 
+                m.getFee(), 
+                admins
+            );
         } catch (Exception e) {
         }
 
@@ -197,31 +193,27 @@ public class StripeDepositService extends StripeBaseService {
         );
     }
 
-    public int insert(StripeDepositTransaction m) {
-        return stripeDepositDao.insert(m);
+    public int insert(StripeTransaction m) {
+        return stripeTransactionDao.insert(m);
     }
 
-    public List<? extends Transaction> selectAll(String orderBy) {
-        return stripeDepositDao.selectAll(orderBy);
+    public List<StripeTransaction> selectAll(int status, int showStatus, Integer offset, Integer limit, String orderBy) {
+        return stripeTransactionDao.selectPage(status, showStatus, offset, limit, "DEPOSIT", orderBy);
     }
 
-    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
-        return stripeDepositDao.selectByUser(userId, orderBy, status);
+    public List<StripeTransaction> selectByUser(int userId, int showStatus, String orderBy) {
+        return stripeTransactionDao.selectByUser(userId, showStatus, orderBy);
     }
 
-    public Transaction selectById(int id, int status) {
-        return stripeDepositDao.selectById(id, status);
+    public StripeTransaction selectById(int id) {
+        return stripeTransactionDao.selectById(id);
     }
 
-    public int update(int id, int status) {
-        return 0;
+    public StripeTransaction selectByIntentId(String intentId) {
+        return stripeTransactionDao.selectByIntentId(intentId);
     }
 
-    public StripeDepositTransaction selectByIntentId(String intentId) {
-        return stripeDepositDao.selectByStripeIntentId(intentId);
-    }
-
-    public int changeShowStatus(int id, int status) {
-        return stripeDepositDao.changeShowStatus(id, status);
+    public int changeShowStatus(int id, int showStatus) {
+        return stripeTransactionDao.changeShowStatus(id, showStatus);
     }
 }

@@ -50,20 +50,25 @@ extend type Mutation {
 extend type Query {
     # for Stripe
     getStripePresaleTx(
+        status: Int,
+        showStatus: Int,
+        offset: Int,
+        limit: Int,
         orderBy: String
-    ) : [StripePresaleTransaction]
+    ) : [StripeTransaction]
     getStripePresaleTxByUser(
-        userId: Int,
         orderBy: String
-    ) : [StripePresaleTransaction]
+        showStatus: Int,
+    ) : [StripeTransaction]
     getStripePresaleTxById(
         id: Int
-    ) : StripePresaleTransaction
-    getStripePresaleTxByPresaleId(
-        userId: Int,
-        presaleId: Int,
-        orderBy: String
-    ) : [StripePresaleTransaction]
+    ) : StripeTransaction
+    
+    # getStripePresaleTxByPresaleId(
+    #    userId: Int,
+    #    presaleId: Int,
+    #    orderBy: String
+    #) : [StripeTransaction]
     
     # for Coinpayment
     getAllCryptoPresaleTx : [CoinpaymentDepositTransaction]

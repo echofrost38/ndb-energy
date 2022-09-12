@@ -1,20 +1,23 @@
 extend type Query {
 	# for stripe
-	getStripeAuctionTxByRound(
-		roundId: String!
-	) : [StripeAuctionTransaction]
-	getStripeAuctionTxByUser
-	 : [StripeAuctionTransaction]
+	# getStripeAuctionTxByRound(
+	# 	roundId: String!
+	# ) : [StripeTransaction]
+	getStripeAuctionTxByUser (
+		showStatus: Int,
+		orderBy: String
+	) : [StripeTransaction]
 	getStripeAuctionTxByAdmin(
-		 userId: String!
-	) : [StripeAuctionTransaction]
+		userId: Int,
+		orderBy: String
+	) : [StripeTransaction]
 	getStripeAuctionTx(
 		roundId: String!,
-	) : [StripeAuctionTransaction]
+	) : [StripeTransaction]
 	getStripeAuctionTxForRoundByAdmin(
-		roundId: String!,
+		roundId: Int!,
 		userId: String
-	) : [StripeAuctionTransaction]
+	) : [StripeTransaction]
 	
 	# for coinpayment
     getCryptoAuctionTxById(

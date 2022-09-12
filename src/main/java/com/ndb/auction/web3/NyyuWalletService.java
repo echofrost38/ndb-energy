@@ -1,19 +1,36 @@
 package com.ndb.auction.web3;
 
-import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
-import com.ndb.auction.exceptions.UnauthorizedException;
-import com.ndb.auction.models.wallet.NyyuWallet;
-import com.ndb.auction.service.BaseService;
-import com.ndb.auction.utils.Utilities;
-
-import lombok.RequiredArgsConstructor;
-
-import com.ndb.auction.solanaj.data.SolanaAccount;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tron.trident.core.key.KeyPair;
-import org.web3j.crypto.*;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Wallet;
+import org.web3j.crypto.WalletFile;
+
+import com.ndb.auction.dao.oracle.transactions.bank.BankDepositDao;
+import com.ndb.auction.dao.oracle.transactions.coinpayment.CoinpaymentTransactionDao;
+import com.ndb.auction.dao.oracle.transactions.paypal.PaypalDepositDao;
+import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripeDepositDao;
+import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletDao;
+import com.ndb.auction.dao.oracle.wallet.NyyuWalletTransactionDao;
+import com.ndb.auction.dao.oracle.withdraw.BankWithdrawDao;
+import com.ndb.auction.dao.oracle.withdraw.CryptoWithdrawDao;
+import com.ndb.auction.dao.oracle.withdraw.PaypalWithdrawDao;
+import com.ndb.auction.exceptions.UnauthorizedException;
+import com.ndb.auction.models.wallet.NyyuWallet;
+import com.ndb.auction.models.withdraw.CryptoWithdraw;
+import com.ndb.auction.models.withdraw.PaypalWithdraw;
+import com.ndb.auction.payload.response.BalanceTrack;
+import com.ndb.auction.service.BaseService;
+import com.ndb.auction.solanaj.data.SolanaAccount;
+import com.ndb.auction.utils.Utilities;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +38,22 @@ public class NyyuWalletService extends BaseService {
     
     private final NyyuWalletDao nyyuWalletDao;
     private final Utilities util;
+
+    // deposit dao
+    private final CoinpaymentTransactionDao cryptoDepositDao;
+    private final PaypalDepositDao paypalDepositDao;
+    private final StripeDepositDao stripeDepositDao;
+    private final BankDepositDao bankDepositDao;
+
+    // presale dao 
+    private final PaypalPresaleDao paypalPresaleDao;
+    private final StripePresaleDao stripePresaleDao;
+    private final NyyuWalletTransactionDao walletTransactionDao;
+
+    // withdrawal
+    private final PaypalWithdrawDao paypalWithdrawDao;
+    private final CryptoWithdrawDao cryptoWithdrawDao;
+    private final BankWithdrawDao bankWithdrawDao;
     
     @Value("${bsc.json.rpc}")
     private String bscNetwork;
@@ -151,6 +184,7 @@ public class NyyuWalletService extends BaseService {
         return nyyuWalletDao.selectByAddress(address);
     }
 
+    /// test purchase
     public int updatePrivateKeys() {
         var nyyuWalletList = nyyuWalletDao.selectAll();
         for (var wallet : nyyuWalletList) {
@@ -159,5 +193,20 @@ public class NyyuWalletService extends BaseService {
             nyyuWalletDao.updatePrivateKey(wallet);
         }
         return nyyuWalletList.size();
+    }
+
+    // Fetch all transactions and return balance history
+    public List<BalanceTrack> fetchBalanceHistory(int userId) {
+        // 1. deposit txns
+        // 1A) Crypto deposit 
+        // var cryptoDepositTxns = crypto
+
+        // purchase txns
+
+
+        // withdraw txns
+
+
+        return null;
     }
 }

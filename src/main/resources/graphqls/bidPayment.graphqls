@@ -41,14 +41,19 @@ extend type Query {
 	
 	# for paypal
 	getAllPaypalAuctionTxns(
+		status: Int,
+		showStatus: Int,
+		offset: Int,
+		limit: Int,
 		orderBy: String
-	) : [PaypalAuctionTransaction]
+	) : [PaypalTransaction]
 	getPaypalAuctionTxnsByUser(
 		orderBy: String
-	) : [PaypalAuctionTransaction]
+		showStatus: Int
+	) : [PaypalTransaction]
 	getPaypalAuctionTxn(
 		id: Int
-	) : PaypalAuctionTransaction
+	) : PaypalTransaction
 }
 
 extend type Mutation {

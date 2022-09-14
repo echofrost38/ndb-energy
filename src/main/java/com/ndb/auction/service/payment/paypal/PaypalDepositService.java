@@ -2,49 +2,44 @@ package com.ndb.auction.service.payment.paypal;
 
 import java.util.List;
 
-import com.ndb.auction.dao.oracle.transactions.paypal.PaypalDepositDao;
-import com.ndb.auction.models.transactions.Transaction;
-import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ndb.auction.dao.oracle.transactions.paypal.PaypalTransactionDao;
+import com.ndb.auction.models.transactions.paypal.PaypalTransaction;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PaypalDepositService extends PaypalBaseService {
 
-    @Autowired
-    private PaypalDepositDao paypalDepositDao;
+    private final PaypalTransactionDao paypalTransactionDao;
 
-    public PaypalDepositTransaction insert(PaypalDepositTransaction m) {
-        return (PaypalDepositTransaction) paypalDepositDao.insert(m);
+    public PaypalTransaction insert(PaypalTransaction m) {
+        return paypalTransactionDao.insert(m);
     }
 
-    public List<? extends Transaction> selectAll(String orderBy) {
-        return paypalDepositDao.selectAll(orderBy);
+    public List<PaypalTransaction> selectAll(int status, int showStatus, Integer offset, Integer limit, String txnType, String orderBy) {
+        return paypalTransactionDao.selectPage(status, showStatus, offset, limit, txnType, orderBy);
     }
 
-    public List<? extends Transaction> selectByUser(int userId, String orderBy, int status) {
-        return paypalDepositDao.selectByUser(userId, orderBy, status);
+    public List<PaypalTransaction> selectByUser(int userId, String orderBy, int status) {
+        return paypalTransactionDao.selectByUser(userId, status, orderBy);
     }
 
-    public Transaction selectById(int id, int status) {
-        return paypalDepositDao.selectById(id, status);
+    public PaypalTransaction selectById(int id) {
+        return paypalTransactionDao.selectById(id);
     }
 
-    public int update(int id, int status) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int updateOrderStatus(int id, String orderStatus) {
+        return paypalTransactionDao.updateOrderStatus(id, orderStatus);
     }
 
-    public int updateOrderStatus(int id, String status) {
-        return paypalDepositDao.updateOrderStatus(id, status);
-    }
-
-    public PaypalDepositTransaction selectByPaypalOrderId(String orderId) {
-        return paypalDepositDao.selectByPaypalOrderId(orderId);
+    public PaypalTransaction selectByPaypalOrderId(String orderId) {
+        return paypalTransactionDao.selectByOrderId(orderId);
     }
     
     public int changeShowStatus(int id, int status) {
-        return paypalDepositDao.changeShowStatus(id, status);
+        return paypalTransactionDao.changeShowStatus(id, status);
     }
 }

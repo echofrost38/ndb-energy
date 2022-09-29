@@ -19,23 +19,20 @@ extend type Query {
 
     # Get Stripe Transaction for deposit
     getStripeDepositTx(
-        status: Int,
-        showStatus: Int,
-        offset: Int,
-        limit: Int,
         orderBy: String
-    ) : [StripeTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxByUser(
         orderBy: String,
         showStatus: Int
-    ) : [StripeTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxByAdmin(
         userId: Int,
         orderBy: String
-    ) : [StripeTransaction]
+    ) : [StripeDepositTransaction]
     getStripeDepositTxById(
         id: Int,
-    ) : StripeTransaction
+        showStatus: Int
+    ) : StripeDepositTransaction
 
     # for test
     getDecryptedPrivateKey(network: String) : String

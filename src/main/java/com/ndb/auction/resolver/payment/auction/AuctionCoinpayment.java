@@ -36,7 +36,7 @@ public class AuctionCoinpayment extends BaseResolver implements GraphQLMutationR
 		// check pending price
 		double orderAmount = 0.0;
 		if(bid.isPendingIncrease()) {
-			orderAmount = bid.getTempTokenAmount() * bid.getTempTokenPrice() - bid.getTokenAmount() * bid.getTokenPrice();
+			orderAmount = bid.getTempTokenAmount() * bid.getTempTokenPrice();
 		} else {
 			orderAmount = bid.getTokenAmount() * bid.getTokenPrice();
 		}		

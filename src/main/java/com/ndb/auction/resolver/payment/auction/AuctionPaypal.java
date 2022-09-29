@@ -9,7 +9,7 @@ import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.exceptions.UserNotFoundException;
 import com.ndb.auction.models.Auction;
 import com.ndb.auction.models.Bid;
-import com.ndb.auction.models.transactions.paypal.PaypalTransaction;
+import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
 import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
 import com.ndb.auction.payload.request.paypal.PurchaseUnit;
@@ -98,17 +98,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
 		// Create not confirmed transaction
-        var entity = PaypalTransaction.builder()
-			.userId(userId)
-			.txnType("AUCTION")
-			.txnId(bid.getRoundId())
-			.fiatAmount(fiatAmount)
-			.fiatType(currencyCode)
-			.usdAmount(checkoutAmount)
-			.fee(checkoutAmount - amount)
-			.cryptoType("NDB")
-			.cryptoAmount(bid.getTokenAmount())
-			.build();
+        PaypalAuctionTransaction entity = new PaypalAuctionTransaction(userId, roundId, fiatAmount, currencyCode, amount, checkoutAmount - amount, null, null);
 
 		// set order id and status
         entity.setPaypalOrderId(orderResponse.getId());
@@ -129,7 +119,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 		CaptureOrderResponseDTO responseDTO = payPalHttpClient.captureOrder(orderId);
 		if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {
 			// fetch transaction
-			PaypalTransaction m = paypalAuctionService.selectByPaypalOrderId(orderId);
+			PaypalAuctionTransaction m = (PaypalAuctionTransaction) paypalAuctionService.selectByPaypalOrderId(orderId);
 			if(m == null) {
                 String msg = messageSource.getMessage("no_transaction", null, Locale.ENGLISH);
 				throw new BidException(msg, "orderId");
@@ -140,7 +130,7 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 			}
 
 			// check Bid
-			Bid bid = bidService.getBid(m.getTxnId(), m.getUserId());
+			Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
 			if(bid == null) {
                 String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
 				throw new BidException(msg, "orderId");
@@ -161,21 +151,22 @@ public class AuctionPaypal extends BaseResolver implements GraphQLMutationResolv
 	}
 
 	@PreAuthorize("hasRole('ROLE_SUPER')")
-	public List<PaypalTransaction> getAllPaypalAuctionTxns(
-		int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-		return paypalAuctionService.selectAll(status, showStatus, offset, limit, orderBy);
+    @SuppressWarnings("unchecked")
+	public List<PaypalAuctionTransaction> getAllPaypalAuctionTxns(String orderBy) {
+		return (List<PaypalAuctionTransaction>) paypalAuctionService.selectAll(orderBy);
 	}
 
 	@PreAuthorize("isAuthenticated()")
-    public List<PaypalTransaction> getPaypalAuctionTxnsByUser(String orderBy, int showStatus) {
+    @SuppressWarnings("unchecked")
+    public List<PaypalAuctionTransaction> getPaypalAuctionTxnsByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return paypalAuctionService.selectByUser(userId, showStatus, orderBy);
+        return (List<PaypalAuctionTransaction>) paypalAuctionService.selectByUser(userId, orderBy);
     }
 	
 	@PreAuthorize("isAuthenticated()")
-    public PaypalTransaction getPaypalAuctionTxn(int id) {
-        return paypalAuctionService.selectById(id);
+    public PaypalAuctionTransaction getPaypalAuctionTxn(int id) {
+        return (PaypalAuctionTransaction) paypalAuctionService.selectById(id);
     }
 
 }

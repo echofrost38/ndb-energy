@@ -1,23 +1,20 @@
 extend type Query {
 	# for stripe
-	# getStripeAuctionTxByRound(
-	# 	roundId: String!
-	# ) : [StripeTransaction]
-	getStripeAuctionTxByUser (
-		showStatus: Int,
-		orderBy: String
-	) : [StripeTransaction]
+	getStripeAuctionTxByRound(
+		roundId: String!
+	) : [StripeAuctionTransaction]
+	getStripeAuctionTxByUser
+	 : [StripeAuctionTransaction]
 	getStripeAuctionTxByAdmin(
-		userId: Int,
-		orderBy: String
-	) : [StripeTransaction]
+		 userId: String!
+	) : [StripeAuctionTransaction]
 	getStripeAuctionTx(
 		roundId: String!,
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	getStripeAuctionTxForRoundByAdmin(
-		roundId: Int!,
+		roundId: String!,
 		userId: String
-	) : [StripeTransaction]
+	) : [StripeAuctionTransaction]
 	
 	# for coinpayment
     getCryptoAuctionTxById(
@@ -41,19 +38,14 @@ extend type Query {
 	
 	# for paypal
 	getAllPaypalAuctionTxns(
-		status: Int,
-		showStatus: Int,
-		offset: Int,
-		limit: Int,
 		orderBy: String
-	) : [PaypalTransaction]
+	) : [PaypalAuctionTransaction]
 	getPaypalAuctionTxnsByUser(
 		orderBy: String
-		showStatus: Int
-	) : [PaypalTransaction]
+	) : [PaypalAuctionTransaction]
 	getPaypalAuctionTxn(
 		id: Int
-	) : PaypalTransaction
+	) : PaypalAuctionTransaction
 }
 
 extend type Mutation {

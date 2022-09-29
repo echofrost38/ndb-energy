@@ -50,25 +50,20 @@ extend type Mutation {
 extend type Query {
     # for Stripe
     getStripePresaleTx(
-        status: Int,
-        showStatus: Int,
-        offset: Int,
-        limit: Int,
         orderBy: String
-    ) : [StripeTransaction]
+    ) : [StripePresaleTransaction]
     getStripePresaleTxByUser(
+        userId: Int,
         orderBy: String
-        showStatus: Int,
-    ) : [StripeTransaction]
+    ) : [StripePresaleTransaction]
     getStripePresaleTxById(
         id: Int
-    ) : StripeTransaction
-    
-    # getStripePresaleTxByPresaleId(
-    #    userId: Int,
-    #    presaleId: Int,
-    #    orderBy: String
-    #) : [StripeTransaction]
+    ) : StripePresaleTransaction
+    getStripePresaleTxByPresaleId(
+        userId: Int,
+        presaleId: Int,
+        orderBy: String
+    ) : [StripePresaleTransaction]
     
     # for Coinpayment
     getAllCryptoPresaleTx : [CoinpaymentDepositTransaction]
@@ -79,19 +74,14 @@ extend type Query {
     
     # for paypal
     getAllPaypalPresaleTxns(
-        status: Int,
-        showStatus: Int,
-        offset: Int,
-        limit: Int,
         orderBy: String
-    ) : [PaypalTransaction]
+    ) : [PaypalPresaleTransaction]
     getPaypalPresaleTxnsByUser(
-        orderBy: String,
-        showStatus: Int
-    ) : [PaypalTransaction]
+        orderBy: String
+    ) : [PaypalPresaleTransaction]
     getPaypalPresaleTxn(
         id: Int
-    ) : PaypalTransaction
+    ) : PaypalPresaleTransaction
 }
 
 schema {

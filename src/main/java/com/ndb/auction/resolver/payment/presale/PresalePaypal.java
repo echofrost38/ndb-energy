@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Locale;
 
 import com.ndb.auction.exceptions.BidException;
-import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.presale.PreSale;
 import com.ndb.auction.models.presale.PreSaleOrder;
-import com.ndb.auction.models.transactions.paypal.PaypalTransaction;
+import com.ndb.auction.models.transactions.paypal.PaypalPresaleTransaction;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
 import com.ndb.auction.payload.request.paypal.PayPalAppContextDTO;
 import com.ndb.auction.payload.request.paypal.PurchaseUnit;
@@ -22,32 +20,31 @@ import com.ndb.auction.service.payment.paypal.PaypalPresaleService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import com.ndb.auction.utils.PaypalHttpClient;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.RequiredArgsConstructor;
 
 @Component
-@RequiredArgsConstructor
 public class PresalePaypal extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
     private final PaypalPresaleService paypalPresaleService;
     private final PaypalHttpClient payPalHttpClient;
+
+	@Autowired
+	public PresalePaypal(PaypalHttpClient payPalHttpClient, PaypalPresaleService presaleService) {
+		this.payPalHttpClient = payPalHttpClient;
+        this.paypalPresaleService = presaleService;
+	}
 
     @PreAuthorize("isAuthenticated()")
     public OrderResponseDTO paypalForPresale(int presaleId, int orderId, String currencyCode) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         
-        var presale = presaleService.getPresaleById(presaleId);
-        if(presale == null || presale.getStatus() != PreSale.STARTED) {
-            String msg = messageSource.getMessage("already_in_action", null, Locale.ENGLISH);
-            throw new UnauthorizedException(msg, "presale");
-        }
-
         PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(orderId);
         if(presaleOrder == null) {
             String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
@@ -82,19 +79,8 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = PaypalTransaction.builder()
-            .userId(userId)
-            .txnType("PRESALE")
-            .txnId(presaleOrder.getId())
-            .fiatAmount(fiatAmount)
-            .fiatType(currencyCode)
-            .usdAmount(checkoutAmount)
-            .fee(checkoutAmount - amount)
-            .paypalOrderId(orderResponse.getId())
-            .paypalOrderStatus(orderResponse.getStatus().toString())
-            .cryptoType("NDB")
-            .cryptoAmount(presaleOrder.getNdbAmount())
-            .build();
+        var m = new PaypalPresaleTransaction(userId, presaleId, orderId, fiatAmount, currencyCode, amount, checkoutAmount - amount,
+            orderResponse.getId(), orderResponse.getStatus().toString());
         return paypalPresaleService.insert(m);
     }
 
@@ -107,7 +93,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
         
         if(responseDTO.getStatus() != null && responseDTO.getStatus().equals("COMPLETED")) {
 			// fetch transaction
-            var m = paypalPresaleService.selectByPaypalOrderId(orderId);
+            PaypalPresaleTransaction m = (PaypalPresaleTransaction) paypalPresaleService.selectByPaypalOrderId(orderId);
 			if(m == null) {
                 String msg = messageSource.getMessage("no_transaction", null, Locale.ENGLISH);
                 throw new BidException(msg, "orderId");
@@ -117,7 +103,7 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
 				throw new UserNotFoundException(msg, "user");
             }
 
-			PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(m.getTxnId());
+			PreSaleOrder presaleOrder = presaleOrderService.getPresaleById(m.getOrderId());
             if(presaleOrder == null) {
                 String msg = messageSource.getMessage("no_order", null, Locale.ENGLISH);
                 throw new BidException(msg, "orderId");
@@ -131,21 +117,22 @@ public class PresalePaypal extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<PaypalTransaction> getAllPaypalPresaleTxns(
-        int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-        return paypalPresaleService.selectAll(status, showStatus, offset, limit, "PRESALE", orderBy);
+    @SuppressWarnings("unchecked")
+    public List<PaypalPresaleTransaction> getAllPaypalPresaleTxns(String orderBy) {
+        return (List<PaypalPresaleTransaction>) paypalPresaleService.selectAll(orderBy);
     }
     
     @PreAuthorize("isAuthenticated()")
-    public List<PaypalTransaction> getPaypalPresaleTxnsByUser(String orderBy, int showStatus) {
+    @SuppressWarnings("unchecked")
+    public List<PaypalPresaleTransaction> getPaypalPresaleTxnsByUser(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return paypalPresaleService.selectByUser(userId, showStatus, orderBy);
+        return (List<PaypalPresaleTransaction>) paypalPresaleService.selectByUser(userId, orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PaypalTransaction getPaypalPresaleTxn(int id) {
-        return paypalPresaleService.selectById(id);
+    public PaypalPresaleTransaction getPaypalPresaleTxn(int id) {
+        return (PaypalPresaleTransaction) paypalPresaleService.selectById(id);
     }
 
 

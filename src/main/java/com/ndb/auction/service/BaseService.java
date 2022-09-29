@@ -29,7 +29,6 @@ import com.ndb.auction.dao.oracle.presale.PreSaleDao;
 import com.ndb.auction.dao.oracle.presale.PreSaleOrderDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalAuctionDao;
 import com.ndb.auction.dao.oracle.transactions.paypal.PaypalPresaleDao;
-import com.ndb.auction.dao.oracle.transactions.paypal.PaypalTransactionDao;
 import com.ndb.auction.dao.oracle.transactions.stripe.StripeCustomerDao;
 import com.ndb.auction.dao.oracle.user.*;
 import com.ndb.auction.dao.oracle.verify.KycSettingDao;
@@ -235,9 +234,6 @@ public class BaseService {
 
     @Autowired
     protected PaypalPresaleDao paypalPresaleDao;
-
-    @Autowired
-    protected PaypalTransactionDao paypalTransactionDao;
 
     @Autowired
     protected WhitelistDao whitelistDao;

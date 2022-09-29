@@ -8,7 +8,7 @@ import com.ndb.auction.models.TaskSetting;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.tier.WalletTask;
-import com.ndb.auction.models.transactions.paypal.PaypalTransaction;
+import com.ndb.auction.models.transactions.paypal.PaypalDepositTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.payload.request.paypal.OrderDTO;
@@ -27,8 +27,7 @@ import com.ndb.auction.utils.PaypalHttpClient;
 import com.ndb.auction.utils.ThirdAPIUtils;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import lombok.RequiredArgsConstructor;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -38,15 +37,29 @@ import java.util.List;
 import java.util.Locale;
 
 @Component
-@RequiredArgsConstructor
 public class DepositPaypal extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
     
-    private final PaypalDepositService paypalDepositService;
+    @Autowired
+    private PaypalDepositService paypalDepositService;
+
     private final PaypalHttpClient payPalHttpClient;
-    private final ThirdAPIUtils apiUtil;
-    private final TierService tierService;
-    private final TaskSettingService taskSettingService;
-    private final MailService mailService;
+
+    @Autowired
+    private ThirdAPIUtils apiUtil;
+
+    @Autowired
+    private TierService tierService;
+
+    @Autowired
+    private TaskSettingService taskSettingService;
+
+    @Autowired
+    private MailService mailService;
+
+	@Autowired
+	public DepositPaypal(PaypalHttpClient payPalHttpClient) {
+		this.payPalHttpClient = payPalHttpClient;
+	}
 
     @PreAuthorize("isAuthenticated()")
     public OrderResponseDTO paypalForDeposit(Double amount, String currencyCode, String cryptoType) throws Exception {
@@ -87,21 +100,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
         order.setApplicationContext(appContext);
         OrderResponseDTO orderResponse = payPalHttpClient.createOrder(order);
 
-        var m = PaypalTransaction.builder()
-            .userId(userId)
-            .txnType("DEPOSIT")
-            .txnId(0)
-            .fiatType(currencyCode)
-            .fiatAmount(amount)
-            .usdAmount(usdAmount)
-            .fee(fee)
-            .paypalOrderId(orderResponse.getId())
-            .paypalOrderStatus(orderResponse.getStatus().name())
-            .cryptoType(cryptoType)
-            .cryptoAmount(deposited)
-            .status(0)
-            .shown(false)
-            .build();
+        var m = new PaypalDepositTransaction(userId, usdAmount, amount, currencyCode, cryptoType, cryptoPrice, orderResponse.getId(), orderResponse.getStatus().toString(), fee, deposited);
                 
         paypalDepositService.insert(m);
         return orderResponse;
@@ -124,7 +123,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             paypalDepositService.updateOrderStatus(m.getId(), "COMPLETED");
 
             // add balance to user
-            internalBalanceService.addFreeBalance(userId, m.getCryptoType(), m.getCryptoAmount());
+            internalBalanceService.addFreeBalance(userId, m.getCryptoType(), m.getDeposited());
 
             List<BalancePayload> balances = internalBalanceService.getInternalBalances(userId);
             double totalBalance = 0.0;
@@ -176,10 +175,10 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             var msg = "";
             if(m.getCryptoType().equals("USDT") || m.getCryptoType().equals("USDC")) {
                 var df = new DecimalFormat("#.00");
-                msg = "Your deposit of " + df.format(m.getCryptoAmount()) + m.getCryptoType() + " was successful.";
+                msg = "Your deposit of " + df.format(m.getDeposited()) + m.getCryptoType() + " was successful.";
             } else {
                 var df = new DecimalFormat("#.00000000");
-                msg = "Your deposit of " + df.format(m.getCryptoAmount()) + m.getCryptoType() + " was successful.";
+                msg = "Your deposit of " + df.format(m.getDeposited()) + m.getCryptoType() + " was successful.";
             }
 
             var admins = userService.getUsersByRole("ROLE_SUPER");
@@ -187,7 +186,7 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
             try {
                 mailService.sendDeposit(user.getEmail(), 
                 user.getAvatar().getPrefix() + " " + user.getAvatar().getName(), 
-                "PayPal", m.getFiatType(), "USDT", m.getUsdAmount(), m.getCryptoAmount(), m.getFee(), admins);   
+                "PayPal", m.getFiatType(), "USDT", m.getAmount(), m.getDeposited(), m.getFee(), admins);   
             } catch (Exception e) {
                 
             }
@@ -203,37 +202,39 @@ public class DepositPaypal extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<PaypalTransaction> getAllPaypalDepositTxns(
-        int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-        return paypalDepositService.selectAll(status, showStatus, offset, limit, "DEPOSIT", orderBy);
+    @SuppressWarnings("unchecked")
+    public List<PaypalDepositTransaction> getAllPaypalDepositTxns(String orderBy) {
+        return (List<PaypalDepositTransaction>) paypalDepositService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<PaypalTransaction> getPaypalDepositTxnsByUser(String orderBy, int showStatus) {
+    @SuppressWarnings("unchecked")
+    public List<PaypalDepositTransaction> getPaypalDepositTxnsByUser(String orderBy, int showStatus) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return paypalDepositService.selectByUser(userId, orderBy, showStatus);
+        return (List<PaypalDepositTransaction>) paypalDepositService.selectByUser(userId, orderBy, showStatus);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PaypalTransaction getPaypalDepositTxnById(int id) {
+    public PaypalDepositTransaction getPaypalDepositTxnById(int id, int showStatus) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var tx = paypalDepositService.selectById(id);
+        var tx = (PaypalDepositTransaction) paypalDepositService.selectById(id, showStatus);
         if(tx.getUserId() == userId) return tx;
         return null;
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<PaypalTransaction> getPaypalDepositTxnsByAdmin(String orderBy) {
+    @SuppressWarnings("unchecked")
+    public List<PaypalDepositTransaction> getPaypalDepositTxnsByAdmin(String orderBy) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return paypalDepositService.selectByUser(userId, orderBy, 1);
+        return (List<PaypalDepositTransaction>) paypalDepositService.selectByUser(userId, orderBy, 1);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public PaypalTransaction getPaypalDepositTxnByIdByAdmin(int id) {
-        return paypalDepositService.selectById(id);
+    public PaypalDepositTransaction getPaypalDepositTxnByIdByAdmin(int id) {
+        return (PaypalDepositTransaction) paypalDepositService.selectById(id, 1);
     }
 
     @PreAuthorize("isAuthenticated()")

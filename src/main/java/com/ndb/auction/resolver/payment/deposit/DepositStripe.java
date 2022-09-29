@@ -3,7 +3,7 @@ package com.ndb.auction.resolver.payment.deposit;
 import com.ndb.auction.exceptions.UnauthorizedException;
 import com.ndb.auction.exceptions.UserSuspendedException;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
-import com.ndb.auction.models.transactions.stripe.StripeTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.payment.stripe.StripeCustomerService;
@@ -47,20 +47,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             throw new UnauthorizedException(msg, "userId");
         }
 
-        var m = StripeTransaction.builder()
-            .userId(userId)
-            .txnType("DEPOSIT")
-            .intentId(paymentIntentId)
-            .methodId(paymentMethodId)
-            .fiatType(fiatType)
-            .fiatAmount(fiatAmount)
-            .usdAmount(amount)
-            .cryptoType(cryptoType)
-            .cryptoAmount(0)
-            .paymentStatus("")
-            .status(false)
-            .shown(true)
-            .build();
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, fiatAmount, fiatType, cryptoType, paymentIntentId, paymentMethodId);
         return stripeDepositService.createDeposit(m, isSaveCard);
     }
 
@@ -84,46 +71,36 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }
-        var m = StripeTransaction.builder()
-            .userId(userId)
-            .txnType("DEPOSIT")
-            .intentId(paymentIntentId)
-            .methodId("")
-            .fiatType(fiatType)
-            .fiatAmount(fiatAmount)
-            .usdAmount(amount)
-            .cryptoType(cryptoType)
-            .cryptoAmount(0)
-            .paymentStatus("")
-            .status(false)
-            .shown(true)
-            .build();
+        StripeDepositTransaction m = new StripeDepositTransaction(userId, amount, fiatAmount, fiatType, cryptoType, paymentIntentId);
         return stripeDepositService.createDepositWithSavedCard(m, customer);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<StripeTransaction> getStripeDepositTx(int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-        return stripeDepositService.selectAll(status, showStatus, offset, limit, orderBy);
+    @SuppressWarnings("unchecked")
+    public List<StripeDepositTransaction> getStripeDepositTx(String orderBy) {
+        return (List<StripeDepositTransaction>) stripeDepositService.selectAll(orderBy);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public List<StripeTransaction> getStripeDepositTxByUser(String orderBy, int showStatus) {
+    @SuppressWarnings("unchecked")
+    public List<StripeDepositTransaction> getStripeDepositTxByUser(String orderBy, int showStatus) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        return stripeDepositService.selectByUser(userId, showStatus, orderBy);
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy, showStatus);
     }
 
     @PreAuthorize("hasRole('ROLE_SUPER')")
-    public List<StripeTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
+    @SuppressWarnings("unchecked")
+    public List<StripeDepositTransaction> getStripeDepositTxByAdmin(int userId, String orderBy) {
         // admin will get all transactions by default
-        return stripeDepositService.selectByUser(userId, 1, orderBy);
+        return (List<StripeDepositTransaction>) stripeDepositService.selectByUser(userId, orderBy, 1);
     }
 
     @PreAuthorize("isAuthenticated()")
-    public StripeTransaction getStripeDepositTxById(int id) {
+    public StripeDepositTransaction getStripeDepositTxById(int id, int showStatus) {
         UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
-        var tx = stripeDepositService.selectById(id);
+        var tx = (StripeDepositTransaction) stripeDepositService.selectById(id, showStatus);
         if(tx.getUserId() == userId) {
             return tx;
         }

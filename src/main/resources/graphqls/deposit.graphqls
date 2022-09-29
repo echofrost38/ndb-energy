@@ -1,19 +1,16 @@
 extend type Query {
     # for paypal
     getAllPaypalDepositTxns(
-        status: Int,
-        showStatus: Int,
-        offset: Int,
-        limit: Int,
         orderBy: String
-    ) : [PaypalTransaction]
+    ) : [PaypalDepositTransaction]
     getPaypalDepositTxnsByUser(
         orderBy: String,
         showStatus: Int
-    ) : [PaypalTransaction]
+    ) : [PaypalDepositTransaction]
     getPaypalDepositTxnById(
-        id: Int
-    ) : PaypalTransaction
+        id: Int,
+        showStatus: Int
+    ) : PaypalDepositTransaction
 
     # bank deposit queries
     getAllBankDepositTxns(

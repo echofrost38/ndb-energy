@@ -2,38 +2,43 @@ package com.ndb.auction.service.payment.paypal;
 
 import java.util.List;
 
-import com.ndb.auction.dao.oracle.transactions.paypal.PaypalTransactionDao;
-import com.ndb.auction.models.transactions.paypal.PaypalTransaction;
-
-import lombok.RequiredArgsConstructor;
+import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
+import com.ndb.auction.service.payment.ITransactionService;
 
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class PaypalAuctionService extends PaypalBaseService {
-
-    private final PaypalTransactionDao paypalTransactionDao;
+public class PaypalAuctionService extends PaypalBaseService implements ITransactionService {
 
     // Create new PayPal order
-    public PaypalTransaction insert(PaypalTransaction m) {
-        return paypalTransactionDao.insert(m);
+    public Transaction insert(PaypalAuctionTransaction m) {
+        return paypalAuctionDao.insert(m);
     }
 
-    public List<PaypalTransaction> selectAll(int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-        return paypalTransactionDao.selectPage(status, showStatus, offset, limit, "AUCTION", orderBy);
+    @Override
+    public List<? extends Transaction> selectAll(String orderBy) {
+        return paypalAuctionDao.selectAll(orderBy);
     }
 
-    public List<PaypalTransaction> selectByUser(int userId, int showStatus, String orderBy) {
-        return paypalTransactionDao.selectByUser(userId, showStatus, orderBy);
+    @Override
+    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
+        return paypalAuctionDao.selectByUser(userId, orderBy);
     }
 
-    public PaypalTransaction selectById(int id) {
-        return paypalTransactionDao.selectById(id);
+    @Override
+    public Transaction selectById(int id) {
+        return paypalAuctionDao.selectById(id);
+    }
+
+    @Override
+    public int update(int id, int status) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     public int updateOrderStatus(int id, String status) {
-        return paypalTransactionDao.updateOrderStatus(id, status);
+        return paypalAuctionDao.updateOrderStatus(id, status);
     }
     
 }

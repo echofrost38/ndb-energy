@@ -3,40 +3,38 @@ package com.ndb.auction.service.payment.stripe;
 import java.util.List;
 import java.util.Locale;
 
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeTransactionDao;
 import com.ndb.auction.exceptions.BidException;
 import com.ndb.auction.models.Bid;
+import com.ndb.auction.models.transactions.Transaction;
+import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
 import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
-import com.ndb.auction.models.transactions.stripe.StripeTransaction;
 import com.ndb.auction.payload.response.PayResponse;
+import com.ndb.auction.service.payment.ITransactionService;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
-
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class StripeAuctionService extends StripeBaseService {
+public class StripeAuctionService extends StripeBaseService implements ITransactionService, IStripeDepositService {
 
-    private final StripeTransactionDao stripeTransactionDao;
-
-    public PayResponse createNewTransaction(StripeTransaction m, boolean isSaveCard) {
+    @Override
+    public PayResponse createNewTransaction(StripeDepositTransaction _m, boolean isSaveCard) {
+        StripeAuctionTransaction m = (StripeAuctionTransaction) _m;
         PaymentIntent intent;
         PayResponse response = new PayResponse();
         double totalAmount = getTotalAmount(m.getUserId(),m.getFiatAmount());
         m.setFee(getStripeFee(m.getUserId(), m.getFiatAmount()));
         totalAmount *= 100; // convert into cent
         try {
-            if (m.getIntentId() == null) {
+            if (m.getPaymentIntentId() == null) {
 
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency(m.getFiatType())
                         .setAmount((long) totalAmount)
-                        .setPaymentMethod(m.getMethodId())
+                        .setPaymentMethod(m.getPaymentMethodId())
                         .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
                         .setConfirm(true);
@@ -48,17 +46,17 @@ public class StripeAuctionService extends StripeBaseService {
 
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams.build());
-                stripeTransactionDao.insert(m);
+                stripeAuctionDao.insert(m);
             } else {
                 // Confirm the paymentIntent to collect the money
-                intent = PaymentIntent.retrieve(m.getIntentId());
+                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripeTransactionDao.updatePaymentIntent(m.getId(), m.getIntentId());
+                stripeAuctionDao.updatePaymentIntent(m.getId(), m.getPaymentIntentId());
             }
 
             if (intent.getStatus().equals("requires_capture")) {
-                stripeTransactionDao.update(m.getUserId(), m.getTxnId(), "AUCTION", intent.getId());
-                Bid bid = bidService.getBid(m.getTxnId(), m.getUserId());
+                stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
+                Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
                     String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
                     throw new BidException(msg, "bid");
@@ -98,7 +96,7 @@ public class StripeAuctionService extends StripeBaseService {
         return response;
     }
 
-    public PayResponse createNewTransactionWithSavedCard(StripeTransaction m, StripeCustomer customer) {
+    public PayResponse createNewTransactionWithSavedCard(StripeAuctionTransaction m, StripeCustomer customer) {
         PaymentIntent intent;
         PayResponse response = new PayResponse();
         double totalAmount = getTotalAmount(m.getUserId(),m.getFiatAmount());
@@ -106,7 +104,7 @@ public class StripeAuctionService extends StripeBaseService {
         totalAmount *= 100;
         try {
 
-            if(m.getIntentId() == null) {
+            if(m.getPaymentIntentId() == null) {
                 // Create new PaymentIntent for the order
                 PaymentIntentCreateParams.Builder createParams = new PaymentIntentCreateParams.Builder()
                         .setCurrency(m.getFiatType())
@@ -119,16 +117,16 @@ public class StripeAuctionService extends StripeBaseService {
 
                 // Create a PaymentIntent with the order amount and currency
                 intent = PaymentIntent.create(createParams.build());
-                stripeTransactionDao.insert(m);
+                stripeAuctionDao.insert(m);
             } else {
-                intent = PaymentIntent.retrieve(m.getIntentId());
+                intent = PaymentIntent.retrieve(m.getPaymentIntentId());
                 intent = intent.confirm();
-                stripeTransactionDao.insert(m);
+                stripeAuctionDao.insert(m);
             }
 
             if (intent.getStatus().equals("requires_capture")) {
-                stripeTransactionDao.update(m.getUserId(), m.getTxnId(), "AUCTION", intent.getId());
-                Bid bid = bidService.getBid(m.getTxnId(), m.getUserId());
+                stripeAuctionDao.update(m.getUserId(), m.getAuctionId(), intent.getId());
+                Bid bid = bidService.getBid(m.getAuctionId(), m.getUserId());
                 if (bid == null) {
                     String msg = messageSource.getMessage("no_bid", null, Locale.ENGLISH);
                     throw new BidException(msg, "bid");
@@ -168,52 +166,62 @@ public class StripeAuctionService extends StripeBaseService {
         return response;
     }
 
-    public List<StripeTransaction> selectAll(int status, int showStatus, Integer offset, Integer limit, String orderBy) {
-        return stripeTransactionDao.selectPage(status, showStatus, offset, limit, "AUCTION", orderBy);
+    @Override
+    public List<? extends StripeDepositTransaction> selectByIntentId(String intentId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public List<StripeTransaction> selectByIds(int auctionId, int userId) {
-        return stripeTransactionDao.selectByIds(userId, auctionId, "AUCTION");
+    @Override
+    public List<? extends Transaction> selectAll(String orderBy) {
+        return stripeAuctionDao.selectAll(orderBy);
     }
 
-    public List<StripeTransaction> selectByUser(int userId, int showStatus, String orderBy) {
-        return stripeTransactionDao.selectByUser(userId, showStatus, orderBy);
+    public List<StripeAuctionTransaction> selectByIds(int auctionId, int userId) {
+        return stripeAuctionDao.selectByIds(auctionId, userId);
     }
 
-    // public List<StripeTransaction> selectByRound(int auctionId, String orderBy) {
-    //     return stripeTransactionDao.selectByRound(auctionId, orderBy);
-    // }
-
-    public StripeTransaction selectById(int id) {
-        return stripeTransactionDao.selectById(id);
+    @Override
+    public List<? extends Transaction> selectByUser(int userId, String orderBy) {
+        return stripeAuctionDao.selectByUser(userId, orderBy);
     }
 
+    public List<? extends Transaction> selectByRound(int auctionId, String orderBy) {
+        return stripeAuctionDao.selectByRound(auctionId, orderBy);
+    }
+
+    @Override
+    public StripeAuctionTransaction selectById(int id) {
+        return (StripeAuctionTransaction) stripeAuctionDao.selectById(id);
+    }
+
+    @Override
     public int update(int id, int status) {
-        return stripeTransactionDao.update(id, status);
+        return stripeAuctionDao.update(id, status);
     }
 
     public int update(int userId, int auctionId, String intentId) {
-        return stripeTransactionDao.update(userId, auctionId, "AUCTION", intentId);
+        return stripeAuctionDao.update(userId, auctionId, intentId);
     }
 
     // update payments - called by closeBid
     public boolean UpdateTransaction(int id, Integer status) {
 
         PaymentIntent intent;
-        StripeTransaction tx = stripeTransactionDao.selectById(id);
+        StripeAuctionTransaction tx = (StripeAuctionTransaction) stripeAuctionDao.selectById(id);
         if (tx == null) {
             return false;
         }
 
-        String paymentIntentId = tx.getIntentId();
+        String paymentIntentId = tx.getPaymentIntentId();
         try {
             intent = PaymentIntent.retrieve(paymentIntentId);
             if (status == Bid.WINNER) {
                 intent.capture();
-                stripeTransactionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CAPTURED);
+                stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CAPTURED);
             } else {
                 intent.cancel();
-                stripeTransactionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CANCELED);
+                stripeAuctionDao.updatePaymentStatus(paymentIntentId, StripeDepositTransaction.CANCELED);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

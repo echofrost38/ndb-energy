@@ -3,15 +3,23 @@ package com.ndb.auction.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ndb.auction.dao.oracle.balance.BalanceChangeDao;
 import com.ndb.auction.models.TokenAsset;
+import com.ndb.auction.models.balance.BalanceChange;
 import com.ndb.auction.models.balance.CryptoBalance;
 import com.ndb.auction.payload.BalancePerUser;
+
+import lombok.RequiredArgsConstructor;
+
 import com.ndb.auction.payload.BalancePayload;
 
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class InternalBalanceService extends BaseService {
+
+    private final BalanceChangeDao balanceChangeDao;
 
     // getting balances
     public List<BalancePayload> getInternalBalances(int userId) {
@@ -41,8 +49,17 @@ public class InternalBalanceService extends BaseService {
         return balance.getFree();
     }
 
-    public int addFreeBalance(int userId, String cryptoType, Double amount) {
+    public int addFreeBalance(int userId, String cryptoType, Double amount, String reason) {
         int tokenId = tokenAssetService.getTokenIdBySymbol(cryptoType);
+
+        // balance change log
+        var balanceLog = BalanceChange.builder()
+            .userId(userId)
+            .tokenId(tokenId)
+            .reason(reason)
+            .amount(amount)
+            .build();
+        balanceChangeDao.insert(balanceLog);
         return balanceDao.addFreeBalance(userId, tokenId, amount);
     }
 

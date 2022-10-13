@@ -116,7 +116,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         }
 
         // get crypto price, and calculate crypto amount
-        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(cryptoType);
+        double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol("USDT");
         double cryptoAmount = usdAmount / cryptoPrice; // total usd
         double fee = getTierFee(userId, cryptoAmount);
         double deposited = cryptoAmount - fee;
@@ -124,7 +124,7 @@ public class DepositBank extends BaseResolver implements GraphQLMutationResolver
         log.info("BANK DEPOSIT PRICE FETCHED");
 
         // update user balance and tier
-        internalBalanceService.addFreeBalance(userId, cryptoType, deposited);
+        internalBalanceService.addFreeBalance(userId, "USDT", deposited, "Bank deposit");
         List<BalancePayload> balances = balanceService.getInternalBalances(userId);
 
         double totalBalance = 0.0;

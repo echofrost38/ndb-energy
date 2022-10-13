@@ -107,8 +107,9 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
                     throw new PreSaleException("You cannot place a presale order because of Nyyu internal wallet", "destination");
                 }
                 targetAddress = generatedAddr;
+            } else {
+                targetAddress = nyyuWallet.getPublicKey();
             }
-            targetAddress = nyyuWallet.getPublicKey();
         } else {
             targetAddress = extAddr;
         }

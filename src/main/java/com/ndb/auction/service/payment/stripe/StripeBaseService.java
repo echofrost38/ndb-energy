@@ -2,11 +2,8 @@ package com.ndb.auction.service.payment.stripe;
 
 import javax.annotation.PostConstruct;
 
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeAuctionDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripePresaleDao;
-import com.ndb.auction.dao.oracle.transactions.stripe.StripeWalletDao;
 import com.ndb.auction.models.transactions.stripe.StripeCustomer;
-import com.ndb.auction.models.transactions.stripe.StripeDepositTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.payload.response.PayResponse;
 import com.ndb.auction.service.BaseService;
@@ -42,15 +39,6 @@ public class StripeBaseService extends BaseService {
 
 	@Autowired 
 	protected BidService bidService;
-
-    @Autowired
-    protected StripeAuctionDao stripeAuctionDao;
-
-    @Autowired 
-    protected StripePresaleDao stripePresaleDao;
-
-    @Autowired
-    protected StripeWalletDao stripeWalletDao;
 
     @Autowired
     protected ThirdAPIUtils thirdAPIUtils;
@@ -126,17 +114,17 @@ public class StripeBaseService extends BaseService {
         }
         return response;
 	}
-    public Builder saveStripeCustomer(Builder createParams, StripeDepositTransaction m) throws StripeException {
-        Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getPaymentMethodId()).build());
+    public Builder saveStripeCustomer(Builder createParams, StripeTransaction m) throws StripeException {
+        Customer customer = Customer.create(new CustomerCreateParams.Builder().setPaymentMethod(m.getMethodId()).build());
         createParams.setCustomer(customer.getId());
         createParams.setSetupFutureUsage(OFF_SESSION);
 
         // save customer
-        PaymentMethod method = PaymentMethod.retrieve(m.getPaymentMethodId());
+        PaymentMethod method = PaymentMethod.retrieve(m.getMethodId());
 
         Card card = method.getCard();
         StripeCustomer stripeCustomer = new StripeCustomer(
-                m.getUserId(), customer.getId(), m.getPaymentMethodId(), card.getBrand(),
+                m.getUserId(), customer.getId(), m.getMethodId(), card.getBrand(),
                 card.getCountry(), card.getExpMonth(), card.getExpYear(), card.getLast4()
         );
 

@@ -19,7 +19,7 @@ import com.ndb.auction.models.avatar.AvatarSet;
 import com.ndb.auction.models.tier.Tier;
 import com.ndb.auction.models.tier.TierTask;
 import com.ndb.auction.models.transactions.paypal.PaypalAuctionTransaction;
-import com.ndb.auction.models.transactions.stripe.StripeAuctionTransaction;
+import com.ndb.auction.models.transactions.stripe.StripeTransaction;
 import com.ndb.auction.models.user.User;
 import com.ndb.auction.models.user.UserAvatar;
 import com.ndb.auction.models.user.Whitelist;
@@ -337,10 +337,10 @@ public class BidService extends BaseService {
             if (bid.getStatus() == Bid.WINNER) {
 
                 // 1) check Stripe transaction to capture!
-                List<StripeAuctionTransaction> stripeTxns = stripeService.selectByIds(roundId, userId);
-                for (StripeAuctionTransaction stripeTransaction : stripeTxns) {
+                var stripeTxns = stripeService.selectByIds(roundId, userId);
+                for (StripeTransaction stripeTransaction : stripeTxns) {
                     try {
-                        PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
+                        PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getIntentId());
                         intent.capture();
                     } catch (Exception e) {
                         break;
@@ -402,10 +402,10 @@ public class BidService extends BaseService {
 
             } else if (bid.getStatus() == Bid.FAILED) { // B) if lost
                 // 1) check Stripe transaction to capture!
-                List<StripeAuctionTransaction> stripeTxns = stripeService.selectByIds(roundId, userId);
-                for (StripeAuctionTransaction stripeTransaction : stripeTxns) {
+                var stripeTxns = stripeService.selectByIds(roundId, userId);
+                for (StripeTransaction stripeTransaction : stripeTxns) {
                     try {
-                        PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getPaymentIntentId());
+                        PaymentIntent intent = PaymentIntent.retrieve(stripeTransaction.getIntentId());
                         intent.cancel();
                     } catch (Exception e) {
                         break;

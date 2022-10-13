@@ -86,7 +86,8 @@ public class StripeDepositDao extends BaseOracleDao implements IStripeDao {
             if (!rs.next())
                 return null;
             return extract(rs);
-        }, id);    }
+        }, id);   
+    }
 
     public int update(int id, int status) {
         return 0;

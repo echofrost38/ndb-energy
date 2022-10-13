@@ -267,12 +267,12 @@ public class CryptoController extends BaseController {
                 var price = apiUtil.getCryptoPriceBySymbol("USDT");
                 log.info("added free balance: {}", fiatAmount / price);
                 
-                balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", fiatAmount / price);
+                balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", fiatAmount / price, "Presale Payment");
                 return new ResponseEntity<>(HttpStatus.OK); 
             }
 
             var overflow = (fiatAmount - totalOrder)/(fiatAmount/amount);
-            balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", overflow);
+            balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", overflow, "Overflow when presale");
             
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), id, totalOrder, "CRYPTO", presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, amount, cryptoType);
@@ -359,7 +359,7 @@ public class CryptoController extends BaseController {
             int result = coinpaymentWalletService.updateStatus(id, amount, deposited, fee, cryptoType);
             log.info("num of updated: {}", result);
 
-            result = balanceService.addFreeBalance(userId, cryptoType, deposited);
+            result = balanceService.addFreeBalance(userId, cryptoType, deposited, "Crypto deposit");
             log.info("num of balance: {}", result);
 
             List<BalancePayload> balances = balanceService.getInternalBalances(userId);

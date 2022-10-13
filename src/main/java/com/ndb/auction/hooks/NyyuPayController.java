@@ -92,7 +92,7 @@ public class NyyuPayController extends BaseController{
             var m = new CoinpaymentDepositTransaction(0, userId, amount, cryptoAmount, fee, "DEPOSIT", cryptoType, "BEP20", "Nyyu.pay");
             m.setDepositStatus(1);
             coinpaymentWalletService.createNewDepositTxn(m);
-            balanceService.addFreeBalance(userId, cryptoType, deposited);
+            balanceService.addFreeBalance(userId, cryptoType, deposited, "Nyyupay deposit");
 
             var balances = balanceService.getInternalBalances(userId);
 
@@ -217,12 +217,12 @@ public class NyyuPayController extends BaseController{
                         "Your purchase of " + ndbToken + "NDB" + " in the presale round was failed.");
                 var price = apiUtil.getCryptoPriceBySymbol("USDT");
                 log.info("added free balance: {}", fiatAmount / price);
-                balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", fiatAmount / price);
+                balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", fiatAmount / price, "Nyyupay presale");
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
             var overflow = (fiatAmount - totalOrder) / cryptoPrice;
-            balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", overflow);
+            balanceService.addFreeBalance(presaleOrder.getUserId(), "USDT", overflow, "Nyyupay overflow presale");
 
             presaleService.handlePresaleOrder(presaleOrder.getUserId(), id, totalOrder, "CRYPTO", presaleOrder);
             coinpaymentPresaleService.updateTransaction(txn.getId(), CryptoTransaction.CONFIRMED, cryptoAmount, cryptoType);

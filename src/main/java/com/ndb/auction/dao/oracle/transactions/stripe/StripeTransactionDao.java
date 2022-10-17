@@ -1,10 +1,14 @@
 package com.ndb.auction.dao.oracle.transactions.stripe;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.ndb.auction.dao.oracle.BaseOracleDao;
@@ -38,11 +42,33 @@ public class StripeTransactionDao extends BaseOracleDao {
             .build();
     }
 
-    public int insert(StripeTransaction m) {
+    public StripeTransaction insert(StripeTransaction m) {
         var sql = "INSERT INTO TBL_STRIPE_TRANSACTION(ID,USER_ID,TXN_TYPE,TXN_ID,INTENT_ID,METHOD_ID,FIAT_TYPE,FIAT_AMOUNT,USD_AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,PAY_STATUS,STATUS,IS_SHOW,CREATED_AT,UPDATED_AT)"
             + " VALUES(SEQ_STRIPE_TXN.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
-        return jdbcTemplate.update(sql, m.getUserId(), m.getTxnType(), m.getTxnId(), m.getIntentId(), m.getMethodId(), m.getFiatType(), m.getFiatAmount(), 
-            m.getUsdAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getPaymentStatus(), m.isStatus(), m.isShown());
+        var keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+                PreparedStatement ps = conn.prepareStatement(sql, new String[] { "ID" });
+                int i = 1;
+                ps.setInt(i++, m.getUserId());
+                ps.setString(i++, m.getTxnType());
+                ps.setInt(i++, m.getTxnId());
+                ps.setString(i++, m.getIntentId());
+                ps.setString(i++, m.getMethodId());
+                ps.setString(i++, m.getFiatType());
+                ps.setDouble(i++, m.getFiatAmount());
+                ps.setDouble(i++, m.getUsdAmount());
+                ps.setString(i++, m.getCryptoType());
+                ps.setDouble(i++, m.getCryptoAmount());
+                ps.setString(i++, m.getPaymentStatus());
+                ps.setBoolean(i++, m.isStatus());
+                ps.setBoolean(i++, m.isShown());
+                return ps;
+            }   
+        }, keyHolder);
+        m.setId(keyHolder.getKey().intValue());
+        return m;
     }
 
     /**

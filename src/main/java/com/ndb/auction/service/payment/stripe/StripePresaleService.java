@@ -34,12 +34,12 @@ public class StripePresaleService extends StripeBaseService {
         try {
             if (m.getIntentId() == null) {
                 PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                        .setAmount((long) totalAmount)
-                        .setCurrency(m.getFiatType())
-                        .setConfirm(true)
-                        .setPaymentMethod(m.getMethodId())
-                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
-                        .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
+                    .setAmount((long) totalAmount)
+                    .setCurrency(m.getFiatType())
+                    .setConfirm(true)
+                    .setPaymentMethod(m.getMethodId())
+                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL)
+                    .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
 
                 // check save card
                 if (isSaveCard) {
@@ -47,12 +47,11 @@ public class StripePresaleService extends StripeBaseService {
                 }
 
                 intent = PaymentIntent.create(createParams.build());
-                stripeTransactionDao.insert(m);
-                log.info("Presale stripe transaction is saved\n");
-                log.info(intent.getId());
-                log.info("\n");
-                log.info(intent.getStatus());
-                m = stripeTransactionDao.selectByIntentId(m.getIntentId());
+                if(intent != null)
+                    m.setIntentId(intent.getId());
+                m = stripeTransactionDao.insert(m);
+                log.info("presale stripe payment");
+                log.info("id: {}, intent: {}", m.getId(), m.getIntentId());
             } else {
                 intent = PaymentIntent.retrieve(m.getIntentId());
                 intent = intent.confirm();
@@ -95,7 +94,7 @@ public class StripePresaleService extends StripeBaseService {
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
 
                 intent = PaymentIntent.create(createParams.build());
-                stripeTransactionDao.insert(m);
+                m = stripeTransactionDao.insert(m);
             }
             else {
                 intent = PaymentIntent.retrieve(m.getIntentId());

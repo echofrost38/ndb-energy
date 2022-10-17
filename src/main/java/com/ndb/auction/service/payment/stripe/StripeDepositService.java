@@ -193,7 +193,7 @@ public class StripeDepositService extends StripeBaseService {
         );
     }
 
-    public int insert(StripeTransaction m) {
+    public StripeTransaction insert(StripeTransaction m) {
         return stripeTransactionDao.insert(m);
     }
 

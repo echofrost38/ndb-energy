@@ -189,7 +189,7 @@ public class StripeAuctionService extends StripeBaseService {
     }
 
     public int update(int id, int status) {
-        return stripeTransactionDao.update(id, status);
+        return stripeTransactionDao.update(id, status, "Processed");
     }
 
     public int update(int userId, int auctionId, String intentId) {

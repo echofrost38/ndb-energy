@@ -118,7 +118,7 @@ public class StripePresaleService extends StripeBaseService {
         int userId = m.getUserId();
         
         handlePresaleOrder(userId, m.getId(), m.getUsdAmount(), "STRIPE", presaleOrder);
-        stripeTransactionDao.update(m.getId(), 1);
+        stripeTransactionDao.update(m.getId(), 1, "Processed");
     }
 
     public List<StripeTransaction> selectAll(int status, int showStatus, Integer offset, Integer limit, String orderBy) {
@@ -134,7 +134,7 @@ public class StripePresaleService extends StripeBaseService {
     }
 
     public int update(int id, int status) {
-        return stripeTransactionDao.update(id, status);
+        return stripeTransactionDao.update(id, status, "Processed");
     }
 
     public int changeShowStatus(int id, int showStatus) {

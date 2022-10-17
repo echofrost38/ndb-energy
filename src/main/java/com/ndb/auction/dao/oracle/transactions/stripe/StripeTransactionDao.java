@@ -150,9 +150,9 @@ public class StripeTransactionDao extends BaseOracleDao {
         return jdbcTemplate.update(sql, intentId, id);
     }
 
-    public int update(int id, int status) {
-        var sql = "UPDATE TBL_STRIPE_TRANSACTION SET STATUS = ?, UPDATED_AT = SYSDATE WHERE ID = ?";
-        return jdbcTemplate.update(sql, status, id);
+    public int update(int id, int status, String paymentStatus) {
+        var sql = "UPDATE TBL_STRIPE_TRANSACTION SET PAY_STATUS = ?, STATUS = ?, UPDATED_AT = SYSDATE WHERE ID = ?";
+        return jdbcTemplate.update(sql, paymentStatus, status, id);
     }
 
     public int updatePaymentStatus(String paymentIntentId, int status) {

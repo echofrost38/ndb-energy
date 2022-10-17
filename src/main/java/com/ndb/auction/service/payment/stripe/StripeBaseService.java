@@ -19,12 +19,14 @@ import com.stripe.model.PaymentMethod.Card;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static com.stripe.param.PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION;
-
+@Slf4j
 @Service
 public class StripeBaseService extends BaseService {
 
@@ -80,6 +82,9 @@ public class StripeBaseService extends BaseService {
 			response.setError("Unrecognized status");
 			return response;
 		}
+
+        log.info("Intent status: {}", intent.getStatus());
+
 		switch (intent.getStatus()) {
         case "requires_action":
             response.setClientSecret(intent.getClientSecret());

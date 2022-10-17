@@ -11,9 +11,10 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StripePresaleService extends StripeBaseService {
@@ -47,6 +48,10 @@ public class StripePresaleService extends StripeBaseService {
 
                 intent = PaymentIntent.create(createParams.build());
                 stripeTransactionDao.insert(m);
+                log.info("Presale stripe transaction is saved\n");
+                log.info(intent.getId());
+                log.info("\n");
+                log.info(intent.getStatus());
                 m = stripeTransactionDao.selectByIntentId(m.getIntentId());
             } else {
                 intent = PaymentIntent.retrieve(m.getIntentId());

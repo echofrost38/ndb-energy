@@ -40,7 +40,7 @@ public class StripeTransactionDao extends BaseOracleDao {
 
     public int insert(StripeTransaction m) {
         var sql = "INSERT INTO TBL_STRIPE_TRANSACTION(ID,USER_ID,TXN_TYPE,TXN_ID,INTENT_ID,METHOD_ID,FIAT_TYPE,FIAT_AMOUNT,USD_AMOUNT,CRYPTO_TYPE,CRYPTO_AMOUNT,PAY_STATUS,STATUS,CREATED_AT,UPDATED_AT)"
-            + " VALUES(SEQ_STRIPE_TXN.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE";
+            + " VALUES(SEQ_STRIPE_TXN.NEXTVAL,?,?,?,?,?,?,?,?,?,?,?,?,?,SYSDATE,SYSDATE)";
         return jdbcTemplate.update(sql, m.getUserId(), m.getTxnType(), m.getTxnId(), m.getIntentId(), m.getMethodId(), m.getFiatType(), m.getFiatAmount(), 
             m.getUsdAmount(), m.getCryptoType(), m.getCryptoAmount(), m.getPaymentStatus(), m.isStatus(), m.isShown());
     }

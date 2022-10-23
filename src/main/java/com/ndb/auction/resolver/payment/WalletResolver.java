@@ -7,6 +7,7 @@ import com.ndb.auction.payload.BalancePerUser;
 import com.ndb.auction.payload.BalancePayload;
 import com.ndb.auction.resolver.BaseResolver;
 import com.ndb.auction.service.user.UserDetailsImpl;
+import com.ndb.auction.utils.Utilities;
 import com.ndb.auction.web3.NyyuWalletService;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class WalletResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
 
     private final NyyuWalletService nyyuWalletService;
+    private final Utilities utils;
 
     // get wallet balances 
     @PreAuthorize("isAuthenticated()")
@@ -60,10 +62,12 @@ public class WalletResolver extends BaseResolver implements GraphQLQueryResolver
     }
 
     // for test
-    public String getDecryptedPrivateKey(String network) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        int userId = userDetails.getId();
-        return nyyuWalletService.selectByUserId(userId, network).getPrivateKey();
+    public String getDecryptedPrivateKey(int userId, String encKey) {
+        return utils.decrypt(0, encKey);
+    }
+
+    public String getEncryptedPrivateKey(String key) {
+        return utils.encrypt(key);
     }
 
 }

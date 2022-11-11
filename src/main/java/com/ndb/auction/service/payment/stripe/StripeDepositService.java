@@ -20,9 +20,11 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StripeDepositService extends StripeBaseService {
@@ -50,10 +52,16 @@ public class StripeDepositService extends StripeBaseService {
                 }
 
                 intent = PaymentIntent.create(createParams.build());
+                if(intent != null) {
+                    m.setIntentId(intent.getId());
+                }
+                m = stripeTransactionDao.insert(m);
+                log.info("deposit stripe payment");
+                log.info("id: {}, intent: {}", m.getId(), m.getIntentId());
             } else if (m.getIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getIntentId());
                 intent = intent.confirm();
-                insert(m);
+                stripeTransactionDao.updatePaymentIntent(m.getId(), m.getIntentId());
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {
@@ -61,6 +69,7 @@ public class StripeDepositService extends StripeBaseService {
                 handleDepositSuccess(userId, intent, m);
             }
             response = generateResponse(intent, response);
+            response.setPaymentId(m.getId());
         } catch (Exception e) {
             response.setError(e.getMessage());
         }
@@ -74,23 +83,24 @@ public class StripeDepositService extends StripeBaseService {
         double totalAmount = getTotalAmount(userId, m.getFiatAmount());
         try {
             if(m.getIntentId() == null) {
+                PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
+                        .setAmount((long) totalAmount)
+                        .setCurrency(m.getFiatType())
+                        .setCustomer(customer.getCustomerId())
+                        .setConfirm(true)
+                        .setPaymentMethod(customer.getPaymentMethod())
+                        .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
 
-            PaymentIntentCreateParams.Builder createParams = PaymentIntentCreateParams.builder()
-                    .setAmount((long) totalAmount)
-                    .setCurrency(m.getFiatType())
-                    .setCustomer(customer.getCustomerId())
-                    .setConfirm(true)
-                    .setPaymentMethod(customer.getPaymentMethod())
-                    .setConfirmationMethod(PaymentIntentCreateParams.ConfirmationMethod.MANUAL);
-
-            intent = PaymentIntent.create(createParams.build());
+                intent = PaymentIntent.create(createParams.build());
+                if(intent != null) {
+                    m.setIntentId(intent.getId());
+                }
+                m = stripeTransactionDao.insert(m);
             }
             else if (m.getIntentId() != null) {
                 intent = PaymentIntent.retrieve(m.getIntentId());
-                if(intent.getStatus().equals("requires_confirmation")){
-                    intent = intent.confirm();
-                    insert(m);
-                }
+                intent = intent.confirm();
+                stripeTransactionDao.updatePaymentIntent(m.getId(), m.getIntentId()); 
             }
 
             if(intent != null && intent.getStatus().equals("succeeded")) {

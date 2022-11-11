@@ -94,6 +94,9 @@ public class StripePresaleService extends StripeBaseService {
                         .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC);
 
                 intent = PaymentIntent.create(createParams.build());
+                if(intent != null) {
+                    m.setIntentId(intent.getId());
+                }
                 m = stripeTransactionDao.insert(m);
             }
             else {

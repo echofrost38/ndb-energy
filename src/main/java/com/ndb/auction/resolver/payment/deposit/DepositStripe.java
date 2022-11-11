@@ -11,6 +11,8 @@ import com.ndb.auction.service.payment.stripe.StripeDepositService;
 import com.ndb.auction.service.user.UserDetailsImpl;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 @Component
 public class DepositStripe extends BaseResolver implements GraphQLMutationResolver, GraphQLQueryResolver {
 
@@ -33,7 +36,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
 
     // Deposit with Stripe
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDeposit(Double amount, Double fiatAmount, String fiatType, String cryptoType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
+    public PayResponse stripeForDeposit(Double amount, String fiatType, String paymentIntentId, String paymentMethodId, boolean isSaveCard) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         if (userService.isUserSuspended(userId)) {
@@ -47,15 +50,25 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             throw new UnauthorizedException(msg, "userId");
         }
 
+        // amount in USDT to make deposit
+        var totalUsdAmount = stripeDepositService.getTotalOrder(userId, amount);
+        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
+        var _fiatAmount = totalUsdAmount * fiatPrice;
+
+        log.info("deposit usd: {}", amount);
+        log.info("total Order usd amount: {}", totalUsdAmount);
+        log.info("fiat price: {}", fiatPrice);
+        log.info("final amount: {}", _fiatAmount);
+
         var m = StripeTransaction.builder()
             .userId(userId)
             .txnType("DEPOSIT")
             .intentId(paymentIntentId)
             .methodId(paymentMethodId)
             .fiatType(fiatType)
-            .fiatAmount(fiatAmount)
+            .fiatAmount(_fiatAmount)
             .usdAmount(amount)
-            .cryptoType(cryptoType)
+            .cryptoType("USDT")
             .cryptoAmount(0)
             .paymentStatus("")
             .status(false)
@@ -65,7 +78,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
     }
 
     @PreAuthorize("isAuthenticated()")
-    public PayResponse stripeForDepositWithSavedCard(Double amount, Double fiatAmount, String fiatType, String cryptoType, int cardId, String paymentIntentId) {
+    public PayResponse stripeForDepositWithSavedCard(Double amount, String fiatType, int cardId, String paymentIntentId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         int userId = userDetails.getId();
         if (userService.isUserSuspended(userId)) {
@@ -84,15 +97,25 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             String msg = messageSource.getMessage("failed_auth_card", null, Locale.ENGLISH);
             throw new UnauthorizedException(msg,"USER_ID");
         }
+
+        var totalUsdAmount = stripeDepositService.getTotalOrder(userId, amount);
+        var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
+        var _fiatAmount = totalUsdAmount * fiatPrice;
+
+        log.info("deposit usd: {}", amount);
+        log.info("total Order usd amount: {}", totalUsdAmount);
+        log.info("fiat price: {}", fiatPrice);
+        log.info("final amount: {}", _fiatAmount);
+
         var m = StripeTransaction.builder()
             .userId(userId)
             .txnType("DEPOSIT")
             .intentId(paymentIntentId)
             .methodId("")
             .fiatType(fiatType)
-            .fiatAmount(fiatAmount)
+            .fiatAmount(_fiatAmount)
             .usdAmount(amount)
-            .cryptoType(cryptoType)
+            .cryptoType("USDT")
             .cryptoAmount(0)
             .paymentStatus("")
             .status(false)

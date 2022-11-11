@@ -46,7 +46,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         }
 
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
-        var totalUsdAmount = stripePresaleService.getTotalAmount(userId, usdAmount);
+        var totalUsdAmount = stripePresaleService.getTotalOrder(userId, usdAmount);
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = totalUsdAmount * fiatPrice;
         var m = StripeTransaction.builder()
@@ -93,7 +93,7 @@ public class PresaleStripe extends BaseResolver implements GraphQLQueryResolver,
         }
 
         var usdAmount = order.getNdbAmount() * order.getNdbPrice();
-        var totalUsdAmount = stripePresaleService.getTotalAmount(userId, usdAmount);
+        var totalUsdAmount = stripePresaleService.getTotalOrder(userId, usdAmount);
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = totalUsdAmount * fiatPrice;
         var m = StripeTransaction.builder()

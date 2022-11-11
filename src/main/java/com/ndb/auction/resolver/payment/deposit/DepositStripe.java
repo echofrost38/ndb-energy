@@ -51,7 +51,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
         }
 
         // amount in USDT to make deposit
-        var totalUsdAmount = stripeDepositService.getTotalOrder(userId, amount);
+        var totalUsdAmount = stripeDepositService.getTotalAmount(userId, amount);
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = totalUsdAmount * fiatPrice;
 
@@ -98,7 +98,7 @@ public class DepositStripe extends BaseResolver implements GraphQLMutationResolv
             throw new UnauthorizedException(msg,"USER_ID");
         }
 
-        var totalUsdAmount = stripeDepositService.getTotalOrder(userId, amount);
+        var totalUsdAmount = stripeDepositService.getTotalAmount(userId, amount);
         var fiatPrice = thirdAPIUtils.getCurrencyRate(fiatType);
         var _fiatAmount = totalUsdAmount * fiatPrice;
 

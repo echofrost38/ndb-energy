@@ -68,7 +68,7 @@ public class DepositCoinpayment extends BaseResolver implements GraphQLMutationR
                 }
                 m.setDepositAddress(address);
             }
-            return m;
+            return coinpaymentWalletService.createNewTransaction(m);//return m;
         } else {
             m = new CoinpaymentDepositTransaction(0, userId,  0.0, 0.0, 0.0, DEPOSIT, cryptoType, network, coin);
             return coinpaymentWalletService.createNewTransaction(m);

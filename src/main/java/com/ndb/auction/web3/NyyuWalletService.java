@@ -3,6 +3,7 @@ package com.ndb.auction.web3;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bitcoinj.core.Base58;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.tron.trident.core.key.KeyPair;
@@ -81,13 +82,13 @@ public class NyyuWalletService extends BaseService {
 
             // encrypt private key!!
             var plainPrivKey = keyPair.getPrivateKey().toString(16);
-            var encryptedPrivKey = util.encrypt(plainPrivKey);
-            if(encryptedPrivKey == null) {
-                // failed to encrypt
-                throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
-            }
+            // var encryptedPrivKey = util.encrypt(plainPrivKey);
+            // if(encryptedPrivKey == null) {
+            //     // failed to encrypt
+            //     throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+            // }
 
-            nyyuWallet.setPrivateKey(encryptedPrivKey);
+            nyyuWallet.setPrivateKey(plainPrivKey);
             nyyuWallet.setNetwork("BEP20");
             
             var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());
@@ -114,12 +115,12 @@ public class NyyuWalletService extends BaseService {
             .network("TRC20")
             .build();
 
-        var encryptedKey = util.encrypt(nyyuWallet.getPrivateKey());
-        if(encryptedKey == null) {
-            // failed to encrypt
-            throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
-        }
-        nyyuWallet.setPrivateKey(encryptedKey);
+        // var encryptedKey = util.encrypt(nyyuWallet.getPrivateKey());
+        // if(encryptedKey == null) {
+        //     // failed to encrypt
+        //     throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+        // }
+        nyyuWallet.setPrivateKey(nyyuWallet.getPrivateKey());
 
         var registered = nyyuPayService.sendNyyuPayRequest(walletRegisterEndpoint, nyyuWallet.getPublicKey());
         nyyuWallet.setNyyuPayRegistered(registered);
@@ -132,16 +133,16 @@ public class NyyuWalletService extends BaseService {
     // generate solana wallet
     private String generateSolanaWallet(int userId) {
         var solAccount =  new SolanaAccount();
-        var encryptedKey = util.encrypt(solAccount.getSecretKey());
-        if(encryptedKey == null) {
-            // failed to encrypt
-            throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
-        }
+        // var encryptedKey = util.encrypt(solAccount.getSecretKey());
+        // if(encryptedKey == null) {
+        //     // failed to encrypt
+        //     throw new UnauthorizedException("Cannot create Nyyu wallet.", "wallet");
+        // }
 
         var nyyuWallet = NyyuWallet.builder()
             .userId(userId)
             .publicKey(solAccount.getPublicKey().toBase58())
-            .privateKey(encryptedKey)
+            .privateKey(Base58.encode(solAccount.getSecretKey()))
             .network("SOL")
             .build();
 

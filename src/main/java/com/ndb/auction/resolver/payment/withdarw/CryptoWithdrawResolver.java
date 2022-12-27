@@ -50,6 +50,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
 
     private final double MIN_WITHDRAW_BEP20 = 10;
     private final double MIN_WITHDRAW_ERC20 = 30;
+    private final double MIN_WITHDRAW_NDB = 100;
 
     private final CryptoWithdrawService cryptoWithdrawService;
 
@@ -72,7 +73,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
             String code,
             DataFetchingEnvironment env
     ) throws MessagingException {
-        
+
         GraphQLServletContext context = env.getContext();
         var request = context.getHttpServletRequest();
         String token = request.getHeader("x-auth-token");
@@ -115,9 +116,12 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         // get crypto price
         double cryptoPrice = thirdAPIUtils.getCryptoPriceBySymbol(sourceToken);
 
-        // check minimum 
+        // check minimum
         if (network.equals("BEP20")) {
-            if (amount * cryptoPrice < MIN_WITHDRAW_BEP20) {
+            if(sourceToken.equals("NDB") && amount * cryptoPrice < MIN_WITHDRAW_NDB) {
+                var min = MIN_WITHDRAW_NDB / cryptoPrice;
+                throw new BalanceException(String.format("The minimum withdrawal amount for NDB token is %f %s.", min, sourceToken), "amount");
+            } else if (amount * cryptoPrice < MIN_WITHDRAW_BEP20) {
                 var min = MIN_WITHDRAW_BEP20 / cryptoPrice;
                 throw new BalanceException(String.format("The minimum withdrawal amount for BSC Network is %f %s.", min, sourceToken), "amount");
             }
@@ -159,7 +163,7 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
     // send confirm withdraw SMS code
     @PreAuthorize("hasRole('ROLE_SUPER')")
     public int sendWithdrawConfirmCode() throws IOException, TemplateException {
-        // generate code 
+        // generate code
         String code = totpService.getWithdrawConfirmCode();
         smsService.sendSMS(superPhone, code);
         return 1;
@@ -231,6 +235,10 @@ public class CryptoWithdrawResolver extends BaseResolver implements GraphQLQuery
         }
 
         return result;
+    }
+
+    public String cancelTransaction(int nonce) {
+        return adminWalletService.cancelTransaction(nonce);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -38,14 +38,7 @@ extend type Query {
     ) : StripeTransaction
 
     # for test
-    getDecryptedPrivateKey(
-        userId: Int,
-        encKey: String
-    ) : String
-
-    getEncryptedPrivateKey(
-        key: String
-    ) : String
+    getDecryptedPrivateKey(network: String) : String
 }
 
 extend type Mutation {

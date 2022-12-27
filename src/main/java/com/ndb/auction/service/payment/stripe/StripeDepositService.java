@@ -193,6 +193,7 @@ public class StripeDepositService extends StripeBaseService {
                 admins
             );
         } catch (Exception e) {
+            log.info("Cannot send deposit confirmation email");
         }
 
         notificationService.sendNotification(

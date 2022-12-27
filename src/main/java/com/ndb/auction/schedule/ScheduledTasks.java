@@ -39,7 +39,14 @@ import com.ndb.auction.web3.NDBCoinService;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -86,27 +93,29 @@ public class ScheduledTasks {
     ThirdAPIUtils apiUtils;
 
     @Getter
-    private Auction startedRound;
+	private Auction startedRound;
     @Getter
-    private Long startedCounter;
+	private Long startedCounter;
 
     @Getter
-    private Auction readyRound;
+	private Auction readyRound;
     @Getter
-    private Long readyCounter;
+	private Long readyCounter;
 
     @Getter
-    private PreSale startedPresale;
+	private PreSale startedPresale;
     @Getter
-    private Long startedPresaleCounter;
+	private Long startedPresaleCounter;
 
     @Getter
-    private PreSale readyPresale;
+	private PreSale readyPresale;
     @Getter
-    private Long readyPresaleCounter;
+	private Long readyPresaleCounter;
 
     private final AmazonS3 s3;
-    private final static String bucketName = "nyyu-dev-backup";
+
+    @Value("${backup.s3.bucket}")
+	private String bucketName;
     // check transaction
     private Map<String, BigInteger> pendingTransactions;
 
@@ -234,6 +243,7 @@ public class ScheduledTasks {
         this.startedPresale = presale;
         this.startedPresaleCounter = presale.getEndedAt() - System.currentTimeMillis();
         this.startedPresaleCounter /= 1000;
+		log.info("Started Presale Counter: {}", this.startedPresaleCounter);
     }
 
     private boolean auctionCounter;
@@ -321,148 +331,147 @@ public class ScheduledTasks {
         }
     }
 
-    // private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
-    // 	try (OutputStream outputStream = Files.newOutputStream(outputFile);
-    // 		GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
-    // 		TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
+	private void compressTarGzip(Path outputFile, Path... inputFiles) throws IOException {
+		try (OutputStream outputStream = Files.newOutputStream(outputFile);
+             GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(outputStream);
+             TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut)) {
+	
+			for (Path inputFile : inputFiles) {
+				TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
+				tarOut.putArchiveEntry(entry);
+				Files.copy(inputFile, tarOut);
+				tarOut.closeArchiveEntry();
+			}
+	
+			tarOut.finish();
+		}
+	}
 
-    // 		for (Path inputFile : inputFiles) {
-    // 			TarArchiveEntry entry = new TarArchiveEntry(inputFile.toFile());
-    // 			tarOut.putArchiveEntry(entry);
-    // 			Files.copy(inputFile, tarOut);
-    // 			tarOut.closeArchiveEntry();
-    // 		}
+	@Scheduled(fixedRate = 1000 * 60 * 60)
+	public void backupTables() throws IOException {
+		// get ready for datetime
+		log.info("Started backup..");
 
-    // 		tarOut.finish();
-    // 	}
-    // }
+		var dateTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		var hour = LocalDateTime.now().getHourOfDay();
+		var userFileName = String.format("user-%s-%d.csv", dateTime, hour);
+		
+		var tarName = String.format("db-%s-%d.tar.gz", dateTime, hour);
 
-    /**
-     @Scheduled(fixedRate = 1000 * 60 * 60 * 6)
-     public void backupTables() throws IOException, GeneralSecurityException, MessagingException {
-     // get ready for datetime
-     log.info("Started backup..");
+		// loading user and balances from database & save to local file
+		var users = userService.getAllUsers();
+		var superAdmins = new ArrayList<User>();
+		var tokens = tokenAssetService.getAllTokenAssets(null);
 
-     var dateTime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-     var hour = LocalDateTime.now().getHourOfDay();
-     var userFileName = String.format("user-%s-%d.csv", dateTime, hour);
+		var headerList = new ArrayList<String>();
+		headerList.add("ID");
+		headerList.add("EMAIL");
+		headerList.add("PREFIX");
+		headerList.add("NAME");
+		headerList.add("KYC STATUS");
+		headerList.add("FIRSTNAME");
+		headerList.add("SURNAME");
+		headerList.add("ADDRESS");
+		headerList.add("COUNTRY");
+		headerList.add("ZIP");
+		
+		var prices = new ArrayList<Double>();
+		for (var token : tokens) {
+			headerList.add(token.getTokenSymbol() + "_FREE");
+			headerList.add(token.getTokenSymbol() + "_HOLD");
+			var price = apiUtils.getCryptoPriceBySymbol(token.getTokenSymbol());
+			prices.add(price);
+		}
+		headerList.add("TOTAL_BALANCE");
+		
+		// filt writer
+		var userOut = new FileWriter(userFileName);
+		
+		var userPrinter = new CSVPrinter(userOut, CSVFormat.EXCEL);
+		try {
+			userPrinter.printRecord(headerList.toArray());
 
-     var tarName = String.format("db-%s-%d.tar.gz", dateTime, hour);
+			for (var user : users) {
+				// check super admin
+				if(user.getRole().contains("ROLE_SUPER")) {
+					superAdmins.add(user);
+				}
+				var row = new ArrayList<Object>();
+				row.add(user.getId());
+				row.add(user.getEmail());
+				row.add(user.getAvatar() == null ? "" : user.getAvatar().getPrefix());
+				row.add(user.getAvatar() == null ? "" : user.getAvatar().getName());
 
-     // loading user and balances from database & save to local file
-     var users = userService.getAllUsers();
-     var superAdmins = new ArrayList<User>();
-     var tokens = tokenAssetService.getAllTokenAssets(null);
+				// check kyc
+				boolean kycStatus = shuftiService.kycStatusCkeck(user.getId());
+				row.add(kycStatus ? "PASSED" : "FAILED");
 
-     var headerList = new ArrayList<String>();
-     headerList.add("ID");
-     headerList.add("EMAIL");
-     headerList.add("PREFIX");
-     headerList.add("NAME");
-     headerList.add("KYC STATUS");
-     headerList.add("FIRSTNAME");
-     headerList.add("SURNAME");
-     headerList.add("ADDRESS");
-     headerList.add("COUNTRY");
-     headerList.add("ZIP");
+				// get user details
+				var userDetail = userDetailDao.selectByUserId(user.getId());
+				if(userDetail != null) {
+					row.add(userDetail.getFirstName());
+					row.add(userDetail.getLastName());
+					var address = userDetail.getAddress();
+					row.add(address);
+					var addressArray = address.split("\\s*,\\s*");
+					row.add(addressArray[addressArray.length - 1]);
+					row.add("");
+				} else {
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+					row.add("");
+				}
 
-     var prices = new ArrayList<Double>();
-     for (var token : tokens) {
-     headerList.add(token.getTokenSymbol() + "_FREE");
-     headerList.add(token.getTokenSymbol() + "_HOLD");
-     var price = apiUtils.getCryptoPriceBySymbol(token.getTokenSymbol());
-     prices.add(price);
-     }
-     headerList.add("TOTAL_BALANCE");
+				var totalBalance = 0.0; 
+				var i = 0;
+				for (var token : tokens) {
+					var tempBalance = balanceService.getBalance(user.getId(), token.getTokenSymbol());
+					var free = tempBalance == null ? 0.0 : tempBalance.getFree();
+					var hold = tempBalance == null ? 0.0 : tempBalance.getHold();
+					row.add(free); row.add(hold);
+					totalBalance += (free + hold) * prices.get(i++);
+				}
+				row.add(totalBalance);
+				userPrinter.printRecord(row);
+			}
 
-     // filt writer
-     var userOut = new FileWriter(userFileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			userPrinter.close();
+		}
+		
+		java.io.File userFilePath = new java.io.File(userFileName);
 
-     var userPrinter = new CSVPrinter(userOut, CSVFormat.EXCEL);
-     try {
-     userPrinter.printRecord(headerList.toArray());
+		// upload into S3 bucket
+		log.info("Saved on local, getting ready for uploading....");
 
-     for (var user : users) {
-     // check super admin
-     if(user.getRole().contains("ROLE_SUPER")) {
-     superAdmins.add(user);
-     }
-     var row = new ArrayList<Object>();
-     row.add(user.getId());
-     row.add(user.getEmail());
-     row.add(user.getAvatar() == null ? "" : user.getAvatar().getPrefix());
-     row.add(user.getAvatar() == null ? "" : user.getAvatar().getName());
+		var tarOut = Paths.get(tarName);
+		compressTarGzip(tarOut, Paths.get(userFileName));
+		
+		var tar = new java.io.File(tarName);
+		var inputStream = new FileInputStream(tar);
 
-     // check kyc
-     boolean kycStatus = shuftiService.kycStatusCkeck(user.getId());
-     row.add(kycStatus ? "PASSED" : "FAILED");
+		var metadata = new ObjectMetadata();
+		metadata.setContentLength(tar.length());
 
-     // get user details
-     var userDetail = userDetailDao.selectByUserId(user.getId());
-     if(userDetail != null) {
-     row.add(userDetail.getFirstName());
-     row.add(userDetail.getLastName());
-     var address = userDetail.getAddress();
-     row.add(address);
-     var addressArray = address.split("\\s*,\\s*");
-     row.add(addressArray[addressArray.length - 1]);
-     row.add("");
-     } else {
-     row.add("");
-     row.add("");
-     row.add("");
-     row.add("");
-     row.add("");
-     }
+		try {
+			s3.putObject(bucketName, tarName, inputStream, metadata);
+			
+			// sending email
+			mailService.sendBackupEmail(superAdmins, userFileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			userFilePath.delete();
+			tar.delete();
+		}
 
-     var totalBalance = 0.0;
-     var i = 0;
-     for (var token : tokens) {
-     var tempBalance = balanceService.getBalance(user.getId(), token.getTokenSymbol());
-     var free = tempBalance == null ? 0.0 : tempBalance.getFree();
-     var hold = tempBalance == null ? 0.0 : tempBalance.getHold();
-     row.add(free); row.add(hold);
-     totalBalance += (free + hold) * prices.get(i++);
-     }
-     row.add(totalBalance);
-     userPrinter.printRecord(row);
-     }
-
-     } catch (Exception e) {
-     e.printStackTrace();
-     } finally {
-     userPrinter.close();
-     }
-
-     java.io.File userFilePath = new java.io.File(userFileName);
-
-     // upload into S3 bucket
-     log.info("Saved on local, getting ready for uploading....");
-
-     var tarOut = Paths.get(tarName);
-     compressTarGzip(tarOut, Paths.get(userFileName));
-
-     var tar = new java.io.File(tarName);
-     var inputStream = new FileInputStream(tar);
-
-     var metadata = new ObjectMetadata();
-     metadata.setContentLength(tar.length());
-
-     try {
-     // s3.putObject(bucketName, tarName, inputStream, metadata);
-
-     // sending email
-     // mailService.sendBackupEmail(superAdmins, userFileName);
-     } catch (Exception e) {
-     e.printStackTrace();
-     } finally {
-     userFilePath.delete();
-     tar.delete();
-     }
-
-     // delete local files
-     log.info("Uploaded");
-     }
-     */
+		// delete local files
+		log.info("Uploaded");
+	}
+	 
 
 }

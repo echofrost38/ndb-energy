@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.ndb.auction.payload.CoinPrice;
 import com.ndb.auction.payload.response.FiatConverted;
 import com.ndb.auction.payload.response.FreaksResponse;
+import com.ndb.auction.web3.NDBCoinService;
 
 import org.apache.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,10 +17,15 @@ public class ThirdAPIUtils {
 
     private WebClient binanceAPI;
     private WebClient xchangeAPI;
+    
+    @Autowired
+    private NDBCoinService ndbCoinService;
 
     private static Gson gson = new Gson();
 
-    public ThirdAPIUtils (WebClient.Builder webClientBuilder) {
+    public ThirdAPIUtils (
+        WebClient.Builder webClientBuilder
+    ) {
         this.binanceAPI = webClientBuilder
             .baseUrl("https://api.binance.com/api/v3")
             .build();
@@ -37,7 +44,8 @@ public class ThirdAPIUtils {
             } else if(symbol.equals("BUSD")) {
                 symbolPair = "USDCBUSD";
             } else if(symbol.equals("NDB")) {
-                return 0.01;
+                var map = ndbCoinService.getAll();
+                return (double) map.get("price");
             }           
             else {
                 symbolPair = symbol + "USDC";

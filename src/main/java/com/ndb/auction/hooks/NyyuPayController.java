@@ -199,7 +199,7 @@ public class NyyuPayController extends BaseController{
             var fiatAmount = cryptoAmount * cryptoPrice; // calculator fiatAmount based amount
 
             var txn = coinpaymentPresaleService.selectById(id);
-            if(txn == null || txn.getDepositStatus() != 0) new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+            if(txn == null || txn.getDepositStatus() != 0) return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
 
             var presaleOrder = presaleOrderService.getPresaleById(txn.getOrderId());
 

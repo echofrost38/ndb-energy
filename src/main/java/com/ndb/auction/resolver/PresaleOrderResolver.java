@@ -23,6 +23,8 @@ import java.util.Locale;
 @Component
 public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryResolver, GraphQLMutationResolver {
     
+    private final double MINIMUM_PURCHASE_NDB = 50;
+
     @Autowired
     private UserReferralService userReferralService;
 
@@ -53,6 +55,13 @@ public class PresaleOrderResolver extends BaseResolver implements GraphQLQueryRe
         if (presale == null) {
             String msg = messageSource.getMessage("no_presale", null, Locale.ENGLISH);
             throw new PreSaleException(msg, "presaleId");
+        }
+
+        // check minimum purchase limit
+        double _ndbAmount = (double)ndbAmount;
+        if(_ndbAmount * presale.getTokenPrice() < MINIMUM_PURCHASE_NDB) {
+            String msg = messageSource.getMessage("presale_purchase_limit", null, Locale.ENGLISH);
+            throw new PreSaleException(msg, "ndbAmount");
         }
 
         // check NDB amount

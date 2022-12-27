@@ -93,6 +93,7 @@ public class UserService extends BaseService {
 						String phone = user.getPhone();
 						smsService.sendSMS(phone, code);
 					} catch (Exception e) {
+						e.printStackTrace();
 						return "error";
 					}
 					break;
@@ -101,6 +102,7 @@ public class UserService extends BaseService {
 						String code = totpService.get2FACode(user.getEmail() + method);
 						mailService.sendVerifyEmail(user, code, _2FA_TEMPLATE);
 					} catch (Exception e) {
+						e.printStackTrace();
 						return "error"; // or exception
 					}
 					break;

@@ -118,6 +118,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         User user = userDao.selectByEmail(oAuth2UserInfo.getEmail());
         if (user != null) {
+            // previous signup type checking!!!!!
+            if(!user.getProvider().equals(provider)) {
+                // doesn't match previous provier type!
+                throw new OAuth2AuthenticationProcessingException("Invalid social provider");
+            }
             user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(provider, oAuth2UserInfo);

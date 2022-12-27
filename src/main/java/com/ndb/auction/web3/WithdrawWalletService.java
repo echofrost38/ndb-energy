@@ -1,7 +1,10 @@
 package com.ndb.auction.web3;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,11 +13,6 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-
-import com.ndb.auction.dao.oracle.withdraw.TokenDao;
-import com.ndb.auction.exceptions.UserNotFoundException;
-import com.ndb.auction.models.withdraw.Token;
-import com.ndb.auction.payload.NetworkMetadata;
 
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.MainNetParams;
@@ -25,30 +23,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Type;
 import org.web3j.contracts.eip20.generated.ERC20;
 import org.web3j.crypto.Bip32ECKeyPair;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.MnemonicUtils;
+import org.web3j.crypto.RawTransaction;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 import org.web3j.utils.Convert.Unit;
 
+import com.ndb.auction.dao.oracle.withdraw.TokenDao;
+import com.ndb.auction.exceptions.UserNotFoundException;
+import com.ndb.auction.models.withdraw.Token;
+import com.ndb.auction.payload.NetworkMetadata;
+import com.nimbusds.openid.connect.sdk.Nonce;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * This service will handle all token withdrawals except NDB 
+ * This service will handle all token withdrawals except NDB
  * (A) Supported Network
- * 0. BTC 
+ * 0. BTC
  * 1. ETH  https://bsc-dataseed.binance.org/
  * 2. BSC  https://mainnet.infura.io/v3/03021c5a727a40eb8d086a4d46d32ec7
  * 3. TRC
  * 4. SOL
- * 
+ *
  * (B) Supported Crypto
  * 1. ETH
  *  1) BSC: 0x2170ed0880ac9a755fd29b2688956bd959f933f8
@@ -68,7 +77,7 @@ import lombok.extern.slf4j.Slf4j;
  * 7. SHIB
  *  1) ETH: 0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce
  *  2) BSC: 0x2859e4544c4bb03966803b044a93563bd2d0dd4d
- * 8. BUSD 
+ * 8. BUSD
  *  1) ETH: 0x4Fabb145d64652a948d72533023f6E7A623C7C53
  *  2) BSC: 0xe9e7cea3dedca5984780bafc599bd69add087d56
  */
@@ -78,27 +87,26 @@ public class WithdrawWalletService {
 
     @Value("${wallet.seed}")
     private String SEED_PHRASE;
-    
+
     // JSON RPC
     @Value("${bsc.json.rpc}")
     private String BSC_JSON_RPC;;
-    
+
     @Value("${eth.json.rpc}")
     private String ETH_JSON_RPC;
 
     private Map<String, NetworkMetadata> networkMetadataMap;
 
     // web3 instances
-    private final BigInteger gasPrice = new BigInteger("10000000000");
-    private final BigInteger gasLimit = new BigInteger("800000");
-    
+    private final BigInteger gasLimit = new BigInteger("80000");
+
     // token address for each network
     private List<Token> tokenList;
 
     // singleton
     @Autowired
     private TokenDao tokenDao;
-    
+
     @Autowired
     private MessageSource messageSource;
 
@@ -120,7 +128,7 @@ public class WithdrawWalletService {
 
     @PostConstruct
     public void init() {
-        
+
         var networkList = new ArrayList<NetworkMetadata>();
         networkList.add(NetworkMetadata.builder()
             .network("ERC20")
@@ -134,10 +142,10 @@ public class WithdrawWalletService {
             .collect(Collectors.toMap(NetworkMetadata::getNetwork, Function.identity()));
     }
 
-    // getting balance 
+    // getting balance
     public double getBalance(String network, String tokenSymbol) {
         try {
-            // bitcoin processing 
+            // bitcoin processing
             if(network.equals("BTC") && tokenSymbol.equals("BTC")) {
                 NetworkParameters params = MainNetParams.get();
                 var seed = new DeterministicSeed(SEED_PHRASE, null, "", 1409478661L);
@@ -154,14 +162,13 @@ public class WithdrawWalletService {
                 String msg = messageSource.getMessage("no_network", null, Locale.ENGLISH);
                 throw new UserNotFoundException(msg, "network");
             }
-            Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc())); 
-            
+            Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc()));
+
             int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT, 0 | Bip32ECKeyPair.HARDENED_BIT, 0,0};
             Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(MnemonicUtils.generateSeed(SEED_PHRASE, null));
             Bip32ECKeyPair  derivedKeyPair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, derivationPath);
             Credentials credentials = Credentials.create(derivedKeyPair);
-            credentials.getAddress();
-            
+
             // get balance
             if(network.equals("ERC20") && tokenSymbol.equals("ETH")) {
                 EthGetBalance ethBalance = web3
@@ -181,12 +188,13 @@ public class WithdrawWalletService {
                 var tokenMetadata = tokenList.stream()
                     .filter(token -> token.getNetwork().equals(network) && token.getTokenSymbol().equals(tokenSymbol))
                     .collect(toSingleton());
+                var _gasPrice = web3.ethGasPrice().send().getGasPrice();
                 @SuppressWarnings("deprecation")
                 ERC20 erc20 = ERC20.load(
-                    tokenMetadata.getAddress(), 
-                    web3, 
-                    credentials, 
-                    gasPrice, 
+                    tokenMetadata.getAddress(),
+                    web3,
+                    credentials,
+                    _gasPrice,
                     gasLimit
                 );
                 var balance = erc20.balanceOf(credentials.getAddress()).sendAsync().get();
@@ -207,7 +215,7 @@ public class WithdrawWalletService {
                 String msg = messageSource.getMessage("no_network", null, Locale.ENGLISH);
                 throw new UserNotFoundException(msg, "network");
             }
-            Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc())); 
+            Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc()));
 
             int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT, 0 | Bip32ECKeyPair.HARDENED_BIT, 0,0};
             Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(MnemonicUtils.generateSeed(SEED_PHRASE, null));
@@ -229,24 +237,74 @@ public class WithdrawWalletService {
                     web3, credentials, address, bAmount, Convert.Unit.WEI).sendAsync().get();
                 return txnReceipt.getTransactionHash();
             } else {
-                var bAmount = Convert.toWei(String.valueOf(amount), Convert.Unit.ETHER);
                 Token tokenMetadata = tokenList.stream()
                     .filter(token -> token.getNetwork().equals(network) && token.getTokenSymbol().equals(tokenSymbol))
                     .collect(toSingleton());
+
+                var _gasPrice = web3.ethGasPrice().send().getGasPrice();
+
                 @SuppressWarnings("deprecation")
                 ERC20 erc20 = ERC20.load(
-                    tokenMetadata.getAddress(), 
-                    web3, 
-                    credentials, 
-                    gasPrice, 
+                    tokenMetadata.getAddress(),
+                    web3,
+                    credentials,
+                    _gasPrice,
                     gasLimit
                 );
-                TransactionReceipt receipt = erc20.transfer(address, bAmount.toBigInteger()).send();
+                var decimals = erc20.decimals().send();
+                var doubleAmount = amount * Math.pow(10, decimals.intValue());
+                var bAmount = BigDecimal.valueOf(doubleAmount).toBigIntegerExact();// BigInteger.valueOf(Double.valueOf(doubleAmount).intValue());
+                log.info("decimals: " + decimals.toString());
+                log.info("amount: " + String.valueOf(amount));
+                log.info("b amount: " + bAmount.toString());
+                TransactionReceipt receipt = erc20.transfer(address, bAmount).send();
                 return receipt.getTransactionHash();
             }
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed";
+        }
+    }
+
+    public String cancelTransaction(int nonce) {
+        String network = "ERC20";
+
+        try {
+            var netMetadata = networkMetadataMap.get(network);
+            if(netMetadata == null) {
+                String msg = messageSource.getMessage("no_network", null, Locale.ENGLISH);
+                throw new UserNotFoundException(msg, "network");
+            }
+            Web3j web3 = Web3j.build(new HttpService(netMetadata.getJsonRpc()));
+
+            int[] derivationPath = {44 | Bip32ECKeyPair.HARDENED_BIT, 60 | Bip32ECKeyPair.HARDENED_BIT, 0 | Bip32ECKeyPair.HARDENED_BIT, 0,0};
+            Bip32ECKeyPair masterKeypair = Bip32ECKeyPair.generateKeyPair(MnemonicUtils.generateSeed(SEED_PHRASE, null));
+            Bip32ECKeyPair  derivedKeyPair = Bip32ECKeyPair.deriveKeyPair(masterKeypair, derivationPath);
+            Credentials credentials = Credentials.create(derivedKeyPair);
+
+            if(!network.equals("ERC20") && !network.equals("BEP20")) {
+                return "Failed";
+            }
+
+            var _gasPrice = web3.ethGasPrice().send().getGasPrice();
+
+            final var function = new org.web3j.abi.datatypes.Function(
+                "transfer",
+                Arrays.<Type>asList(new org.web3j.abi.datatypes.Address("0x6E067BAe54Bc8c493eD649e7234550DF91759f7F"),
+                new org.web3j.abi.datatypes.generated.Uint256(0)),
+                Collections.<TypeReference<?>>emptyList());
+            String ecodedFunction = FunctionEncoder.encode(function);
+
+            RawTransaction rawTransaction = RawTransaction.createTransaction(BigInteger.valueOf(nonce), _gasPrice, gasLimit, "0xdac17f958d2ee523a2206206994597c13d831ec7", BigInteger.ZERO, ecodedFunction);
+            var transactionManager = new RawTransactionManager(web3, credentials);
+            var txn = transactionManager.signAndSend(rawTransaction);
+
+            log.info("hash: {}", txn.getTransactionHash());
+
+            return txn.getTransactionHash();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
         }
     }
 }
